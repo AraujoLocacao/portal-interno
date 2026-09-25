@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Locação | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--navy:#173552;--blue:#294b68;--green:#24705a;--cream:#f5f5f0;--white:#fff;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10);--head:#c9d8ea}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+    button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer} [hidden]{display:none!important}
+    header.bar{background:var(--navy);color:#fff;padding:14px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .bar a{color:#cbd8e1;text-decoration:none;font-weight:600;font-size:.9rem}.bar a:hover{color:#fff}
+    .bar strong{font-size:1.02rem}.bar .who{color:#b9cad7;font-size:.82rem;margin-right:8px}
+    .bar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    main{padding:28px clamp(16px,4vw,48px) 64px;max-width:1600px;margin:0 auto}
+    h1{font-family:Georgia,serif;font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.1;margin:0}
+    h2{font-family:Georgia,serif;font-size:1.3rem;margin:0}
+    .top{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}.top p{margin:6px 0 0;color:var(--muted)}
+    .primary{border:0;background:var(--green);color:#fff;padding:10px 15px;border-radius:10px;font-weight:700;box-shadow:0 6px 18px rgba(36,112,90,.2)}.primary:hover{background:#1d604d}
+    .secondary{border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:10px;font-weight:650}.secondary:hover{border-color:#b6c5cf}
+    .secondary:disabled{opacity:.45;cursor:default}
+    .ghost{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;font-size:.85rem}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .filters{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr)) auto;gap:12px;padding:16px;margin-bottom:18px;align-items:end;position:sticky;top:0;z-index:5}
+    .field{display:grid;gap:5px}.field label{font-size:.76rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;min-width:0}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .mes-nav{display:flex;gap:6px;align-items:center}.mes-nav select{border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;font-weight:700;min-width:170px}
+    .mes-nav .secondary{padding:8px 12px}
+    .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+    .tile{padding:18px 20px}.tile span{display:block;font-size:.78rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .tile strong{display:block;font-size:1.75rem;line-height:1.15;margin-top:6px;font-variant-numeric:tabular-nums}.tile small{color:var(--muted);font-size:.82rem}
+    .table-card{padding:20px;margin-bottom:18px}.table-wrap{overflow-x:auto;margin-top:12px}
+    table{border-collapse:collapse;width:100%;font-size:.88rem}th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:750;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+    td{padding:8px 10px;border-bottom:1px solid #eef1f2;vertical-align:top}tr:last-child td{border-bottom:0}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    tbody tr:hover{background:#f8fafb}
+    th small{display:block;font-weight:600;text-transform:none;letter-spacing:0;color:#8a959e}
+    .muted{color:var(--muted)}.link{border:0;background:none;color:var(--blue);font-weight:700;padding:2px 4px;border-radius:6px;font-size:.82rem}.link:hover{background:#eef2f4}.link.danger{color:var(--red)}
+    .row-actions{white-space:nowrap;text-align:right}
+    .list-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .gate{max-width:420px;margin:60px auto;padding:28px}.gate h1{font-size:1.6rem;margin-bottom:6px}.gate p{color:var(--muted);margin:0 0 18px}.gate form{display:grid;gap:14px}
+    .msg{margin:0;font-size:.85rem;color:var(--muted)}.msg.error{color:var(--red)}.msg.note{background:#fdf6e8;color:#7a5314;border-radius:8px;padding:8px 10px}
+    .msg.bad{background:#fdecec;color:#8e2f2f;border-radius:8px;padding:8px 10px;font-weight:650}
+    .empty{padding:30px;text-align:center;color:var(--muted)}
+    dialog{border:0;border-radius:18px;padding:0;box-shadow:0 28px 90px rgba(10,30,45,.3);width:min(600px,calc(100% - 32px));overflow-x:hidden}dialog::backdrop{background:rgba(10,30,45,.62);backdrop-filter:blur(3px)}
+    dialog.wide{width:min(860px,calc(100% - 32px))}
+    .dialog-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}.close{border:0;background:#eef2f4;width:34px;height:34px;border-radius:50%;font-size:1.2rem}
+    dialog form,.dialog-body{padding:20px 22px 22px;display:grid;gap:14px}
+    .seg{display:flex;gap:8px;flex-wrap:wrap}.seg label{flex:1;min-width:90px;border:1px solid #cbd5da;border-radius:10px;padding:9px 10px;text-align:center;font-weight:700;font-size:.85rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--ink)}
+    .seg label{position:relative}.seg input{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none}.seg label:has(input:checked){background:var(--navy);border-color:var(--navy);color:#fff}
+    .seg label:has(input:focus-visible){outline:2px solid #6da7ec}
+    .actions{display:flex;justify-content:flex-end;gap:10px}
+    .loading{opacity:.55;transition:opacity .2s}
+    .dept{display:flex;justify-content:space-between;align-items:end;gap:10px 24px;flex-wrap:wrap;margin-bottom:24px;border-bottom:1px solid var(--line)}.dept h1{padding-bottom:12px}
+    .tabs{display:flex;gap:2px;overflow-x:auto;max-width:100%}.tab-link{padding:10px 16px;font-weight:700;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;white-space:nowrap}
+    .tab-link:hover{color:var(--ink)}.tab-link.active{color:var(--navy);border-bottom-color:var(--green)}
+    .top h2{font-size:1.5rem}
+    .search-input{border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;min-width:0;width:240px;max-width:100%;background:#fff}
+    .pw{font-family:Consolas,"Courier New",monospace;letter-spacing:.04em;margin-right:4px}
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin:12px 0 28px}
+    .doc{padding:18px;display:flex;gap:14px;align-items:flex-start;min-width:0}.doc>div{min-width:0}
+    .doc-ico{width:44px;height:52px;border-radius:8px;display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#fff;flex:none;background:var(--blue)}
+    .doc-ico.pdf{background:var(--red)}.doc-ico.xls{background:var(--green)}.doc-ico.img{background:var(--amber)}
+    .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}.doc .row-actions{text-align:left;margin-top:8px;margin-left:-4px}
+    .empty-card{border:1px dashed #bac5cc;border-radius:14px;padding:26px;text-align:center;color:var(--muted);grid-column:1/-1}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow)}
+    .pw-field{display:flex;gap:8px}.pw-field input{flex:1}
+    /* Planilha do mês */
+    #planilha{font-size:.84rem}#planilha td,#planilha th{padding:7px 9px}
+    #planilha td.nome{min-width:210px}
+    #planilha tr.semana td{background:var(--head);font-weight:800;letter-spacing:.02em;padding:6px 10px;border-bottom:0}
+    #planilha tr.semana td span{font-weight:600;color:#3d556d;margin-left:6px}
+    #planilha tr.sub td{background:#eef2f4;font-weight:800;border-top:1px solid var(--line)}
+    #planilha tr.total td{background:var(--navy);color:#fff;font-weight:800;border:0}
+    #planilha tr.erro td{background:#fdecec}#planilha tr.erro:hover td{background:#fbe0e0}
+    #planilha tr.erro td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+    .tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:.72rem;font-weight:800;letter-spacing:.02em;white-space:nowrap}
+    .tag.sim{background:#e3f1ec;color:#1d604d}.tag.nao{background:#fdf1dc;color:#8a5a12}.tag.bad{background:var(--red);color:#fff}
+    .tag.pos{background:#e8eef5;color:var(--blue)}
+    .alerta{border:1px solid #efc4c4;background:#fdecec;color:#6e2323;border-radius:14px;padding:14px 18px;margin-bottom:18px}
+    .alerta strong{color:var(--red)}.alerta ul{margin:6px 0 0;padding-left:20px}.alerta li{margin:2px 0}
+    .quadros{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:18px;margin-bottom:18px}
+    .quadros .table-card{margin:0;min-width:0}
+    .bar-cell{display:flex;align-items:center;gap:8px;justify-content:flex-end}.bar-cell i{display:block;height:8px;border-radius:4px;background:#2a78d6;opacity:.75}
+    .bonus{width:110px;border:1px solid #cbd5da;border-radius:8px;padding:5px 8px;text-align:right;font-variant-numeric:tabular-nums;background:#fff}
+    .regras{margin:10px 0 0;font-size:.8rem;color:var(--muted)}
+    /* Formulário da locação */
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .check{display:flex;align-items:center;gap:8px;font-weight:650;font-size:.9rem;text-transform:none;letter-spacing:0;color:var(--ink)}
+    .check input{width:18px;height:18px}
+    .preview{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#f8fafb}
+    .preview h3{margin:0 0 8px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+    .preview dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 14px;margin:0}
+    .preview dt{font-size:.74rem;color:var(--muted);font-weight:650}.preview dd{margin:0;font-weight:800;font-variant-numeric:tabular-nums}
+    /* Calculadoras */
+    .calcs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+    .calc{padding:20px;display:grid;gap:14px;min-width:0}.calc>p{margin:-8px 0 0;color:var(--muted);font-size:.88rem}
+    .calc .field input{text-align:right;font-variant-numeric:tabular-nums}
+    .res{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .res div{background:#f3f6f8;border-radius:10px;padding:10px 12px}.res span{display:block;font-size:.74rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+    .res strong{font-size:1.2rem;font-variant-numeric:tabular-nums}.res .dest{background:var(--navy);color:#fff}.res .dest span{color:#c5d4e2}
+    @media(max-width:1200px){.quadros{grid-template-columns:1fr 1fr}.quadros .table-card:first-child{grid-column:1/-1}}
+    @media(max-width:900px){.filters{grid-template-columns:1fr 1fr;position:static}.filters .mes-nav{grid-column:1/-1}.calcs{grid-template-columns:1fr}.preview dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:700px){.quadros{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
+    @media(max-width:560px){.tile strong{font-size:1.4rem}.tiles{grid-template-columns:1fr 1fr}.grid2,.grid3{grid-template-columns:1fr}.res{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header class="bar">
+  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Locação</strong></div>
+  <div class="bar-actions" id="barActions" hidden><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
+</header>
+
+<section class="card gate" id="gate" hidden>
+  <h1>Locação</h1>
+  <p>Área restrita. Entre com o seu e-mail e senha.</p>
+  <form id="loginForm">
+    <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
+    <button class="primary" type="submit">Entrar</button>
+    <p class="msg error" id="loginMsg" hidden></p>
+  </form>
+</section>
+
+<section class="card gate" id="denied" hidden>
+  <h1>Sem acesso</h1>
+  <p>Este login não tem permissão para a locação. Fale com a gerência.</p>
+  <button class="secondary" id="deniedLogout">Entrar com outro e-mail</button>
+</section>
+
+<main id="app" hidden>
+  <div class="dept"><h1>Locação</h1>
+    <nav class="tabs" aria-label="Seções da locação"><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="calculadoras">Calculadoras</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button></nav></div>
+
+  <section id="tab-locacoes" data-tab>
+  <div class="top">
+    <div><h2>Locações do mês</h2><p id="subtitle">Carregando…</p></div>
+    <div class="bar-actions">
+      <button class="secondary" id="exportCsv">Baixar planilha</button>
+      <button class="primary" id="newLoc">+ Nova locação</button>
+    </div>
+  </div>
+
+  <div class="card filters" role="search">
+    <div class="field"><label for="fMes">Mês</label><div class="mes-nav"><button class="secondary" id="mesPrev" aria-label="Mês anterior">←</button><select id="fMes"></select><button class="secondary" id="mesNext" aria-label="Próximo mês">→</button></div></div>
+    <div class="field"><label for="fCorretor">Corretora</label><select id="fCorretor"></select></div>
+    <div class="field"><label for="fUnidade">Cidade</label><select id="fUnidade"></select></div>
+    <div class="field"><label for="fBusca">Buscar</label><input id="fBusca" type="search" placeholder="REF ou proponente"></div>
+    <button class="secondary" id="clearFilters">Limpar</button>
+  </div>
+
+  <div id="dash">
+    <div class="alerta" id="alerta" hidden></div>
+    <div class="tiles" id="tiles"></div>
+
+    <div class="card table-card">
+      <div class="list-head"><h2>Planilha do mês</h2><span class="muted" id="listCount"></span></div>
+      <div class="table-wrap"><table id="planilha"></table></div>
+      <p class="regras">Como é calculado (igual à planilha): Tx de loc. = VGL × %. Base de cálculo = Tx de loc. × 90%. Corretora = base × 25%. Stefani = base × 10%. Du = base × 1%. Captação: vale só um dos dois, conforme o tipo escolhido na locação — captação nova: Age. novo = Tx de loc. × 8%; cap. imobiliária (pós): Cap. imob. = Tx de loc. × 5%. As semanas vão de segunda a domingo e param na virada do mês.</p>
+    </div>
+
+    <div class="quadros">
+      <div class="card table-card"><h2>Ranking por corretora</h2><p class="msg">Ajuda de custo = VGL × 10%. A bonificação é digitada aqui e fica salva para o mês.</p><div class="table-wrap"><table id="ranking"></table></div></div>
+      <div class="card table-card"><h2>Garantias</h2><div class="table-wrap"><table id="garantiasQ"></table></div></div>
+      <div class="card table-card"><h2>Captadoras</h2><div class="table-wrap"><table id="captadorasQ"></table></div></div>
+    </div>
+  </div>
+  </section>
+
+  <section id="tab-calculadoras" data-tab hidden>
+    <div class="top"><div><h2>Calculadoras</h2><p>As mesmas contas das abas "Calculadora de aluguel proporcional" e "ALPOP" da planilha. Nada aqui é salvo.</p></div></div>
+    <div class="calcs">
+      <form class="card calc" id="calcProp" onsubmit="return false">
+        <h2>Aluguel proporcional</h2>
+        <p>Divide a taxa de locação e as comissões em duas parcelas, pelo número de dias do primeiro mês.</p>
+        <div class="grid2">
+          <div class="field"><label for="pA1">Aluguel do 1º mês (R$)</label><input id="pA1" inputmode="decimal" value="1.300,00"></div>
+          <div class="field"><label for="pD1">Dias no 1º mês</label><input id="pD1" inputmode="numeric" value="21"></div>
+          <div class="field"><label for="pA2">Aluguel do 2º mês (R$)</label><input id="pA2" inputmode="decimal" value="1.300,00"></div>
+          <div class="field"><label for="pD2">Dias no 2º mês</label><input id="pD2" inputmode="numeric" value="8"></div>
+          <div class="field"><label for="pPct">Taxa de locação (%)</label><input id="pPct" inputmode="decimal" value="50"></div>
+        </div>
+        <div class="res" id="pRes"></div>
+        <div class="table-wrap" style="margin-top:0"><table id="pTabela"></table></div>
+      </form>
+      <form class="card calc" id="calcAlpop" onsubmit="return false">
+        <h2>ALPOP</h2>
+        <p>Quanto a imobiliária recebe no ano e quanto sobra para o locador.</p>
+        <div class="grid3">
+          <div class="field"><label for="aAluguel">Aluguel (R$)</label><input id="aAluguel" inputmode="decimal" value="2.700,00"></div>
+          <div class="field"><label for="aAdm">Administração (%)</label><input id="aAdm" inputmode="decimal" value="15"></div>
+          <div class="field"><label for="aCom">1º aluguel (%)</label><input id="aCom" inputmode="decimal" value="50"></div>
+        </div>
+        <p class="msg">Se a administração for de 15% ou 20%, ou se a comissão do primeiro aluguel for outra, é só trocar.</p>
+        <div class="res" id="aRes"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="tab-senhas" data-tab hidden>
+    <div class="top">
+      <div><h2>Senhas</h2><p>Acessos aos sistemas usados pela locação. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".</p></div>
+      <div class="bar-actions"><input class="search-input" id="sBusca" type="search" placeholder="Buscar sistema ou usuário" aria-label="Buscar senha"><button class="primary" id="newSenha">+ Nova senha</button></div>
+    </div>
+    <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="senhasTable"></table></div></div>
+  </section>
+
+  <section id="tab-pop" data-tab hidden>
+    <div class="top">
+      <div><h2>POP e documentos</h2><p>Procedimento operacional padrão da locação e demais materiais.</p></div>
+      <div class="bar-actions"><button class="primary" id="newDoc">+ Enviar documento</button></div>
+    </div>
+    <h2 style="font-size:1.1rem">POP</h2>
+    <div class="doc-grid" id="docsPop"></div>
+    <h2 style="font-size:1.1rem">Outros documentos</h2>
+    <div class="doc-grid" id="docsOutros"></div>
+  </section>
+</main>
+
+<dialog id="locDialog" class="wide">
+  <div class="dialog-head"><h2 id="locTitle">Nova locação</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="locForm" novalidate autocomplete="off">
+    <div class="grid3">
+      <div class="field"><label for="lData">Data</label><input id="lData" name="data" type="date" required></div>
+      <div class="field"><label for="lRef">REF (código do imóvel)</label><input id="lRef" name="referencia" maxlength="20" placeholder="Ex.: AP1620" required style="text-transform:uppercase"></div>
+      <div class="field"><label for="lUnidade">Cidade</label><select id="lUnidade" name="unidade" required></select></div>
+    </div>
+    <p class="msg bad" id="lDup" hidden></p>
+    <div class="field"><label for="lProp">Proponente</label><input id="lProp" name="proponente" maxlength="200" required style="text-transform:uppercase"></div>
+    <div class="grid3">
+      <div class="field"><label for="lCorretor">Corretora</label><select id="lCorretor" name="corretora" required></select></div>
+      <div class="field"><label for="lGarantia">Garantia</label><select id="lGarantia" name="garantia"></select></div>
+      <div class="field"><label>Contrato assinado?</label><div class="seg"><label><input type="radio" name="assinado" value="sim">Sim</label><label><input type="radio" name="assinado" value="nao" checked>Não</label></div></div>
+    </div>
+    <div class="grid3">
+      <div class="field"><label for="lVgl">VGL (valor do aluguel, R$)</label><input id="lVgl" name="vgl" inputmode="decimal" placeholder="0,00" required style="text-align:right"></div>
+      <div class="field"><label for="lPct">% da taxa de locação</label><input id="lPct" name="percentual" inputmode="decimal" list="pctOpcoes" placeholder="60" required style="text-align:right"><datalist id="pctOpcoes"><option value="30"><option value="50"><option value="60"><option value="100"></datalist></div>
+      <div class="field"><label for="lCap">Nome da captadora</label><input id="lCap" name="captadora" maxlength="40" list="capOpcoes" placeholder="Opcional" style="text-transform:uppercase"><datalist id="capOpcoes"></datalist></div>
+    </div>
+    <div class="field"><label>Tipo de captação</label><div class="seg"><label><input type="radio" name="tipo_cap" value="nova" checked>Captação nova (Age. novo 8%)</label><label><input type="radio" name="tipo_cap" value="pos">Cap. imobiliária – pós (5%)</label></div></div>
+    <div class="preview"><h3>Cálculo automático</h3><dl id="lPrev"></dl></div>
+    <div class="field"><label for="lObs">Observação</label><textarea id="lObs" name="observacao" rows="2" maxlength="500"></textarea></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="locSubmit">Salvar</button></div>
+    <p class="msg error" id="locMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="senhaDialog">
+  <div class="dialog-head"><h2 id="senhaTitle">Nova senha</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="senhaForm" autocomplete="off">
+    <div class="field"><label for="sSistema">Sistema</label><input id="sSistema" name="sistema" maxlength="80" placeholder="Ex.: Superlógica, Loft, Pottencial" required></div>
+    <div class="field"><label for="sLink">Link do site</label><input id="sLink" name="link" type="url" maxlength="300" placeholder="https://"></div>
+    <div class="field"><label for="sUsuario">Usuário / login</label><input id="sUsuario" name="usuario" maxlength="150" autocomplete="off"></div>
+    <div class="field"><label for="sSenha">Senha</label><div class="pw-field"><input id="sSenha" name="senha" type="password" maxlength="200" autocomplete="new-password"><button type="button" class="secondary" id="sSenhaVer">Mostrar</button></div>
+      <p class="msg" id="sSenhaHint" hidden>Deixe em branco para manter a senha atual.</p></div>
+    <div class="field"><label for="sObs">Observação</label><textarea id="sObs" name="observacao" rows="2" maxlength="500"></textarea></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="senhaSubmit">Salvar</button></div>
+    <p class="msg error" id="senhaMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="docDialog">
+  <div class="dialog-head"><h2>Enviar documento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="docForm">
+    <div class="field"><label for="dTitulo">Título</label><input id="dTitulo" name="titulo" maxlength="120" placeholder="Ex.: POP – Locação" required></div>
+    <div class="field"><label>Onde fica</label>
+      <div class="seg"><label><input type="radio" name="categoria" value="POP" checked>POP</label><label><input type="radio" name="categoria" value="Outros">Outros documentos</label></div></div>
+    <div class="field"><label for="dArquivo">Arquivo (PDF, Word, Excel ou imagem, até 25 MB)</label><input id="dArquivo" name="arquivo" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" required></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="docSubmit">Enviar</button></div>
+    <p class="msg error" id="docMsg" hidden></p>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Dados ficam no Supabase (ver supabase/locacao.sql). Esta página não contém nenhum dado:
+  // tudo é carregado depois do login e o banco só entrega para quem tem acesso (gestores + locacao_acesso).
+  const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const $=s=>document.querySelector(s);
+  const BUCKET='locacao';
+  const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  // Fórmulas da planilha "RANKING 2026".
+  const REGRA={base:.90,corretora:.25,stefani:.10,du:.01,capImob:.05,ageNovo:.08,ajuda:.10};
+  const CAPTADORAS=['RUBIA','SONORA','NAVEGANTES'];
+  let locs=[],bonus=[],corretoras=[],unidades=[],garantias=[],booted=false,senhas=[],docs=[],senhaEditId=null,locEditId=null,mesSel=null;
+
+  const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  const pad=n=>String(n).padStart(2,'0');
+  const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const br=s=>s?s.split('-').reverse().join('/'):'';
+  const brl=v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const num=v=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const pctTxt=v=>(+v).toLocaleString('pt-BR',{maximumFractionDigits:2})+'%';
+  // Aceita "1.300,00", "1300,5", "1300.50" e "R$ 1.300".
+  function lerNumero(s){s=String(s??'').replace(/[R$\s%]/g,'');if(!s)return NaN;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');return Number(s)}
+  const nomeMes=ym=>{const [y,m]=ym.split('-');return `${MESES[+m-1]} de ${y}`};
+  const refNorm=r=>String(r||'').trim().toUpperCase();
+  const capNome=c=>String(c||'').trim().toUpperCase();
+
+  function calc(l){
+    const tx=(+l.vgl||0)*(+l.percentual||0)/100,base=tx*REGRA.base;
+    return {vgl:+l.vgl||0,tx,base,corretora:base*REGRA.corretora,stefani:base*REGRA.stefani,du:base*REGRA.du,capImob:l.captacao_pos?tx*REGRA.capImob:0,ageNovo:l.captacao_pos?0:tx*REGRA.ageNovo};
+  }
+  const CAMPOS=['vgl','tx','base','corretora','stefani','du','capImob','ageNovo'];
+  function somar(list){const t=Object.fromEntries(CAMPOS.map(k=>[k,0]));list.forEach(l=>{const c=calc(l);CAMPOS.forEach(k=>t[k]+=c[k])});return t}
+
+  // Semanas de segunda a domingo, cortadas na virada do mês (01 a 06/09, 07 a 13/09...), como no relatório semanal.
+  function semanasDoMes(ym){
+    const [y,m]=ym.split('-').map(Number),fim=new Date(y,m,0).getDate(),out=[];let ini=1;
+    for(let d=1;d<=fim;d++){const dow=new Date(y,m-1,d).getDay();if(dow===0||d===fim){out.push({n:out.length+1,de:`${ym}-${pad(ini)}`,ate:`${ym}-${pad(d)}`});ini=d+1}}
+    return out;
+  }
+
+  // ---------- Acesso ----------
+  async function refreshSession(){
+    const {data:{session}}=await db.auth.getSession();
+    $('#barActions').hidden=!session;
+    if(!session){show('gate');return}
+    $('#who').textContent=session.user.email;
+    const {data,error}=await db.rpc('pode_locacao');
+    if(error||data!==true){show('denied');return}
+    show('app');
+    if(!booted){booted=true;showTab();calcProp();calcAlpop();await Promise.all([loadAll(),loadSenhas(),loadDocs()])}
+  }
+  function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
+  $('#loginForm').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,f=new FormData(form),msg=$('#loginMsg');msg.hidden=true;
+    const {error}=await db.auth.signInWithPassword({email:String(f.get('email')).trim(),password:String(f.get('senha'))});
+    if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
+    form.reset();
+  };
+  const sair=async()=>{await db.auth.signOut();booted=false;locs=[];senhas=[];docs=[]};
+
+  // Esta área tem senhas: sai sozinha depois de 30 minutos sem uso.
+  let ultimoUso=Date.now();
+  ['pointerdown','keydown','scroll'].forEach(ev=>addEventListener(ev,()=>ultimoUso=Date.now(),{passive:true}));
+  setInterval(()=>{if(booted&&Date.now()-ultimoUso>30*60*1000){sair();toast('Você saiu por inatividade.')}},60*1000);
+
+  // ---------- Abas ----------
+  // As abas trocam por JavaScript (não por link): o navegador bloqueia o "#aba" quando a página é aberta como arquivo/cópia.
+  function showTab(pedida){
+    const abas=['locacoes','calculadoras','senhas','pop'],tab=abas.includes(pedida)?pedida:abas.includes(location.hash.slice(1))?location.hash.slice(1):'locacoes';
+    if(pedida)try{history.replaceState(null,'','#'+tab)}catch{}
+    document.querySelectorAll('[data-tab]').forEach(s=>s.hidden=s.id!=='tab-'+tab);
+    document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
+  }
+  addEventListener('hashchange',()=>showTab());
+  document.querySelectorAll('.tab-link').forEach(b=>b.onclick=()=>showTab(b.dataset.go));
+  function toast(text){const t=document.createElement('div');t.className='toast';t.textContent=text;document.body.append(t);setTimeout(()=>t.remove(),2200)}
+  async function copiar(text,oque){try{await navigator.clipboard.writeText(text);toast(oque+' copiado')}catch{prompt('Copie abaixo:',text)}}
+  $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
+
+  // ---------- Dados ----------
+  async function loadAll(){
+    $('#dash').classList.add('loading');
+    try{
+      const [c,u,g]=await Promise.all([db.from('corretoras').select('nome,ativa').order('nome'),db.from('unidades').select('nome,ativa').order('nome'),db.from('garantias').select('nome,ativa').order('nome')]);
+      for(const r of [c,u,g])if(r.error)throw r.error;
+      corretoras=c.data;unidades=u.data;garantias=g.data;
+      await loadLocs();
+    }catch(err){$('#subtitle').textContent='Não foi possível carregar os dados: '+err.message}
+    $('#dash').classList.remove('loading');
+  }
+  async function loadLocs(){
+    const all=[];
+    for(let from=0;;from+=1000){
+      const {data,error}=await db.from('locacoes').select('id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,captadora,captacao_pos,observacao,ordem,criado_em').order('data').order('ordem').order('criado_em').range(from,from+999);
+      if(error)throw error;all.push(...data);if(data.length<1000)break;
+    }
+    const b=await db.from('locacao_bonificacoes').select('mes,corretora,valor');if(b.error)throw b.error;
+    locs=all;bonus=b.data;
+    fillMeses();fillFilterOptions();render();
+  }
+
+  function mesesDisponiveis(){
+    const hoje=iso(new Date()).slice(0,7);
+    return [...new Set([hoje,...locs.map(l=>l.data.slice(0,7))])].sort().reverse();
+  }
+  function fillMeses(){
+    const ms=mesesDisponiveis();
+    if(!mesSel||!ms.includes(mesSel)){const hoje=iso(new Date()).slice(0,7);mesSel=locs.some(l=>l.data.startsWith(hoje))?hoje:(locs.length?locs[locs.length-1].data.slice(0,7):hoje)}
+    $('#fMes').innerHTML=ms.map(m=>`<option value="${m}">${nomeMes(m).replace(/^./,c=>c.toUpperCase())}</option>`).join('');
+    $('#fMes').value=mesSel;
+    const i=ms.indexOf(mesSel);$('#mesPrev').disabled=i>=ms.length-1;$('#mesNext').disabled=i<=0;
+  }
+  function fillFilterOptions(){
+    const keep=(sel,html)=>{const v=sel.value;sel.innerHTML=html;if([...sel.options].some(o=>o.value===v))sel.value=v};
+    const nomes=[...new Set([...corretoras.filter(c=>c.ativa).map(c=>c.nome),...locs.map(l=>l.corretora)])].sort();
+    keep($('#fCorretor'),'<option value="">Todas</option>'+nomes.map(n=>`<option value="${safe(n)}">${safe(n)}</option>`).join(''));
+    const us=[...new Set([...unidades.map(u=>u.nome),...locs.map(l=>l.unidade)])];
+    keep($('#fUnidade'),'<option value="">Todas</option>'+us.map(n=>`<option value="${safe(n)}">${safe(n)}</option>`).join(''));
+  }
+  $('#fMes').addEventListener('change',e=>{mesSel=e.target.value;fillMeses();render()});
+  function passoMes(dir){const ms=mesesDisponiveis(),i=ms.indexOf(mesSel)-dir;if(ms[i]){mesSel=ms[i];fillMeses();render()}}
+  $('#mesPrev').onclick=()=>passoMes(-1);$('#mesNext').onclick=()=>passoMes(1);
+  ['#fCorretor','#fUnidade','#fBusca'].forEach(s=>$(s).addEventListener('input',render));
+  $('#clearFilters').onclick=()=>{$('#fCorretor').value='';$('#fUnidade').value='';$('#fBusca').value='';render()};
+
+  const doMes=()=>locs.filter(l=>l.data.startsWith(mesSel));
+  function filtered(){
+    const c=$('#fCorretor').value,u=$('#fUnidade').value,q=$('#fBusca').value.trim().toUpperCase();
+    return doMes().filter(l=>!(c&&l.corretora!==c)&&!(u&&l.unidade!==u)&&!(q&&!(l.referencia+' '+l.proponente).toUpperCase().includes(q)));
+  }
+
+  // Erros do mês (aparecem em vermelho): REF repetida e garantia não informada.
+  function errosDoMes(){
+    const list=doMes(),porRef={},porId={};
+    list.forEach(l=>(porRef[refNorm(l.referencia)]??=[]).push(l));
+    const repetidas=Object.entries(porRef).filter(([,ls])=>ls.length>1);
+    repetidas.forEach(([ref,ls])=>ls.forEach(l=>(porId[l.id]??=[]).push(`REF repetida (${ls.length}×)`)));
+    const semGarantia=list.filter(l=>!l.garantia);
+    semGarantia.forEach(l=>(porId[l.id]??=[]).push('Garantia não informada'));
+    return {repetidas,semGarantia,porId};
+  }
+
+  // ---------- Painel ----------
+  function render(){
+    const list=filtered(),todos=doMes(),t=somar(list);
+    const partes=[$('#fCorretor').value||'Todas as corretoras',$('#fUnidade').value||'todas as cidades'];
+    $('#subtitle').textContent=`${nomeMes(mesSel).replace(/^./,c=>c.toUpperCase())} · ${partes.join(' · ')}`;
+    const ass=list.filter(l=>l.assinado).length;
+    $('#tiles').innerHTML=[
+      ['Locações',list.length,list.length===1?'contrato':'contratos'],
+      ['VGL',brl(t.vgl),'soma dos aluguéis'],
+      ['Taxa de locação',brl(t.tx),'VGL × %'],
+      ['Base de cálculo',brl(t.base),'taxa × 90%'],
+      ['Assinados',`${ass} de ${list.length}`,list.length-ass?`${list.length-ass} ainda sem assinatura`:'todos assinados']
+    ].map(([a,b,c])=>`<div class="card tile"><span>${a}</span><strong>${b}</strong><small>${c}</small></div>`).join('');
+    renderAlerta();renderPlanilha(list);renderRanking(todos);renderGarantias(todos);renderCaptadoras(todos);
+  }
+
+  function renderAlerta(){
+    const {repetidas,semGarantia}=errosDoMes(),itens=[];
+    repetidas.forEach(([ref,ls])=>itens.push(`<strong>${safe(ref)}</strong> aparece ${ls.length} vezes (${ls.map(l=>`${brl(l.vgl)} em ${br(l.data).slice(0,5)}`).join(', ')}). Os totais contam todas as linhas: confira e exclua a que estiver sobrando.`));
+    semGarantia.forEach(l=>itens.push(`<strong>${safe(l.referencia)}</strong> (${safe(l.proponente)}) está sem garantia. Clique em "Editar" para informar.`));
+    $('#alerta').hidden=!itens.length;
+    $('#alerta').innerHTML=itens.length?`<strong>Atenção: ${itens.length} ${itens.length===1?'ponto':'pontos'} para conferir neste mês</strong> (linhas em vermelho na planilha)<ul>${itens.map(i=>`<li>${i}</li>`).join('')}</ul>`:'';
+  }
+
+  const cols=`<thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th><th class="num">Tx de loc.</th><th class="num">Base de cálculo</th><th class="num">Corretora<small>25%</small></th><th class="num">Stefani<small>10%</small></th><th class="num">Du<small>1%</small></th><th class="num">Cap. imob.<small>5%</small></th><th>Nome cap.</th><th class="num">Age. novo<small>8%</small></th><th></th></tr></thead>`;
+  const linhaValores=t=>CAMPOS.map((k,i)=>`<td class="num">${num(t[k])}</td>${i===0?'<td></td>':''}${k==='capImob'?'<td></td>':''}`).join('');
+  function renderPlanilha(list){
+    const {porId}=errosDoMes(),sems=semanasDoMes(mesSel);
+    $('#listCount').textContent=`${list.length} ${list.length===1?'locação':'locações'}`;
+    if(!list.length){$('#planilha').innerHTML=`<tbody><tr><td class="empty">${doMes().length?'Nenhuma locação com esses filtros.':'Nenhuma locação lançada neste mês. Clique em "+ Nova locação".'}</td></tr></tbody>`;return}
+    let html='';
+    sems.forEach(s=>{
+      const ls=list.filter(l=>l.data>=s.de&&l.data<=s.ate);if(!ls.length)return;
+      html+=`<tr class="semana"><td colspan="17">SEMANA ${pad(s.n)}<span>${br(s.de).slice(0,5)} a ${br(s.ate).slice(0,5)}</span></td></tr>`;
+      html+=ls.map(l=>{const c=calc(l),err=porId[l.id];return `<tr${err?' class="erro"':''}>
+        <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${err?.some(e=>e.startsWith('REF'))?` <span class="tag bad">${safe(err.find(e=>e.startsWith('REF')))}</span>`:''}</td>
+        <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td>
+        <td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
+        <td class="nome">${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}</td>
+        <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
+        <td class="num"><strong>${num(c.vgl)}</strong></td><td class="num">${pctTxt(l.percentual)}</td>
+        <td class="num">${num(c.tx)}</td><td class="num">${num(c.base)}</td><td class="num">${num(c.corretora)}</td><td class="num">${num(c.stefani)}</td><td class="num">${num(c.du)}</td><td class="num">${l.captacao_pos?num(c.capImob):'<span class="muted">–</span>'}</td>
+        <td style="white-space:nowrap">${l.captadora?safe(capNome(l.captadora))+' ':''}<span class="tag pos">${l.captacao_pos?'PÓS':'NOVA'}</span></td>
+        <td class="num">${l.captacao_pos?'<span class="muted">–</span>':num(c.ageNovo)}</td>
+        <td class="row-actions"><button class="link" data-edit="${l.id}">Editar</button><button class="link danger" data-del="${l.id}">Excluir</button></td></tr>`}).join('');
+      html+=`<tr class="sub"><td colspan="6">Total da semana ${pad(s.n)} · ${ls.length} ${ls.length===1?'locação':'locações'}</td>${linhaValores(somar(ls))}<td></td></tr>`;
+    });
+    html+=`<tr class="total"><td colspan="6">TOTAL MENSAL · ${list.length} ${list.length===1?'locação':'locações'}</td>${linhaValores(somar(list))}<td></td></tr>`;
+    $('#planilha').innerHTML=cols+'<tbody>'+html+'</tbody>';
+  }
+  $('#planilha').onclick=async e=>{
+    const {edit,del}=e.target.dataset;
+    if(edit)openLoc(locs.find(l=>l.id===edit));
+    if(del){const l=locs.find(x=>x.id===del);if(!l||!confirm(`Excluir a locação ${l.referencia} (${l.proponente}, ${brl(l.vgl)})?`))return;
+      const {error}=await db.from('locacoes').delete().eq('id',del);if(error){alert('Não foi possível excluir: '+error.message);return}
+      locs=locs.filter(x=>x.id!==del);toast('Locação excluída');fillMeses();render()}
+  };
+
+  // Ranking: sempre o mês inteiro (sem os filtros), como o quadro da planilha.
+  function renderRanking(list){
+    const by={};list.forEach(l=>{const o=by[l.corretora]??={n:0,vgl:0};o.n++;o.vgl+=+l.vgl||0});
+    const mes=mesSel+'-01';
+    bonus.filter(b=>b.mes===mes).forEach(b=>by[b.corretora]??={n:0,vgl:0});
+    const names=Object.keys(by).sort((a,b)=>by[b].vgl-by[a].vgl||a.localeCompare(b)),max=Math.max(1,...names.map(n=>by[n].vgl));
+    if(!names.length){$('#ranking').innerHTML='<tbody><tr><td class="empty">Sem locações no mês.</td></tr></tbody>';return}
+    const bon=n=>bonus.find(b=>b.mes===mes&&b.corretora===n)?.valor;
+    const tb=names.reduce((a,n)=>a+(+bon(n)||0),0),tv=names.reduce((a,n)=>a+by[n].vgl,0),tn=names.reduce((a,n)=>a+by[n].n,0);
+    $('#ranking').innerHTML=`<thead><tr><th>Corretora</th><th class="num">Locações</th><th class="num">VGL</th><th class="num">Ajuda de custo</th><th class="num">Bonificação</th></tr></thead><tbody>${names.map((n,i)=>`<tr>
+      <td><strong>${i+1}º</strong> ${safe(n)}</td><td class="num">${by[n].n}</td>
+      <td class="num"><div class="bar-cell"><i style="width:${Math.round(by[n].vgl/max*70)}px"></i>${num(by[n].vgl)}</div></td>
+      <td class="num">${num(by[n].vgl*REGRA.ajuda)}</td>
+      <td class="num"><input class="bonus" data-bonus="${safe(n)}" inputmode="decimal" aria-label="Bonificação de ${safe(n)}" value="${bon(n)!=null?num(bon(n)):''}" placeholder="–"></td></tr>`).join('')}
+      <tr class="sub" style="background:#eef2f4;font-weight:800"><td><strong>Total</strong></td><td class="num"><strong>${tn}</strong></td><td class="num"><strong>${num(tv)}</strong></td><td class="num"><strong>${num(tv*REGRA.ajuda)}</strong></td><td class="num"><strong>${num(tb)}</strong></td></tr></tbody>`;
+  }
+  $('#ranking').addEventListener('change',async e=>{
+    const n=e.target.dataset.bonus;if(!n)return;
+    const mes=mesSel+'-01',txt=e.target.value.trim(),v=lerNumero(txt);
+    if(txt&&(!isFinite(v)||v<0)){alert('Digite um valor, por exemplo 500 ou 500,00.');e.target.value='';return}
+    const r=txt?await db.from('locacao_bonificacoes').upsert({mes,corretora:n,valor:v}):await db.from('locacao_bonificacoes').delete().eq('mes',mes).eq('corretora',n);
+    if(r.error){alert('Não foi possível salvar a bonificação: '+r.error.message);return}
+    bonus=bonus.filter(b=>!(b.mes===mes&&b.corretora===n));if(txt)bonus.push({mes,corretora:n,valor:v});
+    toast('Bonificação salva');renderRanking(doMes());
+  });
+
+  function renderGarantias(list){
+    const by={};list.forEach(l=>{const k=l.garantia||'NÃO INFORMADA';by[k]=(by[k]||0)+1});
+    const nomes=[...new Set([...garantias.filter(g=>g.ativa).map(g=>g.nome),...Object.keys(by)])].sort((a,b)=>(a==='NÃO INFORMADA')-(b==='NÃO INFORMADA')||(by[b]||0)-(by[a]||0)||a.localeCompare(b));
+    $('#garantiasQ').innerHTML=`<thead><tr><th>Garantia</th><th class="num">Locações</th></tr></thead><tbody>${nomes.map(g=>`<tr${g==='NÃO INFORMADA'?' style="color:var(--red);font-weight:700"':''}><td>${safe(g)}</td><td class="num">${by[g]||'<span class="muted">·</span>'}</td></tr>`).join('')}
+      <tr style="background:#eef2f4"><td><strong>Total</strong></td><td class="num"><strong>${list.length}</strong></td></tr></tbody>`;
+  }
+  function renderCaptadoras(list){
+    const by={};list.forEach(l=>{const k=capNome(l.captadora)||'SEM CAPTADORA';const o=by[k]??={nova:0,pos:0};o[l.captacao_pos?'pos':'nova']++});
+    const nomes=[...new Set([...CAPTADORAS,...Object.keys(by).filter(k=>k!=='SEM CAPTADORA')])];if(by['SEM CAPTADORA'])nomes.push('SEM CAPTADORA');
+    const tot=k=>(by[k]?.nova||0)+(by[k]?.pos||0);
+    const cel=(k,c)=>k!=='SEM CAPTADORA'&&by[k]?.[c]||'<span class="muted">·</span>';
+    $('#captadorasQ').innerHTML=`<thead><tr><th>Captadora</th><th class="num">Nova</th><th class="num">Pós</th><th class="num">Locações</th></tr></thead><tbody>${nomes.map(k=>`<tr${k==='SEM CAPTADORA'?' class="muted"':''}><td>${safe(k)}</td><td class="num">${cel(k,'nova')}</td><td class="num">${cel(k,'pos')}</td><td class="num"><strong>${tot(k)||'<span class="muted">·</span>'}</strong></td></tr>`).join('')}
+      <tr style="background:#eef2f4"><td><strong>Total com captadora</strong></td><td></td><td></td><td class="num"><strong>${list.filter(l=>capNome(l.captadora)).length}</strong></td></tr></tbody>`;
+  }
+
+  // ---------- Nova / editar locação ----------
+  const locDialog=$('#locDialog');
+  function opcoes(lista,atual,vazio){
+    const nomes=[...new Set([...lista.filter(x=>x.ativa).map(x=>x.nome),...(atual?[atual]:[])])];
+    return (vazio?`<option value="">${vazio}</option>`:'')+nomes.map(n=>`<option${n===atual?' selected':''}>${safe(n)}</option>`).join('');
+  }
+  function openLoc(l){
+    locEditId=l?.id||null;const f=$('#locForm');f.reset();$('#locMsg').hidden=true;
+    $('#locTitle').textContent=l?`Editar locação ${l.referencia}`:'Nova locação';
+    $('#lUnidade').innerHTML=opcoes(unidades,l?.unidade,'Selecione…');
+    $('#lCorretor').innerHTML=opcoes([...corretoras].sort((a,b)=>a.nome.localeCompare(b.nome)),l?.corretora,'Selecione…');
+    $('#lGarantia').innerHTML=opcoes(garantias,l?.garantia,'Não informada');
+    $('#capOpcoes').innerHTML=[...new Set([...CAPTADORAS,...locs.map(x=>capNome(x.captadora)).filter(Boolean)])].map(c=>`<option value="${safe(c)}">`).join('');
+    const hoje=iso(new Date()),padrao=hoje.startsWith(mesSel)?hoje:mesSel+'-01';
+    if(l){f.data.value=l.data;f.referencia.value=l.referencia;f.proponente.value=l.proponente;f.vgl.value=num(l.vgl);f.percentual.value=String(+l.percentual).replace('.',',');
+      f.captadora.value=l.captadora||'';f.tipo_cap.value=l.captacao_pos?'pos':'nova';f.observacao.value=l.observacao||'';f.assinado.value=l.assinado?'sim':'nao';
+      if(!l.garantia)$('#lGarantia').value=''}
+    else{f.data.value=padrao;if(!f.unidade.value&&unidades.some(u=>u.nome==='ITAJAÍ'))f.unidade.value='ITAJAÍ';f.percentual.value='60'}
+    previewLoc();locDialog.showModal();(l?$('#lVgl'):$('#lRef')).focus();
+  }
+  $('#newLoc').onclick=()=>openLoc(null);
+  function previewLoc(){
+    const f=$('#locForm'),pos=f.tipo_cap.value==='pos',c=calc({vgl:lerNumero(f.vgl.value)||0,percentual:lerNumero(f.percentual.value)||0,captacao_pos:pos});
+    $('#lPrev').innerHTML=[['Tx de loc.',c.tx],['Base de cálculo',c.base],['Corretora 25%',c.corretora],['Stefani 10%',c.stefani],['Du 1%',c.du],pos?['Cap. imob. (pós) 5%',c.capImob]:['Age. novo 8%',c.ageNovo],['Ajuda de custo 10%',c.vgl*REGRA.ajuda]].map(([a,v])=>`<div><dt>${a}</dt><dd>${brl(v)}</dd></div>`).join('');
+    // Aviso de REF repetida no mesmo mês (deixa salvar, mas avisa).
+    const ref=refNorm(f.referencia.value),ym=(f.data.value||'').slice(0,7);
+    const dup=ref&&ym?locs.filter(l=>l.id!==locEditId&&refNorm(l.referencia)===ref&&l.data.startsWith(ym)):[];
+    $('#lDup').hidden=!dup.length;
+    $('#lDup').textContent=dup.length?`Atenção: ${ref} já foi lançada em ${nomeMes(ym)} (${dup.map(l=>`${l.proponente}, ${brl(l.vgl)}`).join('; ')}). Se salvar, as duas linhas ficam em vermelho.`:'';
+  }
+  $('#locForm').addEventListener('input',previewLoc);
+  $('#locForm').onsubmit=async e=>{
+    e.preventDefault();const f=e.currentTarget,msg=$('#locMsg'),erro=(t,campo)=>{msg.textContent=t;msg.hidden=false;campo?.focus()};msg.hidden=true;
+    const vgl=lerNumero(f.vgl.value),pct=lerNumero(f.percentual.value);
+    const reg={data:f.data.value,referencia:refNorm(f.referencia.value),unidade:f.unidade.value,corretora:f.corretora.value,assinado:f.assinado.value==='sim',
+      proponente:f.proponente.value.trim().toUpperCase(),garantia:f.garantia.value||null,vgl,percentual:pct,captadora:capNome(f.captadora.value)||null,captacao_pos:f.tipo_cap.value==='pos',observacao:f.observacao.value.trim()||null};
+    if(!reg.data)return erro('Informe a data.',f.data);
+    if(!reg.referencia)return erro('Informe a REF do imóvel.',f.referencia);
+    if(!reg.unidade)return erro('Escolha a cidade.',f.unidade);
+    if(!reg.proponente)return erro('Informe o proponente.',f.proponente);
+    if(!reg.corretora)return erro('Escolha a corretora.',f.corretora);
+    if(!isFinite(vgl)||vgl<=0)return erro('Informe o VGL (valor do aluguel), por exemplo 2.500,00.',f.vgl);
+    if(!isFinite(pct)||pct<=0||pct>200)return erro('Informe o percentual da taxa de locação, por exemplo 60.',f.percentual);
+    $('#locSubmit').disabled=true;
+    let r;
+    if(locEditId)r=await db.from('locacoes').update(reg).eq('id',locEditId);
+    else{reg.ordem=Math.max(0,...locs.filter(l=>l.data.slice(0,7)===reg.data.slice(0,7)).map(l=>l.ordem||0))+1;r=await db.from('locacoes').insert(reg)}
+    $('#locSubmit').disabled=false;
+    if(r.error)return erro('Não foi possível salvar: '+r.error.message);
+    locDialog.close();mesSel=reg.data.slice(0,7);toast(locEditId?'Locação atualizada':'Locação salva');
+    try{await loadLocs()}catch(err){alert('Salvo, mas não foi possível atualizar a tela: '+err.message)}
+  };
+
+  // ---------- Exportar ----------
+  $('#exportCsv').onclick=()=>{
+    const sems=semanasDoMes(mesSel),sem=d=>sems.find(s=>d>=s.de&&d<=s.ate)?.n||'',esc=v=>`"${String(v??'').replace(/"/g,'""')}"`,n=v=>num(v).replace(/\./g,'');
+    const head=['Semana','Data','REF','Cidade','Corretora','Ass.','Proponente','Garantia','VGL','%','Tx de loc','Base de calculo','Corretora 25%','Stefani 10%','Du 1%','Cap imob 5%','Nome cap','Tipo captacao','Age novo 8%','Observacao'];
+    const rows=filtered().map(l=>{const c=calc(l);return [sem(l.data),br(l.data),l.referencia,l.unidade,l.corretora,l.assinado?'SIM':'NÃO',l.proponente,l.garantia||'NÃO INFORMADA',n(c.vgl),String(+l.percentual).replace('.',','),n(c.tx),n(c.base),n(c.corretora),n(c.stefani),n(c.du),n(c.capImob),l.captadora||'',l.captacao_pos?'PÓS':'NOVA',n(c.ageNovo),l.observacao||'']});
+    const csv=[head,...rows].map(r=>r.map(esc).join(';')).join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`locacoes-${mesSel}.csv`;a.click();URL.revokeObjectURL(a.href);
+  };
+
+  // ---------- Calculadoras ----------
+  const res=(itens)=>itens.map(([a,v,d])=>`<div${d?' class="dest"':''}><span>${a}</span><strong>${isFinite(v)?brl(v):'–'}</strong></div>`).join('');
+  // Aba "CALCULADORA DE ALUGUEL PROPORCIONAL" da planilha.
+  function calcProp(){
+    const a1=lerNumero($('#pA1').value),d1=lerNumero($('#pD1').value),a2=lerNumero($('#pA2').value),d2=lerNumero($('#pD2').value),p=lerNumero($('#pPct').value)/100;
+    const prop1=a1/30*d1,prop2=a2/30*d2,taxa=a2*p,taxa1=prop1*p,taxa2=taxa-taxa1;
+    $('#pRes').innerHTML=res([['Valor proporcional do 1º mês',prop1],['Valor proporcional do 2º mês',prop2],['Taxa 1 de 2',taxa1],['Taxa 2 de 2',taxa2],['Taxa de locação total',taxa,true]]);
+    const linhas=[['Corretora',taxa*.9*.25],['Captação nova',taxa*.08],['Captação pós',taxa*.05],['Stefani',taxa*.9*.10],['Maria Eduarda (Du)',taxa*.9*.01]];
+    $('#pTabela').innerHTML=`<thead><tr><th>Para quem?</th><th class="num">Valor</th><th class="num">Parcela 1</th><th class="num">Parcela 2</th></tr></thead><tbody>${linhas.map(([q,v])=>{const p1=v/30*d1;return `<tr><td>${q}</td><td class="num"><strong>${isFinite(v)?num(v):'–'}</strong></td><td class="num">${isFinite(p1)?num(p1):'–'}</td><td class="num">${isFinite(p1)?num(v-p1):'–'}</td></tr>`}).join('')}</tbody>`;
+  }
+  // Aba "ALPOP" da planilha.
+  function calcAlpop(){
+    const al=lerNumero($('#aAluguel').value),adm=al*lerNumero($('#aAdm').value)/100,prim=al*lerNumero($('#aCom').value)/100,anoAdm=prim+adm*11;
+    $('#aRes').innerHTML=res([['Administração mensal',adm],['Comissão do 1º aluguel',prim],['Total de administração no ano',anoAdm],['Total que o locador recebe no ano',al*12-anoAdm,true]]);
+  }
+  $('#calcProp').addEventListener('input',calcProp);$('#calcAlpop').addEventListener('input',calcAlpop);
+
+  // ---------- Senhas ----------
+  // A senha nunca vem na listagem: só pela função locacao_senha_revelar, um registro por vez.
+  async function loadSenhas(){
+    const {data,error}=await db.from('locacao_senhas').select('id,sistema,link,usuario,observacao,atualizado_em,atualizado_por').order('sistema');
+    if(error){$('#senhasTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
+    senhas=data;renderSenhas();
+  }
+  const siteOk=u=>/^https?:\/\//i.test(u||'');
+  function renderSenhas(){
+    const q=$('#sBusca').value.trim().toLowerCase();
+    const list=senhas.filter(s=>!q||(s.sistema+' '+(s.usuario||'')+' '+(s.observacao||'')).toLowerCase().includes(q));
+    if(!list.length){$('#senhasTable').innerHTML=`<tbody><tr><td class="empty">${senhas.length?'Nenhuma senha encontrada.':'Nenhuma senha cadastrada ainda. Clique em "+ Nova senha".'}</td></tr></tbody>`;return}
+    $('#senhasTable').innerHTML=`<thead><tr><th>Sistema</th><th>Usuário</th><th>Senha</th><th>Observação</th><th>Atualizado</th><th></th></tr></thead><tbody>${list.map(s=>`<tr>
+      <td><strong>${safe(s.sistema)}</strong>${siteOk(s.link)?`<br><a class="link" style="padding:0" href="${safe(s.link)}" target="_blank" rel="noopener noreferrer">Abrir site ↗</a>`:''}</td>
+      <td>${s.usuario?`${safe(s.usuario)} <button class="link" data-copy-user="${s.id}">Copiar</button>`:'<span class="muted">–</span>'}</td>
+      <td style="white-space:nowrap"><span class="pw" id="pw-${s.id}">••••••••</span><button class="link" data-show="${s.id}">Mostrar</button><button class="link" data-copy-pw="${s.id}">Copiar</button></td>
+      <td>${safe(s.observacao||'')}</td>
+      <td style="white-space:nowrap"><small class="muted">${br(iso(new Date(s.atualizado_em)))}<br>${safe((s.atualizado_por||'').split('@')[0])}</small></td>
+      <td class="row-actions"><button class="link" data-edit-senha="${s.id}">Editar</button><button class="link danger" data-del-senha="${s.id}">Excluir</button></td></tr>`).join('')}</tbody>`;
+  }
+  $('#sBusca').addEventListener('input',renderSenhas);
+  async function revelar(id){const {data,error}=await db.rpc('locacao_senha_revelar',{p_id:id});if(error){alert('Não foi possível ver a senha: '+error.message);return null}return data}
+  const ocultarTimers={};
+  $('#senhasTable').onclick=async e=>{
+    const d=e.target.dataset,s=senhas.find(x=>x.id===(d.copyUser||d.show||d.copyPw||d.editSenha||d.delSenha));if(!s)return;
+    if(d.copyUser)copiar(s.usuario,'Usuário');
+    if(d.show){const span=$('#pw-'+s.id);
+      if(e.target.textContent==='Ocultar'){span.textContent='••••••••';e.target.textContent='Mostrar';return}
+      const pw=await revelar(s.id);if(pw===null)return;span.textContent=pw||'(sem senha)';e.target.textContent='Ocultar';
+      clearTimeout(ocultarTimers[s.id]);ocultarTimers[s.id]=setTimeout(()=>{span.textContent='••••••••';e.target.textContent='Mostrar'},30000)}
+    if(d.copyPw){const pw=await revelar(s.id);if(pw)copiar(pw,'Senha');else if(pw!==null)toast('Sem senha cadastrada')}
+    if(d.editSenha)openSenha(s);
+    if(d.delSenha&&confirm(`Excluir o acesso "${s.sistema}"? A senha será apagada.`)){
+      const {error}=await db.rpc('locacao_senha_excluir',{p_id:s.id});if(error){alert('Não foi possível excluir: '+error.message);return}
+      senhas=senhas.filter(x=>x.id!==s.id);renderSenhas()}
+  };
+  const senhaDialog=$('#senhaDialog');
+  function openSenha(s){
+    senhaEditId=s?.id||null;const f=$('#senhaForm');f.reset();$('#senhaMsg').hidden=true;
+    $('#senhaTitle').textContent=s?'Editar senha':'Nova senha';$('#sSenhaHint').hidden=!s;
+    $('#sSenha').type='password';$('#sSenhaVer').textContent='Mostrar';
+    if(s){f.sistema.value=s.sistema;f.link.value=s.link||'';f.usuario.value=s.usuario||'';f.observacao.value=s.observacao||''}
+    senhaDialog.showModal();
+  }
+  $('#newSenha').onclick=()=>openSenha(null);
+  $('#sSenhaVer').onclick=()=>{const i=$('#sSenha'),ver=i.type==='password';i.type=ver?'text':'password';$('#sSenhaVer').textContent=ver?'Ocultar':'Mostrar'};
+  senhaDialog.addEventListener('close',()=>{$('#sSenha').value=''});
+  $('#senhaForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#senhaMsg');msg.hidden=true;
+    const args={p_id:senhaEditId,p_sistema:String(f.get('sistema')).trim(),p_link:String(f.get('link')).trim(),p_usuario:String(f.get('usuario')).trim(),p_observacao:String(f.get('observacao')).trim(),p_senha:String(f.get('senha'))};
+    if(!args.p_sistema){msg.textContent='Informe o sistema.';msg.hidden=false;return}
+    $('#senhaSubmit').disabled=true;const {error}=await db.rpc('locacao_senha_salvar',args);$('#senhaSubmit').disabled=false;
+    if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
+    senhaDialog.close();toast('Senha salva');await loadSenhas();
+  };
+
+  // ---------- POP e documentos ----------
+  async function loadDocs(){
+    const {data,error}=await db.from('locacao_documentos').select('id,titulo,categoria,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').order('enviado_em',{ascending:false});
+    if(error){$('#docsPop').innerHTML=`<div class="empty-card">Não foi possível carregar: ${safe(error.message)}</div>`;return}
+    docs=data;renderDocs();
+  }
+  const tipoDoc=n=>{const x=(n.split('.').pop()||'').toLowerCase();return x==='pdf'?['pdf','PDF']:['doc','docx'].includes(x)?['doc','WORD']:['xls','xlsx'].includes(x)?['xls','EXCEL']:['img','IMAGEM']};
+  const tamanho=b=>b>=1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(b/1024))+' KB';
+  function renderDocs(){
+    const card=d=>{const [cls,label]=tipoDoc(d.nome_arquivo);return `<article class="card doc"><div class="doc-ico ${cls}">${label}</div><div><h3>${safe(d.titulo)}</h3>
+      <small>${safe(d.nome_arquivo)} · ${tamanho(d.tamanho||0)}</small><small>Enviado em ${br(iso(new Date(d.enviado_em)))} por ${safe((d.enviado_por||'').split('@')[0])}</small>
+      <div class="row-actions"><button class="link" data-abrir="${d.id}">Abrir</button><button class="link" data-baixar="${d.id}">Baixar</button><button class="link danger" data-del-doc="${d.id}">Excluir</button></div></div></article>`};
+    const pop=docs.filter(d=>d.categoria==='POP'),outros=docs.filter(d=>d.categoria!=='POP');
+    $('#docsPop').innerHTML=pop.map(card).join('')||'<div class="empty-card">Nenhum POP enviado ainda. Clique em "+ Enviar documento".</div>';
+    $('#docsOutros').innerHTML=outros.map(card).join('')||'<div class="empty-card">Nenhum outro documento.</div>';
+  }
+  document.querySelector('#tab-pop').addEventListener('click',async e=>{
+    const d=e.target.dataset,doc=docs.find(x=>x.id===(d.abrir||d.baixar||d.delDoc));if(!doc)return;
+    if(d.abrir){const w=window.open('','_blank');const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,600);
+      if(error){w?.close();alert('Não foi possível abrir: '+error.message);return}if(w)w.location=data.signedUrl;else location.href=data.signedUrl}
+    if(d.baixar){const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,600,{download:doc.nome_arquivo});
+      if(error){alert('Não foi possível baixar: '+error.message);return}const a=document.createElement('a');a.href=data.signedUrl;a.click()}
+    if(d.delDoc&&confirm(`Excluir o documento "${doc.titulo}"?`)){
+      const r=await db.storage.from(BUCKET).remove([doc.caminho]);if(r.error){alert('Não foi possível excluir: '+r.error.message);return}
+      const {error}=await db.from('locacao_documentos').delete().eq('id',doc.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+      docs=docs.filter(x=>x.id!==doc.id);renderDocs()}
+  });
+  const docDialog=$('#docDialog');
+  $('#newDoc').onclick=()=>{$('#docForm').reset();$('#docMsg').hidden=true;docDialog.showModal()};
+  $('#docForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#docMsg'),file=f.get('arquivo');msg.hidden=true;
+    if(!file||!file.size){msg.textContent='Escolha um arquivo.';msg.hidden=false;return}
+    if(file.size>25*1024*1024){msg.textContent='O arquivo passa de 25 MB.';msg.hidden=false;return}
+    const limpo=file.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-');
+    const caminho=`${crypto.randomUUID()}/${limpo}`;
+    $('#docSubmit').disabled=true;$('#docSubmit').textContent='Enviando…';
+    try{
+      const up=await db.storage.from(BUCKET).upload(caminho,file,{contentType:file.type||undefined});if(up.error)throw up.error;
+      const {error}=await db.from('locacao_documentos').insert({titulo:String(f.get('titulo')).trim(),categoria:f.get('categoria'),caminho,nome_arquivo:file.name,tamanho:file.size});
+      if(error){await db.storage.from(BUCKET).remove([caminho]);throw error}
+      docDialog.close();toast('Documento enviado');await loadDocs();
+    }catch(err){msg.textContent='Não foi possível enviar: '+(/mime|type/i.test(err.message)?'tipo de arquivo não aceito.':err.message);msg.hidden=false}
+    $('#docSubmit').disabled=false;$('#docSubmit').textContent='Enviar';
+  };
+
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+  db.auth.onAuthStateChange(()=>setTimeout(()=>refreshSession().catch(console.error),0));
+</script>
+</body>
+</html>

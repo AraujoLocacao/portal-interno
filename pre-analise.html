@@ -85,6 +85,21 @@
     .link-tile .row-actions{text-align:left;margin:8px 0 0 -4px}
     .group-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
     .nota{margin:10px 0 0;background:#fff8ec;border:1px solid #f0dcb8;border-left:4px solid var(--amber);border-radius:10px;padding:10px 14px;color:#5b4520;font-size:.92rem;white-space:pre-line}
+    /* Aba Locações (a mesma planilha da Locação, só até a coluna %) */
+    .loc-filters{grid-template-columns:auto repeat(2,minmax(0,1fr)) auto}
+    .mes-nav{display:flex;gap:6px;align-items:center}.mes-nav select{border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;font-weight:700;min-width:170px}
+    .mes-nav .secondary{padding:8px 12px}.secondary:disabled{opacity:.45;cursor:default}
+    #locTabela tr.semana td{background:#c9d8ea;font-weight:800;letter-spacing:.02em;padding:6px 10px;border-bottom:0}
+    #locTabela tr.semana td span{font-weight:600;color:#3d556d;margin-left:6px}
+    #locTabela tr.sub td{background:#eef2f4;font-weight:800;border-top:1px solid var(--line)}
+    #locTabela tr.total td{background:var(--navy);color:#fff;font-weight:800;border:0}
+    #locTabela tr.erro td{background:#fdecec}#locTabela tr.erro td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+    .tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:.72rem;font-weight:800;letter-spacing:.02em;white-space:nowrap}
+    .tag.sim{background:#e3f1ec;color:#1d604d}.tag.nao{background:#fdf1dc;color:#8a5a12}.tag.bad{background:var(--red);color:#fff}
+    .alerta{border:1px solid #efc4c4;background:#fdecec;color:#6e2323;border-radius:14px;padding:14px 18px;margin-bottom:18px}
+    .alerta strong{color:var(--red)}.alerta ul{margin:6px 0 0;padding-left:20px}.alerta li{margin:2px 0}
+    .msg.bad{background:#fdecec;color:#8e2f2f;border-radius:8px;padding:8px 10px;font-weight:650}
+    dialog.wide{width:min(760px,calc(100% - 32px))}
     @media(max-width:1100px){.filters{grid-template-columns:repeat(3,minmax(0,1fr));position:static}.filters .search{grid-column:1/-1}}
     @media(max-width:820px){.charts{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}}
     @media(max-width:560px){.filters{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.tile strong{font-size:1.6rem}}
@@ -115,7 +130,7 @@
 
 <main id="app" hidden>
   <div class="dept"><h1>Pré-análise</h1>
-    <nav class="tabs" aria-label="Seções da pré-análise"><button type="button" class="tab-link" data-go="analises">Análises</button><button type="button" class="tab-link" data-go="validacoes">Validações</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button></nav></div>
+    <nav class="tabs" aria-label="Seções da pré-análise"><button type="button" class="tab-link" data-go="analises">Análises</button><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="validacoes">Validações</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button></nav></div>
 
   <section id="tab-analises" data-tab>
   <div class="top">
@@ -174,6 +189,24 @@
   </div>
   </section>
 
+  <section id="tab-locacoes" data-tab hidden>
+    <div class="top">
+      <div><h2>Locações</h2><p id="locSub">A mesma planilha do departamento Locação. Aqui aparecem só os dados do contrato; taxa de locação e comissões ficam na Locação.</p></div>
+      <div class="bar-actions"><button class="primary" id="locNova">+ Nova locação</button></div>
+    </div>
+    <div class="card filters loc-filters" role="search">
+      <div class="field"><label for="locMes">Mês</label><div class="mes-nav"><button class="secondary" id="locMesPrev" aria-label="Mês anterior">←</button><select id="locMes"></select><button class="secondary" id="locMesNext" aria-label="Próximo mês">→</button></div></div>
+      <div class="field"><label for="locFCorretor">Corretora</label><select id="locFCorretor"></select></div>
+      <div class="field"><label for="locFBusca">Buscar</label><input id="locFBusca" type="search" placeholder="REF ou proponente"></div>
+      <button class="secondary" id="locLimpar">Limpar</button>
+    </div>
+    <div class="alerta" id="locAlerta" hidden></div>
+    <div class="card table-card">
+      <div class="list-head"><h2>Planilha do mês</h2><span class="muted" id="locCount"></span></div>
+      <div class="table-wrap"><table id="locTabela"></table></div>
+    </div>
+  </section>
+
   <section id="tab-validacoes" data-tab hidden>
     <div class="top">
       <div><h2>Validações</h2><p>Atalhos para os sites de consulta usados na análise. Cada link abre numa nova aba.</p></div>
@@ -217,6 +250,29 @@
     <div class="field"><label for="iObs">Observação</label><textarea id="iObs" name="observacao" rows="2" maxlength="500"></textarea></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="itemSubmit">Salvar</button></div>
     <p class="msg error" id="itemMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="locDialog" class="wide">
+  <div class="dialog-head"><h2 id="locTitulo">Nova locação</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="locForm" novalidate autocomplete="off">
+    <div class="grid2">
+      <div class="field"><label for="locData">Data</label><input id="locData" name="data" type="date" required></div>
+      <div class="field"><label for="locRef">REF (código do imóvel)</label><input id="locRef" name="referencia" maxlength="20" placeholder="Ex.: AP1620" required style="text-transform:uppercase"></div>
+    </div>
+    <p class="msg bad" id="locDup" hidden></p>
+    <div class="field"><label for="locProp">Proponente</label><input id="locProp" name="proponente" maxlength="200" required style="text-transform:uppercase"></div>
+    <div class="grid2">
+      <div class="field"><label for="locUnidade">Cidade</label><select id="locUnidade" name="unidade" required></select></div>
+      <div class="field"><label for="locCorretora">Corretora</label><select id="locCorretora" name="corretora" required></select></div>
+      <div class="field"><label for="locGarantia">Garantia</label><select id="locGarantia" name="garantia"></select></div>
+      <div class="field"><label>Contrato assinado?</label><div class="seg"><label><input type="radio" name="assinado" value="sim">Sim</label><label><input type="radio" name="assinado" value="nao" checked>Não</label></div></div>
+      <div class="field"><label for="locVgl">VGL (valor do aluguel, R$)</label><input id="locVgl" name="vgl" inputmode="decimal" placeholder="0,00" required style="text-align:right"></div>
+      <div class="field"><label for="locPct">% da taxa de locação</label><input id="locPct" name="percentual" inputmode="decimal" list="locPctOpcoes" placeholder="60" required style="text-align:right"><datalist id="locPctOpcoes"><option value="30"><option value="50"><option value="60"><option value="100"></datalist></div>
+    </div>
+    <div class="field"><label for="locObs">Observação</label><textarea id="locObs" name="observacao" rows="2" maxlength="500"></textarea></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="locSalvar">Salvar</button></div>
+    <p class="msg error" id="locMsg" hidden></p>
   </form>
 </dialog>
 
@@ -312,7 +368,7 @@
     const {data,error}=await db.rpc('pode_pre_analise');
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();await Promise.all([loadAll(),loadLinks(),loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();await Promise.all([loadAll().then(loadLocacoes),loadLinks(),loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   $('#loginForm').onsubmit=async e=>{
@@ -331,7 +387,7 @@
   // ---------- Abas ----------
   // As abas trocam por JavaScript (não por link), então funcionam em qualquer endereço; o #aba só serve para lembrar a aba ao recarregar.
   function showTab(pedida){
-    const abas=['analises','validacoes','senhas','pop'],tab=abas.includes(pedida)?pedida:abas.includes(location.hash.slice(1))?location.hash.slice(1):'analises';
+    const abas=['analises','locacoes','validacoes','senhas','pop'],tab=abas.includes(pedida)?pedida:abas.includes(location.hash.slice(1))?location.hash.slice(1):'analises';
     if(pedida)try{history.replaceState(null,'','#'+tab)}catch{}
     document.querySelectorAll('[data-tab]').forEach(s=>s.hidden=s.id!=='tab-'+tab);
     document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
@@ -734,6 +790,142 @@
       docDialog.close();toast('Documento enviado');await loadDocs();
     }catch(err){msg.textContent='Não foi possível enviar: '+(/mime|type/i.test(err.message)?'tipo de arquivo não aceito.':err.message);msg.hidden=false}
     $('#docSubmit').disabled=false;$('#docSubmit').textContent='Enviar';
+  };
+
+  // ---------- Locações ----------
+  // A mesma tabela "locacoes" do departamento Locação (locacao.html). A pré-análise preenche parte dela:
+  // aqui aparecem só as colunas até "%". Taxa de locação e comissões não são mostradas nesta página.
+  const LOC_MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const LOC_CAMPOS='id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,observacao,ordem';
+  let locs=[],locUnidades=[],locMes=null,locEditId=null;
+  const locNum=v=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const locBrl=v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const locNomeMes=ym=>{const [y,m]=ym.split('-');return `${LOC_MESES[+m-1]} de ${y}`};
+  const locMesTitulo=ym=>locNomeMes(ym).replace(/^./,c=>c.toUpperCase());
+  const locRef=r=>String(r||'').trim().toUpperCase();
+  // Aceita "1.300,00", "1300,5", "1300.50" e "R$ 1.300".
+  function locLer(s){s=String(s??'').replace(/[R$\s%]/g,'');if(!s)return NaN;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');return Number(s)}
+  // Semanas de segunda a domingo, cortadas na virada do mês (igual à Locação e ao relatório semanal).
+  function locSemanas(ym){
+    const [y,m]=ym.split('-').map(Number),fim=new Date(y,m,0).getDate(),out=[];let ini=1;
+    for(let d=1;d<=fim;d++){const dow=new Date(y,m-1,d).getDay();if(dow===0||d===fim){out.push({n:out.length+1,de:`${ym}-${pad(ini)}`,ate:`${ym}-${pad(d)}`});ini=d+1}}
+    return out;
+  }
+  async function loadLocacoes(){
+    try{
+      const u=await db.from('unidades').select('nome,ativa').order('nome');if(u.error)throw u.error;locUnidades=u.data;
+      const all=[];
+      for(let from=0;;from+=1000){
+        const {data,error}=await db.from('locacoes').select(LOC_CAMPOS).order('data').order('ordem').order('criado_em').range(from,from+999);
+        if(error)throw error;all.push(...data);if(data.length<1000)break;
+      }
+      locs=all;locFillMeses();locFillCorretoras();renderLocacoes();
+    }catch(err){$('#locTabela').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar as locações: ${safe(err.message)}</td></tr></tbody>`}
+  }
+  const locMesesDisp=()=>{const hoje=iso(new Date()).slice(0,7);return [...new Set([hoje,...locs.map(l=>l.data.slice(0,7))])].sort().reverse()};
+  function locFillMeses(){
+    const ms=locMesesDisp(),hoje=iso(new Date()).slice(0,7);
+    if(!locMes||!ms.includes(locMes))locMes=locs.some(l=>l.data.startsWith(hoje))?hoje:(locs.length?locs[locs.length-1].data.slice(0,7):hoje);
+    $('#locMes').innerHTML=ms.map(m=>`<option value="${m}">${locMesTitulo(m)}</option>`).join('');$('#locMes').value=locMes;
+    const i=ms.indexOf(locMes);$('#locMesPrev').disabled=i>=ms.length-1;$('#locMesNext').disabled=i<=0;
+  }
+  function locFillCorretoras(){
+    const sel=$('#locFCorretor'),v=sel.value,nomes=[...new Set([...corretoras.filter(c=>c.ativa).map(c=>c.nome),...locs.map(l=>l.corretora)])].sort();
+    sel.innerHTML='<option value="">Todas</option>'+nomes.map(n=>`<option value="${safe(n)}">${safe(n)}</option>`).join('');if(nomes.includes(v))sel.value=v;
+  }
+  $('#locMes').addEventListener('change',e=>{locMes=e.target.value;locFillMeses();renderLocacoes()});
+  const locPasso=dir=>{const ms=locMesesDisp(),i=ms.indexOf(locMes)-dir;if(ms[i]){locMes=ms[i];locFillMeses();renderLocacoes()}};
+  $('#locMesPrev').onclick=()=>locPasso(-1);$('#locMesNext').onclick=()=>locPasso(1);
+  ['#locFCorretor','#locFBusca'].forEach(s=>$(s).addEventListener('input',renderLocacoes));
+  $('#locLimpar').onclick=()=>{$('#locFCorretor').value='';$('#locFBusca').value='';renderLocacoes()};
+  const locDoMes=()=>locs.filter(l=>l.data.startsWith(locMes));
+
+  // Erros do mês, em vermelho (os mesmos da Locação): REF repetida e garantia não informada.
+  function locErros(){
+    const porRef={},porId={};locDoMes().forEach(l=>(porRef[locRef(l.referencia)]??=[]).push(l));
+    const repetidas=Object.entries(porRef).filter(([,ls])=>ls.length>1);
+    repetidas.forEach(([,ls])=>ls.forEach(l=>(porId[l.id]??=[]).push(`REF repetida (${ls.length}×)`)));
+    const semGarantia=locDoMes().filter(l=>!l.garantia);semGarantia.forEach(l=>(porId[l.id]??=[]).push('sem garantia'));
+    return {repetidas,semGarantia,porId};
+  }
+  function renderLocacoes(){
+    const c=$('#locFCorretor').value,q=$('#locFBusca').value.trim().toUpperCase();
+    const list=locDoMes().filter(l=>!(c&&l.corretora!==c)&&!(q&&!(l.referencia+' '+l.proponente).toUpperCase().includes(q)));
+    const {repetidas,semGarantia,porId}=locErros(),itens=[];
+    repetidas.forEach(([ref,ls])=>itens.push(`<strong>${safe(ref)}</strong> aparece ${ls.length} vezes (${ls.map(l=>`${locBrl(l.vgl)} em ${br(l.data).slice(0,5)}`).join(', ')}). Confira e exclua a que estiver sobrando.`));
+    semGarantia.forEach(l=>itens.push(`<strong>${safe(l.referencia)}</strong> (${safe(l.proponente)}) está sem garantia. Clique em "Editar" para informar.`));
+    $('#locAlerta').hidden=!itens.length;
+    $('#locAlerta').innerHTML=itens.length?`<strong>Atenção: ${itens.length} ${itens.length===1?'ponto':'pontos'} para conferir neste mês</strong> (linhas em vermelho)<ul>${itens.map(i=>`<li>${i}</li>`).join('')}</ul>`:'';
+    $('#locCount').textContent=`${locMesTitulo(locMes)} · ${list.length} ${list.length===1?'locação':'locações'}`;
+    if(!list.length){$('#locTabela').innerHTML=`<tbody><tr><td class="empty">${locDoMes().length?'Nenhuma locação com esses filtros.':'Nenhuma locação lançada neste mês. Clique em "+ Nova locação".'}</td></tr></tbody>`;return}
+    const soma=ls=>ls.reduce((a,l)=>a+(+l.vgl||0),0);let html='';
+    locSemanas(locMes).forEach(s=>{
+      const ls=list.filter(l=>l.data>=s.de&&l.data<=s.ate);if(!ls.length)return;
+      html+=`<tr class="semana"><td colspan="9">SEMANA ${pad(s.n)}<span>${br(s.de).slice(0,5)} a ${br(s.ate).slice(0,5)}</span></td></tr>`;
+      html+=ls.map(l=>{const err=porId[l.id],rep=err?.find(e=>e.startsWith('REF'));return `<tr${err?' class="erro"':''}>
+        <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${rep?` <span class="tag bad">${rep}</span>`:''}</td>
+        <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td><td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
+        <td>${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}</td>
+        <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
+        <td class="num"><strong>${locNum(l.vgl)}</strong></td><td class="num">${(+l.percentual).toLocaleString('pt-BR',{maximumFractionDigits:2})}%</td>
+        <td class="row-actions"><button class="link" data-loc-edit="${l.id}">Editar</button><button class="link danger" data-loc-del="${l.id}">Excluir</button></td></tr>`}).join('');
+      html+=`<tr class="sub"><td colspan="6">Total da semana ${pad(s.n)} · ${ls.length} ${ls.length===1?'locação':'locações'}</td><td class="num">${locNum(soma(ls))}</td><td colspan="2"></td></tr>`;
+    });
+    html+=`<tr class="total"><td colspan="6">TOTAL MENSAL · ${list.length} ${list.length===1?'locação':'locações'}</td><td class="num">${locNum(soma(list))}</td><td colspan="2"></td></tr>`;
+    $('#locTabela').innerHTML=`<thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th><th></th></tr></thead><tbody>${html}</tbody>`;
+  }
+  $('#locTabela').onclick=async e=>{
+    const {locEdit,locDel}=e.target.dataset;
+    if(locEdit)openLocacao(locs.find(l=>l.id===locEdit));
+    if(locDel){const l=locs.find(x=>x.id===locDel);if(!l||!confirm(`Excluir a locação ${l.referencia} (${l.proponente}, ${locBrl(l.vgl)})?`))return;
+      const {error}=await db.from('locacoes').delete().eq('id',locDel);if(error){alert('Não foi possível excluir: '+error.message);return}
+      locs=locs.filter(x=>x.id!==locDel);toast('Locação excluída');locFillMeses();renderLocacoes()}
+  };
+
+  const locDialog=$('#locDialog');
+  function locOpcoes(lista,atual,vazio){
+    const nomes=[...new Set([...lista.filter(x=>x.ativa).map(x=>x.nome),...(atual?[atual]:[])])];
+    return `<option value="">${vazio}</option>`+nomes.map(n=>`<option${n===atual?' selected':''}>${safe(n)}</option>`).join('');
+  }
+  function openLocacao(l){
+    locEditId=l?.id||null;const f=$('#locForm');f.reset();$('#locMsg').hidden=true;
+    $('#locTitulo').textContent=l?`Editar locação ${l.referencia}`:'Nova locação';
+    $('#locUnidade').innerHTML=locOpcoes(locUnidades,l?.unidade,'Selecione…');
+    $('#locCorretora').innerHTML=locOpcoes(corretoras,l?.corretora,'Selecione…');
+    $('#locGarantia').innerHTML=locOpcoes(garantias,l?.garantia,'Não informada');
+    if(l){f.data.value=l.data;f.referencia.value=l.referencia;f.proponente.value=l.proponente;f.vgl.value=locNum(l.vgl);f.percentual.value=String(+l.percentual).replace('.',',');
+      f.assinado.value=l.assinado?'sim':'nao';f.observacao.value=l.observacao||'';if(!l.garantia)f.garantia.value=''}
+    else{const hoje=iso(new Date());f.data.value=hoje.startsWith(locMes)?hoje:locMes+'-01';if(locUnidades.some(u=>u.nome==='ITAJAÍ'))f.unidade.value='ITAJAÍ';f.percentual.value='60'}
+    locDupCheck();locDialog.showModal();(l?$('#locVgl'):$('#locRef')).focus();
+  }
+  $('#locNova').onclick=()=>openLocacao(null);
+  // Avisa se a REF já foi lançada no mesmo mês (deixa salvar, mas a linha fica em vermelho).
+  function locDupCheck(){
+    const f=$('#locForm'),ref=locRef(f.referencia.value),ym=(f.data.value||'').slice(0,7);
+    const dup=ref&&ym?locs.filter(l=>l.id!==locEditId&&locRef(l.referencia)===ref&&l.data.startsWith(ym)):[];
+    $('#locDup').hidden=!dup.length;
+    $('#locDup').textContent=dup.length?`Atenção: ${ref} já foi lançada em ${locNomeMes(ym)} (${dup.map(l=>`${l.proponente}, ${locBrl(l.vgl)}`).join('; ')}). Se salvar, as duas linhas ficam em vermelho.`:'';
+  }
+  $('#locForm').addEventListener('input',locDupCheck);
+  $('#locForm').onsubmit=async e=>{
+    e.preventDefault();const f=e.currentTarget,msg=$('#locMsg'),erro=(t,campo)=>{msg.textContent=t;msg.hidden=false;campo?.focus()};msg.hidden=true;
+    const vgl=locLer(f.vgl.value),pct=locLer(f.percentual.value);
+    // Só os campos da pré-análise: captadora e tipo de captação continuam como a Locação deixou.
+    const reg={data:f.data.value,referencia:locRef(f.referencia.value),unidade:f.unidade.value,corretora:f.corretora.value,assinado:f.assinado.value==='sim',
+      proponente:f.proponente.value.trim().toUpperCase(),garantia:f.garantia.value||null,vgl,percentual:pct,observacao:f.observacao.value.trim()||null};
+    if(!reg.data)return erro('Informe a data.',f.data);
+    if(!reg.referencia)return erro('Informe a REF do imóvel.',f.referencia);
+    if(!reg.proponente)return erro('Informe o proponente.',f.proponente);
+    if(!reg.unidade)return erro('Escolha a cidade.',f.unidade);
+    if(!reg.corretora)return erro('Escolha a corretora.',f.corretora);
+    if(!isFinite(vgl)||vgl<=0)return erro('Informe o VGL (valor do aluguel), por exemplo 2.500,00.',f.vgl);
+    if(!isFinite(pct)||pct<=0||pct>200)return erro('Informe o percentual da taxa de locação, por exemplo 60.',f.percentual);
+    $('#locSalvar').disabled=true;let r;
+    if(locEditId)r=await db.from('locacoes').update(reg).eq('id',locEditId);
+    else{reg.ordem=Math.max(0,...locs.filter(l=>l.data.slice(0,7)===reg.data.slice(0,7)).map(l=>l.ordem||0))+1;r=await db.from('locacoes').insert(reg)}
+    $('#locSalvar').disabled=false;
+    if(r.error)return erro('Não foi possível salvar: '+r.error.message);
+    locDialog.close();locMes=reg.data.slice(0,7);toast(locEditId?'Locação atualizada':'Locação salva');await loadLocacoes();
   };
 
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
