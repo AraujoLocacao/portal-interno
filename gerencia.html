@@ -246,7 +246,7 @@
           <div class="chart-box" id="box-analises"><canvas id="ch-analises" role="img" aria-label="Análises por corretor"></canvas></div>
         </div>
         <div class="card chart-card">
-          <div class="chart-head"><div><h2>Visitas, propostas e fechamentos</h2><p>Por corretor, conforme os lançamentos semanais.</p></div><div class="legend" id="lg-resultados"></div></div>
+          <div class="chart-head"><div><h2>Visitas, propostas e fechamentos</h2><p>Por corretor. Visitas e propostas: lançamentos semanais. Fechamentos: planilha da Locação.</p></div><div class="legend" id="lg-resultados"></div></div>
           <div class="chart-box" id="box-resultados"><canvas id="ch-resultados" role="img" aria-label="Visitas, propostas e fechamentos por corretor"></canvas></div>
         </div>
         <div class="card chart-card">
@@ -349,13 +349,13 @@
     <p class="msg note" id="semNota" hidden></p>
     <div class="table-wrap" style="margin-top:0">
       <table class="res-table">
-        <thead><tr><th class="u">Unidade</th><th class="c">Corretor</th><th class="num n">Leads do corretor</th><th class="num n">Visitas</th><th class="num n">Propostas</th><th class="num n">Fechamentos</th><th class="num v">VGL (R$)</th><th></th></tr></thead>
+        <thead><tr><th class="u">Unidade</th><th class="c">Corretor</th><th class="num n">Leads do corretor</th><th class="num n">Visitas</th><th class="num n">Propostas</th><th></th></tr></thead>
         <tbody id="semLinhas"></tbody>
-        <tfoot><tr><td colspan="2" style="text-align:left">TOTAL</td><td id="tLc">0</td><td id="tVis">0</td><td id="tProp">0</td><td id="tFech">0</td><td id="tVgl">R$ 0</td><td></td></tr></tfoot>
+        <tfoot><tr><td colspan="2" style="text-align:left">TOTAL</td><td id="tLc">0</td><td id="tVis">0</td><td id="tProp">0</td><td></td></tr></tfoot>
       </table>
     </div>
     <button type="button" class="link" id="addLinha" style="justify-self:start">+ Adicionar corretor</button>
-    <p class="msg">Campo em branco conta como zero. O VGL pode ser digitado como 6000 ou 6.000,00.</p>
+    <p class="msg">Campo em branco conta como zero. Fechamentos e VGL não são lançados aqui: vêm da planilha da Locação.</p>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="semSubmit">Salvar</button></div>
     <p class="msg error" id="semMsg" hidden></p>
   </form>
@@ -366,7 +366,8 @@
 <script>
   // Dados ficam no Supabase (ver supabase/gerencia.sql). Esta página não contém nenhum dado:
   // tudo é carregado depois do login e o banco só entrega para a gerência (tabela "gestores").
-  // Leads: leads_diarios (atendimento). Análises: pre_analises (pré-análise). Visitas, propostas, fechamentos e VGL: resultados_semanais.
+  // Leads: leads_diarios (atendimento). Análises: pre_analises (pré-análise). Fechamentos (quantidade de locações) e VGL: locacoes (Locação).
+  // Leads do corretor, visitas e propostas: resultados_semanais (lançados pela gerência; as colunas fechamentos/vgl de lá não são mais usadas).
   const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
   const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
@@ -376,7 +377,7 @@
   const MESES=['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
   const CAMPOS=['leads','lc','env','apr','rec','ana','vis','prop','fech','vgl'];
   const METRICAS=[{k:'leads',nome:'Leads'},{k:'env',nome:'Análises enviadas'},{k:'apr',nome:'Aprovadas'},{k:'vis',nome:'Visitas'},{k:'prop',nome:'Propostas'},{k:'fech',nome:'Fechamentos'},{k:'vgl',nome:'VGL',moeda:true}];
-  let leads=[],analises=[],resultados=[],corretoras=[],unidades=[],fatos=[],charts={},booted=false,semRel=null,metrica='leads';
+  let leads=[],analises=[],resultados=[],locacoes=[],corretoras=[],unidades=[],fatos=[],charts={},booted=false,semRel=null,metrica='leads';
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
   const pad=n=>String(n).padStart(2,'0');
@@ -421,7 +422,7 @@
     if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
     form.reset();
   };
-  const sair=async()=>{if(apSujo&&!confirm('Os textos da apresentação não foram salvos. Sair mesmo assim?'))return;await db.auth.signOut();booted=false;leads=[];analises=[];resultados=[];fatos=[];equipe=[];fotos={};apresentacoes=[];apPronto=false;apSujo=false};
+  const sair=async()=>{if(apSujo&&!confirm('Os textos da apresentação não foram salvos. Sair mesmo assim?'))return;await db.auth.signOut();booted=false;leads=[];analises=[];resultados=[];locacoes=[];fatos=[];equipe=[];fotos={};apresentacoes=[];apPronto=false;apSujo=false};
   $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
 
   // ---------- Abas ----------
@@ -453,25 +454,28 @@
   async function loadAll(){
     $('#dash').classList.add('loading');
     try{
-      const [c,u,l,a,r]=await Promise.all([
+      const [c,u,l,a,r,lo]=await Promise.all([
         db.from('corretoras').select('nome,ativa').order('nome'),db.from('unidades').select('nome,ativa').order('nome'),
         tudo('leads_diarios','data,ate,unidade,corretora,quantidade,ordem'),tudo('pre_analises','data,corretora,situacao'),
-        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,fechamentos,vgl,ordem')]);
+        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem'),tudo('locacoes','data,unidade,corretora,vgl')]);
       if(c.error)throw c.error;if(u.error)throw u.error;
-      corretoras=c.data;unidades=u.data;leads=l;analises=a;resultados=r.map(x=>({...x,vgl:Number(x.vgl)}));
+      corretoras=c.data;unidades=u.data;leads=l;analises=a;resultados=r;locacoes=lo.map(x=>({...x,vgl:Number(x.vgl)}));
       montarFatos();
-      if(!semRel){const ult=[...resultados].pop();semRel=ult?ult.data:semanaDe(iso(new Date()))[0]}
+      if(!semRel){const ult=[...resultados.map(x=>x.data),...locacoes.map(x=>x.data)].sort().pop();semRel=semanaDe(ult||iso(new Date()))[0]}
       fillFilterOptions();render();renderSemanal();
       await iniciarApresentacao();
     }catch(err){$('#subtitle').textContent='Não foi possível carregar os dados: '+err.message}
     $('#dash').classList.remove('loading');
   }
-  // Junta as três fontes numa lista só: cada item tem data, corretor, unidade (quando houver) e os números.
+  // Junta as quatro fontes numa lista só: cada item tem data, corretor, unidade (quando houver) e os números.
+  // Cada linha da planilha da Locação conta como 1 fechamento com o seu VGL. Ela entra sem unidade (como as análises),
+  // na unidade do corretor naquela semana; a cidade do imóvel só é usada se o corretor não tiver outro dado na semana.
   function montarFatos(){
     fatos=[
       ...leads.map(l=>({data:l.data,corretora:l.corretora,unidade:l.unidade,leads:l.quantidade,ordem:100+(l.ordem||0)})),
       ...analises.map(a=>({data:a.data,corretora:a.corretora||SEM,unidade:null,env:1,apr:+(a.situacao==='APROVADO'),rec:+(a.situacao==='RECUSADO'),ana:+(a.situacao==='EM ANÁLISE')})),
-      ...resultados.map(r=>({data:r.data,corretora:r.corretora,unidade:r.unidade,lc:r.leads_corretor,vis:r.visitas,prop:r.propostas,fech:r.fechamentos,vgl:r.vgl,ordem:r.ordem}))
+      ...resultados.map(r=>({data:r.data,corretora:r.corretora,unidade:r.unidade,lc:r.leads_corretor,vis:r.visitas,prop:r.propostas,ordem:r.ordem})),
+      ...locacoes.map(l=>({data:l.data,corretora:l.corretora,unidade:null,cidade:l.unidade,fech:1,vgl:l.vgl}))
     ];
   }
   const ordemUnidades=()=>[...new Set([...unidades.map(u=>u.nome),...fatos.map(f=>f.unidade).filter(Boolean)])];
@@ -498,7 +502,7 @@
   function filtrar({ignoreCorretor=false}={}){
     const [de,ate]=periodo(),u=$('#fUnidade').value,c=$('#fCorretor').value;
     let fs=fatos.filter(f=>!(de&&f.data<de)&&!(ate&&f.data>ate));
-    if(u){const cs=new Set(fs.filter(f=>f.unidade===u).map(f=>f.corretora));fs=fs.filter(f=>f.unidade?f.unidade===u:cs.has(f.corretora))}
+    if(u){const cs=new Set(fs.filter(f=>f.unidade===u).map(f=>f.corretora));fs=fs.filter(f=>f.unidade?f.unidade===u:cs.has(f.corretora)||f.cidade===u)}
     if(c&&!ignoreCorretor)fs=fs.filter(f=>f.corretora===c);
     return fs;
   }
@@ -518,17 +522,17 @@
       tile('Aprovadas',fmtN(t.apr),t.env?`${pct(t.apr,t.env)} das enviadas`:'','Pré-análise')+
       tile('Visitas',fmtN(t.vis),t.leads?`${pct(t.vis,t.leads)} dos leads`:'','Lançado por você')+
       tile('Propostas',fmtN(t.prop),t.vis?`${pct(t.prop,t.vis)} das visitas`:'','Lançado por você')+
-      tile('Fechamentos',fmtN(t.fech),t.leads?`${pct(t.fech,t.leads)} dos leads`:'','Lançado por você')+
-      tile('VGL',brl(Math.round(t.vgl)),t.fech?`média ${brl(Math.round(t.vgl/t.fech))} por fechamento`:'','Lançado por você');
+      tile('Fechamentos',fmtN(t.fech),t.leads?`${pct(t.fech,t.leads)} dos leads`:'','Locação')+
+      tile('VGL',brl(Math.round(t.vgl)),t.fech?`média ${brl(Math.round(t.vgl/t.fech))} por fechamento`:'','Locação');
     renderCobertura(de,ate);
     const todos=filtrar({ignoreCorretor:true}),by=porCorretor(todos);
     renderLeads(by);renderAnalises(by);renderResultados(by);renderVgl(by);renderEvolucao(fs);renderResumo(by);renderComparar(by);
   }
-  // Aviso quando o período vai além da última semana lançada (visitas, propostas e VGL ainda não informados).
+  // Aviso quando o período vai além da última semana lançada (visitas e propostas ainda não informadas).
   function renderCobertura(de,ate){
     const ult=resultados.reduce((m,r)=>r.ate>m?r.ate:m,''),hoje=iso(new Date()),fim=ate&&ate<hoje?ate:hoje,n=$('#cobertura');
     n.hidden=!(ult&&fim>ult&&(!de||de<=fim));
-    if(!n.hidden)n.innerHTML=`Visitas, propostas, fechamentos e VGL estão lançados até <strong>${br(ult)}</strong>. Para lançar as semanas seguintes, use a aba <strong>Relatório semanal</strong> → "+ Lançar semana".`;
+    if(!n.hidden)n.innerHTML=`Visitas e propostas estão lançadas até <strong>${br(ult)}</strong>. Para lançar as semanas seguintes, use a aba <strong>Relatório semanal</strong> → "+ Lançar semana". Fechamentos e VGL vêm da planilha da Locação.`;
   }
 
   Chart.defaults.font.family='Inter,"Segoe UI",Arial,sans-serif';Chart.defaults.font.size=12;Chart.defaults.color='#52514e';
@@ -650,7 +654,8 @@
     const get=(u,c)=>{const k=u+'|'+c;if(!rows.has(k))rows.set(k,{unidade:u,corretora:c,ordem:999,...zero()});return rows.get(k)};
     fs.filter(f=>f.unidade).forEach(f=>{const x=get(f.unidade,f.corretora);somar(x,f);x.ordem=Math.min(x.ordem,f.ordem??999)});
     const unidadeDe=c=>[...rows.values()].find(x=>x.corretora===c)?.unidade;
-    fs.filter(f=>!f.unidade).forEach(f=>somar(get(unidadeDe(f.corretora)||'OUTROS',f.corretora),f));
+    // Locações (têm a cidade do imóvel) antes das análises: assim a análise de quem só fechou na semana vai para a mesma unidade.
+    fs.filter(f=>!f.unidade).sort((x,y)=>!!y.cidade-!!x.cidade).forEach(f=>somar(get(unidadeDe(f.corretora)||f.cidade||'OUTROS',f.corretora),f));
     const us=[...ordemUnidades(),'OUTROS'];
     return [...rows.values()].sort((x,y)=>us.indexOf(x.unidade)-us.indexOf(y.unidade)||x.ordem-y.ordem||x.corretora.localeCompare(y.corretora));
   }
@@ -674,7 +679,7 @@
     const g=ls.reduce(somar,zero());
     $('#relBody').innerHTML=head+us.map(bloco).join('')+`<div class="rel-unit geral"><h3>RESUMO GERAL</h3><div class="table-wrap" style="margin:0"><table><thead><tr><th></th>${COLS.map(([,n])=>`<th class="num">${n}</th>`).join('')}</tr></thead>
       <tbody><tr class="sub"><td>RESUMO DA SEMANA</td>${COLS.map(([k])=>celula(k,g[k])).join('')}</tr></tbody></table></div></div>`+
-      (lancada?'':`<p class="msg note" style="margin-top:12px">Visitas, propostas, fechamentos e VGL desta semana ainda não foram lançados. Clique em "Lançar esta semana".</p>`);
+      (lancada?'':`<p class="msg note" style="margin-top:12px">Visitas e propostas desta semana ainda não foram lançadas. Clique em "Lançar esta semana". Fechamentos e VGL já vêm da planilha da Locação.</p>`);
   }
   function passoRel(dir){const [a]=semanaDe(semRel),ws=semanasComDados(),w=dir<0?ws.filter(x=>x<a).pop():ws.find(x=>x>a);if(w){semRel=w;renderRelatorio()}}
   $('#relPrev').onclick=()=>passoRel(-1);$('#relNext').onclick=()=>passoRel(1);
@@ -690,9 +695,9 @@
     const [de,ate]=periodo(),ws=[...new Set(resultados.map(r=>r.data))].filter(d=>!(de&&d<de)&&!(ate&&d>ate)).sort().reverse();
     $('#listCount').textContent=plural(ws.length,'semana','semanas')+(de||ate?' no período':'');
     if(!ws.length){$('#lista').innerHTML='<tbody><tr><td class="empty">Nenhuma semana lançada neste período. Clique em "+ Lançar semana".</td></tr></tbody>';return}
-    $('#lista').innerHTML=`<thead><tr><th>Semana</th><th class="num">Corretores</th><th class="num">Leads corretor</th><th class="num">Visitas</th><th class="num">Propostas</th><th class="num">Fechamentos</th><th class="num">VGL</th><th></th></tr></thead><tbody>${ws.map(w=>{
+    $('#lista').innerHTML=`<thead><tr><th>Semana</th><th class="num">Corretores</th><th class="num">Leads corretor</th><th class="num">Visitas</th><th class="num">Propostas</th><th></th></tr></thead><tbody>${ws.map(w=>{
       const rs=resultados.filter(r=>r.data===w),s=k=>rs.reduce((a,r)=>a+r[k],0);
-      return `<tr><td style="white-space:nowrap"><strong>${br(w).slice(0,5)} a ${br(rs[0].ate)}</strong></td><td class="num">${rs.length}</td><td class="num">${s('leads_corretor')}</td><td class="num">${s('visitas')}</td><td class="num">${s('propostas')}</td><td class="num">${s('fechamentos')}</td><td class="num">${brl(s('vgl'))}</td>
+      return `<tr><td style="white-space:nowrap"><strong>${br(w).slice(0,5)} a ${br(rs[0].ate)}</strong></td><td class="num">${rs.length}</td><td class="num">${s('leads_corretor')}</td><td class="num">${s('visitas')}</td><td class="num">${s('propostas')}</td>
         <td class="row-actions"><button class="link" data-ver="${w}">Ver</button><button class="link" data-edit="${w}">Editar</button><button class="link danger" data-del="${w}">Excluir</button></td></tr>`}).join('')}</tbody>`;
   }
   $('#lista').onclick=async e=>{
@@ -719,8 +724,7 @@
   const optsCorretor=c=>'<option value="">Selecione…</option>'+opcoes(corretoras.filter(x=>x.ativa).map(x=>x.nome).sort(),c);
   const campoN=(k,v)=>`<td><input class="n" data-k="${k}" type="number" min="0" max="10000" step="1" inputmode="numeric" value="${v||v===0?v:''}" aria-label="${k}"></td>`;
   const linhaHtml=(l={})=>`<tr><td><select class="u" aria-label="Unidade">${optsUnidade(l.unidade||unidades.find(u=>u.ativa)?.nome)}</select></td><td><select class="c" aria-label="Corretor">${optsCorretor(l.corretora)}</select></td>
-    ${campoN('leads_corretor',l.leads_corretor)}${campoN('visitas',l.visitas)}${campoN('propostas',l.propostas)}${campoN('fechamentos',l.fechamentos)}
-    <td><input class="v" data-k="vgl" inputmode="decimal" placeholder="0,00" value="${l.vgl?String(l.vgl).replace('.',','):''}" aria-label="VGL"></td><td><button type="button" class="rm" aria-label="Remover linha">×</button></td></tr>`;
+    ${campoN('leads_corretor',l.leads_corretor)}${campoN('visitas',l.visitas)}${campoN('propostas',l.propostas)}<td><button type="button" class="rm" aria-label="Remover linha">×</button></td></tr>`;
   // Aceita 6000 · 6.000 · 6.000,00 · R$ 6.000,50
   function lerValor(s){
     s=String(s||'').replace(/R\$|\s/g,'');if(!s)return 0;
@@ -728,9 +732,9 @@
     const v=Number(s);return Number.isFinite(v)&&v>=0?Math.round(v*100)/100:NaN;
   }
   function somarSemana(){
-    const t={leads_corretor:0,visitas:0,propostas:0,fechamentos:0,vgl:0};
-    document.querySelectorAll('#semLinhas input').forEach(i=>{const k=i.dataset.k;t[k]+=k==='vgl'?(lerValor(i.value)||0):(parseInt(i.value,10)||0)});
-    $('#tLc').textContent=t.leads_corretor;$('#tVis').textContent=t.visitas;$('#tProp').textContent=t.propostas;$('#tFech').textContent=t.fechamentos;$('#tVgl').textContent=brl(t.vgl);
+    const t={leads_corretor:0,visitas:0,propostas:0};
+    document.querySelectorAll('#semLinhas input').forEach(i=>{t[i.dataset.k]+=parseInt(i.value,10)||0});
+    $('#tLc').textContent=t.leads_corretor;$('#tVis').textContent=t.visitas;$('#tProp').textContent=t.propostas;
   }
   function preencher(linhas){$('#semLinhas').innerHTML=(linhas.length?linhas:[{}]).map(linhaHtml).join('');somarSemana()}
   const temDigitado=()=>[...document.querySelectorAll('#semLinhas input')].some(i=>i.value!=='');
@@ -790,7 +794,7 @@
     $('#semSubmit').disabled=false;
     if(error)return erro('Não foi possível salvar: '+error.message);
     semDialog.close();semRel=a;toast('Semana salva');
-    try{const r=await tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,fechamentos,vgl,ordem');resultados=r.map(x=>({...x,vgl:Number(x.vgl)}));montarFatos();render();renderSemanal();if(apPronto)renderThumbs()}
+    try{resultados=await tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem');montarFatos();render();renderSemanal();if(apPronto)renderThumbs()}
     catch(err){alert('Salvo, mas não foi possível atualizar a tela: '+err.message)}
   };
 
@@ -821,8 +825,8 @@
   const iniciais=n=>String(n||'?').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
   const periodoTxt=(a,b)=>`${a.slice(8)} a ${b.slice(8)} de ${MESES[+b.slice(5,7)-1].toLowerCase()} de ${b.slice(0,4)}`;
   function numSemana(a){let n=1,d=a.slice(0,8)+'01';while(semanaDe(d)[0]<a){d=proxDia(semanaDe(d)[1]);n++}return n}
-  // Fechamentos e VGL de cada corretor na semana (a semana começa em "a").
-  function numerosSemana(a){const by={};resultados.filter(r=>r.data===a).forEach(r=>{const o=by[r.corretora]??={fech:0,vgl:0};o.fech+=r.fechamentos;o.vgl+=r.vgl});return by}
+  // Fechamentos e VGL de cada corretor na semana (a semana começa em "a"), da planilha da Locação.
+  function numerosSemana(a){const b=semanaDe(a)[1],by={};locacoes.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{const o=by[l.corretora]??={fech:0,vgl:0};o.fech++;o.vgl+=l.vgl});return by}
   // Pessoa do slide: "e:<id>" = alguém da galeria; "c:<NOME>" = nome dos lançamentos (usa a galeria se estiver ligado a alguém).
   function pessoa(ref){
     if(!ref)return null;
@@ -835,7 +839,7 @@
   function sugerir(a,base){
     const c=copia(base||PADRAO),by=numerosSemana(a),nomes=Object.keys(by),nomeDe=n=>pessoa('c:'+n).nome;
     const top=nomes.filter(n=>by[n].vgl>0||by[n].fech>0).sort((x,y)=>by[y].vgl-by[x].vgl||by[y].fech-by[x].fech)[0];
-    const temHistorico=resultados.some(r=>r.data<a),jaFechou=n=>resultados.some(r=>r.data<a&&r.corretora===n&&r.fechamentos>0);
+    const temHistorico=locacoes.some(l=>l.data<a),jaFechou=n=>locacoes.some(l=>l.data<a&&l.corretora===n);
     c.destaques=[];
     if(top){const f=by[top].fech;c.destaques.push({titulo:'Corretora Destaque da Semana',selo:'Top Performance',pessoa:'c:'+top,numeros:true,
       msg:f>1?`Parabéns ${nomeDe(top)} por essas excelentes locações! Parabéns por mais esses negócios fechados!`:`Parabéns ${nomeDe(top)} por essa excelente locação! Parabéns por mais esse negócio fechado!`})}
@@ -884,7 +888,7 @@
   const secao=(nome,obs,p,on,corpo)=>`<div class="card ap-sec"><div class="ap-sec-head"><h3>${nome}${obs?`<small>${obs}</small>`:''}</h3><label class="inc"><input type="checkbox" data-p="${p}" ${on?'checked':''}> Incluir</label></div>${corpo}</div>`;
   function opcoesPessoa(atual){
     let v=atual;if(v&&v.startsWith('c:')){const e=equipe.find(x=>x.corretora===v.slice(2));if(e)v='e:'+e.id}
-    const semFoto=[...new Set([...corretoras.filter(c=>c.ativa).map(c=>c.nome),...resultados.map(r=>r.corretora)])].filter(n=>!equipe.some(e=>e.corretora===n)).sort();
+    const semFoto=[...new Set([...corretoras.filter(c=>c.ativa).map(c=>c.nome),...resultados.map(r=>r.corretora),...locacoes.map(l=>l.corretora)])].filter(n=>!equipe.some(e=>e.corretora===n)).sort();
     const ops=[...equipe.filter(e=>e.ativo).map(e=>['e:'+e.id,`${e.nome} (${e.funcao})`]),...semFoto.map(n=>['c:'+n,`${n} (sem foto na galeria)`])];
     if(v&&!ops.some(o=>o[0]===v))ops.unshift([v,pessoa(v)?.nome||'Pessoa removida']);
     return '<option value="">Escolha…</option>'+ops.map(([k,l])=>`<option value="${attr(k)}"${k===v?' selected':''}>${safe(l)}</option>`).join('');
@@ -900,7 +904,7 @@
     $('#apForm').innerHTML=
       secao('Capa','','capa.on',ap.capa.on,campo('capa.titulo','Título',ap.capa.titulo,{area:true})+campo('capa.sub','Subtítulo',ap.capa.sub,{area:true})+campo('capa.rodape','Rodapé',ap.capa.rodape))+
       secao('Pauta','','pauta.on',ap.pauta.on,ap.pauta.itens.map((it,i)=>`<div class="ap-row">${campo(`pauta.itens.${i}.t`,'Item '+(i+1),it.t)}${campo(`pauta.itens.${i}.d`,'Descrição',it.d)}</div>`).join(''))+
-      secao('Resultados da semana','automático','resultados.on',ap.resultados.on,`<p class="auto">Tabela da semana igual à planilha (Itajaí, Navegantes e resumo geral), com os números lançados.${lancada?'':' <strong style="color:#9a5b00">Esta semana ainda não tem visitas, propostas e VGL lançados (aba Relatório semanal).</strong>'}</p>`)+
+      secao('Resultados da semana','automático','resultados.on',ap.resultados.on,`<p class="auto">Tabela da semana igual à planilha (Itajaí, Navegantes e resumo geral), com os números lançados.${lancada?'':' <strong style="color:#9a5b00">Esta semana ainda não tem visitas e propostas lançadas (aba Relatório semanal).</strong>'}</p>`)+
       secao('Funil da semana','opcional, automático','funil.on',ap.funil.on,'<p class="auto">Leads, análises, aprovadas, visitas, propostas e fechamentos da semana, com as porcentagens e o VGL.</p>')+
       `<div class="card ap-sec"><div class="ap-sec-head"><h3>Destaques<small>um slide para cada</small></h3><button type="button" class="link" data-acao="addDest">+ Adicionar destaque</button></div>${dest||'<p class="auto">Nenhum destaque nesta semana. Clique em "+ Adicionar destaque".</p>'}</div>`+
       secao('Mensagem para a equipe','','time.on',ap.time.on,campo('time.titulo','Título',ap.time.titulo)+campo('time.frase','Frase',ap.time.frase,{area:true,rows:3}))+
