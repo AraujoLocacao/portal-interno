@@ -83,6 +83,8 @@
     .link-tile a.go{display:block;text-decoration:none;color:var(--ink)}.link-tile a.go strong{font-size:1.02rem}.link-tile a.go strong:after{content:" ↗";color:var(--blue)}
     .link-tile a.go span{display:block;color:#52616c;font-size:.86rem;margin-top:2px}.link-tile a.go small{display:block;color:var(--muted);font-size:.78rem;margin-top:4px;overflow-wrap:anywhere}
     .link-tile .row-actions{text-align:left;margin:8px 0 0 -4px}
+    .group-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .nota{margin:10px 0 0;background:#fff8ec;border:1px solid #f0dcb8;border-left:4px solid var(--amber);border-radius:10px;padding:10px 14px;color:#5b4520;font-size:.92rem;white-space:pre-line}
     @media(max-width:1100px){.filters{grid-template-columns:repeat(3,minmax(0,1fr));position:static}.filters .search{grid-column:1/-1}}
     @media(max-width:820px){.charts{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}}
     @media(max-width:560px){.filters{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.tile strong{font-size:1.6rem}}
@@ -175,7 +177,7 @@
   <section id="tab-validacoes" data-tab hidden>
     <div class="top">
       <div><h2>Validações</h2><p>Atalhos para os sites de consulta usados na análise. Cada link abre numa nova aba.</p></div>
-      <div class="bar-actions"><button class="primary" id="newLink">+ Novo link</button></div>
+      <div class="bar-actions"><input class="search-input" id="vBusca" type="search" placeholder="Buscar (ex.: SP, Bahia, federal)" aria-label="Buscar link"><button class="primary" id="newLink">+ Novo link</button></div>
     </div>
     <div id="linkGroups"></div>
   </section>
@@ -215,6 +217,15 @@
     <div class="field"><label for="iObs">Observação</label><textarea id="iObs" name="observacao" rows="2" maxlength="500"></textarea></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="itemSubmit">Salvar</button></div>
     <p class="msg error" id="itemMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="notaDialog">
+  <div class="dialog-head"><h2 id="notaTitle">Nota</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="notaForm">
+    <div class="field"><label for="nTexto">Orientação que aparece embaixo do título do grupo</label><textarea id="nTexto" name="nota" rows="4" maxlength="600"></textarea></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary">Salvar</button></div>
+    <p class="msg error" id="notaMsg" hidden></p>
   </form>
 </dialog>
 
@@ -282,7 +293,7 @@
   const $=s=>document.querySelector(s);
   const SEM='__sem__',SEM_LABEL='Não informada';
   const COLORS={APROVADO:'#2a78d6',RECUSADO:'#eb6834','EM ANÁLISE':'#a3a19a'};
-  let rows=[],corretoras=[],garantias=[],charts={},editingId=null,booted=false,senhas=[],docs=[],senhaEditId=null,links=[],linkEditId=null;
+  let rows=[],corretoras=[],garantias=[],charts={},editingId=null,booted=false,senhas=[],docs=[],senhaEditId=null,links=[],linkEditId=null,notas={},notaGrupo=null;
   const BUCKET='pre-analise';
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
@@ -562,21 +573,41 @@
 
   // ---------- Validações (links) ----------
   async function loadLinks(){
-    const {data,error}=await db.from('pre_analise_links').select('id,grupo,nome,url,descricao,ordem').order('ordem').order('nome');
+    const [l,g]=await Promise.all([db.from('pre_analise_links').select('id,grupo,nome,url,descricao,ordem').order('ordem').order('nome'),db.from('pre_analise_link_grupos').select('grupo,nota')]);
+    const error=l.error||g.error;
     if(error){$('#linkGroups').innerHTML=`<div class="empty-card">Não foi possível carregar: ${safe(error.message)}</div>`;return}
-    links=data;renderLinks();
+    links=l.data;notas=Object.fromEntries(g.data.map(x=>[x.grupo,x.nota||'']));renderLinks();
   }
+  const semAcento=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  // Busca de 2 letras procura a sigla do estado como palavra inteira ("SP" não acha "SPC" nem "Espírito").
+  function casaBusca(l,q){
+    const hay=semAcento(`${l.nome} ${l.descricao||''} ${l.grupo}`);
+    return q.length<=2?new RegExp(`(^|[^a-z])${q}([^a-z]|$)`).test(hay):hay.includes(q);
+  }
+  $('#vBusca').addEventListener('input',()=>renderLinks());
   const mesmoNome=(a,b)=>a.trim().toLowerCase()===b.trim().toLowerCase();
   function renderLinks(){
     const grupos=[...new Set(links.map(l=>l.grupo))];
     $('#lGrupos').innerHTML=grupos.map(g=>`<option value="${safe(g)}">`).join('');
     if(!links.length){$('#linkGroups').innerHTML='<div class="empty-card">Nenhum link cadastrado. Clique em "+ Novo link".</div>';return}
     const host=u=>{try{return new URL(u).host}catch{return u}};
-    $('#linkGroups').innerHTML=grupos.map(g=>`<div class="card link-group"><h2>${safe(g)}</h2><div class="link-grid">${links.filter(l=>l.grupo===g).map(l=>`
+    const q=semAcento($('#vBusca').value.trim()).replace(/[^a-z0-9 ]/g,'');
+    const visiveis=q?links.filter(l=>casaBusca(l,q)):links;
+    if(!visiveis.length){$('#linkGroups').innerHTML='<div class="empty-card">Nenhum link encontrado.</div>';return}
+    $('#linkGroups').innerHTML=grupos.filter(g=>visiveis.some(l=>l.grupo===g)).map(g=>`<div class="card link-group"><div class="group-head"><h2>${safe(g)}</h2><button class="link" data-nota="${safe(g)}">${notas[g]?'Editar nota':'+ Nota'}</button></div>
+      ${notas[g]?`<p class="nota">${safe(notas[g])}</p>`:''}<div class="link-grid">${visiveis.filter(l=>l.grupo===g).map(l=>`
       <div class="link-tile"><a class="go" href="${safe(l.url)}" target="_blank" rel="noopener noreferrer"><strong>${safe(l.nome)}</strong>${l.descricao?`<span>${safe(l.descricao)}</span>`:''}<small>${safe(host(l.url))}</small></a>
         <div class="row-actions">${senhas.some(s=>mesmoNome(s.sistema,l.nome))?`<button class="link" data-login="${l.id}">Ver login</button>`:''}<button class="link" data-edit-link="${l.id}">Editar</button><button class="link danger" data-del-link="${l.id}">Excluir</button></div></div>`).join('')}</div></div>`).join('');
   }
+  const notaDialog=$('#notaDialog');
+  $('#notaForm').onsubmit=async e=>{
+    e.preventDefault();const nota=$('#nTexto').value.trim(),msg=$('#notaMsg');msg.hidden=true;
+    const {error}=nota?await db.from('pre_analise_link_grupos').upsert({grupo:notaGrupo,nota}):await db.from('pre_analise_link_grupos').delete().eq('grupo',notaGrupo);
+    if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
+    notas[notaGrupo]=nota;notaDialog.close();renderLinks();
+  };
   $('#linkGroups').onclick=async e=>{
+    if(e.target.dataset.nota!==undefined){notaGrupo=e.target.dataset.nota;$('#notaTitle').textContent='Nota – '+notaGrupo;$('#nTexto').value=notas[notaGrupo]||'';$('#notaMsg').hidden=true;notaDialog.showModal();return}
     const d=e.target.dataset,l=links.find(x=>x.id===(d.login||d.editLink||d.delLink));if(!l)return;
     if(d.login){showTab('senhas');$('#sBusca').value=l.nome;renderSenhas()}
     if(d.editLink)openLink(l);
