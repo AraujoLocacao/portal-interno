@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Meu painel | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--navy:#173552;--blue:#294b68;--green:#24705a;--cream:#f5f5f0;--white:#fff;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10);--head:#c9d8ea}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+    button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer} [hidden]{display:none!important}
+    header.bar{background:var(--navy);color:#fff;padding:14px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .bar a{color:#cbd8e1;text-decoration:none;font-weight:600;font-size:.9rem}.bar a:hover{color:#fff}
+    .bar strong{font-size:1.02rem}.bar .who{color:#b9cad7;font-size:.82rem;margin-right:8px}
+    .bar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    main{padding:28px clamp(16px,4vw,48px) 64px;max-width:1500px;margin:0 auto}
+    h1{font-family:Georgia,serif;font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.1;margin:0}
+    h2{font-family:Georgia,serif;font-size:1.3rem;margin:0}
+    .top{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}.top p{margin:6px 0 0;color:var(--muted)}
+    .top h2{font-size:1.5rem}
+    .primary{border:0;background:var(--green);color:#fff;padding:10px 15px;border-radius:10px;font-weight:700;box-shadow:0 6px 18px rgba(36,112,90,.2)}.primary:hover{background:#1d604d}
+    .secondary{border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:10px;font-weight:650}.secondary:hover{border-color:#b6c5cf}
+    .secondary:disabled{opacity:.45;cursor:default}
+    .ghost{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;font-size:.85rem}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:12px;padding:16px;margin-bottom:18px;align-items:end;position:sticky;top:0;z-index:5}
+    .field{display:grid;gap:5px}.field label{font-size:.76rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .field input,.field select{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;min-width:0}
+    .field input:focus,.field select:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .dates{display:flex;gap:6px}.dates input{padding:9px 6px}
+    .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:12px}
+    .tile{padding:16px 18px}.tile span{display:block;font-size:.76rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .tile strong{display:block;font-size:clamp(1.45rem,2.1vw,1.85rem);line-height:1.15;margin-top:6px;font-variant-numeric:tabular-nums}.tile small{color:var(--muted);font-size:.8rem;display:block}
+    .tile .src{margin-top:6px;font-size:.72rem;color:#8a959d}
+    .note{background:#fdf6e8;color:#7a5314;border-radius:10px;padding:9px 14px;font-size:.88rem;margin:0 0 18px}
+    .charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:18px 0}
+    .chart-card{padding:20px 20px 16px;min-width:0}.chart-card.wide{grid-column:1/-1}
+    .chart-head{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:12px;flex-wrap:wrap}.chart-head p{margin:3px 0 0;color:var(--muted);font-size:.85rem}
+    .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:#52514e}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+    .chart-box{position:relative;width:100%}
+    .chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid #cbd5da;background:#fff;border-radius:999px;padding:5px 12px;font-size:.82rem;font-weight:700;color:var(--muted)}
+    .chip:hover{border-color:#9fb0bb;color:var(--ink)}.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+    .table-card{padding:20px;margin-bottom:18px}.table-wrap{overflow-x:auto;margin-top:12px}
+    table{border-collapse:collapse;width:100%;font-size:.88rem}th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:750;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+    td{padding:9px 10px;border-bottom:1px solid #eef1f2;vertical-align:top}tr:last-child td{border-bottom:0}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    tbody tr:hover{background:#f8fafb}tr.tot td{background:#f3f6f8;font-weight:800;border-top:1px solid var(--line)}
+    .muted{color:var(--muted)}.link{border:0;background:none;color:var(--blue);font-weight:700;padding:2px 4px;border-radius:6px;font-size:.82rem}.link:hover{background:#eef2f4}.link.danger{color:var(--red)}
+    .row-actions{white-space:nowrap;text-align:right}
+    .list-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .gate{max-width:420px;margin:60px auto;padding:28px}.gate h1{font-size:1.6rem;margin-bottom:6px}.gate p{color:var(--muted);margin:0 0 18px}.gate form{display:grid;gap:14px}
+    .msg{margin:0;font-size:.85rem;color:var(--muted)}.msg.error{color:var(--red)}.msg.note{background:#fdf6e8;color:#7a5314;border-radius:8px;padding:8px 10px}
+    .empty{padding:30px;text-align:center;color:var(--muted)}
+    .empty-card{border:1px dashed #bac5cc;border-radius:0 0 10px 10px;padding:26px;text-align:center;color:var(--muted)}
+    dialog{border:0;border-radius:18px;padding:0;box-shadow:0 28px 90px rgba(10,30,45,.3);width:min(1000px,calc(100% - 32px));overflow-x:hidden}dialog::backdrop{background:rgba(10,30,45,.62);backdrop-filter:blur(3px)}
+    .dialog-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}.close{border:0;background:#eef2f4;width:34px;height:34px;border-radius:50%;font-size:1.2rem}
+    dialog form{padding:20px 22px 22px;display:grid;gap:14px}
+    .actions{display:flex;justify-content:flex-end;gap:10px}
+    .loading{opacity:.55;transition:opacity .2s}
+    .dept{display:flex;justify-content:space-between;align-items:end;gap:10px 24px;flex-wrap:wrap;margin-bottom:24px;border-bottom:1px solid var(--line)}.dept h1{padding-bottom:12px}
+    .tabs{display:flex;gap:2px;overflow-x:auto;max-width:100%}.tab-link{padding:10px 16px;font-weight:700;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;white-space:nowrap}
+    .tab-link:hover{color:var(--ink)}.tab-link.active{color:var(--navy);border-bottom-color:var(--green)}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow)}
+    /* Relatório semanal: mesmo formato da planilha */
+    .rel-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.rel-nav input{border:1px solid #cbd5da;border-radius:10px;padding:7px 9px;background:#fff}
+    .rel-nav .secondary{padding:7px 11px}
+    .rel-day{background:var(--head);text-align:center;font-weight:800;font-size:.85rem;padding:6px;border-radius:8px 8px 0 0;letter-spacing:.02em}
+    .rel-unit{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:12px}
+    .rel-unit h3{margin:0;padding:8px 12px;font-size:.95rem;font-weight:800;letter-spacing:.02em}
+    .rel-unit table{font-size:.9rem;table-layout:fixed;min-width:760px}.rel-unit th:first-child{width:20%}.rel-unit th{background:var(--navy);color:#fff;padding:6px 10px;border:0}
+    .rel-unit td{padding:6px 10px;font-weight:650}.rel-unit tr.sub td{background:#eef2f4;font-weight:800;border-top:1px solid var(--line)}
+    .rel-unit.geral th{background:#24705a}
+    .rel-unit th.man,.rel-unit td.man{background-clip:padding-box}
+    /* Lançar semana */
+    .res-table th{padding:6px 6px}.res-table td{padding:5px 6px;border:0}
+    .res-table select,.res-table input{border:1px solid #cbd5da;border-radius:9px;padding:7px 8px;background:#fff;min-width:0;width:100%}
+    .res-table input{text-align:right;font-variant-numeric:tabular-nums}
+    .res-table select:focus,.res-table input:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .res-table .n{width:84px}.res-table .v{width:120px}.res-table .u{width:140px}.res-table .c{min-width:140px}
+    .res-table tfoot td{font-weight:800;border-top:1px solid var(--line);padding-top:9px;text-align:right}
+    .rm{border:0;background:#f3f5f6;border-radius:8px;font-size:1.1rem;color:var(--muted);width:32px;height:34px}.rm:hover{background:#fdece4;color:var(--red)}
+    .week-label{font-weight:800;color:var(--navy);align-self:end;padding-bottom:9px}
+    @media(max-width:900px){.filters{grid-template-columns:1fr 1fr;position:static}}
+    @media(max-width:820px){.charts{grid-template-columns:1fr}}
+    @media(max-width:560px){.tile strong{font-size:1.5rem}.tiles{grid-template-columns:1fr 1fr}}
+
+    /* ---------- Aba Apresentação ---------- */
+    .ap-semana{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px}
+    .ap-semana strong{font-size:1.05rem;color:var(--navy)}.ap-status{font-size:.82rem;color:var(--muted)}.ap-status.dirty{color:#9a5b00;font-weight:700}
+    .ap-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,440px);gap:18px;align-items:start;margin-bottom:24px}
+    .ap-form{display:grid;gap:12px}
+    .ap-sec{padding:14px 16px;display:grid;gap:10px}
+    .ap-sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .ap-sec-head h3{margin:0;font-size:1rem}.ap-sec-head h3 small{color:var(--muted);font-weight:600;margin-left:6px}
+    .ap-sec .auto{margin:0;color:var(--muted);font-size:.86rem}
+    .inc{display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;color:var(--muted)}
+    .ap-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:8px}
+    .ap-sec input:not([type=checkbox]),.ap-sec textarea,.ap-sec select{width:100%;border:1px solid #cbd5da;border-radius:9px;padding:7px 9px;background:#fff;min-width:0;font-size:.9rem}
+    .ap-sec textarea{resize:vertical}
+    .ap-sec input:focus,.ap-sec textarea:focus,.ap-sec select:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .ap-lbl{font-size:.72rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block}
+    .dest{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;background:#fbfcfc}
+    .dest-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;font-size:.88rem}
+    .ap-preview{position:sticky;top:12px;padding:14px;max-height:calc(100vh - 24px);overflow:auto}
+    .ap-preview h3{margin:0 0 10px;font-size:1rem}
+    .thumb{margin-bottom:12px;cursor:pointer}.thumb small{display:block;font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:4px}
+    .thumb-in{position:relative;overflow:hidden;border-radius:8px;border:1px solid var(--line);box-shadow:0 4px 14px rgba(23,53,82,.08)}
+    .thumb:hover .thumb-in{border-color:#6da7ec}
+    .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:12px}
+    .pes{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}.pes.off{opacity:.5}
+    .pes-foto{aspect-ratio:1/1;background:#e8edf0;display:grid;place-items:center;font-size:2rem;font-weight:800;color:#8a99a4}
+    .pes-foto img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
+    .pes-info{padding:10px 12px}.pes-info strong{display:block}.pes-info small{color:var(--muted);display:block;font-size:.8rem}
+    .pes .row-actions{text-align:left;margin:6px 0 0 -4px}
+    .foto-prev{width:140px;aspect-ratio:1/1;border-radius:12px;background:#e8edf0;overflow:hidden;display:grid;place-items:center;color:var(--muted);font-size:.8rem}
+    .foto-prev img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+    #pesForm{padding:20px 22px 22px;display:grid;gap:14px}
+    dialog.estreito{width:min(560px,calc(100% - 32px))}
+    @media(max-width:1000px){.ap-grid{grid-template-columns:1fr}.ap-preview{position:static;max-height:none}}
+    @media(max-width:560px){.ap-row{grid-template-columns:1fr}}
+
+    /* Modo apresentação (tela cheia) */
+    #show{position:fixed;inset:0;background:#0d1620;z-index:100;display:grid;place-items:center}
+    #showStage{position:relative;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,.5)}
+    .show-bar{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(0,0,0,.55);color:#fff;padding:6px 10px;border-radius:12px;font-weight:700;font-size:.9rem;opacity:.25;transition:opacity .2s}
+    .show-bar:hover{opacity:1}.show-bar button{border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:6px 12px;font-weight:700}
+
+    /* ---------- Slides (1440 x 810, mesmo visual da apresentação do Canva) ---------- */
+    .slide{width:1440px;height:810px;background:#fff;color:#1e293b;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding:56px 72px;transform-origin:0 0;line-height:1.3}
+    .slide *{box-sizing:border-box}
+    .s-head{display:flex;justify-content:space-between;align-items:flex-start;gap:30px}
+    .s-kick{font-size:16px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#4a6d96}.s-kick.lar{color:#d97706}
+    .s-title{font-size:40px;font-weight:700;margin:10px 0 0;color:#1e293b;font-family:Arial,Helvetica,sans-serif;line-height:1.15}
+    .s-selo{background:#fdf0c4;color:#b45309;font-weight:700;font-size:17px;padding:9px 22px;border-radius:999px;white-space:nowrap;margin-top:18px}
+    .s-dir{color:#5f7189;font-weight:700;font-size:18px;margin-top:26px;white-space:nowrap}
+    .s-capa,.s-fim{background:#6f9bcc;color:#fff}
+    .s-logo{background:#fff;border-radius:10px;width:134px;height:80px;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+    .s-logo img{width:118px;display:block}
+    .s-capa .s-top{position:absolute;top:92px;right:72px;font-weight:700;font-size:16px;color:rgba(255,255,255,.75);letter-spacing:.02em}
+    .s-capa-body{position:absolute;left:72px;right:240px;top:275px}
+    .s-pill-row{display:flex;align-items:center;gap:14px;font-size:15px;color:rgba(255,255,255,.85)}
+    .s-pill{background:#2f4461;color:#c7d6ea;font-weight:700;padding:8px 18px;border-radius:999px}
+    .s-capa h1{font-size:62px;line-height:1.08;margin:24px 0 20px;font-weight:700;font-family:Arial,Helvetica,sans-serif}
+    .s-capa p{font-size:22px;margin:0;color:rgba(255,255,255,.85)}
+    .s-capa .s-data{margin-top:18px;font-weight:700;color:#fff}
+    .s-foot{position:absolute;left:72px;right:72px;bottom:44px;border-top:1px solid rgba(255,255,255,.7);padding-top:26px;font-size:16px}
+    .s-fim{text-align:center}.s-fim .s-logo{margin:6px auto 0}
+    .s-fim h1{font-size:58px;margin:190px 0 40px;font-family:Arial,Helvetica,sans-serif}
+    .s-fim p{font-size:22px;margin:0 auto;max-width:1100px;color:rgba(255,255,255,.92)}
+    .s-fim .s-foot{text-align:center}
+    .s-cards{display:grid;gap:22px;position:absolute;left:72px;right:72px;top:340px}
+    .s-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:34px 28px 30px}
+    .s-card h3{font-size:24px;margin:22px 0 14px;font-family:Arial,Helvetica,sans-serif}
+    .s-card p{font-size:18px;color:#64748b;margin:0;line-height:1.35}
+    .s-ico{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:#eef2f7;color:#3b5577}.s-ico.am{background:#fdf0c4;color:#c2410c}.s-ico.ve{background:#e8f7ee;color:#16a34a}
+    .s-ico svg{width:26px;height:26px;fill:currentColor}
+    .s-tab-wrap{position:absolute;left:0;right:0;top:160px;display:flex;justify-content:center}
+    .s-tab{width:760px;font-family:Calibri,Carlito,Arial,sans-serif}
+    .s-tab .semn{text-align:center;font-weight:800;font-size:22px;margin-bottom:4px}
+    .s-tab table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:14px;table-layout:fixed}
+    .s-tab td,.s-tab th{border:1px solid #444;padding:3px 6px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;font-size:15px;letter-spacing:0;text-transform:none;vertical-align:middle;color:inherit}
+    .s-tab tr:hover{background:none}.s-tab tr:last-child td{border-bottom:1px solid #444}
+    .s-tab .tt td{background:#fff;text-align:center;font-weight:800}.s-tab .per td{background:#c5d6ea;text-align:center;font-weight:800}
+    .s-tab th{background:#000;color:#fff;text-align:center;font-weight:800;padding:14px 6px 3px}
+    .s-tab td:first-child{text-align:center;font-weight:800}.s-tab .lead{text-align:center;font-weight:800}
+    .s-tab .sub td{background:#000;color:#fff;font-weight:800}.s-tab .sub td:first-child{text-align:left}
+    .s-tab.compacto td,.s-tab.compacto th{font-size:13px}.s-tab.compacto th{padding:6px 6px 2px}.s-tab.compacto td{padding:1px 6px}
+    .s-dest{position:absolute;left:72px;right:72px;top:238px;display:grid;grid-template-columns:345px 1fr;gap:40px}
+    .s-foto{width:345px;height:365px;border-radius:22px;border:2px solid #cbd5e1;overflow:hidden;background:#e2e8f0;display:grid;place-items:center;font-size:90px;font-weight:700;color:#94a3b8}
+    .s-foto img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
+    .s-tag{display:inline-block;background:#eef2f7;border:1px solid #cbd5e1;color:#3b5577;font-weight:700;font-size:15px;padding:7px 14px;border-radius:6px;margin-top:10px}
+    .s-nome{font-size:44px;font-weight:700;margin:6px 0 6px;color:#1e293b}
+    .s-fun{font-size:19px;color:#64748b}
+    .s-nums{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+    .s-num{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:22px 22px 20px}
+    .s-num strong{display:block;font-size:34px;color:#2d4f7a}.s-num.vgl strong{color:#16a34a}.s-num span{font-weight:700;font-size:16px}
+    .s-msg{margin-top:22px;border-left:4px solid #d97706;background:#f8fafc;padding:18px 20px;font-style:italic;font-size:18px;color:#334155;line-height:1.4}
+    .s-frase{position:absolute;left:200px;right:200px;top:240px;background:#f8fafc;padding:34px 24px;text-align:center;font-style:italic;font-size:40px;color:#334155;line-height:1.25}
+    .s-funil{position:absolute;left:72px;right:72px;top:250px;display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+    .s-etapa{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:22px 16px;text-align:center;position:relative}
+    .s-etapa span{display:block;font-size:15px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+    .s-etapa strong{display:block;font-size:46px;margin:10px 0 6px;color:#1e293b}
+    .s-etapa small{font-size:15px;color:#4a6d96;font-weight:700}
+    .s-vgl{position:absolute;left:72px;right:72px;top:500px;display:flex;justify-content:center;gap:18px}
+    .s-vgl div{background:#e8f7ee;border-radius:16px;padding:20px 40px;text-align:center}.s-vgl span{font-weight:700;color:#166534;font-size:16px}.s-vgl strong{display:block;font-size:40px;color:#16a34a;margin-top:4px}
+
+    #printArea{display:none}
+    @media print{
+      @page{size:1440px 810px;margin:0}
+      html,body{background:#fff;margin:0}
+      body>*:not(#printArea){display:none!important}
+      #printArea{display:block!important}
+      #printArea .slide{break-after:page;page-break-after:always}
+      *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    }
+  </style>
+</head>
+<body>
+<header class="bar">
+  <div><a href="./">← Portal interno</a> &nbsp;·&nbsp; <strong>Meu painel</strong></div>
+  <div class="bar-actions" id="barActions" hidden><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
+</header>
+
+<section class="card gate" id="gate" hidden>
+  <h1>Meu painel</h1>
+  <p>Área exclusiva da gerência. Entre com o seu e-mail e senha.</p>
+  <form id="loginForm">
+    <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
+    <button class="primary" type="submit">Entrar</button>
+    <p class="msg error" id="loginMsg" hidden></p>
+  </form>
+</section>
+
+<section class="card gate" id="denied" hidden>
+  <h1>Sem acesso</h1>
+  <p>Esta área é exclusiva da gerência.</p>
+  <button class="secondary" id="deniedLogout">Entrar com outro e-mail</button>
+</section>
+
+<main id="app" hidden>
+  <div class="dept"><h1>Meu painel</h1>
+    <nav class="tabs" aria-label="Seções do painel"><button type="button" class="tab-link" data-go="painel">Painel</button><button type="button" class="tab-link" data-go="semanal">Relatório semanal</button><button type="button" class="tab-link" data-go="apresentacao">Apresentação</button></nav></div>
+
+  <div class="card filters" role="search">
+    <div class="field"><label for="fPeriodo">Período</label><select id="fPeriodo"><option value="mes">Este mês</option><option value="mespassado">Mês passado</option><option value="90">Últimos 90 dias</option><option value="ano">Este ano</option><option value="tudo">Tudo</option><option value="custom">Escolher datas…</option></select>
+      <div class="dates" id="customDates" hidden><input id="fDe" type="date" aria-label="De"><input id="fAte" type="date" aria-label="Até"></div></div>
+    <div class="field"><label for="fUnidade">Unidade</label><select id="fUnidade"></select></div>
+    <div class="field"><label for="fCorretor">Corretor</label><select id="fCorretor"></select></div>
+    <button class="secondary" id="clearFilters">Limpar</button>
+  </div>
+
+  <section id="tab-painel" data-tab>
+    <div id="dash">
+      <p class="msg" id="subtitle" style="margin:0 0 12px">Carregando…</p>
+      <div class="tiles" id="tiles"></div>
+      <p class="note" id="cobertura" hidden></p>
+
+      <div class="charts">
+        <div class="card chart-card">
+          <div class="chart-head"><div><h2>Leads por corretor</h2><p>Lançados pelo atendimento. Clique num corretor para filtrar.</p></div></div>
+          <div class="chart-box" id="box-leads"><canvas id="ch-leads" role="img" aria-label="Leads por corretor"></canvas></div>
+        </div>
+        <div class="card chart-card">
+          <div class="chart-head"><div><h2>Análises por corretor</h2><p>Enviadas à pré-análise e o resultado. Ao lado: total e % aprovada.</p></div><div class="legend" id="lg-analises"></div></div>
+          <div class="chart-box" id="box-analises"><canvas id="ch-analises" role="img" aria-label="Análises por corretor"></canvas></div>
+        </div>
+        <div class="card chart-card">
+          <div class="chart-head"><div><h2>Visitas, propostas e fechamentos</h2><p>Por corretor, conforme os lançamentos semanais.</p></div><div class="legend" id="lg-resultados"></div></div>
+          <div class="chart-box" id="box-resultados"><canvas id="ch-resultados" role="img" aria-label="Visitas, propostas e fechamentos por corretor"></canvas></div>
+        </div>
+        <div class="card chart-card">
+          <div class="chart-head"><div><h2>VGL por corretor</h2><p>Valor geral de locação fechado no período.</p></div></div>
+          <div class="chart-box" id="box-vgl"><canvas id="ch-vgl" role="img" aria-label="VGL por corretor"></canvas></div>
+        </div>
+        <div class="card chart-card wide">
+          <div class="chart-head"><div><h2 id="evoTitle">Semana a semana</h2><p>Escolha o número que quer acompanhar.</p></div><div class="chips" id="chips" role="group" aria-label="Número do gráfico"></div></div>
+          <div class="chart-box" style="height:280px"><canvas id="ch-evolucao" role="img" aria-label="Evolução no período"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card table-card">
+        <h2>Resultado por corretor</h2>
+        <div class="table-wrap"><table id="resumo"></table></div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head"><div><h2 id="cmpTitle">Comparar corretores</h2><p>Escolha uma coluna da tabela acima para ver em gráfico.</p></div><div class="chips" id="chipsCmp" role="group" aria-label="Coluna do gráfico"></div></div>
+        <div class="chart-box" id="box-comparar"><canvas id="ch-comparar" role="img" aria-label="Comparação entre corretores"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-semanal" data-tab hidden>
+    <div class="top">
+      <div><h2>Relatório semanal</h2><p>Igual à sua planilha. Leads vêm do atendimento e análises da pré-análise; o resto você lança aqui.</p></div>
+      <div class="bar-actions"><button class="secondary" id="exportCsv">Baixar planilha</button><button class="primary" id="newSemana">+ Lançar semana</button></div>
+    </div>
+
+    <div class="card table-card" id="relCard">
+      <div class="chart-head"><div><h2>Resumo da semana</h2><p>Use as setas para trocar a semana.</p></div>
+        <div class="rel-nav"><button class="secondary" id="relPrev" aria-label="Semana anterior">←</button><input type="date" id="relData" aria-label="Um dia da semana"><button class="secondary" id="relNext" aria-label="Próxima semana">→</button><button class="secondary" id="relEdit">Editar semana</button><button class="secondary" id="relCopy">Copiar para WhatsApp</button></div></div>
+      <div id="relBody"></div>
+    </div>
+
+    <div class="card table-card">
+      <div class="list-head"><h2>Semanas lançadas</h2><span class="muted" id="listCount"></span></div>
+      <div class="table-wrap"><table id="lista"></table></div>
+    </div>
+  </section>
+
+  <section id="tab-apresentacao" data-tab hidden>
+    <div class="top">
+      <div><h2>Apresentação da semana</h2><p>Reunião de segunda, 16h. Os números saem dos lançamentos; os textos você ajusta aqui e clica em "Salvar textos".</p></div>
+      <div class="bar-actions"><button class="secondary" id="apSalvar">Salvar textos</button><button class="secondary" id="apPdf">Baixar PDF</button><button class="primary" id="apApresentar">▶ Apresentar</button></div>
+    </div>
+
+    <div class="card ap-semana">
+      <div class="rel-nav"><button class="secondary" id="apPrev" aria-label="Semana anterior">←</button><input type="date" id="apData" aria-label="Um dia da semana apresentada"><button class="secondary" id="apNext" aria-label="Próxima semana">→</button>
+        <strong id="apSemanaTxt"></strong></div>
+      <div class="rel-nav"><span class="ap-status" id="apStatus"></span><button class="secondary" id="apSugerir">Refazer sugestões</button></div>
+    </div>
+    <p class="msg" style="margin:10px 0 16px">Sugestões automáticas da semana: <strong>destaque</strong> = quem teve o maior VGL; <strong>primeira locação</strong> = quem fechou pela primeira vez. Você pode trocar tudo.</p>
+
+    <div class="ap-grid">
+      <div class="ap-form" id="apForm"></div>
+      <div class="card ap-preview"><h3>Slides <small class="muted" id="apConta"></small></h3><p class="msg" style="margin:-6px 0 10px">Clique num slide para apresentar a partir dele.</p><div id="apThumbs"></div></div>
+    </div>
+
+    <div class="card table-card">
+      <div class="list-head"><div><h2>Galeria da equipe</h2><p class="msg" style="margin-top:4px">Fotos, nomes e funções usados nas apresentações. Ficam guardados só para você.</p></div><button class="primary" id="newPessoa">+ Adicionar pessoa</button></div>
+      <div class="gal" id="galeria"></div>
+    </div>
+  </section>
+</main>
+
+<div id="show" hidden>
+  <div id="showStage"></div>
+  <div class="show-bar"><button id="showPrev" aria-label="Slide anterior">←</button><span id="showNum"></span><button id="showNext" aria-label="Próximo slide">→</button><button id="showSair">Sair (Esc)</button></div>
+</div>
+
+<div id="printArea"></div>
+
+<dialog id="pesDialog" class="estreito">
+  <div class="dialog-head"><h2 id="pesTitle">Adicionar pessoa</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="pesForm">
+    <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+      <div class="foto-prev" id="pesPrev">Sem foto</div>
+      <div class="field" style="flex:1;min-width:200px"><label for="pFoto">Foto (JPG ou PNG)</label><input id="pFoto" type="file" accept="image/jpeg,image/png,image/webp">
+        <p class="msg">De preferência uma foto em pé ou do rosto, com boa luz. Ela é reduzida automaticamente.</p></div>
+    </div>
+    <div class="field"><label for="pNome">Nome (como aparece no slide)</label><input id="pNome" maxlength="80" placeholder="Ex.: Thayná" required></div>
+    <div class="field"><label for="pFuncao">Função</label><input id="pFuncao" maxlength="80" list="funcoesSug" required><datalist id="funcoesSug"><option>Corretora de Imóveis</option><option>Corretor de Imóveis</option><option>Atendimento</option><option>Pré-análise</option><option>Gerência</option></datalist></div>
+    <div class="field"><label for="pCorretora">Nome nos lançamentos (opcional)</label><select id="pCorretora"></select>
+      <p class="msg">Ligue ao nome usado nos leads e resultados para a foto e os números aparecerem juntos no destaque.</p></div>
+    <label class="inc" style="color:var(--ink)"><input type="checkbox" id="pAtivo" checked> Ativo na equipe</label>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="pesSubmit">Salvar</button></div>
+    <p class="msg error" id="pesMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="semDialog">
+  <div class="dialog-head"><h2 id="semTitle">Lançar semana</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="semForm" novalidate>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div class="field" style="width:200px"><label for="sData">Um dia da semana</label><input id="sData" type="date" required></div>
+      <div class="week-label" id="sSemana"></div>
+    </div>
+    <p class="msg note" id="semNota" hidden></p>
+    <div class="table-wrap" style="margin-top:0">
+      <table class="res-table">
+        <thead><tr><th class="u">Unidade</th><th class="c">Corretor</th><th class="num n">Leads do corretor</th><th class="num n">Visitas</th><th class="num n">Propostas</th><th class="num n">Fechamentos</th><th class="num v">VGL (R$)</th><th></th></tr></thead>
+        <tbody id="semLinhas"></tbody>
+        <tfoot><tr><td colspan="2" style="text-align:left">TOTAL</td><td id="tLc">0</td><td id="tVis">0</td><td id="tProp">0</td><td id="tFech">0</td><td id="tVgl">R$ 0</td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <button type="button" class="link" id="addLinha" style="justify-self:start">+ Adicionar corretor</button>
+    <p class="msg">Campo em branco conta como zero. O VGL pode ser digitado como 6000 ou 6.000,00.</p>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="semSubmit">Salvar</button></div>
+    <p class="msg error" id="semMsg" hidden></p>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  // Dados ficam no Supabase (ver supabase/gerencia.sql). Esta página não contém nenhum dado:
+  // tudo é carregado depois do login e o banco só entrega para a gerência (tabela "gestores").
+  // Leads: leads_diarios (atendimento). Análises: pre_analises (pré-análise). Visitas, propostas, fechamentos e VGL: resultados_semanais.
+  const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const $=s=>document.querySelector(s);
+  const COR={azul:'#2a78d6',laranja:'#eb6834',agua:'#1baf7a',cinza:'#a3a19a'};
+  const SEM='Não informada';
+  const MESES=['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+  const CAMPOS=['leads','lc','env','apr','rec','ana','vis','prop','fech','vgl'];
+  const METRICAS=[{k:'leads',nome:'Leads'},{k:'env',nome:'Análises enviadas'},{k:'apr',nome:'Aprovadas'},{k:'vis',nome:'Visitas'},{k:'prop',nome:'Propostas'},{k:'fech',nome:'Fechamentos'},{k:'vgl',nome:'VGL',moeda:true}];
+  let leads=[],analises=[],resultados=[],corretoras=[],unidades=[],fatos=[],charts={},booted=false,semRel=null,metrica='leads';
+
+  const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  const pad=n=>String(n).padStart(2,'0');
+  const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const br=s=>s?s.split('-').reverse().join('/'):'';
+  const dia=s=>new Date(s+'T12:00');
+  const titulo=s=>s.toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase());
+  const fmtN=v=>Number(v).toLocaleString('pt-BR');
+  const brl=v=>Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:v%1?2:0,maximumFractionDigits:2});
+  const brlCurto=v=>v>=1000?'R$ '+(v/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil':brl(v);
+  const pct=(a,b)=>{if(!b)return '–';const p=a/b*100;return (p<10&&p%1?p.toFixed(1):Math.round(p)).toString().replace('.',',')+'%'};
+  const zero=()=>Object.fromEntries(CAMPOS.map(k=>[k,0]));
+  const somar=(o,f)=>{CAMPOS.forEach(k=>o[k]+=f[k]||0);return o};
+  const plural=(n,s,p)=>`${fmtN(n)} ${n===1?s:p}`;
+
+  // Semana de segunda a domingo, cortada na virada do mês (como no relatório: 01 a 06/09, 07 a 13/09...).
+  function semanaDe(d){
+    const x=dia(d),seg=new Date(x);seg.setDate(x.getDate()-(x.getDay()+6)%7);
+    const dom=new Date(seg);dom.setDate(seg.getDate()+6);
+    const ini=new Date(x.getFullYear(),x.getMonth(),1,12),fim=new Date(x.getFullYear(),x.getMonth()+1,0,12);
+    return [iso(seg<ini?ini:seg),iso(dom>fim?fim:dom)];
+  }
+  const proxDia=d=>{const x=dia(d);x.setDate(x.getDate()+1);return iso(x)};
+  const tituloSemana=(a,b)=>`SEMANA DO DIA ${a.slice(8)} A ${b.slice(8)} DE ${MESES[+b.slice(5,7)-1]} DE ${b.slice(0,4)}`;
+  const rotuloSemana=(a,b)=>`${a.slice(8)}–${b.slice(8)}/${b.slice(5,7)}`;
+
+  // ---------- Acesso ----------
+  async function refreshSession(){
+    const {data:{session}}=await db.auth.getSession();
+    $('#barActions').hidden=!session;
+    if(!session){show('gate');return}
+    $('#who').textContent=session.user.email;
+    const {data,error}=await db.rpc('is_gestor');
+    if(error||data!==true){show('denied');return}
+    show('app');
+    if(!booted){booted=true;showTab();await loadAll()}
+  }
+  function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
+  $('#loginForm').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,f=new FormData(form),msg=$('#loginMsg');msg.hidden=true;
+    const {error}=await db.auth.signInWithPassword({email:String(f.get('email')).trim(),password:String(f.get('senha'))});
+    if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
+    form.reset();
+  };
+  const sair=async()=>{if(apSujo&&!confirm('Os textos da apresentação não foram salvos. Sair mesmo assim?'))return;await db.auth.signOut();booted=false;leads=[];analises=[];resultados=[];fatos=[];equipe=[];fotos={};apresentacoes=[];apPronto=false;apSujo=false};
+  $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
+
+  // ---------- Abas ----------
+  function showTab(pedida){
+    const abas=['painel','semanal','apresentacao'],tab=abas.includes(pedida)?pedida:abas.includes(location.hash.slice(1))?location.hash.slice(1):'painel';
+    if(pedida)try{history.replaceState(null,'','#'+tab)}catch{}
+    document.querySelectorAll('[data-tab]').forEach(s=>s.hidden=s.id!=='tab-'+tab);
+    document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
+    // Gráfico desenhado com a aba escondida fica com tamanho zero: redesenha ao voltar.
+    if(tab==='painel'&&fatos.length)render();
+    // Os filtros do painel não valem para a apresentação (ela é sempre de uma semana inteira).
+    $('.filters').hidden=tab==='apresentacao';
+    if(tab==='apresentacao'&&apPronto)renderThumbs();
+  }
+  addEventListener('hashchange',()=>showTab());
+  document.querySelectorAll('.tab-link').forEach(b=>b.onclick=()=>showTab(b.dataset.go));
+  function toast(text){const t=document.createElement('div');t.className='toast';t.textContent=text;document.body.append(t);setTimeout(()=>t.remove(),2200)}
+  async function copiar(text,oque){try{await navigator.clipboard.writeText(text);toast(oque+' copiado')}catch{prompt('Copie abaixo:',text)}}
+
+  // ---------- Dados ----------
+  async function tudo(tabela,campos){
+    const all=[];
+    for(let from=0;;from+=1000){
+      const {data,error}=await db.from(tabela).select(campos).order('data').range(from,from+999);
+      if(error)throw error;all.push(...data);if(data.length<1000)break;
+    }
+    return all;
+  }
+  async function loadAll(){
+    $('#dash').classList.add('loading');
+    try{
+      const [c,u,l,a,r]=await Promise.all([
+        db.from('corretoras').select('nome,ativa').order('nome'),db.from('unidades').select('nome,ativa').order('nome'),
+        tudo('leads_diarios','data,ate,unidade,corretora,quantidade,ordem'),tudo('pre_analises','data,corretora,situacao'),
+        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,fechamentos,vgl,ordem')]);
+      if(c.error)throw c.error;if(u.error)throw u.error;
+      corretoras=c.data;unidades=u.data;leads=l;analises=a;resultados=r.map(x=>({...x,vgl:Number(x.vgl)}));
+      montarFatos();
+      if(!semRel){const ult=[...resultados].pop();semRel=ult?ult.data:semanaDe(iso(new Date()))[0]}
+      fillFilterOptions();render();renderSemanal();
+      await iniciarApresentacao();
+    }catch(err){$('#subtitle').textContent='Não foi possível carregar os dados: '+err.message}
+    $('#dash').classList.remove('loading');
+  }
+  // Junta as três fontes numa lista só: cada item tem data, corretor, unidade (quando houver) e os números.
+  function montarFatos(){
+    fatos=[
+      ...leads.map(l=>({data:l.data,corretora:l.corretora,unidade:l.unidade,leads:l.quantidade,ordem:100+(l.ordem||0)})),
+      ...analises.map(a=>({data:a.data,corretora:a.corretora||SEM,unidade:null,env:1,apr:+(a.situacao==='APROVADO'),rec:+(a.situacao==='RECUSADO'),ana:+(a.situacao==='EM ANÁLISE')})),
+      ...resultados.map(r=>({data:r.data,corretora:r.corretora,unidade:r.unidade,lc:r.leads_corretor,vis:r.visitas,prop:r.propostas,fech:r.fechamentos,vgl:r.vgl,ordem:r.ordem}))
+    ];
+  }
+  const ordemUnidades=()=>[...new Set([...unidades.map(u=>u.nome),...fatos.map(f=>f.unidade).filter(Boolean)])];
+
+  function fillFilterOptions(){
+    const keep=(sel,html)=>{const v=sel.value;sel.innerHTML=html;if([...sel.options].some(o=>o.value===v))sel.value=v};
+    keep($('#fUnidade'),'<option value="">Todas</option>'+ordemUnidades().map(n=>`<option value="${safe(n)}">${safe(titulo(n))}</option>`).join(''));
+    const nomes=[...new Set([...corretoras.filter(c=>c.ativa).map(c=>c.nome),...fatos.map(f=>f.corretora)])].sort((a,b)=>(a===SEM)-(b===SEM)||a.localeCompare(b));
+    keep($('#fCorretor'),'<option value="">Todos</option>'+nomes.map(n=>`<option value="${safe(n)}">${safe(n)}</option>`).join(''));
+  }
+
+  // ---------- Filtros ----------
+  function periodo(){
+    const p=$('#fPeriodo').value,t=new Date(),y=t.getFullYear(),m=t.getMonth();
+    $('#customDates').hidden=p!=='custom';
+    if(p==='mes')return [iso(new Date(y,m,1)),iso(new Date(y,m+1,0))];
+    if(p==='mespassado')return [iso(new Date(y,m-1,1)),iso(new Date(y,m,0))];
+    if(p==='90')return [iso(new Date(y,m,t.getDate()-89)),iso(t)];
+    if(p==='ano')return [`${y}-01-01`,`${y}-12-31`];
+    if(p==='custom')return [$('#fDe').value||'',$('#fAte').value||''];
+    return ['',''];
+  }
+  // As análises não têm unidade: no filtro de unidade entram as dos corretores que tiveram leads ou resultados nela no período.
+  function filtrar({ignoreCorretor=false}={}){
+    const [de,ate]=periodo(),u=$('#fUnidade').value,c=$('#fCorretor').value;
+    let fs=fatos.filter(f=>!(de&&f.data<de)&&!(ate&&f.data>ate));
+    if(u){const cs=new Set(fs.filter(f=>f.unidade===u).map(f=>f.corretora));fs=fs.filter(f=>f.unidade?f.unidade===u:cs.has(f.corretora))}
+    if(c&&!ignoreCorretor)fs=fs.filter(f=>f.corretora===c);
+    return fs;
+  }
+  ['#fUnidade','#fCorretor','#fPeriodo','#fDe','#fAte'].forEach(s=>$(s).addEventListener('input',()=>{render();renderSemanal()}));
+  $('#clearFilters').onclick=()=>{$('#fUnidade').value='';$('#fCorretor').value='';$('#fPeriodo').value='mes';render();renderSemanal()};
+
+  // ---------- Painel ----------
+  function porCorretor(fs){const by={};fs.forEach(f=>somar(by[f.corretora]??=zero(),f));return by}
+  function render(){
+    const fs=filtrar(),[de,ate]=periodo(),t=fs.reduce(somar,zero());
+    const partes=[$('#fCorretor').value||'Todos os corretores',$('#fUnidade').value?titulo($('#fUnidade').value):'todas as unidades'];
+    $('#subtitle').textContent=`${partes.join(' · ')} · ${de||ate?`${br(de)||'início'} a ${br(ate)||'hoje'}`:'todo o período'}`;
+    const tile=(nome,valor,nota,fonte)=>`<div class="card tile"><span>${nome}</span><strong>${valor}</strong><small>${nota||'&nbsp;'}</small><div class="src">${fonte}</div></div>`;
+    $('#tiles').innerHTML=
+      tile('Leads',fmtN(t.leads),t.lc?`+ ${plural(t.lc,'lead','leads')} do próprio corretor`:'','Atendimento')+
+      tile('Análises enviadas',fmtN(t.env),t.leads?`${pct(t.env,t.leads)} dos leads`:'','Pré-análise')+
+      tile('Aprovadas',fmtN(t.apr),t.env?`${pct(t.apr,t.env)} das enviadas`:'','Pré-análise')+
+      tile('Visitas',fmtN(t.vis),t.leads?`${pct(t.vis,t.leads)} dos leads`:'','Lançado por você')+
+      tile('Propostas',fmtN(t.prop),t.vis?`${pct(t.prop,t.vis)} das visitas`:'','Lançado por você')+
+      tile('Fechamentos',fmtN(t.fech),t.leads?`${pct(t.fech,t.leads)} dos leads`:'','Lançado por você')+
+      tile('VGL',brl(Math.round(t.vgl)),t.fech?`média ${brl(Math.round(t.vgl/t.fech))} por fechamento`:'','Lançado por você');
+    renderCobertura(de,ate);
+    const todos=filtrar({ignoreCorretor:true}),by=porCorretor(todos);
+    renderLeads(by);renderAnalises(by);renderResultados(by);renderVgl(by);renderEvolucao(fs);renderResumo(by);renderComparar(by);
+  }
+  // Aviso quando o período vai além da última semana lançada (visitas, propostas e VGL ainda não informados).
+  function renderCobertura(de,ate){
+    const ult=resultados.reduce((m,r)=>r.ate>m?r.ate:m,''),hoje=iso(new Date()),fim=ate&&ate<hoje?ate:hoje,n=$('#cobertura');
+    n.hidden=!(ult&&fim>ult&&(!de||de<=fim));
+    if(!n.hidden)n.innerHTML=`Visitas, propostas, fechamentos e VGL estão lançados até <strong>${br(ult)}</strong>. Para lançar as semanas seguintes, use a aba <strong>Relatório semanal</strong> → "+ Lançar semana".`;
+  }
+
+  Chart.defaults.font.family='Inter,"Segoe UI",Arial,sans-serif';Chart.defaults.font.size=12;Chart.defaults.color='#52514e';
+  const tooltip={backgroundColor:'#fff',titleColor:'#0b0b0b',bodyColor:'#52514e',footerColor:'#52514e',borderColor:'rgba(11,11,11,.12)',borderWidth:1,padding:10,boxPadding:4,usePointStyle:true};
+  const fonteRotulo='600 12px Inter,"Segoe UI",Arial,sans-serif';
+  // Rótulo no fim de cada linha (barras empilhadas: um texto por corretor).
+  const rotuloFim=textos=>({id:'rotuloFim',afterDatasetsDraw(chart){
+    const {ctx}=chart;ctx.save();ctx.fillStyle='#52514e';ctx.font=fonteRotulo;ctx.textBaseline='middle';
+    chart.data.labels.forEach((_,i)=>{let x=0,y=null;chart.data.datasets.forEach((d,di)=>{const el=chart.getDatasetMeta(di).data[i];if(el){x=Math.max(x,el.x);y=el.y}});if(y!==null&&textos[i])ctx.fillText(textos[i],x+8,y)});
+    ctx.restore()}});
+  // Valor em cada barra (barras lado a lado ou uma série só).
+  const rotuloBarra=(fmt,zero=false)=>({id:'rotuloBarra',afterDatasetsDraw(chart){
+    const {ctx}=chart,hor=chart.options.indexAxis==='y';ctx.save();ctx.fillStyle='#52514e';ctx.font=fonteRotulo;
+    chart.data.datasets.forEach((d,di)=>chart.getDatasetMeta(di).data.forEach((el,i)=>{const v=d.data[i];if(!v&&!(zero&&v===0))return;
+      if(hor){ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(fmt(v),el.x+6,el.y)}else{ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmt(v),el.x,el.y-4)}}));
+    ctx.restore()}});
+  function draw(key,config){if(charts[key])charts[key].destroy();charts[key]=new Chart($('#ch-'+key),config)}
+  function vazio(key,text){const c=charts[key];if(!c)return;const {ctx,width,height}=c;ctx.save();ctx.fillStyle='#898781';ctx.textAlign='center';ctx.fillText(text,width/2,height/2);ctx.restore()}
+  const legenda=sets=>sets.map(s=>`<span><i style="background:${s.cor}"></i>${safe(s.label)}</span>`).join('');
+
+  // Barras horizontais por corretor. Clique num corretor filtra o painel por ele.
+  function barrasCorretor(key,names,sets,{empilhado=false,textos=null,fmt=fmtN,moeda=false,porcento=false,altura=40,footer=null}={}){
+    $('#box-'+key).style.height=Math.max(150,names.length*altura+40)+'px';
+    const sel=$('#fCorretor').value,apaga=(c,n)=>!sel||sel===n?c:c+'55';
+    const datasets=sets.map(s=>({label:s.label,data:s.data,backgroundColor:names.map(n=>apaga(s.cor,n)),borderColor:'#fff',borderWidth:empilhado?{right:2}:0,borderSkipped:false,borderRadius:4,
+      barThickness:empilhado||sets.length===1?22:11,categoryPercentage:.8,barPercentage:.9}));
+    const ticks={precision:0,color:'#898781'};if(moeda){ticks.callback=v=>brlCurto(v);ticks.maxTicksLimit=5;ticks.maxRotation=0}if(porcento)ticks.callback=v=>v+'%';
+    draw(key,{type:'bar',data:{labels:names,datasets},plugins:[textos?rotuloFim(textos):rotuloBarra(fmt,porcento)],
+      options:{indexAxis:'y',maintainAspectRatio:false,animation:false,layout:{padding:{right:textos?112:moeda?82:36}},
+        scales:{x:{stacked:empilhado,beginAtZero:true,grid:{color:'#e1e0d9'},border:{display:false},ticks},y:{stacked:empilhado,grid:{display:false},border:{color:'#c3c2b7'},ticks:{color:'#0b0b0b'}}},
+        onClick:(_,els)=>{if(!els.length)return;const n=names[els[0].index];$('#fCorretor').value=$('#fCorretor').value===n?'':n;render();renderSemanal()},
+        onHover:(e,els)=>{e.native.target.style.cursor=els.length?'pointer':'default'},
+        plugins:{legend:{display:false},tooltip:{...tooltip,callbacks:{label:c=>` ${c.dataset.label}: ${moeda?brl(c.raw):porcento?fmt(c.raw):fmtN(c.raw)}`,...(footer?{footer:items=>footer(names[items[0].dataIndex])}:{})}}}}});
+    if(!names.length)vazio(key,'Nada lançado com esses filtros');
+  }
+  const ordenar=(by,campo)=>Object.keys(by).filter(n=>by[n][campo]>0).sort((a,b)=>by[b][campo]-by[a][campo]||a.localeCompare(b));
+
+  function renderLeads(by){
+    const names=ordenar(by,'leads'),total=names.reduce((a,n)=>a+by[n].leads,0);
+    barrasCorretor('leads',names,[{label:'Leads',cor:COR.azul,data:names.map(n=>by[n].leads)}],{footer:n=>`${pct(by[n].leads,total)} dos leads`+(by[n].lc?` · + ${by[n].lc} do próprio corretor`:'')});
+  }
+  function renderAnalises(by){
+    const names=ordenar(by,'env'),sets=[{label:'Aprovadas',cor:COR.azul,k:'apr'},{label:'Recusadas',cor:COR.laranja,k:'rec'},{label:'Em análise',cor:COR.cinza,k:'ana'}]
+      .filter(s=>s.k!=='ana'||names.some(n=>by[n].ana)).map(s=>({...s,data:names.map(n=>by[n][s.k])}));
+    $('#lg-analises').innerHTML=legenda(sets);
+    barrasCorretor('analises',names,sets,{empilhado:true,textos:names.map(n=>`${by[n].env} · ${pct(by[n].apr,by[n].env)} aprov.`),footer:n=>`Enviadas: ${by[n].env}`+(by[n].leads?` (${pct(by[n].env,by[n].leads)} dos leads)`:'')});
+  }
+  function renderResultados(by){
+    const names=Object.keys(by).filter(n=>by[n].vis||by[n].prop||by[n].fech).sort((a,b)=>by[b].fech-by[a].fech||by[b].prop-by[a].prop||by[b].vis-by[a].vis||a.localeCompare(b));
+    const sets=[{label:'Visitas',cor:COR.azul,k:'vis'},{label:'Propostas',cor:COR.laranja,k:'prop'},{label:'Fechamentos',cor:COR.agua,k:'fech'}].map(s=>({...s,data:names.map(n=>by[n][s.k])}));
+    $('#lg-resultados').innerHTML=legenda(sets);
+    barrasCorretor('resultados',names,sets,{altura:52,footer:n=>by[n].leads?`Fechamentos: ${pct(by[n].fech,by[n].leads)} dos leads`:''});
+  }
+  function renderVgl(by){
+    const names=ordenar(by,'vgl'),total=names.reduce((a,n)=>a+by[n].vgl,0);
+    barrasCorretor('vgl',names,[{label:'VGL',cor:COR.agua,data:names.map(n=>by[n].vgl)}],{moeda:true,fmt:brlCurto,footer:n=>`${pct(by[n].vgl,total)} do VGL · ${plural(by[n].fech,'fechamento','fechamentos')}`});
+  }
+
+  // Semana a semana (ou mês a mês, em períodos longos).
+  $('#chips').innerHTML=METRICAS.map(m=>`<button type="button" class="chip" data-m="${m.k}" aria-pressed="${m.k===metrica}">${m.nome}</button>`).join('');
+  $('#chips').onclick=e=>{const k=e.target.dataset.m;if(!k)return;metrica=k;document.querySelectorAll('#chips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===k));renderEvolucao(filtrar())};
+  function renderEvolucao(fs){
+    let [de,ate]=periodo();const datas=fs.map(f=>f.data).sort(),hoje=iso(new Date());
+    if(!de)de=datas[0];if(!ate)ate=datas[datas.length-1];
+    if(ate>hoje&&(!datas.length||datas[datas.length-1]<=hoje))ate=hoje;
+    const keys=[],labels=[];let mensal=false;
+    if(de&&ate){
+      for(let d=de;d<=ate;){const [a,b]=semanaDe(d);keys.push(a);labels.push(rotuloSemana(a,b));d=proxDia(b)}
+      if(keys.length>20){mensal=true;keys.length=0;labels.length=0;const x=dia(de);x.setDate(1);
+        while(iso(x)<=ate){keys.push(iso(x).slice(0,7));labels.push(`${MESES[x.getMonth()].slice(0,3).toLowerCase()}/${String(x.getFullYear()).slice(2)}`);x.setMonth(x.getMonth()+1)}}
+    }
+    const m=METRICAS.find(x=>x.k===metrica),by={};keys.forEach(k=>by[k]=0);
+    fs.forEach(f=>{const k=mensal?f.data.slice(0,7):semanaDe(f.data)[0];if(k in by)by[k]+=f[metrica]||0});
+    $('#evoTitle').textContent=`${m.nome} ${mensal?'mês a mês':'semana a semana'}`;
+    const fmt=m.moeda?brlCurto:fmtN;
+    draw('evolucao',{type:'bar',data:{labels,datasets:[{label:m.nome,data:keys.map(k=>by[k]),backgroundColor:COR.azul,borderRadius:4,borderSkipped:'start',maxBarThickness:56}]},
+      plugins:keys.length<=16?[rotuloBarra(fmt)]:[],
+      options:{maintainAspectRatio:false,animation:false,layout:{padding:{top:22}},
+        scales:{x:{grid:{display:false},border:{color:'#c3c2b7'},ticks:{color:'#898781',maxRotation:0,autoSkipPadding:10}},y:{beginAtZero:true,grid:{color:'#e1e0d9'},border:{display:false},ticks:{precision:0,color:'#898781',...(m.moeda?{callback:v=>brlCurto(v)}:{})}}},
+        plugins:{legend:{display:false},tooltip:{...tooltip,callbacks:{label:c=>` ${m.nome}: ${m.moeda?brl(c.raw):fmtN(c.raw)}`}}}}});
+  }
+
+  function renderResumo(by){
+    const names=Object.keys(by).sort((a,b)=>by[b].fech-by[a].fech||by[b].vgl-by[a].vgl||by[b].leads-by[a].leads||a.localeCompare(b));
+    if(!names.length){$('#resumo').innerHTML='<tbody><tr><td class="empty">Nada lançado com esses filtros.</td></tr></tbody>';return}
+    const tot=names.reduce((o,n)=>somar(o,by[n]),zero()),sel=$('#fCorretor').value,z=v=>v||'<span class="muted">·</span>';
+    const linha=(n,o,total)=>`<tr${total?' class="tot"':sel===n?' style="background:#eef4fb"':''}><td>${total?'Total':safe(n)}</td><td class="num">${o.leads?fmtN(o.leads):z(0)}</td><td class="num">${z(o.lc)}</td>
+      <td class="num">${z(o.env)}</td><td class="num">${z(o.apr)}</td><td class="num">${pct(o.apr,o.env)}</td><td class="num">${z(o.vis)}</td><td class="num">${z(o.prop)}</td>
+      <td class="num">${z(o.fech)}</td><td class="num">${o.vgl?brl(o.vgl):z(0)}</td><td class="num">${pct(o.fech,o.leads)}</td></tr>`;
+    $('#resumo').innerHTML=`<thead><tr><th>Corretor</th><th class="num">Leads</th><th class="num">Leads do corretor</th><th class="num">Análises</th><th class="num">Aprovadas</th><th class="num">% aprovada</th>
+      <th class="num">Visitas</th><th class="num">Propostas</th><th class="num">Fechamentos</th><th class="num">VGL</th><th class="num">Lead → fechamento</th></tr></thead>
+      <tbody>${names.map(n=>linha(n,by[n])).join('')}${linha('',tot,true)}</tbody>`;
+  }
+
+  // Gráfico abaixo da tabela: mostra a coluna escolhida, um corretor por barra.
+  // Percentuais só entram para quem tem a base (ex.: % aprovada só para quem enviou análise).
+  const fmtPct=v=>(v<10&&v%1?v.toFixed(1):Math.round(v)).toString().replace('.',',')+'%';
+  const COMPARAR=[
+    {k:'leads',nome:'Leads'},{k:'lc',nome:'Leads do corretor'},{k:'env',nome:'Análises'},{k:'apr',nome:'Aprovadas'},
+    {k:'pAprov',nome:'% aprovada',pct:['apr','env']},{k:'vis',nome:'Visitas'},{k:'prop',nome:'Propostas'},{k:'fech',nome:'Fechamentos'},
+    {k:'vgl',nome:'VGL',moeda:true},{k:'pFech',nome:'Lead → fechamento',pct:['fech','leads']}];
+  let comparar='pFech';
+  $('#chipsCmp').innerHTML=COMPARAR.map(m=>`<button type="button" class="chip" data-m="${m.k}" aria-pressed="${m.k===comparar}">${m.nome}</button>`).join('');
+  $('#chipsCmp').onclick=e=>{const k=e.target.dataset.m;if(!k)return;comparar=k;document.querySelectorAll('#chipsCmp .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===k));renderComparar(porCorretor(filtrar({ignoreCorretor:true})))};
+  function renderComparar(by){
+    const m=COMPARAR.find(x=>x.k===comparar),val={};
+    Object.keys(by).forEach(n=>{const o=by[n];if(m.pct){if(o[m.pct[1]])val[n]=o[m.pct[0]]/o[m.pct[1]]*100}else if(o[m.k])val[n]=o[m.k]});
+    const names=Object.keys(val).sort((a,b)=>val[b]-val[a]||a.localeCompare(b));
+    $('#cmpTitle').textContent=`Comparar corretores: ${m.nome}`;
+    const fmt=m.moeda?brlCurto:m.pct?fmtPct:fmtN;
+    barrasCorretor('comparar',names,[{label:m.nome,cor:COR.azul,data:names.map(n=>val[n])}],{fmt,moeda:!!m.moeda,porcento:!!m.pct,
+      footer:m.pct?n=>`${fmtN(by[n][m.pct[0]])} de ${fmtN(by[n][m.pct[1]])}`:null});
+  }
+
+  // ---------- Relatório semanal ----------
+  // Linhas da semana por unidade e corretor. As análises (sem unidade) entram na unidade do corretor naquela semana.
+  function linhasSemana(a,b){
+    const fs=fatos.filter(f=>f.data>=a&&f.data<=b),rows=new Map();
+    const get=(u,c)=>{const k=u+'|'+c;if(!rows.has(k))rows.set(k,{unidade:u,corretora:c,ordem:999,...zero()});return rows.get(k)};
+    fs.filter(f=>f.unidade).forEach(f=>{const x=get(f.unidade,f.corretora);somar(x,f);x.ordem=Math.min(x.ordem,f.ordem??999)});
+    const unidadeDe=c=>[...rows.values()].find(x=>x.corretora===c)?.unidade;
+    fs.filter(f=>!f.unidade).forEach(f=>somar(get(unidadeDe(f.corretora)||'OUTROS',f.corretora),f));
+    const us=[...ordemUnidades(),'OUTROS'];
+    return [...rows.values()].sort((x,y)=>us.indexOf(x.unidade)-us.indexOf(y.unidade)||x.ordem-y.ordem||x.corretora.localeCompare(y.corretora));
+  }
+  const COLS=[['leads','Leads'],['lc','Leads corretor'],['env','Análises'],['apr','Aprovadas'],['vis','Visitas'],['prop','Propostas'],['fech','Fechamentos'],['vgl','VGL']];
+  const celula=(k,v)=>`<td class="num">${k==='vgl'?brl(v):fmtN(v)}</td>`;
+  const semanasComDados=()=>[...new Set(fatos.map(f=>semanaDe(f.data)[0]))].sort();
+  function renderSemanal(){
+    renderRelatorio();renderLista();
+  }
+  function renderRelatorio(){
+    const [a,b]=semanaDe(semRel),ls=linhasSemana(a,b),ws=semanasComDados(),lancada=resultados.some(r=>r.data===a);
+    $('#relData').value=semRel;$('#relPrev').disabled=!ws.some(w=>w<a);$('#relNext').disabled=!ws.some(w=>w>a);$('#relCopy').disabled=!ls.length;
+    $('#relEdit').textContent=lancada?'Editar semana':'Lançar esta semana';
+    const head=`<div class="rel-day">${tituloSemana(a,b)}</div>`;
+    if(!ls.length){$('#relBody').innerHTML=head+'<div class="empty-card">Nenhum dado nesta semana.</div>';return}
+    const th=`<thead><tr><th>Corretor</th>${COLS.map(([,n])=>`<th class="num">${n}</th>`).join('')}</tr></thead>`;
+    const us=[...new Set(ls.map(l=>l.unidade))];
+    const bloco=u=>{const r=ls.filter(l=>l.unidade===u),s=r.reduce(somar,zero());
+      return `<div class="rel-unit"><h3>RESUMO SEMANAL ${safe(u)}</h3><div class="table-wrap" style="margin:0"><table>${th}<tbody>${r.map(l=>`<tr><td>${safe(l.corretora)}</td>${COLS.map(([k])=>celula(k,l[k])).join('')}</tr>`).join('')}
+        <tr class="sub"><td>SUBTOTAL</td>${COLS.map(([k])=>celula(k,s[k])).join('')}</tr></tbody></table></div></div>`};
+    const g=ls.reduce(somar,zero());
+    $('#relBody').innerHTML=head+us.map(bloco).join('')+`<div class="rel-unit geral"><h3>RESUMO GERAL</h3><div class="table-wrap" style="margin:0"><table><thead><tr><th></th>${COLS.map(([,n])=>`<th class="num">${n}</th>`).join('')}</tr></thead>
+      <tbody><tr class="sub"><td>RESUMO DA SEMANA</td>${COLS.map(([k])=>celula(k,g[k])).join('')}</tr></tbody></table></div></div>`+
+      (lancada?'':`<p class="msg note" style="margin-top:12px">Visitas, propostas, fechamentos e VGL desta semana ainda não foram lançados. Clique em "Lançar esta semana".</p>`);
+  }
+  function passoRel(dir){const [a]=semanaDe(semRel),ws=semanasComDados(),w=dir<0?ws.filter(x=>x<a).pop():ws.find(x=>x>a);if(w){semRel=w;renderRelatorio()}}
+  $('#relPrev').onclick=()=>passoRel(-1);$('#relNext').onclick=()=>passoRel(1);
+  $('#relData').addEventListener('change',e=>{if(e.target.value){semRel=semanaDe(e.target.value)[0];renderRelatorio()}});
+  $('#relEdit').onclick=()=>openSemana(semRel);
+  $('#relCopy').onclick=()=>{
+    const [a,b]=semanaDe(semRel),ls=linhasSemana(a,b),us=[...new Set(ls.map(l=>l.unidade))];
+    const txt=l=>`${fmtN(l.leads)} leads · ${l.lc} leads corretor · ${l.env} análises (${l.apr} aprov.) · ${l.vis} visitas · ${l.prop} propostas · ${l.fech} fechamentos · VGL ${brl(l.vgl)}`;
+    copiar([`*RESUMO SEMANAL – ${tituloSemana(a,b)}*`,...us.flatMap(u=>{const r=ls.filter(l=>l.unidade===u);return ['',`*${u}*`,...r.map(l=>`${l.corretora}: ${txt(l)}`),`_Subtotal: ${txt(r.reduce(somar,zero()))}_`]}),'',`*RESUMO DA SEMANA:* ${txt(ls.reduce(somar,zero()))}`].join('\n'),'Relatório');
+  };
+
+  function renderLista(){
+    const [de,ate]=periodo(),ws=[...new Set(resultados.map(r=>r.data))].filter(d=>!(de&&d<de)&&!(ate&&d>ate)).sort().reverse();
+    $('#listCount').textContent=plural(ws.length,'semana','semanas')+(de||ate?' no período':'');
+    if(!ws.length){$('#lista').innerHTML='<tbody><tr><td class="empty">Nenhuma semana lançada neste período. Clique em "+ Lançar semana".</td></tr></tbody>';return}
+    $('#lista').innerHTML=`<thead><tr><th>Semana</th><th class="num">Corretores</th><th class="num">Leads corretor</th><th class="num">Visitas</th><th class="num">Propostas</th><th class="num">Fechamentos</th><th class="num">VGL</th><th></th></tr></thead><tbody>${ws.map(w=>{
+      const rs=resultados.filter(r=>r.data===w),s=k=>rs.reduce((a,r)=>a+r[k],0);
+      return `<tr><td style="white-space:nowrap"><strong>${br(w).slice(0,5)} a ${br(rs[0].ate)}</strong></td><td class="num">${rs.length}</td><td class="num">${s('leads_corretor')}</td><td class="num">${s('visitas')}</td><td class="num">${s('propostas')}</td><td class="num">${s('fechamentos')}</td><td class="num">${brl(s('vgl'))}</td>
+        <td class="row-actions"><button class="link" data-ver="${w}">Ver</button><button class="link" data-edit="${w}">Editar</button><button class="link danger" data-del="${w}">Excluir</button></td></tr>`}).join('')}</tbody>`;
+  }
+  $('#lista').onclick=async e=>{
+    const {ver,edit,del}=e.target.dataset;
+    if(ver){semRel=ver;renderRelatorio();$('#relCard').scrollIntoView({behavior:'smooth',block:'start'})}
+    if(edit)openSemana(edit);
+    if(del){const [a,b]=semanaDe(del);if(!confirm(`Excluir os resultados da semana de ${br(a).slice(0,5)} a ${br(b)}? Os leads e as análises não são apagados.`))return;
+      const {error}=await db.from('resultados_semanais').delete().eq('data',del);if(error){alert('Não foi possível excluir: '+error.message);return}
+      resultados=resultados.filter(r=>r.data!==del);montarFatos();render();renderSemanal();if(apPronto)renderThumbs();toast('Semana excluída')}
+  };
+
+  // ---------- Exportar ----------
+  $('#exportCsv').onclick=()=>{
+    const [de,ate]=periodo(),ws=semanasComDados().filter(w=>!(de&&w<de)&&!(ate&&w>ate)),esc=v=>`"${String(v??'').replace(/"/g,'""')}"`,num=v=>String(v).replace('.',',');
+    const linhas=ws.flatMap(w=>{const [a,b]=semanaDe(w);return linhasSemana(a,b).map(l=>[`${br(a)} a ${br(b)}`,l.unidade,l.corretora,...COLS.map(([k])=>num(l[k]))])});
+    const csv=['Semana;Unidade;Corretor;'+COLS.map(([,n])=>n).join(';'),...linhas.map(r=>r.map(esc).join(';'))].join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`relatorio-semanal-${iso(new Date())}.csv`;a.click();URL.revokeObjectURL(a.href);
+  };
+
+  // ---------- Lançar semana ----------
+  const semDialog=$('#semDialog');let semOriginal=null,semCampo=null;
+  const opcoes=(lista,atual)=>[...new Set([...lista,...(atual?[atual]:[])])].map(n=>`<option${n===atual?' selected':''}>${safe(n)}</option>`).join('');
+  const optsUnidade=u=>opcoes(unidades.filter(x=>x.ativa).map(x=>x.nome),u);
+  const optsCorretor=c=>'<option value="">Selecione…</option>'+opcoes(corretoras.filter(x=>x.ativa).map(x=>x.nome).sort(),c);
+  const campoN=(k,v)=>`<td><input class="n" data-k="${k}" type="number" min="0" max="10000" step="1" inputmode="numeric" value="${v||v===0?v:''}" aria-label="${k}"></td>`;
+  const linhaHtml=(l={})=>`<tr><td><select class="u" aria-label="Unidade">${optsUnidade(l.unidade||unidades.find(u=>u.ativa)?.nome)}</select></td><td><select class="c" aria-label="Corretor">${optsCorretor(l.corretora)}</select></td>
+    ${campoN('leads_corretor',l.leads_corretor)}${campoN('visitas',l.visitas)}${campoN('propostas',l.propostas)}${campoN('fechamentos',l.fechamentos)}
+    <td><input class="v" data-k="vgl" inputmode="decimal" placeholder="0,00" value="${l.vgl?String(l.vgl).replace('.',','):''}" aria-label="VGL"></td><td><button type="button" class="rm" aria-label="Remover linha">×</button></td></tr>`;
+  // Aceita 6000 · 6.000 · 6.000,00 · R$ 6.000,50
+  function lerValor(s){
+    s=String(s||'').replace(/R\$|\s/g,'');if(!s)return 0;
+    if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');
+    const v=Number(s);return Number.isFinite(v)&&v>=0?Math.round(v*100)/100:NaN;
+  }
+  function somarSemana(){
+    const t={leads_corretor:0,visitas:0,propostas:0,fechamentos:0,vgl:0};
+    document.querySelectorAll('#semLinhas input').forEach(i=>{const k=i.dataset.k;t[k]+=k==='vgl'?(lerValor(i.value)||0):(parseInt(i.value,10)||0)});
+    $('#tLc').textContent=t.leads_corretor;$('#tVis').textContent=t.visitas;$('#tProp').textContent=t.propostas;$('#tFech').textContent=t.fechamentos;$('#tVgl').textContent=brl(t.vgl);
+  }
+  function preencher(linhas){$('#semLinhas').innerHTML=(linhas.length?linhas:[{}]).map(linhaHtml).join('');somarSemana()}
+  const temDigitado=()=>[...document.querySelectorAll('#semLinhas input')].some(i=>i.value!=='');
+  // Semana já lançada: abre para editar. Semana nova: traz os corretores que tiveram leads nela (ou os da última semana lançada).
+  function carregarSemana(data,inicial){
+    const [a,b]=semanaDe(data),rs=resultados.filter(r=>r.data===a).sort((x,y)=>x.ordem-y.ordem),nota=$('#semNota');
+    const avisar=t=>{nota.textContent=t;nota.hidden=false};
+    $('#sSemana').textContent=`Semana de ${br(a).slice(0,5)} a ${br(b)}`;
+    if(!inicial&&a===semCampo)return;
+    if(!inicial&&a===semOriginal){avisar(`Você está editando a semana de ${br(a).slice(0,5)} a ${br(b)}.`)}
+    else if(rs.length){
+      if(!inicial&&temDigitado()&&!confirm(`A semana de ${br(a).slice(0,5)} a ${br(b)} já foi lançada. Abrir para editar? O que você digitou aqui será descartado.`)){$('#sData').value=semCampo;$('#sSemana').textContent=`Semana de ${br(semCampo).slice(0,5)} a ${br(semanaDe(semCampo)[1])}`;return}
+      semOriginal=a;preencher(rs);$('#semTitle').textContent='Editar semana';avisar(`Você está editando a semana de ${br(a).slice(0,5)} a ${br(b)}.`);
+    }
+    else if(semOriginal)avisar(`Ao salvar, os resultados de ${br(semOriginal).slice(0,5)} passam para a semana de ${br(a).slice(0,5)} a ${br(b)}.`);
+    else{
+      nota.hidden=true;
+      if(inicial){
+        const doAtend=[];leads.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{if(!doAtend.some(x=>x.corretora===l.corretora))doAtend.push({unidade:l.unidade,corretora:l.corretora})});
+        const ult=[...new Set(resultados.map(r=>r.data))].filter(d=>d<a).pop();
+        const base=doAtend.length?doAtend:resultados.filter(r=>r.data===ult).sort((x,y)=>x.ordem-y.ordem).map(r=>({unidade:r.unidade,corretora:r.corretora}));
+        preencher(base.filter(l=>corretoras.find(c=>c.nome===l.corretora)?.ativa!==false));
+        if(doAtend.length)avisar('Os corretores abaixo são os que receberam leads nesta semana, segundo o atendimento.');
+      }
+    }
+    semCampo=a;
+  }
+  function openSemana(data){
+    semOriginal=null;semCampo=null;$('#semMsg').hidden=true;$('#semTitle').textContent='Lançar semana';
+    $('#sData').value=data||iso(new Date());carregarSemana($('#sData').value,true);
+    semDialog.showModal();
+    const vazio=[...semDialog.querySelectorAll('#semLinhas input')].find(i=>i.value==='');(vazio||$('#sData')).focus();
+  }
+  $('#newSemana').onclick=()=>openSemana(null);
+  $('#sData').addEventListener('change',e=>{if(e.target.value)carregarSemana(e.target.value)});
+  $('#semLinhas').addEventListener('input',somarSemana);
+  $('#semLinhas').addEventListener('click',e=>{if(e.target.classList.contains('rm')){e.target.closest('tr').remove();if(!$('#semLinhas').children.length)preencher([]);somarSemana()}});
+  $('#addLinha').onclick=()=>{$('#semLinhas').insertAdjacentHTML('beforeend',linhaHtml());$('#semLinhas').lastElementChild.querySelector('.c').focus()};
+  $('#semForm').onsubmit=async e=>{
+    e.preventDefault();const msg=$('#semMsg'),erro=t=>{msg.textContent=t;msg.hidden=false};msg.hidden=true;
+    const data=$('#sData').value;if(!data)return erro('Informe um dia da semana.');
+    const [a,b]=semanaDe(data),linhas=[],vistos=new Set();
+    for(const tr of document.querySelectorAll('#semLinhas tr')){
+      const corretora=tr.querySelector('.c').value,unidade=tr.querySelector('.u').value,ins=[...tr.querySelectorAll('input')];
+      if(!corretora&&ins.every(i=>i.value===''))continue;
+      if(!corretora){tr.querySelector('.c').focus();return erro('Escolha o corretor em todas as linhas (ou remova a linha).')}
+      if(vistos.has(corretora))return erro(`${corretora} aparece duas vezes. Deixe uma linha só por corretor.`);
+      const l={unidade,corretora,ordem:linhas.length};
+      for(const i of ins){const k=i.dataset.k,v=i.value.trim();
+        if(k==='vgl'){const n=lerValor(v);if(Number.isNaN(n)){i.focus();return erro(`O VGL de ${corretora} não é um valor válido.`)}l.vgl=n}
+        else{if(v!==''&&!/^\d+$/.test(v)){i.focus();return erro(`Use só números inteiros para ${corretora}.`)}l[k]=v===''?0:parseInt(v,10)}}
+      vistos.add(corretora);linhas.push(l);
+    }
+    if(!linhas.length)return erro('Informe pelo menos um corretor.');
+    $('#semSubmit').disabled=true;
+    const {error}=await db.rpc('resultados_salvar_semana',{p_data:a,p_ate:b,p_linhas:linhas,p_data_anterior:semOriginal&&semOriginal!==a?semOriginal:null});
+    $('#semSubmit').disabled=false;
+    if(error)return erro('Não foi possível salvar: '+error.message);
+    semDialog.close();semRel=a;toast('Semana salva');
+    try{const r=await tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,fechamentos,vgl,ordem');resultados=r.map(x=>({...x,vgl:Number(x.vgl)}));montarFatos();render();renderSemanal();if(apPronto)renderThumbs()}
+    catch(err){alert('Salvo, mas não foi possível atualizar a tela: '+err.message)}
+  };
+
+  // ---------- Apresentação da semana ----------
+  // Slides no mesmo formato da reunião de segunda (modelo feito no Canva). Os números vêm sempre dos lançamentos;
+  // os textos ficam na tabela "apresentacoes" (um registro por semana) e as fotos na galeria "equipe" (bucket privado).
+  let equipe=[],fotos={},apresentacoes=[],ap=null,apSemana=null,apSalvoEm=null,apPronto=false,apSujo=false,tThumbs=null,showSlides=[],showIdx=0;
+  const PADRAO={
+    capa:{on:true,titulo:'Acompanhamento de Resultados\n& Reconhecimento',sub:'Análise semanal de metas, funil de locação e celebração das corretoras destaque da imobiliária.',rodape:'Foco • Alta Performance • Conquistas'},
+    pauta:{on:true,itens:[{t:'1. Metas Batidas',d:'Celebração dos resultados alcançados no mês anterior.'},{t:'2. Balanço Semanal',d:'Análise detalhada de novos contratos e atendimentos.'},
+      {t:'3. Corretora Destaque',d:'Reconhecimento da melhor performance semanal.'},{t:'4. Próximos Passos',d:'Alinhamento das prioridades e plano de ação.'}]},
+    resultados:{on:true},
+    funil:{on:false},
+    destaques:[],
+    time:{on:true,titulo:'Parabéns, equipe!',frase:'O próximo desafio é aumentar o volume de oportunidades que chegam às etapas finais do funil e transformar essa semana forte em constância.'},
+    foco:{on:true,titulo:'Foco para a Próxima Semana: Repetir o que fizemos bem feito na semana anterior.',cards:[
+      {t:'Atendimento Ágil',d:'Lead novo precisa de velocidade. Quanto mais rápido o primeiro contato e os retornos, menor a chance de perdermos o cliente no caminho.'},
+      {t:'+ Visitas + Chance de conversão',d:'Nosso objetivo é tirar o cliente do WhatsApp e levá-lo para o imóvel. Vamos trabalhar cada atendimento buscando gerar visita.'},
+      {t:'Propostas',d:'Visitou e gostou? Vamos estimular a proposta. Não esperar o cliente pedir: conduzir o atendimento para a negociação.'}]},
+    fim:{on:true,titulo:'Excelente trabalho a toda a equipe!',msg:'Vamos com tudo para bater a próxima meta!'}
+  };
+  const copia=o=>JSON.parse(JSON.stringify(o));
+  // Texto salvo + padrão (para seções que surgirem depois continuarem funcionando com textos antigos).
+  const mesclar=c=>{const o=copia(PADRAO);for(const k in c||{})o[k]=Array.isArray(c[k])?c[k]:c[k]&&typeof c[k]==='object'?{...o[k],...c[k]}:c[k];return o};
+  const attr=s=>safe(s).replace(/"/g,'&quot;');
+  const txt=s=>safe(s).replace(/\n/g,'<br>');
+  const brl2=v=>Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const iniciais=n=>String(n||'?').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
+  const periodoTxt=(a,b)=>`${a.slice(8)} a ${b.slice(8)} de ${MESES[+b.slice(5,7)-1].toLowerCase()} de ${b.slice(0,4)}`;
+  function numSemana(a){let n=1,d=a.slice(0,8)+'01';while(semanaDe(d)[0]<a){d=proxDia(semanaDe(d)[1]);n++}return n}
+  // Fechamentos e VGL de cada corretor na semana (a semana começa em "a").
+  function numerosSemana(a){const by={};resultados.filter(r=>r.data===a).forEach(r=>{const o=by[r.corretora]??={fech:0,vgl:0};o.fech+=r.fechamentos;o.vgl+=r.vgl});return by}
+  // Pessoa do slide: "e:<id>" = alguém da galeria; "c:<NOME>" = nome dos lançamentos (usa a galeria se estiver ligado a alguém).
+  function pessoa(ref){
+    if(!ref)return null;
+    const e=ref.startsWith('e:')?equipe.find(x=>x.id===ref.slice(2)):equipe.find(x=>x.corretora===ref.slice(2));
+    if(e)return {nome:e.nome,funcao:e.funcao,corretora:e.corretora,foto:fotos[e.id]||null};
+    return ref.startsWith('c:')?{nome:titulo(ref.slice(2)),funcao:'Corretora de Imóveis',corretora:ref.slice(2),foto:null}:null;
+  }
+
+  // Sugestões a partir dos números: destaque = maior VGL da semana; primeira locação = quem fechou pela primeira vez.
+  function sugerir(a,base){
+    const c=copia(base||PADRAO),by=numerosSemana(a),nomes=Object.keys(by),nomeDe=n=>pessoa('c:'+n).nome;
+    const top=nomes.filter(n=>by[n].vgl>0||by[n].fech>0).sort((x,y)=>by[y].vgl-by[x].vgl||by[y].fech-by[x].fech)[0];
+    const temHistorico=resultados.some(r=>r.data<a),jaFechou=n=>resultados.some(r=>r.data<a&&r.corretora===n&&r.fechamentos>0);
+    c.destaques=[];
+    if(top){const f=by[top].fech;c.destaques.push({titulo:'Corretora Destaque da Semana',selo:'Top Performance',pessoa:'c:'+top,numeros:true,
+      msg:f>1?`Parabéns ${nomeDe(top)} por essas excelentes locações! Parabéns por mais esses negócios fechados!`:`Parabéns ${nomeDe(top)} por essa excelente locação! Parabéns por mais esse negócio fechado!`})}
+    if(temHistorico)nomes.filter(n=>n!==top&&by[n].fech>0&&!jaFechou(n)).forEach(n=>c.destaques.push({titulo:'Primeira Locação',selo:'',pessoa:'c:'+n,numeros:false,
+      msg:`${nomeDe(n)}, parabéns pela sua primeira locação aqui na Araujo! Que essa seja somente a primeira de muitas.`}));
+    const fecharam=nomes.filter(n=>by[n].fech>0).length,totF=nomes.reduce((s,n)=>s+by[n].fech,0);
+    c.time.titulo=nomes.length>1&&fecharam===nomes.length?'Parabéns Equipe! Todas, sem exceção, fecharam locações!':totF?`Parabéns, equipe! ${plural(totF,'locação fechada','locações fechadas')} na semana.`:'Parabéns, equipe!';
+    return c;
+  }
+
+  async function iniciarApresentacao(){
+    const r=await db.from('apresentacoes').select('semana,conteudo,atualizado_em');
+    apresentacoes=r.error?[]:r.data;
+    await loadEquipe();
+    // Padrão: a semana anterior (a reunião de segunda apresenta a semana que acabou).
+    if(!apSemana){const x=new Date();x.setDate(x.getDate()-7);apSemana=semanaDe(iso(x))[0]}
+    apPronto=true;carregarAp(apSemana);
+    if(r.error)$('#apStatus').textContent='Não foi possível carregar os textos salvos: '+r.error.message;
+  }
+  function carregarAp(a){
+    apSemana=a;const salvo=apresentacoes.find(x=>x.semana===a);
+    if(salvo){ap=mesclar(salvo.conteudo);apSalvoEm=salvo.atualizado_em}
+    else{
+      // Semana nova: repete os textos da última apresentação salva (capa, pauta, foco...) e sugere os destaques.
+      const ant=apresentacoes.filter(x=>x.semana<a).sort((x,y)=>x.semana.localeCompare(y.semana)).pop();
+      ap=sugerir(a,ant?mesclar(ant.conteudo):null);apSalvoEm=null;
+    }
+    apSujo=false;renderApForm();renderThumbs();statusAp();
+  }
+  function statusAp(){const s=$('#apStatus');s.classList.toggle('dirty',apSujo);
+    s.textContent=apSujo?'Alterações não salvas':apSalvoEm?`Textos salvos em ${br(iso(new Date(apSalvoEm)))}`:'Sugestão automática (ainda não salva)'}
+  const marcarSujo=()=>{apSujo=true;statusAp()};
+  addEventListener('beforeunload',e=>{if(apSujo){e.preventDefault();e.returnValue=''}});
+
+  function irSemana(d){
+    const a=semanaDe(d)[0];if(a===apSemana)return;
+    if(apSujo&&!confirm('Os textos desta semana não foram salvos. Trocar de semana mesmo assim?')){$('#apData').value=apSemana;return}
+    carregarAp(a);
+  }
+  $('#apPrev').onclick=()=>{const x=dia(apSemana);x.setDate(x.getDate()-1);irSemana(iso(x))};
+  $('#apNext').onclick=()=>irSemana(proxDia(semanaDe(apSemana)[1]));
+  $('#apData').addEventListener('change',e=>{if(e.target.value)irSemana(e.target.value)});
+
+  // ---------- Formulário ----------
+  const campo=(p,label,v,{area=false,rows=2,ph=''}={})=>`<label style="display:block"><span class="ap-lbl">${label}</span>${area?`<textarea data-p="${p}" rows="${rows}" placeholder="${attr(ph)}">${safe(v)}</textarea>`:`<input data-p="${p}" value="${attr(v)}" placeholder="${attr(ph)}">`}</label>`;
+  const secao=(nome,obs,p,on,corpo)=>`<div class="card ap-sec"><div class="ap-sec-head"><h3>${nome}${obs?`<small>${obs}</small>`:''}</h3><label class="inc"><input type="checkbox" data-p="${p}" ${on?'checked':''}> Incluir</label></div>${corpo}</div>`;
+  function opcoesPessoa(atual){
+    let v=atual;if(v&&v.startsWith('c:')){const e=equipe.find(x=>x.corretora===v.slice(2));if(e)v='e:'+e.id}
+    const semFoto=[...new Set([...corretoras.filter(c=>c.ativa).map(c=>c.nome),...resultados.map(r=>r.corretora)])].filter(n=>!equipe.some(e=>e.corretora===n)).sort();
+    const ops=[...equipe.filter(e=>e.ativo).map(e=>['e:'+e.id,`${e.nome} (${e.funcao})`]),...semFoto.map(n=>['c:'+n,`${n} (sem foto na galeria)`])];
+    if(v&&!ops.some(o=>o[0]===v))ops.unshift([v,pessoa(v)?.nome||'Pessoa removida']);
+    return '<option value="">Escolha…</option>'+ops.map(([k,l])=>`<option value="${attr(k)}"${k===v?' selected':''}>${safe(l)}</option>`).join('');
+  }
+  function renderApForm(){
+    const [a,b]=semanaDe(apSemana),lancada=resultados.some(r=>r.data===a);
+    $('#apData').value=apSemana;$('#apSemanaTxt').textContent=`Semana ${pad(numSemana(a))} · ${periodoTxt(a,b)}`;
+    const dest=ap.destaques.map((d,i)=>`<div class="dest"><div class="dest-head"><span>Destaque ${i+1}</span><span class="row-actions">
+        <button type="button" class="link" data-acao="sobe" data-i="${i}" ${i?'':'disabled'} aria-label="Subir">↑</button><button type="button" class="link" data-acao="desce" data-i="${i}" ${i<ap.destaques.length-1?'':'disabled'} aria-label="Descer">↓</button><button type="button" class="link danger" data-acao="delDest" data-i="${i}">Remover</button></span></div>
+      <div class="ap-row">${campo(`destaques.${i}.titulo`,'Título do slide',d.titulo)}<label style="display:block"><span class="ap-lbl">Pessoa</span><select data-p="destaques.${i}.pessoa">${opcoesPessoa(d.pessoa)}</select></label></div>
+      <div class="ap-row">${campo(`destaques.${i}.selo`,'Selo (opcional)',d.selo,{ph:'Ex.: Top Performance'})}<label class="inc" style="align-self:end;padding-bottom:8px"><input type="checkbox" data-p="destaques.${i}.numeros" ${d.numeros?'checked':''}> Mostrar contratos e VGL da semana</label></div>
+      ${campo(`destaques.${i}.msg`,'Mensagem',d.msg,{area:true,rows:3})}</div>`).join('');
+    $('#apForm').innerHTML=
+      secao('Capa','','capa.on',ap.capa.on,campo('capa.titulo','Título',ap.capa.titulo,{area:true})+campo('capa.sub','Subtítulo',ap.capa.sub,{area:true})+campo('capa.rodape','Rodapé',ap.capa.rodape))+
+      secao('Pauta','','pauta.on',ap.pauta.on,ap.pauta.itens.map((it,i)=>`<div class="ap-row">${campo(`pauta.itens.${i}.t`,'Item '+(i+1),it.t)}${campo(`pauta.itens.${i}.d`,'Descrição',it.d)}</div>`).join(''))+
+      secao('Resultados da semana','automático','resultados.on',ap.resultados.on,`<p class="auto">Tabela da semana igual à planilha (Itajaí, Navegantes e resumo geral), com os números lançados.${lancada?'':' <strong style="color:#9a5b00">Esta semana ainda não tem visitas, propostas e VGL lançados (aba Relatório semanal).</strong>'}</p>`)+
+      secao('Funil da semana','opcional, automático','funil.on',ap.funil.on,'<p class="auto">Leads, análises, aprovadas, visitas, propostas e fechamentos da semana, com as porcentagens e o VGL.</p>')+
+      `<div class="card ap-sec"><div class="ap-sec-head"><h3>Destaques<small>um slide para cada</small></h3><button type="button" class="link" data-acao="addDest">+ Adicionar destaque</button></div>${dest||'<p class="auto">Nenhum destaque nesta semana. Clique em "+ Adicionar destaque".</p>'}</div>`+
+      secao('Mensagem para a equipe','','time.on',ap.time.on,campo('time.titulo','Título',ap.time.titulo)+campo('time.frase','Frase',ap.time.frase,{area:true,rows:3}))+
+      secao('Foco para a próxima semana','','foco.on',ap.foco.on,campo('foco.titulo','Título',ap.foco.titulo,{area:true})+ap.foco.cards.map((c,i)=>`<div class="ap-row">${campo(`foco.cards.${i}.t`,'Card '+(i+1),c.t)}${campo(`foco.cards.${i}.d`,'Texto',c.d,{area:true,rows:3})}</div>`).join(''))+
+      secao('Encerramento','','fim.on',ap.fim.on,campo('fim.titulo','Título',ap.fim.titulo)+campo('fim.msg','Mensagem',ap.fim.msg,{area:true}));
+  }
+  const setP=(o,p,v)=>{const ks=p.split('.'),ult=ks.pop();ks.reduce((x,k)=>x[k],o)[ult]=v};
+  $('#apForm').addEventListener('input',e=>{const p=e.target.dataset.p;if(!p)return;
+    setP(ap,p,e.target.type==='checkbox'?e.target.checked:e.target.value);marcarSujo();clearTimeout(tThumbs);tThumbs=setTimeout(renderThumbs,250)});
+  $('#apForm').addEventListener('click',e=>{
+    const {acao,i}=e.target.dataset;if(!acao)return;const n=+i,d=ap.destaques;
+    if(acao==='addDest')d.push({titulo:'Destaque da Semana',selo:'',pessoa:'',numeros:false,msg:''});
+    if(acao==='delDest'){if(!confirm('Remover este destaque?'))return;d.splice(n,1)}
+    if(acao==='sobe')[d[n-1],d[n]]=[d[n],d[n-1]];
+    if(acao==='desce')[d[n+1],d[n]]=[d[n],d[n+1]];
+    marcarSujo();renderApForm();renderThumbs();
+  });
+  $('#apSugerir').onclick=()=>{
+    if(!confirm('Refazer os destaques e o título da mensagem para a equipe a partir dos números da semana? Os outros textos continuam como estão.'))return;
+    const s=sugerir(apSemana,ap);ap.destaques=s.destaques;ap.time.titulo=s.time.titulo;marcarSujo();renderApForm();renderThumbs();
+  };
+  $('#apSalvar').onclick=async()=>{
+    $('#apSalvar').disabled=true;
+    const agora=new Date().toISOString(),{data,error}=await db.from('apresentacoes').upsert({semana:apSemana,conteudo:ap,atualizado_em:agora}).select('semana,conteudo,atualizado_em');
+    $('#apSalvar').disabled=false;
+    if(error){alert('Não foi possível salvar: '+error.message);return}
+    const reg=data?.[0]||{semana:apSemana,conteudo:copia(ap),atualizado_em:agora};
+    apresentacoes=apresentacoes.filter(x=>x.semana!==apSemana).concat(reg);apSalvoEm=reg.atualizado_em;apSujo=false;statusAp();toast('Textos salvos');
+  };
+
+  // ---------- Slides ----------
+  const ICONES={trofeu:'M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5 5 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5 5 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z',
+    grafico:'M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z',estrela:'M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
+    alvo:'M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3-8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',
+    agenda:'M16.53 11.06 15.47 10l-4.88 4.88-2.12-2.12-1.06 1.06L10.59 17l5.94-5.94zM19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 16H5V8h14v11z',
+    casa:'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',caneta:'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'};
+  const icone=(n,cls='')=>`<div class="s-ico ${cls}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONES[n]}"/></svg></div>`;
+  const logo='<div class="s-logo"><img src="logo-araujo.jpg" alt="Araujo Locação"></div>';
+  const cab=(kick,tit,{lar=false,dir=''}={})=>`<div class="s-head"><div><div class="s-kick${lar?' lar':''}">${safe(kick)}</div><h2 class="s-title">${txt(tit)}</h2></div>${dir}</div>`;
+  // Tabela da semana no formato da planilha (só unidades e corretores com leads ou resultados lançados).
+  function tabelaSlide(a,b){
+    const ls=linhasSemana(a,b).filter(l=>l.ordem<999&&l.unidade!=='OUTROS'),us=[...new Set(ls.map(l=>l.unidade))];
+    if(!ls.length)return '<p style="text-align:center;font-size:26px;color:#64748b;margin-top:140px">Nenhum lançamento nesta semana.</p>';
+    const C=[['leads','LEADS'],['lc','LEADS CORRETOR'],['vis','VISITAS'],['prop','PROPOSTAS'],['fech','FECHAMENTOS'],['vgl','VGL']];
+    const val=(k,x)=>k==='vgl'?brl2(x):fmtN(x),cels=o=>C.map(([k],j)=>`<td${j===0?' class="lead"':''}>${val(k,o[k])}</td>`).join('');
+    const cols='<colgroup><col style="width:18%"><col style="width:9%"><col style="width:17%"><col style="width:10%"><col style="width:13%"><col style="width:15%"><col style="width:18%"></colgroup>';
+    const per=`<tr class="per"><td colspan="7">SEMANA DO DIA ${a.slice(8)} A ${b.slice(8)} DE ${MESES[+b.slice(5,7)-1]} DE ${b.slice(0,4)}</td></tr>`;
+    const head=`<tr><th>CORRETOR</th>${C.map(c=>`<th>${c[1]}</th>`).join('')}</tr>`;
+    const bloco=u=>{const r=ls.filter(l=>l.unidade===u);
+      return `<table>${cols}<tr class="tt"><td colspan="7">RESUMO SEMANAL ${safe(u)}</td></tr>${per}${head}${r.map(l=>`<tr><td>${safe(l.corretora)}</td>${cels(l)}</tr>`).join('')}<tr class="sub"><td>SUBTOTAL:</td>${cels(r.reduce(somar,zero()))}</tr></table>`};
+    const geral=`<table>${cols}<tr class="tt"><td colspan="7">RESUMO GERAL</td></tr><tr class="sub"><td></td>${C.map(c=>`<td style="text-align:center">${c[1]}</td>`).join('')}</tr><tr class="sub"><td>RESUMO DA SEMANA</td>${cels(ls.reduce(somar,zero()))}</tr></table>`;
+    return `<div class="s-tab${ls.length+us.length*3>14?' compacto':''}"><div class="semn">SEMANA ${pad(numSemana(a))}</div>${us.map(bloco).join('')}${geral}</div>`;
+  }
+  function slides(){
+    if(!ap)return [];
+    const [a,b]=semanaDe(apSemana),per=periodoTxt(a,b),out=[];
+    if(ap.capa.on)out.push(['Capa',`<div class="slide s-capa">${logo}<div class="s-top">REUNIÃO DE RESULTADOS</div><div class="s-capa-body"><div class="s-pill-row"><span class="s-pill">APRESENTAÇÃO SEMANAL</span><span>Araujo Locação • CRECI 6945J</span></div>
+      <h1>${txt(ap.capa.titulo)}</h1><p>${txt(ap.capa.sub)}</p><p class="s-data">Semana de ${per}</p></div><div class="s-foot">${txt(ap.capa.rodape)}</div></div>`]);
+    if(ap.pauta.on){const ic=[['trofeu','am'],['grafico',''],['estrela','am'],['alvo','']];
+      out.push(['Pauta',`<div class="slide">${cab('ESTRUTURA DO ENCONTRO','Pauta da Reunião Semanal')}<div class="s-cards" style="grid-template-columns:repeat(4,1fr)">${ap.pauta.itens.map((it,i)=>`<div class="s-card">${icone(...ic[i])}<h3>${txt(it.t)}</h3><p>${txt(it.d)}</p></div>`).join('')}</div></div>`])}
+    if(ap.resultados.on)out.push(['Resultados da semana',`<div class="slide">${cab('VISÃO GERAL','Resultados da Semana',{dir:'<div class="s-dir">Semana Anterior</div>'})}<div class="s-tab-wrap">${tabelaSlide(a,b)}</div></div>`]);
+    if(ap.funil.on){
+      const t=fatos.filter(f=>f.data>=a&&f.data<=b).reduce(somar,zero()),ok=s=>s.startsWith('–')?'&nbsp;':s;
+      const E=[['Leads',t.leads,''],['Análises',t.env,pct(t.env,t.leads)+' dos leads'],['Aprovadas',t.apr,pct(t.apr,t.env)+' das análises'],['Visitas',t.vis,pct(t.vis,t.leads)+' dos leads'],['Propostas',t.prop,pct(t.prop,t.vis)+' das visitas'],['Fechamentos',t.fech,pct(t.fech,t.leads)+' dos leads']];
+      out.push(['Funil da semana',`<div class="slide">${cab('VISÃO GERAL','Funil da Semana',{dir:`<div class="s-dir">${safe(per)}</div>`})}<div class="s-funil">${E.map(([n,v,s])=>`<div class="s-etapa"><span>${n}</span><strong>${fmtN(v)}</strong><small>${ok(s)||'&nbsp;'}</small></div>`).join('')}</div>
+        <div class="s-vgl"><div><span>VGL DA SEMANA</span><strong>${brl2(t.vgl)}</strong></div>${t.fech?`<div><span>MÉDIA POR FECHAMENTO</span><strong>${brl2(t.vgl/t.fech)}</strong></div>`:''}</div></div>`]);
+    }
+    const nums=numerosSemana(a);
+    ap.destaques.forEach(d=>{
+      const p=pessoa(d.pessoa)||{nome:'Escolha a pessoa',funcao:'',foto:null,corretora:null},n=(p.corretora&&nums[p.corretora])||{fech:0,vgl:0};
+      out.push([d.titulo||'Destaque',`<div class="slide">${cab('RECONHECIMENTO SEMANAL',d.titulo,{lar:true,dir:d.selo?`<div class="s-selo">${safe(d.selo)}</div>`:''})}
+        <div class="s-dest"><div class="s-foto">${p.foto?`<img src="${attr(p.foto)}" alt="">`:safe(iniciais(p.nome))}</div><div><span class="s-tag">DESTAQUE DA SEMANA</span><div class="s-nome">${safe(p.nome)}</div><div class="s-fun">${safe([p.funcao,'Araujo Locação'].filter(Boolean).join(' • '))}</div>
+        ${d.numeros?`<div class="s-nums"><div class="s-num"><strong>${fmtN(n.fech)}</strong><span>${n.fech===1?'Contrato':'Contratos'}</span></div><div class="s-num vgl"><strong>${brl2(n.vgl)}</strong><span>VGL</span></div></div>`:''}
+        ${d.msg?`<div class="s-msg"${d.numeros?'':' style="margin-top:130px"'}>${txt(d.msg)}</div>`:''}</div></div></div>`]);
+    });
+    if(ap.time.on)out.push(['Mensagem para a equipe',`<div class="slide">${cab('RECONHECIMENTO SEMANAL',ap.time.titulo,{lar:true})}${ap.time.frase?`<div class="s-frase">${txt(ap.time.frase)}</div>`:''}</div>`]);
+    if(ap.foco.on){const ic=[['agenda',''],['casa','ve'],['caneta','am']];
+      out.push(['Foco da próxima semana',`<div class="slide">${cab('PLANEJAMENTO ESTRATÉGICO',ap.foco.titulo)}<div class="s-cards" style="grid-template-columns:repeat(3,1fr);top:320px">${ap.foco.cards.map((c,i)=>`<div class="s-card">${icone(...ic[i])}<h3>${txt(c.t)}</h3><p>${txt(c.d)}</p></div>`).join('')}</div></div>`])}
+    if(ap.fim.on)out.push(['Encerramento',`<div class="slide s-fim">${logo}<h1>${txt(ap.fim.titulo)}</h1><p>${txt(ap.fim.msg)}</p><div class="s-foot">Araujo Locação • CRECI 6945J • Apresentação de Resultados</div></div>`]);
+    return out;
+  }
+  const escalar=(html,w,h)=>{const k=h?Math.min(w/1440,h/810):w/1440;return {k,html:`<div style="width:1440px;height:810px;transform:scale(${k});transform-origin:0 0">${html}</div>`}};
+  function renderThumbs(){
+    if(!ap)return;const box=$('#apThumbs'),w=Math.max(220,box.clientWidth||400),ss=slides();
+    $('#apConta').textContent=`(${ss.length})`;
+    box.innerHTML=ss.map(([n,h],i)=>{const e=escalar(h,w);return `<div class="thumb" data-i="${i}" role="button" tabindex="0" aria-label="Apresentar a partir do slide ${i+1}"><small>${i+1}. ${safe(n)}</small><div class="thumb-in" style="height:${Math.round(810*e.k)}px">${e.html}</div></div>`}).join('')||'<p class="msg">Nenhum slide incluído.</p>';
+  }
+  $('#apThumbs').addEventListener('click',e=>{const t=e.target.closest('.thumb');if(t)apresentar(+t.dataset.i)});
+  $('#apThumbs').addEventListener('keydown',e=>{const t=e.target.closest('.thumb');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();apresentar(+t.dataset.i)}});
+  addEventListener('resize',()=>{clearTimeout(tThumbs);tThumbs=setTimeout(()=>{if(apPronto&&!$('#tab-apresentacao').hidden)renderThumbs();if(!$('#show').hidden)mostrar()},200)});
+
+  // ---------- Apresentar (tela cheia) ----------
+  function apresentar(i=0){
+    showSlides=slides();if(!showSlides.length)return;showIdx=Math.min(i,showSlides.length-1);
+    $('#show').hidden=false;mostrar();document.documentElement.requestFullscreen?.().catch(()=>{});
+  }
+  function mostrar(){
+    const e=escalar(showSlides[showIdx][1],innerWidth,innerHeight),st=$('#showStage');
+    st.style.width=Math.round(1440*e.k)+'px';st.style.height=Math.round(810*e.k)+'px';st.innerHTML=e.html;
+    $('#showNum').textContent=`${showIdx+1} / ${showSlides.length}`;
+  }
+  const passo=d=>{const n=showIdx+d;if(n>=0&&n<showSlides.length){showIdx=n;mostrar()}};
+  function fecharShow(){$('#show').hidden=true;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}
+  $('#showPrev').onclick=()=>passo(-1);$('#showNext').onclick=()=>passo(1);$('#showSair').onclick=fecharShow;$('#showStage').onclick=()=>passo(1);
+  $('#apApresentar').onclick=()=>apresentar(0);
+  addEventListener('keydown',e=>{
+    if($('#show').hidden)return;
+    if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();passo(1)}
+    else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();passo(-1)}
+    else if(e.key==='Escape')fecharShow();
+  });
+  // Esc do navegador sai da tela cheia: fecha a apresentação junto.
+  document.addEventListener('fullscreenchange',()=>{if($('#show').hidden)return;if(!document.fullscreenElement)fecharShow();else setTimeout(mostrar,50)});
+
+  // ---------- PDF (pela impressão do navegador: "Salvar como PDF") ----------
+  $('#apPdf').onclick=async()=>{
+    const ss=slides();if(!ss.length)return;const pa=$('#printArea');pa.innerHTML=ss.map(s=>s[1]).join('');
+    await Promise.all([...pa.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
+    const [a,b]=semanaDe(apSemana),antes=document.title;document.title=`Reunião semanal ${br(a).slice(0,5)} a ${br(b)}`.replace(/\//g,'-');
+    toast('Na janela que abrir, escolha "Salvar como PDF"');
+    setTimeout(()=>{window.print();document.title=antes;pa.innerHTML=''},400);
+  };
+
+  // ---------- Galeria da equipe ----------
+  async function loadEquipe(){
+    const {data,error}=await db.from('equipe').select('id,nome,funcao,corretora,foto,ativo').order('nome');
+    if(error){$('#galeria').innerHTML=`<div class="empty-card" style="border-radius:10px;grid-column:1/-1">Não foi possível carregar a galeria: ${safe(error.message)}</div>`;return}
+    equipe=data;fotos={};
+    const caminhos=equipe.filter(e=>e.foto).map(e=>e.foto);
+    if(caminhos.length){const r=await db.storage.from('equipe').createSignedUrls(caminhos,4*3600);
+      if(!r.error)r.data.forEach(x=>{const e=equipe.find(y=>y.foto===x.path);if(e&&x.signedUrl)fotos[e.id]=x.signedUrl})}
+    renderGaleria();
+  }
+  function renderGaleria(){
+    $('#galeria').innerHTML=equipe.map(e=>`<div class="pes${e.ativo?'':' off'}"><div class="pes-foto">${fotos[e.id]?`<img src="${attr(fotos[e.id])}" alt="Foto de ${attr(e.nome)}">`:safe(iniciais(e.nome))}</div>
+      <div class="pes-info"><strong>${safe(e.nome)}</strong><small>${safe(e.funcao)}</small>${e.corretora?`<small>Nos lançamentos: ${safe(e.corretora)}</small>`:''}${e.ativo?'':'<small>Inativo</small>'}
+      <div class="row-actions"><button class="link" data-edit-p="${e.id}">Editar</button><button class="link danger" data-del-p="${e.id}">Excluir</button></div></div></div>`).join('')
+      ||'<div class="empty-card" style="border-radius:10px;grid-column:1/-1">Ninguém na galeria ainda. Clique em "+ Adicionar pessoa".</div>';
+  }
+  const atualizarAp=()=>{if(apPronto){renderApForm();renderThumbs()}};
+  const pesDialog=$('#pesDialog');let pesEdit=null,pesFoto=null;
+  const prevFoto=url=>{$('#pesPrev').innerHTML=url?`<img src="${attr(url)}" alt="">`:'Sem foto'};
+  function openPessoa(p){
+    pesEdit=p||null;pesFoto=null;$('#pesMsg').hidden=true;$('#pesTitle').textContent=p?'Editar pessoa':'Adicionar pessoa';
+    $('#pFoto').value='';$('#pNome').value=p?.nome||'';$('#pFuncao').value=p?.funcao||'Corretora de Imóveis';$('#pAtivo').checked=p?p.ativo:true;
+    const livres=corretoras.map(c=>c.nome).filter(n=>!equipe.some(e=>e.corretora===n&&e.id!==p?.id)).sort();
+    $('#pCorretora').innerHTML='<option value="">Não ligar</option>'+livres.map(n=>`<option${n===p?.corretora?' selected':''}>${safe(n)}</option>`).join('');
+    prevFoto(p&&fotos[p.id]);pesDialog.showModal();$('#pNome').focus();
+  }
+  // Reduz a foto para no máximo 900 px (JPEG) antes de enviar.
+  function reduzir(file){return new Promise((res,rej)=>{const img=new Image();
+    img.onload=()=>{const k=Math.min(1,900/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(img.src);
+      c.toBlob(b=>b?res(b):rej(new Error('não foi possível ler a imagem')),'image/jpeg',.86)};
+    img.onerror=()=>rej(new Error('o arquivo não é uma imagem válida'));img.src=URL.createObjectURL(file)})}
+  $('#pFoto').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
+    try{pesFoto=await reduzir(f);prevFoto(URL.createObjectURL(pesFoto))}catch(err){pesFoto=null;$('#pesMsg').textContent='Foto: '+err.message;$('#pesMsg').hidden=false}});
+  $('#newPessoa').onclick=()=>openPessoa(null);
+  $('#galeria').onclick=async e=>{
+    const {editP,delP}=e.target.dataset,p=equipe.find(x=>x.id===(editP||delP));if(!p)return;
+    if(editP)openPessoa(p);
+    if(delP&&confirm(`Excluir ${p.nome} da galeria? A foto também será apagada.`)){
+      const {error}=await db.from('equipe').delete().eq('id',p.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+      if(p.foto)await db.storage.from('equipe').remove([p.foto]);
+      await loadEquipe();atualizarAp();toast('Excluído')}
+  };
+  $('#pesForm').onsubmit=async e=>{
+    e.preventDefault();const msg=$('#pesMsg'),erro=t=>{msg.textContent=t;msg.hidden=false};msg.hidden=true;
+    const reg={nome:$('#pNome').value.trim(),funcao:$('#pFuncao').value.trim(),corretora:$('#pCorretora').value||null,ativo:$('#pAtivo').checked};
+    if(!reg.nome||!reg.funcao)return erro('Preencha o nome e a função.');
+    $('#pesSubmit').disabled=true;let novo=null;
+    try{
+      if(pesFoto){novo=`${crypto.randomUUID()}.jpg`;const up=await db.storage.from('equipe').upload(novo,pesFoto,{contentType:'image/jpeg'});if(up.error)throw up.error;reg.foto=novo}
+      const {error}=pesEdit?await db.from('equipe').update(reg).eq('id',pesEdit.id):await db.from('equipe').insert(reg);
+      if(error)throw error;
+      if(novo&&pesEdit?.foto)await db.storage.from('equipe').remove([pesEdit.foto]);
+      pesDialog.close();toast('Salvo');await loadEquipe();atualizarAp();
+    }catch(err){
+      if(novo)await db.storage.from('equipe').remove([novo]);
+      erro('Não foi possível salvar: '+(/duplicate|unique/i.test(err.message)?'esse nome dos lançamentos já está ligado a outra pessoa da galeria.':err.message));
+    }
+    $('#pesSubmit').disabled=false;
+  };
+
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+  db.auth.onAuthStateChange(()=>setTimeout(()=>refreshSession().catch(console.error),0));
+</script>
+</body>
+</html>

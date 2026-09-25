@@ -15,5 +15,9 @@ Portal interno da Araujo Locação: avisos, processos e estrutura da equipe.
 - `supabase/pre_analise.sql` — tabelas `pre_analises`, `corretoras` e `garantias`. Só gestores e os e-mails da tabela `pre_analise_acesso` leem e gravam
 - `atendimento.html` — atendimento (aba "Funções"): leads do dia por corretor e unidade, senhas e POP. Exige login
 - `supabase/atendimento.sql` — tabelas `leads_diarios`, `unidades`, `atendimento_senhas` e `atendimento_documentos`. Só gestores e os e-mails da tabela `atendimento_acesso` leem e gravam. Usa a mesma tabela `corretoras` da pré-análise
+- `gerencia.html` — "Meu painel", exclusivo da gerência (botão "Meu painel" no mural, depois de "Entrar (gerência)"): gráficos cruzando leads do atendimento, análises da pré-análise e os resultados semanais por corretor, mais o relatório semanal no formato da planilha
+- `supabase/gerencia.sql` — tabela `resultados_semanais` (leads do corretor, visitas, propostas, fechamentos e VGL por corretor e semana) e função `resultados_salvar_semana`. Só gestores leem e gravam
+- Aba "Apresentação" do `gerencia.html` — monta os slides da reunião semanal (segunda, 16h) com os números da semana, destaques sugeridos e fotos da galeria da equipe; apresenta em tela cheia e salva em PDF pela impressão do navegador. Usa `logo-araujo.jpg`
+- `supabase/apresentacao.sql` — tabela `equipe` (galeria: nome, função, foto, ligação com o nome nos lançamentos), bucket privado `equipe` e tabela `apresentacoes` (textos de cada semana). Só gestores
 - `supabase/pre_analise_validacoes.sql` — aba "Validações": tabelas `pre_analise_links` (atalhos: SPC Serasa, certidões federais e de todos os estados, processos) e `pre_analise_link_grupos` (nota de cada grupo), editáveis pela página
 - `supabase/pre_analise_senhas_pop.sql` — aba "Senhas" (senhas criptografadas no Vault, lidas só pelas funções `senha_*`) e aba "POP" (bucket privado `pre-analise` + tabela `pre_analise_documentos`)
