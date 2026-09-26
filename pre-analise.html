@@ -354,6 +354,12 @@
   const BUCKET='pre-analise';
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  // Confirmação desenhada na própria página: alguns navegadores (como o do painel do app) bloqueiam a janela confirm() do sistema.
+  function confirmar(texto,ok='Excluir'){return new Promise(res=>{const d=document.createElement('dialog');
+    d.innerHTML=`<div style="padding:22px;display:grid;gap:16px;max-width:460px"><p style="margin:0;font-weight:600">${safe(texto)}</p><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" class="secondary" value="n">Cancelar</button><button type="button" class="primary" style="background:var(--red);box-shadow:none" value="s">${safe(ok)}</button></div></div>`;
+    let feito=false;const fim=v=>{if(!feito){feito=true;res(v)}};
+    d.addEventListener('click',e=>{const v=e.target.closest('button')?.value;if(v){fim(v==='s');d.close()}});
+    d.addEventListener('close',()=>{fim(false);d.remove()});document.body.append(d);d.showModal();d.querySelector('[value=n]').focus()})}
 
   const pad=n=>String(n).padStart(2,'0');
   const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
