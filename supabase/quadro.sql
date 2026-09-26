@@ -176,3 +176,21 @@ $$;
 drop trigger if exists locacoes_cria_cartao on public.locacoes;
 create trigger locacoes_cria_cartao after insert on public.locacoes
   for each row execute function public.quadro_cartao_da_locacao();
+
+-- Locação excluída da planilha => o cartão criado por ela sai do quadro (com o histórico).
+-- Cartões importados do Trello (trello_id preenchido) só se desligam da planilha (on delete set null), para não perder o histórico antigo.
+create or replace function public.quadro_exclui_cartao_da_locacao()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  delete from public.quadro_cartoes where locacao_id = old.id and trello_id is null;
+  return old;
+end;
+$$;
+
+drop trigger if exists locacoes_exclui_cartao on public.locacoes;
+create trigger locacoes_exclui_cartao before delete on public.locacoes
+  for each row execute function public.quadro_exclui_cartao_da_locacao();
