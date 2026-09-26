@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Quadro de contratos | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--navy:#173552;--blue:#294b68;--green:#24705a;--cream:#f5f5f0;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10);--col:#e9edf0}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+    button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer} [hidden]{display:none!important}
+    header.bar{background:var(--navy);color:#fff;padding:14px clamp(16px,3vw,32px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .bar a{color:#cbd8e1;text-decoration:none;font-weight:600;font-size:.9rem}.bar a:hover{color:#fff}
+    .bar strong{font-size:1.02rem}.bar .who{color:#b9cad7;font-size:.82rem;margin-right:8px}
+    .bar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    h1{font-family:Georgia,serif;font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.1;margin:0}
+    h2{font-family:Georgia,serif;font-size:1.25rem;margin:0}
+    .primary{border:0;background:var(--green);color:#fff;padding:9px 14px;border-radius:10px;font-weight:700}.primary:hover{background:#1d604d}
+    .secondary{border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:10px;font-weight:650}.secondary:hover{border-color:#b6c5cf}
+    .ghost{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;font-size:.85rem}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .gate{max-width:420px;margin:60px auto;padding:28px}.gate h1{font-size:1.6rem;margin-bottom:6px}.gate p{color:var(--muted);margin:0 0 18px}.gate form{display:grid;gap:14px}
+    .field{display:grid;gap:5px}.field label,.lbl{font-size:.74rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;min-width:0}
+    input:focus,select:focus,textarea:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .msg{margin:0;font-size:.85rem;color:var(--muted)}.msg.error{color:var(--red)}
+    .muted{color:var(--muted)}.link{border:0;background:none;color:var(--blue);font-weight:700;padding:2px 4px;border-radius:6px;font-size:.82rem}.link:hover{background:#eef2f4}.link.danger{color:var(--red)}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow)}
+    /* Barra de ferramentas */
+    .tools{display:flex;gap:10px;align-items:end;flex-wrap:wrap;padding:16px clamp(16px,3vw,32px) 10px}
+    .tools .grow{flex:1}.tools input,.tools select{border:1px solid #cbd5da;border-radius:10px;padding:8px 10px;background:#fff;min-width:0}
+    .tools .busca{width:260px;max-width:100%}
+    .sub{margin:4px 0 0;color:var(--muted);font-size:.88rem}
+    /* Quadro */
+    .board{display:flex;gap:12px;align-items:flex-start;overflow-x:auto;padding:6px clamp(16px,3vw,32px) 24px;min-height:calc(100vh - 190px)}
+    .kcol{background:var(--col);border-radius:14px;width:282px;flex:none;display:flex;flex-direction:column;max-height:calc(100vh - 200px)}
+    .kcol.entrada{box-shadow:inset 0 3px 0 var(--green)}
+    .kcol-head{padding:10px 12px 6px;display:flex;justify-content:space-between;gap:8px;align-items:start}
+    .kcol-head h3{margin:0;font-size:.8rem;font-weight:800;letter-spacing:.02em;line-height:1.3}
+    .kcol-head span{background:#fff;border-radius:999px;padding:0 8px;font-size:.75rem;font-weight:800;color:var(--muted);flex:none}
+    .kcol-body{overflow-y:auto;padding:4px 8px 8px;display:flex;flex-direction:column;gap:8px;min-height:40px}
+    .kcol-body.over{background:#dde6ec;border-radius:0 0 14px 14px}
+    .kcard{background:#fff;border-radius:10px;padding:8px 10px;box-shadow:0 1px 0 rgba(9,30,66,.18);cursor:pointer;border:1px solid transparent;text-align:left;width:100%}
+    .kcard:hover{border-color:#9ec5f4}.kcard.drag{opacity:.4}
+    .kcard .t{font-size:.86rem;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+    .kcard .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:.74rem;color:var(--muted);align-items:center}
+    .kcard .meta .plan{background:#e3f1ec;color:#1d604d;border-radius:5px;padding:0 6px;font-weight:750}
+    .kcard .meta .velho{color:var(--red);font-weight:750}
+    .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+    .chip{display:inline-block;border-radius:5px;padding:1px 7px;font-size:.68rem;font-weight:800;line-height:1.5;letter-spacing:.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .placeholder{height:6px;border-radius:4px;background:#6da7ec;flex:none}
+    .mais{border:0;background:transparent;color:var(--blue);font-weight:700;font-size:.82rem;padding:6px}
+    .kcol-foot{padding:0 8px 8px}.kcol-foot button{width:100%;border:0;background:transparent;text-align:left;padding:6px 8px;border-radius:8px;color:var(--muted);font-weight:650;font-size:.85rem}.kcol-foot button:hover{background:#dde3e8;color:var(--ink)}
+    /* Janela do cartão */
+    dialog{border:0;border-radius:18px;padding:0;box-shadow:0 28px 90px rgba(10,30,45,.3);width:min(600px,calc(100% - 24px));overflow-x:hidden}dialog::backdrop{background:rgba(10,30,45,.62)}
+    dialog.wide{width:min(900px,calc(100% - 24px))}
+    .dialog-head{display:flex;justify-content:space-between;align-items:start;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}.close{border:0;background:#eef2f4;width:34px;height:34px;border-radius:50%;font-size:1.2rem;flex:none}
+    .dialog-body{padding:16px 20px 20px;display:grid;gap:16px}
+    .ctitle{width:100%;border:1px solid transparent;border-radius:8px;padding:4px 6px;font-family:Georgia,serif;font-size:1.25rem;font-weight:700;background:transparent}
+    .ctitle:hover{border-color:var(--line)}
+    .cgrid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px}
+    .side{display:grid;gap:14px;align-content:start}
+    .desc{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f8f9;border-radius:10px;padding:12px 14px;font-size:.9rem;min-height:60px}
+    .desc:empty:before{content:"Sem descrição.";color:var(--muted)}
+    textarea.edit{width:100%;min-height:260px;border:1px solid #cbd5da;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:.9rem}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .plan-box{border:1px solid #cfe3da;background:#f2f8f5;border-radius:10px;padding:10px 12px;font-size:.86rem}
+    .plan-box dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:6px 0 0}.plan-box dt{color:var(--muted)}.plan-box dd{margin:0;font-weight:700}
+    .etq-picker{border:1px solid var(--line);border-radius:10px;padding:8px;display:grid;gap:4px;max-height:280px;overflow-y:auto}
+    .etq-picker label{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.82rem}
+    .hist{display:grid;gap:10px}
+    .hist .h{font-size:.84rem;display:grid;gap:3px}.hist .h small{color:var(--muted)}
+    .hist .h.com .txt{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere}
+    .hist .h.mov{color:#52616c}
+    .av{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:.68rem;font-weight:800;margin-right:6px;vertical-align:middle}
+    .colunas-lista{display:grid;gap:8px}.colunas-lista .cl{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:6px;align-items:center}
+    .colunas-lista input[type=text]{border:1px solid #cbd5da;border-radius:8px;padding:6px 8px;min-width:0}
+    .mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;font-size:.8rem}
+    @media(max-width:760px){.cgrid{grid-template-columns:1fr}.kcol{width:260px}}
+  </style>
+</head>
+<body>
+<header class="bar">
+  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Quadro de contratos</strong> <span id="deptLinks"></span></div>
+  <div class="bar-actions" id="barActions" hidden><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
+</header>
+
+<section class="card gate" id="gate" hidden>
+  <h1>Quadro de contratos</h1>
+  <p>Área restrita da Locação e da Pré-análise. Entre com o seu e-mail e senha.</p>
+  <form id="loginForm">
+    <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
+    <button class="primary" type="submit">Entrar</button>
+    <p class="msg error" id="loginMsg" hidden></p>
+  </form>
+</section>
+
+<section class="card gate" id="denied" hidden>
+  <h1>Sem acesso</h1>
+  <p>Este login não tem permissão para o quadro de contratos. Fale com a gerência.</p>
+  <button class="secondary" id="deniedLogout">Entrar com outro e-mail</button>
+</section>
+
+<main id="app" hidden>
+  <div class="tools">
+    <div class="grow"><h1>Contratos de locação</h1><p class="sub" id="resumo">Carregando…</p></div>
+    <input class="busca" id="fBusca" type="search" placeholder="Buscar REF, nome ou texto" aria-label="Buscar cartão">
+    <select id="fEtiqueta" aria-label="Filtrar por etiqueta"></select>
+    <button class="secondary" id="btnColunas">Colunas</button>
+    <button class="primary" id="btnNovo">+ Novo cartão</button>
+  </div>
+  <div class="board" id="board"></div>
+</main>
+
+<dialog id="cardDialog" class="wide">
+  <div class="dialog-head"><div style="flex:1;min-width:0"><input class="ctitle" id="cTitulo" maxlength="300" aria-label="Título do cartão"><p class="msg" id="cOnde" style="margin:2px 6px 0"></p></div><button class="close" data-close aria-label="Fechar">×</button></div>
+  <div class="dialog-body">
+    <div class="cgrid">
+      <div style="display:grid;gap:16px;align-content:start;min-width:0">
+        <div class="chips" id="cChips"></div>
+        <div>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Descrição</span><button class="link" id="cDescEditar">Editar</button></div>
+          <div class="desc" id="cDesc"></div>
+          <div id="cDescForm" hidden><textarea class="edit" id="cDescTxt" maxlength="20000"></textarea>
+            <div class="row" style="margin-top:8px"><button class="primary" id="cDescSalvar">Salvar</button><button class="secondary" id="cDescCancelar">Cancelar</button></div></div>
+        </div>
+        <div>
+          <span class="lbl">Comentário</span>
+          <textarea class="edit" id="cComentario" style="min-height:70px;margin-top:5px" maxlength="5000" placeholder="Escreva um comentário…"></textarea>
+          <div class="row" style="margin-top:6px"><button class="primary" id="cComentar">Comentar</button></div>
+        </div>
+        <div>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Histórico</span><label class="msg"><input type="checkbox" id="cSoComent"> Só comentários</label></div>
+          <div class="hist" id="cHist" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="field"><label for="cColuna">Coluna</label><select id="cColuna"></select></div>
+        <div>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Etiquetas</span><button class="link" id="cEtqAbrir">Escolher</button></div>
+          <div id="cEtqBox" hidden style="margin-top:6px"><input id="cEtqBusca" type="search" placeholder="Buscar etiqueta" style="width:100%;border:1px solid #cbd5da;border-radius:8px;padding:6px 8px;margin-bottom:6px"><div class="etq-picker" id="cEtqLista"></div>
+            <div class="row" style="margin-top:6px"><input id="cEtqNova" placeholder="Nova etiqueta" maxlength="60" style="flex:1;min-width:0;border:1px solid #cbd5da;border-radius:8px;padding:6px 8px"><select id="cEtqCor" class="mini"></select><button class="mini" id="cEtqCriar">Criar</button></div></div>
+        </div>
+        <div>
+          <span class="lbl">Planilha de locações</span>
+          <div id="cPlan" style="margin-top:6px"></div>
+        </div>
+        <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <a class="link" id="cTrello" target="_blank" rel="noopener noreferrer" hidden>Abrir no Trello ↗</a>
+          <span class="msg" id="cAnexos" hidden></span>
+          <span class="msg" id="cCriado"></span>
+          <button class="link danger" id="cExcluir">Excluir cartão</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="novoDialog">
+  <div class="dialog-head"><h2>Novo cartão</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="novoForm" class="dialog-body">
+    <p class="msg">Locações lançadas na planilha já viram cartão sozinhas. Use aqui para o que não está na planilha.</p>
+    <div class="field"><label for="nTitulo">Título (REF - NOME - ENTRADA)</label><input id="nTitulo" maxlength="300" required></div>
+    <div class="field"><label for="nColuna">Coluna</label><select id="nColuna"></select></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button class="primary" id="nSalvar">Criar</button></div>
+    <p class="msg error" id="nMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="colDialog">
+  <div class="dialog-head"><h2>Colunas</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <div class="dialog-body">
+    <p class="msg">Renomeie, mude a ordem ou escolha a coluna de <strong>entrada</strong>, onde nascem os cartões das locações novas da planilha. Só dá para excluir coluna vazia.</p>
+    <div class="colunas-lista" id="colLista"></div>
+    <form class="row" id="colNova"><input name="nome" maxlength="120" placeholder="Nova coluna" required style="flex:1;border:1px solid #cbd5da;border-radius:8px;padding:7px 9px"><button class="secondary">Adicionar</button></form>
+    <p class="msg error" id="colMsg" hidden></p>
+  </div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Quadro de contratos (ver supabase/quadro.sql): a esteira do antigo Trello "Contratos de Locação", compartilhada
+  // entre a Locação e a Pré-análise. Cada locação lançada na planilha vira cartão sozinha (gatilho no banco).
+  // Esta página não mostra comissões: da locação ligada aparecem só os dados do contrato.
+  const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const $=s=>document.querySelector(s);
+  const LIMITE=40; // cartões mostrados por coluna antes de "Mostrar mais" (a última coluna tem centenas)
+  // Cores das etiquetas, iguais às do Trello.
+  const CORES={green:['#4bce97','#164b35'],green_dark:['#1f845a','#fff'],green_light:['#baf3db','#164b35'],yellow:['#f5cd47','#533f04'],yellow_dark:['#946f00','#fff'],yellow_light:['#f8e6a0','#533f04'],
+    orange:['#fea362','#702e00'],orange_dark:['#c25100','#fff'],orange_light:['#fedec8','#702e00'],red:['#f87168','#5d1f1a'],red_dark:['#c9372c','#fff'],red_light:['#ffd5d2','#5d1f1a'],
+    purple:['#9f8fef','#352c63'],purple_dark:['#6e5dc6','#fff'],purple_light:['#dfd8fd','#352c63'],blue:['#579dff','#09326c'],blue_dark:['#0c66e4','#fff'],blue_light:['#cce0ff','#09326c'],
+    sky:['#6cc3e0','#164555'],sky_dark:['#227d9b','#fff'],sky_light:['#c6edfb','#164555'],lime:['#94c748','#37471f'],lime_dark:['#5b7f24','#fff'],lime_light:['#d3f1a7','#37471f'],
+    pink:['#e774bb','#50253f'],pink_dark:['#ae4787','#fff'],pink_light:['#fdd0ec','#50253f'],black:['#8590a2','#fff'],black_dark:['#626f86','#fff'],black_light:['#dcdfe4','#172b4d'],gray:['#dcdfe4','#172b4d']};
+  let colunas=[],etiquetas=[],cartoes=[],comentarios={},locacoes=[],booted=false,meuEmail='',mostrar={},aberto=null,hist=[];
+
+  const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  const pad=n=>String(n).padStart(2,'0');
+  const dataHora=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+  const dataBr=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`};
+  const brl=v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const refDe=t=>(String(t).match(/^\s*([A-Za-z]{2}\d{3,5})/)||[])[1]?.toUpperCase()||null;
+  const nome=a=>!a?'—':a.includes('@')?a.split('@')[0].replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):a;
+  const iniciais=a=>nome(a).split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
+  const diasDesde=s=>Math.floor((Date.now()-new Date(s))/864e5);
+  // Descrição no formato do Trello: **negrito**, _itálico_ e \* escapados.
+  const md=s=>safe(s).replace(/\\([*_#\-\[\]()])/g,'$1').replace(/\*\*([^*]+?)\*\*/g,'<strong>$1</strong>').replace(/(^|[\s(])_([^_\n]+?)_(?=[\s).,:;!?]|$)/g,'$1<em>$2</em>');
+  const chip=e=>{const [bg,fg]=CORES[e.cor]||CORES.gray;return `<span class="chip" style="background:${bg};color:${fg}" title="${safe(e.nome)}">${safe(e.nome)}</span>`};
+  function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),2200)}
+
+  // ---------- Acesso ----------
+  async function refreshSession(){
+    const {data:{session}}=await db.auth.getSession();
+    $('#barActions').hidden=!session;
+    if(!session){show('gate');return}
+    meuEmail=session.user.email;$('#who').textContent=meuEmail;
+    const [q,l,p]=await Promise.all([db.rpc('pode_quadro'),db.rpc('pode_locacao'),db.rpc('pode_pre_analise')]);
+    if(q.error||q.data!==true){show('denied');return}
+    $('#deptLinks').innerHTML=(l.data?' · <a href="locacao.html">Locação</a>':'')+(p.data?' · <a href="pre-analise.html">Pré-análise</a>':'');
+    show('app');
+    if(!booted){booted=true;await carregar()}
+  }
+  function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
+  $('#loginForm').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,f=new FormData(form),msg=$('#loginMsg');msg.hidden=true;
+    const {error}=await db.auth.signInWithPassword({email:String(f.get('email')).trim(),password:String(f.get('senha'))});
+    if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
+    form.reset();
+  };
+  const sair=async()=>{await db.auth.signOut();booted=false;cartoes=[]};
+  $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
+
+  // ---------- Dados ----------
+  async function tudo(tabela,campos,ordem){
+    const all=[];
+    for(let from=0;;from+=1000){
+      let q=db.from(tabela).select(campos);if(ordem)q=q.order(ordem);
+      const {data,error}=await q.range(from,from+999);
+      if(error)throw error;all.push(...data);if(data.length<1000)break;
+    }
+    return all;
+  }
+  async function carregar(){
+    try{
+      const [c,e,k,m,l]=await Promise.all([tudo('quadro_colunas','id,nome,posicao,entrada','posicao'),tudo('quadro_etiquetas','id,nome,cor','nome'),
+        tudo('quadro_cartoes','id,coluna_id,posicao,titulo,referencia,descricao,etiquetas,locacao_id,modelo,trello_url,anexos_trello,criado_em,criado_por,movido_em','posicao'),
+        tudo('quadro_comentarios','cartao_id,comentarios'),tudo('locacoes','id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl','data')]);
+      colunas=c;etiquetas=e;cartoes=k;locacoes=l;comentarios=Object.fromEntries(m.map(x=>[x.cartao_id,x.comentarios]));
+      preencherFiltros();render();
+      // Link vindo da planilha (quadro.html?c=<cartão>): abre o cartão direto.
+      const pedido=new URLSearchParams(location.search).get('c');
+      if(pedido&&!document.querySelector('dialog[open]')&&cartoes.some(c=>c.id===pedido)){abrirCartao(pedido);try{history.replaceState(null,'',location.pathname)}catch{}}
+    }catch(err){$('#resumo').textContent='Não foi possível carregar o quadro: '+err.message}
+  }
+  // Atualiza ao voltar para a aba (outra pessoa pode ter mexido), se nenhuma janela estiver aberta.
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&booted&&!document.querySelector('dialog[open]'))carregar()});
+
+  function preencherFiltros(){
+    const v=$('#fEtiqueta').value;
+    $('#fEtiqueta').innerHTML='<option value="">Todas as etiquetas</option>'+etiquetas.map(e=>`<option value="${e.id}">${safe(e.nome)}</option>`).join('');
+    $('#fEtiqueta').value=v;
+  }
+  ['#fBusca','#fEtiqueta'].forEach(s=>$(s).addEventListener('input',()=>{mostrar={};render()}));
+  const etq=id=>etiquetas.find(e=>e.id===id);
+  const locDe=id=>locacoes.find(l=>l.id===id);
+  const doColuna=id=>cartoes.filter(c=>c.coluna_id===id).sort((a,b)=>a.posicao-b.posicao);
+  function filtrados(list){
+    const q=$('#fBusca').value.trim().toUpperCase(),e=$('#fEtiqueta').value;
+    return list.filter(c=>!(e&&!c.etiquetas.includes(e))&&!(q&&!(c.titulo+' '+c.descricao).toUpperCase().includes(q)));
+  }
+
+  // ---------- Quadro ----------
+  function cardHtml(c){
+    const d=diasDesde(c.movido_em),n=comentarios[c.id]||0,l=locDe(c.locacao_id);
+    return `<article class="kcard" draggable="true" data-id="${c.id}" tabindex="0">
+      ${c.etiquetas.length?`<div class="chips">${c.etiquetas.map(etq).filter(Boolean).map(chip).join('')}</div>`:''}
+      <div class="t">${safe(c.titulo)}</div>
+      <div class="meta">${l?`<span class="plan" title="Ligado à planilha de locações">Planilha · ${brl(l.vgl)}</span>`:''}${n?`<span title="Comentários">💬 ${n}</span>`:''}${c.anexos_trello?`<span title="Anexos no Trello">📎 ${c.anexos_trello}</span>`:''}
+        ${c.modelo?'<span>modelo do Trello</span>':`<span class="${d>=7&&!ultima(c.coluna_id)?'velho':''}" title="Tempo nesta coluna${d>=7&&!ultima(c.coluna_id)?' (parado há 7 dias ou mais)':''}">${d===0?'hoje':d===1?'há 1 dia':`há ${d} dias`}</span>`}</div></article>`;
+  }
+  const ultima=id=>colunas.length&&colunas[colunas.length-1].id===id;
+  function render(){
+    const filtro=$('#fBusca').value.trim()||$('#fEtiqueta').value;
+    const vis=filtrados(cartoes).length;
+    $('#resumo').textContent=`${cartoes.length} cartões em ${colunas.length} colunas`+(filtro?` · ${vis} encontrados`:'')+'. Arraste os cartões entre as colunas ou clique para abrir.';
+    $('#board').innerHTML=colunas.map(col=>{
+      const todos=doColuna(col.id),list=filtrados(todos),lim=mostrar[col.id]||LIMITE,parte=list.slice(0,lim);
+      return `<section class="kcol${col.entrada?' entrada':''}" data-col="${col.id}"><div class="kcol-head"><h3>${safe(col.nome)}${col.entrada?' <small class="muted" title="Locações novas da planilha entram aqui">· entrada</small>':''}</h3><span>${filtro?`${list.length}/`:''}${todos.length}</span></div>
+        <div class="kcol-body" data-col="${col.id}">${parte.map(cardHtml).join('')}${list.length>lim?`<button class="mais" data-mais="${col.id}">Mostrar mais (${list.length-lim})</button>`:''}</div>
+        <div class="kcol-foot"><button data-novo="${col.id}">+ Adicionar cartão</button></div></section>`;
+    }).join('');
+  }
+  $('#board').addEventListener('click',e=>{
+    const m=e.target.closest('[data-mais]');if(m){mostrar[m.dataset.mais]=(mostrar[m.dataset.mais]||LIMITE)+100;render();return}
+    const n=e.target.closest('[data-novo]');if(n){abrirNovo(n.dataset.novo);return}
+    const k=e.target.closest('.kcard');if(k)abrirCartao(k.dataset.id);
+  });
+  $('#board').addEventListener('keydown',e=>{const k=e.target.closest('.kcard');if(k&&e.key==='Enter')abrirCartao(k.dataset.id)});
+
+  // Arrastar e soltar entre colunas (no celular, use o campo "Coluna" dentro do cartão).
+  let arrastando=null;const ph=document.createElement('div');ph.className='placeholder';
+  $('#board').addEventListener('dragstart',e=>{const k=e.target.closest('.kcard');if(!k)return;arrastando=k.dataset.id;k.classList.add('drag');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',arrastando)});
+  $('#board').addEventListener('dragend',e=>{e.target.closest?.('.kcard')?.classList.remove('drag');ph.remove();document.querySelectorAll('.kcol-body.over').forEach(b=>b.classList.remove('over'));arrastando=null});
+  $('#board').addEventListener('dragover',e=>{
+    const body=e.target.closest('.kcol')?.querySelector('.kcol-body');if(!body||!arrastando)return;e.preventDefault();
+    document.querySelectorAll('.kcol-body.over').forEach(b=>b!==body&&b.classList.remove('over'));body.classList.add('over');
+    const depois=[...body.querySelectorAll('.kcard:not(.drag)')].find(k=>{const r=k.getBoundingClientRect();return e.clientY<r.top+r.height/2});
+    if(depois)body.insertBefore(ph,depois);else{const mais=body.querySelector('.mais');mais?body.insertBefore(ph,mais):body.append(ph)}
+  });
+  $('#board').addEventListener('drop',async e=>{
+    const body=e.target.closest('.kcol')?.querySelector('.kcol-body');if(!body||!arrastando)return;e.preventDefault();
+    const col=body.dataset.col,prev=ph.previousElementSibling?.closest('.kcard'),next=ph.nextElementSibling?.closest?.('.kcard');
+    const id=arrastando;ph.remove();body.classList.remove('over');
+    const cp=prev&&cartoes.find(c=>c.id===prev.dataset.id),cn=next&&cartoes.find(c=>c.id===next.dataset.id);
+    let pos;
+    if(cp&&cn)pos=(cp.posicao+cn.posicao)/2;
+    else if(cp){const resto=doColuna(col).filter(c=>c.posicao>cp.posicao&&c.id!==id);pos=resto.length?(cp.posicao+resto[0].posicao)/2:cp.posicao+1024}
+    else if(cn)pos=cn.posicao-1024;
+    else pos=1024;
+    if(prev?.dataset.id===id||next?.dataset.id===id){const c=cartoes.find(x=>x.id===id);if(c.coluna_id===col)return}
+    await mover(id,col,pos);
+  });
+  async function mover(id,col,pos){
+    const c=cartoes.find(x=>x.id===id),antes={coluna_id:c.coluna_id,posicao:c.posicao,movido_em:c.movido_em};
+    if(c.coluna_id!==col)c.movido_em=new Date().toISOString();c.coluna_id=col;c.posicao=pos;render();
+    const {error}=await db.rpc('quadro_mover',{p_cartao:id,p_coluna:col,p_posicao:pos});
+    if(error){Object.assign(c,antes);render();alert('Não foi possível mover: '+error.message);return false}
+    if(antes.coluna_id!==col)toast('Movido para '+colunas.find(x=>x.id===col).nome.toLowerCase());
+    return true;
+  }
+  const topoDe=col=>{const l=doColuna(col);return l.length?l[0].posicao-1024:1024};
+
+  // ---------- Cartão ----------
+  const cd=$('#cardDialog');
+  async function abrirCartao(id){
+    const c=cartoes.find(x=>x.id===id);if(!c)return;aberto=c;
+    $('#cTitulo').value=c.titulo;$('#cDescForm').hidden=true;$('#cDesc').hidden=false;$('#cDescEditar').hidden=false;$('#cComentario').value='';$('#cEtqBox').hidden=true;
+    $('#cColuna').innerHTML=colunas.map(x=>`<option value="${x.id}"${x.id===c.coluna_id?' selected':''}>${safe(x.nome)}</option>`).join('');
+    $('#cTrello').hidden=!c.trello_url;if(c.trello_url)$('#cTrello').href=c.trello_url;
+    $('#cAnexos').hidden=!c.anexos_trello;$('#cAnexos').textContent=`${c.anexos_trello} ${c.anexos_trello===1?'anexo ficou':'anexos ficaram'} no Trello`;
+    $('#cCriado').textContent=`Criado em ${dataBr(c.criado_em)}${c.criado_por?' por '+nome(c.criado_por):''}`;
+    pintarCartao();if(!cd.open)cd.showModal();
+    $('#cHist').innerHTML='<p class="msg">Carregando histórico…</p>';
+    const {data,error}=await db.from('quadro_historico').select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').eq('cartao_id',id).order('criado_em',{ascending:false});
+    if(aberto!==c)return;
+    if(error){$('#cHist').innerHTML=`<p class="msg error">Não foi possível carregar o histórico: ${safe(error.message)}</p>`;return}
+    hist=data;pintarHist();
+  }
+  function pintarCartao(){
+    const c=aberto,col=colunas.find(x=>x.id===c.coluna_id);
+    $('#cOnde').textContent=`na coluna ${col?.nome||'?'} · há ${diasDesde(c.movido_em)} dia(s) nesta coluna`;
+    $('#cChips').innerHTML=c.etiquetas.map(etq).filter(Boolean).map(chip).join('');
+    $('#cDesc').innerHTML=md(c.descricao);
+    const l=locDe(c.locacao_id);
+    if(l)$('#cPlan').innerHTML=`<div class="plan-box"><strong>${safe(l.referencia)}</strong> · ${safe(l.proponente)}<dl><dt>Data</dt><dd>${dataBr(l.data+'T12:00')}</dd><dt>Corretora</dt><dd>${safe(l.corretora)}</dd><dt>Cidade</dt><dd>${safe(l.unidade)}</dd>
+      <dt>Garantia</dt><dd>${safe(l.garantia||'Não informada')}</dd><dt>VGL</dt><dd>${brl(l.vgl)}</dd><dt>Assinado</dt><dd>${l.assinado?'Sim':'Não'}</dd></dl><button class="link" id="cDesligar" style="margin-top:6px;padding-left:0">Desligar da planilha</button></div>`;
+    else{
+      const ligadas=new Set(cartoes.map(x=>x.locacao_id).filter(Boolean)),ref=c.referencia||refDe(c.titulo);
+      const opc=locacoes.filter(x=>!ligadas.has(x.id)).sort((a,b)=>(b.referencia===ref)-(a.referencia===ref)||b.data.localeCompare(a.data));
+      $('#cPlan').innerHTML=`<p class="msg">Este cartão não está ligado a nenhuma locação da planilha.</p>${opc.length?`<select id="cLigar" class="mini" style="width:100%;margin-top:6px"><option value="">Ligar a uma locação…</option>${opc.map(x=>`<option value="${x.id}">${safe(x.referencia)} · ${safe(x.proponente)} · ${dataBr(x.data+'T12:00')}</option>`).join('')}</select>`:''}`;
+    }
+  }
+  function pintarHist(){
+    const so=$('#cSoComent').checked,list=hist.filter(h=>!so||h.tipo==='comentario');
+    if(!list.length){$('#cHist').innerHTML='<p class="msg">Nada no histórico.</p>';return}
+    $('#cHist').innerHTML=list.map(h=>{
+      const quem=`<span class="av" title="${safe(h.autor||'')}">${safe(iniciais(h.autor))}</span><strong>${safe(nome(h.autor))}</strong>`;
+      if(h.tipo==='comentario')return `<div class="h com"><div>${quem} <small>${dataHora(h.criado_em)}</small>${h.autor===meuEmail?` <button class="link danger" data-del-com="${h.id}">Excluir</button>`:''}</div><div class="txt">${md(h.texto||'')}</div></div>`;
+      const acao=h.tipo==='movido'?`moveu de <em>${safe(h.de_coluna||'?')}</em> para <em>${safe(h.para_coluna||'?')}</em>`:h.tipo==='criado'?`criou o cartão${h.para_coluna?` em <em>${safe(h.para_coluna)}</em>`:''}${h.texto?` (${safe(h.texto)})`:''}`:h.tipo==='arquivado'?'arquivou o cartão':h.tipo==='restaurado'?'restaurou o cartão':safe(h.texto||'editou o cartão');
+      return `<div class="h mov"><div>${quem} ${acao} <small>· ${dataHora(h.criado_em)}</small></div></div>`;
+    }).join('');
+  }
+  $('#cSoComent').onchange=pintarHist;
+  async function salvarCartao(campos,oque){
+    const c=aberto,antes={...c};Object.assign(c,campos,{atualizado_em:new Date().toISOString()});
+    const {error}=await db.from('quadro_cartoes').update({...campos,atualizado_em:c.atualizado_em}).eq('id',c.id);
+    if(error){Object.assign(c,antes);alert('Não foi possível salvar: '+error.message);pintarCartao();return false}
+    render();if(oque)toast(oque);return true;
+  }
+  $('#cTitulo').addEventListener('change',()=>{const t=$('#cTitulo').value.trim();if(!t){$('#cTitulo').value=aberto.titulo;return}if(t!==aberto.titulo)salvarCartao({titulo:t,referencia:refDe(t)},'Título salvo')});
+  // Mudar a coluna aqui põe o cartão no topo da coluna nova; o histórico é recarregado para mostrar a mudança.
+  $('#cColuna').onchange=async e=>{if(await mover(aberto.id,e.target.value,topoDe(e.target.value)))abrirCartao(aberto.id);else e.target.value=aberto.coluna_id};
+  $('#cDescEditar').onclick=()=>{$('#cDescTxt').value=aberto.descricao;$('#cDescForm').hidden=false;$('#cDesc').hidden=true;$('#cDescEditar').hidden=true;$('#cDescTxt').focus()};
+  $('#cDescCancelar').onclick=()=>{$('#cDescForm').hidden=true;$('#cDesc').hidden=false;$('#cDescEditar').hidden=false};
+  $('#cDescSalvar').onclick=async()=>{if(await salvarCartao({descricao:$('#cDescTxt').value},'Descrição salva')){$('#cDescCancelar').onclick();pintarCartao()}};
+  $('#cComentar').onclick=async()=>{
+    const t=$('#cComentario').value.trim();if(!t)return;$('#cComentar').disabled=true;
+    const {data,error}=await db.from('quadro_historico').insert({cartao_id:aberto.id,tipo:'comentario',texto:t,autor:meuEmail}).select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').single();
+    $('#cComentar').disabled=false;if(error){alert('Não foi possível comentar: '+error.message);return}
+    $('#cComentario').value='';hist.unshift(data);comentarios[aberto.id]=(comentarios[aberto.id]||0)+1;pintarHist();render();
+  };
+  $('#cHist').addEventListener('click',async e=>{
+    const id=e.target.dataset.delCom;if(!id||!confirm('Excluir este comentário?'))return;
+    const {error}=await db.from('quadro_historico').delete().eq('id',id);if(error){alert('Não foi possível excluir: '+error.message);return}
+    hist=hist.filter(h=>h.id!==id);comentarios[aberto.id]=Math.max(0,(comentarios[aberto.id]||1)-1);pintarHist();render();
+  });
+  $('#cPlan').addEventListener('change',e=>{if(e.target.id==='cLigar'&&e.target.value)salvarCartao({locacao_id:e.target.value},'Ligado à planilha').then(pintarCartao)});
+  $('#cPlan').addEventListener('click',e=>{if(e.target.id==='cDesligar'&&confirm('Desligar este cartão da locação da planilha? A locação continua na planilha.'))salvarCartao({locacao_id:null},'Desligado da planilha').then(pintarCartao)});
+  $('#cExcluir').onclick=async()=>{
+    if(!confirm(`Excluir o cartão "${aberto.titulo}"? O histórico dele também será apagado. A locação da planilha não é apagada.`))return;
+    const {error}=await db.from('quadro_cartoes').delete().eq('id',aberto.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+    cartoes=cartoes.filter(x=>x.id!==aberto.id);cd.close();render();toast('Cartão excluído');
+  };
+  // Etiquetas
+  $('#cEtqAbrir').onclick=()=>{$('#cEtqBox').hidden=!$('#cEtqBox').hidden;$('#cEtqBusca').value='';pintarEtq();$('#cEtqCor').innerHTML=Object.keys(CORES).filter(k=>k!=='gray').map(k=>`<option value="${k}" style="background:${CORES[k][0]}">${k.replace('_',' ')}</option>`).join('')};
+  function pintarEtq(){
+    const q=$('#cEtqBusca').value.trim().toUpperCase();
+    $('#cEtqLista').innerHTML=etiquetas.filter(e=>!q||e.nome.toUpperCase().includes(q)).map(e=>`<label><input type="checkbox" value="${e.id}"${aberto.etiquetas.includes(e.id)?' checked':''}>${chip(e)}</label>`).join('')||'<p class="msg">Nenhuma etiqueta.</p>';
+  }
+  $('#cEtqBusca').addEventListener('input',pintarEtq);
+  $('#cEtqLista').addEventListener('change',e=>{const id=e.target.value,set=new Set(aberto.etiquetas);e.target.checked?set.add(id):set.delete(id);salvarCartao({etiquetas:[...set]}).then(pintarCartao)});
+  $('#cEtqCriar').onclick=async()=>{
+    const n=$('#cEtqNova').value.trim().toUpperCase();if(!n)return;
+    const {data,error}=await db.from('quadro_etiquetas').insert({nome:n,cor:$('#cEtqCor').value}).select('id,nome,cor').single();
+    if(error){alert('Não foi possível criar: '+error.message);return}
+    etiquetas.push(data);etiquetas.sort((a,b)=>a.nome.localeCompare(b.nome));$('#cEtqNova').value='';preencherFiltros();
+    await salvarCartao({etiquetas:[...aberto.etiquetas,data.id]});pintarCartao();pintarEtq();
+  };
+
+  // ---------- Novo cartão ----------
+  const MODELO='Aluguel:\nEntrada:\nVencimento:\n\nGarantia:\n**LIXO:**\n**SEGURO INCENDIO**\n**CHAVES:**\n**SINDICO:**\n**UC:**\n**ÁGUA:**\n**VISTORIA:**\n\nMORADORES:\n\n_CORRETORA:_\nCAPTADORA:\n\n**FECHADO DIA:**\n\n_**INFORMAÇÕES KENLO IMOB]**_';
+  function abrirNovo(col){
+    const ent=col||colunas.find(c=>c.entrada)?.id||colunas[0]?.id;
+    $('#nColuna').innerHTML=colunas.map(x=>`<option value="${x.id}"${x.id===ent?' selected':''}>${safe(x.nome)}</option>`).join('');
+    $('#novoForm').reset();$('#nColuna').value=ent;$('#nMsg').hidden=true;$('#novoDialog').showModal();$('#nTitulo').focus();
+  }
+  $('#btnNovo').onclick=()=>abrirNovo(null);
+  $('#novoForm').onsubmit=async e=>{
+    e.preventDefault();const t=$('#nTitulo').value.trim(),col=$('#nColuna').value;if(!t)return;
+    $('#nSalvar').disabled=true;
+    const {data,error}=await db.from('quadro_cartoes').insert({coluna_id:col,posicao:topoDe(col),titulo:t,referencia:refDe(t),descricao:MODELO,criado_por:meuEmail}).select('id,coluna_id,posicao,titulo,referencia,descricao,etiquetas,locacao_id,modelo,trello_url,anexos_trello,criado_em,criado_por,movido_em').single();
+    $('#nSalvar').disabled=false;
+    if(error){$('#nMsg').textContent='Não foi possível criar: '+error.message;$('#nMsg').hidden=false;return}
+    await db.from('quadro_historico').insert({cartao_id:data.id,tipo:'criado',para_coluna:colunas.find(x=>x.id===col).nome,autor:meuEmail});
+    cartoes.push(data);$('#novoDialog').close();render();abrirCartao(data.id);
+  };
+
+  // ---------- Colunas ----------
+  function pintarColunas(){
+    $('#colLista').innerHTML=colunas.map((c,i)=>`<div class="cl" data-id="${c.id}"><label title="Coluna de entrada"><input type="radio" name="entrada" value="${c.id}"${c.entrada?' checked':''}></label>
+      <input type="text" value="${safe(c.nome)}" maxlength="120" aria-label="Nome da coluna"><button class="mini" data-up ${i?'':'disabled'} aria-label="Subir">↑</button><button class="mini" data-down ${i<colunas.length-1?'':'disabled'} aria-label="Descer">↓</button>
+      <button class="mini" data-del ${doColuna(c.id).length?'disabled title="Só dá para excluir coluna vazia"':''} aria-label="Excluir">×</button></div>`).join('');
+  }
+  const colErro=t=>{$('#colMsg').textContent=t;$('#colMsg').hidden=false};
+  $('#btnColunas').onclick=()=>{$('#colMsg').hidden=true;pintarColunas();$('#colDialog').showModal()};
+  $('#colLista').addEventListener('change',async e=>{
+    const row=e.target.closest('.cl'),c=colunas.find(x=>x.id===row.dataset.id);
+    if(e.target.type==='radio'){const r1=await db.from('quadro_colunas').update({entrada:false}).neq('id',c.id),r2=await db.from('quadro_colunas').update({entrada:true}).eq('id',c.id);
+      if(r1.error||r2.error)return colErro('Não foi possível salvar.');colunas.forEach(x=>x.entrada=x.id===c.id);render();toast('Coluna de entrada salva');return}
+    const n=e.target.value.trim();if(!n){e.target.value=c.nome;return}
+    const {error}=await db.from('quadro_colunas').update({nome:n}).eq('id',c.id);if(error)return colErro('Não foi possível renomear: '+error.message);c.nome=n;render();toast('Coluna renomeada');
+  });
+  $('#colLista').addEventListener('click',async e=>{
+    const b=e.target.closest('button');if(!b)return;const row=b.closest('.cl'),i=colunas.findIndex(x=>x.id===row.dataset.id),c=colunas[i];
+    if(b.hasAttribute('data-del')){if(!confirm(`Excluir a coluna "${c.nome}"?`))return;const {error}=await db.from('quadro_colunas').delete().eq('id',c.id);if(error)return colErro('Não foi possível excluir: '+error.message);colunas.splice(i,1)}
+    else{const j=b.hasAttribute('data-up')?i-1:i+1,o=colunas[j];
+      const r=await Promise.all([db.from('quadro_colunas').update({posicao:o.posicao}).eq('id',c.id),db.from('quadro_colunas').update({posicao:c.posicao}).eq('id',o.id)]);
+      if(r.some(x=>x.error))return colErro('Não foi possível mudar a ordem.');[c.posicao,o.posicao]=[o.posicao,c.posicao];colunas.sort((a,b)=>a.posicao-b.posicao)}
+    pintarColunas();render();
+  });
+  $('#colNova').onsubmit=async e=>{
+    e.preventDefault();const n=e.currentTarget.nome.value.trim();if(!n)return;
+    const {data,error}=await db.from('quadro_colunas').insert({nome:n,posicao:Math.max(0,...colunas.map(c=>c.posicao))+1}).select('id,nome,posicao,entrada').single();
+    if(error)return colErro('Não foi possível adicionar: '+error.message);colunas.push(data);e.currentTarget.reset();pintarColunas();render();
+  };
+
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+  cd.addEventListener('close',()=>{aberto=null});
+  db.auth.onAuthStateChange(()=>setTimeout(()=>refreshSession().catch(console.error),0));
+</script>
+</body>
+</html>

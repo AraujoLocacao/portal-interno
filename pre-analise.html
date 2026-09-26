@@ -98,6 +98,7 @@
     .tag.sim{background:#e3f1ec;color:#1d604d}.tag.nao{background:#fdf1dc;color:#8a5a12}.tag.bad{background:var(--red);color:#fff}
     .alerta{border:1px solid #efc4c4;background:#fdecec;color:#6e2323;border-radius:14px;padding:14px 18px;margin-bottom:18px}
     .alerta strong{color:var(--red)}.alerta ul{margin:6px 0 0;padding-left:20px}.alerta li{margin:2px 0}
+    a.etapa{display:inline-block;margin-top:2px;font-size:.72rem;font-weight:700;color:var(--blue);text-decoration:none;background:#eef2f6;border-radius:5px;padding:0 6px}a.etapa:hover{background:#dde6ef}
     .msg.bad{background:#fdecec;color:#8e2f2f;border-radius:8px;padding:8px 10px;font-weight:650}
     dialog.wide{width:min(760px,calc(100% - 32px))}
     @media(max-width:1100px){.filters{grid-template-columns:repeat(3,minmax(0,1fr));position:static}.filters .search{grid-column:1/-1}}
@@ -130,7 +131,7 @@
 
 <main id="app" hidden>
   <div class="dept"><h1>Pré-análise</h1>
-    <nav class="tabs" aria-label="Seções da pré-análise"><button type="button" class="tab-link" data-go="analises">Análises</button><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="validacoes">Validações</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button></nav></div>
+    <nav class="tabs" aria-label="Seções da pré-análise"><button type="button" class="tab-link" data-go="analises">Análises</button><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="validacoes">Validações</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button><a class="tab-link" href="quadro.html" style="text-decoration:none">Quadro ↗</a></nav></div>
 
   <section id="tab-analises" data-tab>
   <div class="top">
@@ -797,7 +798,7 @@
   // aqui aparecem só as colunas até "%". Taxa de locação e comissões não são mostradas nesta página.
   const LOC_MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
   const LOC_CAMPOS='id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,observacao,ordem';
-  let locs=[],locUnidades=[],locMes=null,locEditId=null;
+  let locs=[],locEtapas={},locUnidades=[],locMes=null,locEditId=null;
   const locNum=v=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const locBrl=v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const locNomeMes=ym=>{const [y,m]=ym.split('-');return `${LOC_MESES[+m-1]} de ${y}`};
@@ -819,7 +820,11 @@
         const {data,error}=await db.from('locacoes').select(LOC_CAMPOS).order('data').order('ordem').order('criado_em').range(from,from+999);
         if(error)throw error;all.push(...data);if(data.length<1000)break;
       }
-      locs=all;locFillMeses();locFillCorretoras();renderLocacoes();
+      locs=all;
+      // Etapa de cada locação no quadro de contratos (quadro.html). Se o quadro não carregar, a planilha funciona igual.
+      try{const [k,c]=await Promise.all([db.from('quadro_cartoes').select('id,locacao_id,coluna_id').not('locacao_id','is',null),db.from('quadro_colunas').select('id,nome')]);
+        const nomes=Object.fromEntries((c.data||[]).map(x=>[x.id,x.nome]));locEtapas=Object.fromEntries((k.data||[]).map(x=>[x.locacao_id,{cartao:x.id,coluna:nomes[x.coluna_id]}]))}catch{locEtapas={}}
+      locFillMeses();locFillCorretoras();renderLocacoes();
     }catch(err){$('#locTabela').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar as locações: ${safe(err.message)}</td></tr></tbody>`}
   }
   const locMesesDisp=()=>{const hoje=iso(new Date()).slice(0,7);return [...new Set([hoje,...locs.map(l=>l.data.slice(0,7))])].sort().reverse()};
@@ -865,7 +870,7 @@
       html+=ls.map(l=>{const err=porId[l.id],rep=err?.find(e=>e.startsWith('REF'));return `<tr${err?' class="erro"':''}>
         <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${rep?` <span class="tag bad">${rep}</span>`:''}</td>
         <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td><td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
-        <td>${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}</td>
+        <td>${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}${locEtapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${locEtapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(locEtapas[l.id].coluna)}</a>`:''}</td>
         <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
         <td class="num"><strong>${locNum(l.vgl)}</strong></td><td class="num">${(+l.percentual).toLocaleString('pt-BR',{maximumFractionDigits:2})}%</td>
         <td class="row-actions"><button class="link" data-loc-edit="${l.id}">Editar</button><button class="link danger" data-loc-del="${l.id}">Excluir</button></td></tr>`}).join('');

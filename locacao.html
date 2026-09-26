@@ -70,6 +70,7 @@
     /* Planilha do mês */
     #planilha{font-size:.84rem}#planilha td,#planilha th{padding:7px 9px}
     #planilha td.nome{min-width:210px}
+    a.etapa{display:inline-block;margin-top:2px;font-size:.72rem;font-weight:700;color:var(--blue);text-decoration:none;background:#eef2f6;border-radius:5px;padding:0 6px}a.etapa:hover{background:#dde6ef}
     #planilha tr.semana td{background:var(--head);font-weight:800;letter-spacing:.02em;padding:6px 10px;border-bottom:0}
     #planilha tr.semana td span{font-weight:600;color:#3d556d;margin-left:6px}
     #planilha tr.sub td{background:#eef2f4;font-weight:800;border-top:1px solid var(--line)}
@@ -133,7 +134,7 @@
 
 <main id="app" hidden>
   <div class="dept"><h1>Locação</h1>
-    <nav class="tabs" aria-label="Seções da locação"><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="calculadoras">Calculadoras</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button></nav></div>
+    <nav class="tabs" aria-label="Seções da locação"><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="calculadoras">Calculadoras</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button><a class="tab-link" href="quadro.html" style="text-decoration:none">Quadro ↗</a></nav></div>
 
   <section id="tab-locacoes" data-tab>
   <div class="top">
@@ -287,7 +288,7 @@
   // Fórmulas da planilha "RANKING 2026".
   const REGRA={base:.90,corretora:.25,stefani:.10,du:.01,capImob:.05,ageNovo:.08,ajuda:.10};
   const CAPTADORAS=['RUBIA','SONORA','NAVEGANTES'];
-  let locs=[],bonus=[],corretoras=[],unidades=[],garantias=[],booted=false,senhas=[],docs=[],senhaEditId=null,locEditId=null,mesSel=null;
+  let etapas={},locs=[],bonus=[],corretoras=[],unidades=[],garantias=[],booted=false,senhas=[],docs=[],senhaEditId=null,locEditId=null,mesSel=null;
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
   const pad=n=>String(n).padStart(2,'0');
@@ -374,6 +375,9 @@
     }
     const b=await db.from('locacao_bonificacoes').select('mes,corretora,valor');if(b.error)throw b.error;
     locs=all;bonus=b.data;
+    // Etapa de cada locação no quadro de contratos (quadro.html). Se o quadro não carregar, a planilha funciona igual.
+    try{const [k,c]=await Promise.all([db.from('quadro_cartoes').select('id,locacao_id,coluna_id').not('locacao_id','is',null),db.from('quadro_colunas').select('id,nome')]);
+      const nomes=Object.fromEntries((c.data||[]).map(x=>[x.id,x.nome]));etapas=Object.fromEntries((k.data||[]).map(x=>[x.locacao_id,{cartao:x.id,coluna:nomes[x.coluna_id]}]))}catch{etapas={}}
     fillMeses();fillFilterOptions();render();
   }
 
@@ -456,7 +460,7 @@
         <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${err?.some(e=>e.startsWith('REF'))?` <span class="tag bad">${safe(err.find(e=>e.startsWith('REF')))}</span>`:''}</td>
         <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td>
         <td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
-        <td class="nome">${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}</td>
+        <td class="nome">${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}${etapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${etapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(etapas[l.id].coluna)}</a>`:''}</td>
         <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
         <td class="num"><strong>${num(c.vgl)}</strong></td><td class="num">${pctTxt(l.percentual)}</td>
         <td class="num">${num(c.tx)}</td><td class="num">${num(c.base)}</td><td class="num">${num(c.corretora)}</td><td class="num">${num(c.stefani)}</td><td class="num">${num(c.du)}</td><td class="num">${l.captacao_pos?num(c.capImob):'<span class="muted">–</span>'}</td>
