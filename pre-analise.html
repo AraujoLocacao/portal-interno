@@ -148,7 +148,7 @@
     <div class="field"><label for="fCorretora">Corretora</label><select id="fCorretora"></select></div>
     <div class="field"><label for="fGarantia">Garantia</label><select id="fGarantia"></select></div>
     <div class="field"><label for="fSituacao">Situação</label><select id="fSituacao"><option value="">Todas</option><option>APROVADO</option><option>RECUSADO</option><option>EM ANÁLISE</option></select></div>
-    <div class="field"><label for="fPeriodo">Período</label><select id="fPeriodo"><option value="mes">Este mês</option><option value="mespassado">Mês passado</option><option value="90">Últimos 90 dias</option><option value="ano">Este ano</option><option value="tudo">Tudo</option><option value="custom">Escolher datas…</option></select>
+    <div class="field"><label for="fPeriodo">Período</label><select id="fPeriodo"><option value="mes">Este mês</option><option value="mespassado">Mês passado</option><option value="90">Últimos 90 dias</option><option value="ano">Este ano</option><option value="12m">Últimos 12 meses</option><option value="anopassado">Ano passado</option><option value="tudo">Tudo</option><option value="custom">Escolher datas…</option></select>
       <div class="dates" id="customDates" hidden><input id="fDe" type="date" aria-label="De"><input id="fAte" type="date" aria-label="Até"></div></div>
     <button class="secondary" id="clearFilters">Limpar</button>
   </div>
@@ -360,7 +360,6 @@
     let feito=false;const fim=v=>{if(!feito){feito=true;res(v)}};
     d.addEventListener('click',e=>{const v=e.target.closest('button')?.value;if(v){fim(v==='s');d.close()}});
     d.addEventListener('close',()=>{fim(false);d.remove()});document.body.append(d);d.showModal();d.querySelector('[value=n]').focus()})}
-
   const pad=n=>String(n).padStart(2,'0');
   const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const br=s=>s?s.split('-').reverse().join('/'):'';
@@ -442,6 +441,8 @@
     if(p==='mespassado')return [iso(new Date(y,m-1,1)),iso(new Date(y,m,0))];
     if(p==='90')return [iso(new Date(y,m,t.getDate()-89)),iso(t)];
     if(p==='ano')return [`${y}-01-01`,`${y}-12-31`];
+    if(p==='12m')return [iso(new Date(y,m-11,1)),iso(new Date(y,m+1,0))];
+    if(p==='anopassado')return [`${y-1}-01-01`,`${y-1}-12-31`];
     if(p==='custom')return [$('#fDe').value||'',$('#fAte').value||''];
     return ['',''];
   }
@@ -553,10 +554,14 @@
       <tbody>${names.map(n=>line(n,by[n])).join('')}${line('',tot,true)}</tbody>`;
   }
 
-  function renderLista(list){
+  // Com o histórico inteiro são milhares de linhas: mostra 300 por vez.
+  let listaAtual=[],listaLimite=300;
+  function renderLista(list,maisLinhas){
+    listaAtual=list;listaLimite=maisLinhas?listaLimite+300:300;
     $('#listCount').textContent=`${list.length} ${list.length===1?'análise':'análises'}`;
     if(!list.length){$('#lista').innerHTML='<tbody><tr><td class="empty">Nenhuma análise com esses filtros.</td></tr></tbody>';return}
-    $('#lista').innerHTML=`<thead><tr><th>Dia</th><th>Corretora</th><th>Nome do cliente</th><th>Referência</th><th>Situação</th><th>Onde</th><th></th></tr></thead><tbody>${list.map(r=>`<tr>
+    const resto=list.length-listaLimite;
+    $('#lista').innerHTML=`<thead><tr><th>Dia</th><th>Corretora</th><th>Nome do cliente</th><th>Referência</th><th>Situação</th><th>Onde</th><th></th></tr></thead><tfoot>${resto>0?`<tr><td colspan="7" style="text-align:center"><button class="secondary" data-mais>Mostrar mais ${Math.min(300,resto)} (faltam ${resto})</button></td></tr>`:''}</tfoot><tbody>${list.slice(0,listaLimite).map(r=>`<tr>
       <td style="white-space:nowrap">${br(r.data)}</td><td>${r.corretora?safe(r.corretora):`<span class="muted">${SEM_LABEL}</span>`}</td>
       <td>${safe(r.cliente)}${r.observacao?`<br><small class="muted">${safe(r.observacao)}</small>`:''}</td><td>${safe(r.referencia||'')}</td>
       <td><span class="badge ${r.situacao.split(' ')[0]}">${safe(r.situacao)}</span></td>
@@ -564,6 +569,7 @@
       <td class="row-actions"><button class="link" data-edit="${r.id}">Editar</button><button class="link danger" data-del="${r.id}">Excluir</button></td></tr>`).join('')}</tbody>`;
   }
   $('#lista').onclick=async e=>{
+    if(e.target.dataset.mais!==undefined){renderLista(listaAtual,true);return}
     const ed=e.target.dataset.edit,del=e.target.dataset.del;
     if(ed)openItem(rows.find(r=>r.id===ed));
     if(del){const r=rows.find(x=>x.id===del);if(!await confirmar(`Excluir a análise de ${r.cliente}?`))return;
