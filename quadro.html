@@ -198,6 +198,12 @@
   let colunas=[],etiquetas=[],cartoes=[],comentarios={},locacoes=[],booted=false,meuEmail='',mostrar={},aberto=null,hist=[];
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  // Confirmação desenhada na própria página: alguns navegadores (como o do painel do app) bloqueiam a janela confirm() do sistema.
+  function confirmar(texto,ok='Excluir'){return new Promise(res=>{const d=document.createElement('dialog');
+    d.innerHTML=`<div style="padding:22px;display:grid;gap:16px;max-width:460px"><p style="margin:0;font-weight:600">${safe(texto)}</p><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" class="secondary" value="n">Cancelar</button><button type="button" class="primary" style="background:var(--red);box-shadow:none" value="s">${safe(ok)}</button></div></div>`;
+    let feito=false;const fim=v=>{if(!feito){feito=true;res(v)}};
+    d.addEventListener('click',e=>{const v=e.target.closest('button')?.value;if(v){fim(v==='s');d.close()}});
+    d.addEventListener('close',()=>{fim(false);d.remove()});document.body.append(d);d.showModal();d.querySelector('[value=n]').focus()})}
   const pad=n=>String(n).padStart(2,'0');
   const dataHora=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
   const dataBr=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`};
@@ -393,14 +399,14 @@
     $('#cComentario').value='';hist.unshift(data);comentarios[aberto.id]=(comentarios[aberto.id]||0)+1;pintarHist();render();
   };
   $('#cHist').addEventListener('click',async e=>{
-    const id=e.target.dataset.delCom;if(!id||!confirm('Excluir este comentário?'))return;
+    const id=e.target.dataset.delCom;if(!id||!await confirmar('Excluir este comentário?'))return;
     const {error}=await db.from('quadro_historico').delete().eq('id',id);if(error){alert('Não foi possível excluir: '+error.message);return}
     hist=hist.filter(h=>h.id!==id);comentarios[aberto.id]=Math.max(0,(comentarios[aberto.id]||1)-1);pintarHist();render();
   });
   $('#cPlan').addEventListener('change',e=>{if(e.target.id==='cLigar'&&e.target.value)salvarCartao({locacao_id:e.target.value},'Ligado à planilha').then(pintarCartao)});
-  $('#cPlan').addEventListener('click',e=>{if(e.target.id==='cDesligar'&&confirm('Desligar este cartão da locação da planilha? A locação continua na planilha.'))salvarCartao({locacao_id:null},'Desligado da planilha').then(pintarCartao)});
+  $('#cPlan').addEventListener('click',async e=>{if(e.target.id==='cDesligar'&&await confirmar('Desligar este cartão da locação da planilha? A locação continua na planilha.','Desligar'))salvarCartao({locacao_id:null},'Desligado da planilha').then(pintarCartao)});
   $('#cExcluir').onclick=async()=>{
-    if(!confirm(`Excluir o cartão "${aberto.titulo}"? O histórico dele também será apagado. A locação da planilha não é apagada.`))return;
+    if(!await confirmar(`Excluir o cartão "${aberto.titulo}"? O histórico dele também será apagado. A locação da planilha não é apagada.`))return;
     const {error}=await db.from('quadro_cartoes').delete().eq('id',aberto.id);if(error){alert('Não foi possível excluir: '+error.message);return}
     cartoes=cartoes.filter(x=>x.id!==aberto.id);cd.close();render();toast('Cartão excluído');
   };
@@ -455,7 +461,7 @@
   });
   $('#colLista').addEventListener('click',async e=>{
     const b=e.target.closest('button');if(!b)return;const row=b.closest('.cl'),i=colunas.findIndex(x=>x.id===row.dataset.id),c=colunas[i];
-    if(b.hasAttribute('data-del')){if(!confirm(`Excluir a coluna "${c.nome}"?`))return;const {error}=await db.from('quadro_colunas').delete().eq('id',c.id);if(error)return colErro('Não foi possível excluir: '+error.message);colunas.splice(i,1)}
+    if(b.hasAttribute('data-del')){if(!await confirmar(`Excluir a coluna "${c.nome}"?`))return;const {error}=await db.from('quadro_colunas').delete().eq('id',c.id);if(error)return colErro('Não foi possível excluir: '+error.message);colunas.splice(i,1)}
     else{const j=b.hasAttribute('data-up')?i-1:i+1,o=colunas[j];
       const r=await Promise.all([db.from('quadro_colunas').update({posicao:o.posicao}).eq('id',c.id),db.from('quadro_colunas').update({posicao:c.posicao}).eq('id',o.id)]);
       if(r.some(x=>x.error))return colErro('Não foi possível mudar a ordem.');[c.posicao,o.posicao]=[o.posicao,c.posicao];colunas.sort((a,b)=>a.posicao-b.posicao)}

@@ -354,6 +354,7 @@
   const BUCKET='pre-analise';
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+
   const pad=n=>String(n).padStart(2,'0');
   const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const br=s=>s?s.split('-').reverse().join('/'):'';
@@ -559,7 +560,7 @@
   $('#lista').onclick=async e=>{
     const ed=e.target.dataset.edit,del=e.target.dataset.del;
     if(ed)openItem(rows.find(r=>r.id===ed));
-    if(del){const r=rows.find(x=>x.id===del);if(!confirm(`Excluir a análise de ${r.cliente}?`))return;
+    if(del){const r=rows.find(x=>x.id===del);if(!await confirmar(`Excluir a análise de ${r.cliente}?`))return;
       const {error}=await db.from('pre_analises').delete().eq('id',del);if(error){alert('Não foi possível excluir: '+error.message);return}
       rows=rows.filter(x=>x.id!==del);render()}
   };
@@ -668,7 +669,7 @@
     const d=e.target.dataset,l=links.find(x=>x.id===(d.login||d.editLink||d.delLink));if(!l)return;
     if(d.login){showTab('senhas');$('#sBusca').value=l.nome;renderSenhas()}
     if(d.editLink)openLink(l);
-    if(d.delLink&&confirm(`Excluir o link "${l.nome}"?`)){
+    if(d.delLink&&await confirmar(`Excluir o link "${l.nome}"?`)){
       const {error}=await db.from('pre_analise_links').delete().eq('id',l.id);if(error){alert('Não foi possível excluir: '+error.message);return}
       links=links.filter(x=>x.id!==l.id);renderLinks()}
   };
@@ -724,7 +725,7 @@
       clearTimeout(ocultarTimers[s.id]);ocultarTimers[s.id]=setTimeout(()=>{span.textContent='••••••••';e.target.textContent='Mostrar'},30000)}
     if(d.copyPw){const pw=await revelar(s.id);if(pw)copiar(pw,'Senha');else if(pw!==null)toast('Sem senha cadastrada')}
     if(d.editSenha)openSenha(s);
-    if(d.delSenha&&confirm(`Excluir o acesso "${s.sistema}"? A senha será apagada.`)){
+    if(d.delSenha&&await confirmar(`Excluir o acesso "${s.sistema}"? A senha será apagada.`)){
       const {error}=await db.rpc('senha_excluir',{p_id:s.id});if(error){alert('Não foi possível excluir: '+error.message);return}
       senhas=senhas.filter(x=>x.id!==s.id);renderSenhas()}
   };
@@ -770,7 +771,7 @@
       if(error){w?.close();alert('Não foi possível abrir: '+error.message);return}if(w)w.location=data.signedUrl;else location.href=data.signedUrl}
     if(d.baixar){const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,600,{download:doc.nome_arquivo});
       if(error){alert('Não foi possível baixar: '+error.message);return}const a=document.createElement('a');a.href=data.signedUrl;a.click()}
-    if(d.delDoc&&confirm(`Excluir o documento "${doc.titulo}"?`)){
+    if(d.delDoc&&await confirmar(`Excluir o documento "${doc.titulo}"?`)){
       const r=await db.storage.from(BUCKET).remove([doc.caminho]);if(r.error){alert('Não foi possível excluir: '+r.error.message);return}
       const {error}=await db.from('pre_analise_documentos').delete().eq('id',doc.id);if(error){alert('Não foi possível excluir: '+error.message);return}
       docs=docs.filter(x=>x.id!==doc.id);renderDocs()}
@@ -882,7 +883,7 @@
   $('#locTabela').onclick=async e=>{
     const {locEdit,locDel}=e.target.dataset;
     if(locEdit)openLocacao(locs.find(l=>l.id===locEdit));
-    if(locDel){const l=locs.find(x=>x.id===locDel);if(!l||!confirm(`Excluir a locação ${l.referencia} (${l.proponente}, ${locBrl(l.vgl)})?`))return;
+    if(locDel){const l=locs.find(x=>x.id===locDel);if(!l||!await confirmar(`Excluir a locação ${l.referencia} (${l.proponente}, ${locBrl(l.vgl)})?`))return;
       const {error}=await db.from('locacoes').delete().eq('id',locDel);if(error){alert('Não foi possível excluir: '+error.message);return}
       locs=locs.filter(x=>x.id!==locDel);toast('Locação excluída');locFillMeses();renderLocacoes()}
   };
