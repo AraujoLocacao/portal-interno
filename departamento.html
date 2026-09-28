@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Departamentos | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--navy:#173552;--blue:#294b68;--green:#24705a;--cream:#f5f5f0;--white:#fff;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10)}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+    button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer} [hidden]{display:none!important}
+    header.bar{background:var(--navy);color:#fff;padding:14px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .bar a{color:#cbd8e1;text-decoration:none;font-weight:600;font-size:.9rem}.bar a:hover{color:#fff}
+    .bar strong{font-size:1.02rem}.bar .who{color:#b9cad7;font-size:.82rem;margin-right:8px}
+    .bar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .bar select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:5px 8px;font-size:.85rem;max-width:230px}.bar select option{color:var(--ink)}
+    main{padding:28px clamp(16px,4vw,48px) 64px;max-width:1500px;margin:0 auto}
+    h1{font-family:Georgia,serif;font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.1;margin:0}
+    h2{font-family:Georgia,serif;font-size:1.3rem;margin:0}
+    .top{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}.top p{margin:6px 0 0;color:var(--muted)}.top h2{font-size:1.5rem}
+    .primary{border:0;background:var(--green);color:#fff;padding:10px 15px;border-radius:10px;font-weight:700;box-shadow:0 6px 18px rgba(36,112,90,.2)}.primary:hover{background:#1d604d}
+    .secondary{border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:10px;font-weight:650}.secondary:hover{border-color:#b6c5cf}
+    .ghost{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;font-size:.85rem}
+    .danger-btn{border:1px solid #e7c9c9;background:#fff;color:var(--red);padding:9px 14px;border-radius:10px;font-weight:650;margin-right:auto}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .filters{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr)) auto;gap:12px;padding:16px;margin-bottom:18px;align-items:end}
+    .field{display:grid;gap:5px}.field label,.field .lbl{font-size:.76rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;min-width:0}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+    .tile{padding:18px 20px}.tile span{display:block;font-size:.78rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .tile strong{display:block;font-size:2rem;line-height:1.15;margin-top:6px}.tile small{color:var(--muted);font-size:.82rem}
+    .tile.alert strong{color:var(--red)}.tile.warn strong{color:var(--amber)}
+    .table-card{padding:20px;margin-bottom:18px}.table-wrap{overflow-x:auto;margin-top:12px}
+    table{border-collapse:collapse;width:100%;font-size:.88rem}th{text-align:left;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:750;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+    td{padding:9px 10px;border-bottom:1px solid #eef1f2;vertical-align:top}tr:last-child td{border-bottom:0}
+    tbody tr:hover{background:#f8fafb}
+    .muted{color:var(--muted)}.link{border:0;background:none;color:var(--blue);font-weight:700;padding:2px 4px;border-radius:6px;font-size:.82rem}.link:hover{background:#eef2f4}.link.danger{color:var(--red)}
+    .row-actions{white-space:nowrap;text-align:right}
+    .gate{max-width:420px;margin:60px auto;padding:28px}.gate h1{font-size:1.6rem;margin-bottom:6px}.gate p{color:var(--muted);margin:0 0 18px}.gate form{display:grid;gap:14px}
+    .msg{margin:0;font-size:.85rem;color:var(--muted)}.msg.error{color:var(--red)}
+    .empty{padding:30px;text-align:center;color:var(--muted)}
+    dialog{border:0;border-radius:18px;padding:0;box-shadow:0 28px 90px rgba(10,30,45,.3);width:min(600px,calc(100% - 32px));overflow-x:hidden}dialog::backdrop{background:rgba(10,30,45,.62);backdrop-filter:blur(3px)}
+    .dialog-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}.close{border:0;background:#eef2f4;width:34px;height:34px;border-radius:50%;font-size:1.2rem}
+    dialog form{padding:20px 22px 22px;display:grid;gap:14px}
+    .seg{display:flex;gap:8px;flex-wrap:wrap}.seg label{flex:1;min-width:110px;border:1px solid #cbd5da;border-radius:10px;padding:9px 10px;text-align:center;font-weight:700;font-size:.85rem;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--ink);position:relative}
+    .seg input{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none}.seg label:has(input:checked){background:var(--navy);border-color:var(--navy);color:#fff}
+    .seg label:has(input:focus-visible){outline:2px solid #6da7ec}
+    .actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+    .loading{opacity:.55;transition:opacity .2s}
+    .dept{display:flex;justify-content:space-between;align-items:end;gap:10px 24px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--line)}.dept>div{padding-bottom:12px}
+    .dept .area{font-size:.75rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.11em;margin-bottom:6px}
+    .tabs{display:flex;gap:2px;overflow-x:auto;max-width:100%}.tab-link{padding:10px 16px;font-weight:700;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;white-space:nowrap}
+    .tab-link:hover{color:var(--ink)}.tab-link.active{color:var(--navy);border-bottom-color:var(--green)}
+    .preview-note{background:#fdf6e8;color:#7a5314;border:1px solid #f0dfbd;border-radius:12px;padding:10px 14px;font-size:.88rem;margin-bottom:22px}
+    .search-input{border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;min-width:0;width:240px;max-width:100%;background:#fff}
+    .pw{font-family:Consolas,"Courier New",monospace;letter-spacing:.04em;margin-right:4px}
+    .pw-field{display:flex;gap:8px}.pw-field input{flex:1}
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin:12px 0 28px}
+    .doc{padding:18px;display:flex;gap:14px;align-items:flex-start;min-width:0}.doc>div{min-width:0}
+    .doc-ico{width:44px;height:52px;border-radius:8px;display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#fff;flex:none;background:var(--blue)}
+    .doc-ico.pdf{background:var(--red)}.doc-ico.xls{background:var(--green)}.doc-ico.img{background:var(--amber)}.doc-ico.html{background:var(--navy)}
+    dialog.leitor{width:min(1100px,calc(100% - 26px));height:min(90vh,940px)}dialog.leitor .dialog-head{padding:12px 18px}dialog.leitor iframe{width:100%;height:calc(100% - 60px);border:0;background:#fff}
+    .check{display:flex;align-items:center;gap:7px;font-size:.88rem;font-weight:650;padding-bottom:9px}
+    .chips{display:flex;flex-wrap:wrap;gap:4px}.chip{background:#eef2f4;border-radius:6px;padding:1px 7px;font-size:.72rem;font-weight:700;color:#52616c;white-space:nowrap}
+    .chip.warn{background:#fdece4;color:var(--red)}.chip.ok{background:#e3f1ea;color:var(--green)}
+    .nota{font-size:.84rem}.nota small{display:block;color:var(--muted);font-size:.76rem}
+    .atv-card.auto{border-style:dashed;box-shadow:none;background:#fbfbf9}
+    .ferramenta{overflow:hidden}.ferramenta iframe{display:block;width:100%;height:calc(100vh - 150px);min-height:640px;border:0;background:#fff}.ferramenta iframe:fullscreen{height:100vh}
+    .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}.doc .row-actions{text-align:left;margin-top:8px;margin-left:-4px}
+    .empty-card{border:1px dashed #bac5cc;border-radius:14px;padding:26px;text-align:center;color:var(--muted);grid-column:1/-1}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow)}
+    /* Quadro de demandas */
+    .board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start}
+    .col{background:#eceee9;border-radius:14px;padding:10px;min-height:120px;display:flex;flex-direction:column;gap:9px}
+    .col.over{outline:2px dashed #6da7ec;outline-offset:-2px}
+    .col-head{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 4px;font-weight:800;font-size:.85rem}
+    .col-head span{display:flex;align-items:center;gap:7px}.col-head i{width:10px;height:10px;border-radius:3px;display:inline-block}
+    .col-head b{background:#fff;border-radius:999px;padding:1px 9px;font-size:.78rem;color:var(--muted)}
+    .dm{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 12px;display:grid;gap:5px;cursor:pointer;box-shadow:0 2px 6px rgba(23,53,82,.05);text-align:left;width:100%}
+    .dm:hover{border-color:#b6c5cf}.dm:focus-visible{outline:2px solid #6da7ec}
+    .dm .atv{font-size:.68rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.06em}
+    .dm .tt{font-weight:700;font-size:.92rem;line-height:1.3;overflow-wrap:anywhere}.dm .ref{color:var(--muted);font-size:.82rem;overflow-wrap:anywhere}
+    .dm .ft{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:3px;font-size:.78rem}
+    .who-chip{background:#eef2f4;border-radius:999px;padding:2px 9px;font-weight:700;color:var(--blue);max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .prazo{font-weight:700;color:var(--muted);white-space:nowrap}.prazo.late{color:var(--red)}.prazo.today{color:var(--amber)}
+    .dm.done .tt{text-decoration:line-through;color:var(--muted)}
+    .col-empty{color:#8a969e;font-size:.84rem;text-align:center;padding:14px 6px}
+    .col-more{border:0;background:none;color:var(--blue);font-weight:700;font-size:.82rem;padding:4px}
+    /* Atividades */
+    .atv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .atv-card{padding:18px;display:flex;flex-direction:column;gap:10px}
+    .atv-card h3{margin:0;font-size:1.02rem}
+    .atv-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;font-size:.78rem;color:var(--muted);line-height:1.25}.atv-nums span{display:grid;gap:2px}
+    .atv-nums strong{color:var(--ink);font-size:1.35rem;line-height:1.1}.atv-nums .late strong{color:var(--red)}
+    .atv-card .row-actions{text-align:left;margin-left:-4px;margin-top:auto}
+    /* Escolha do departamento */
+    .dep-area{margin:0 0 26px}.dep-area h2{font-size:1.15rem;margin-bottom:12px}
+    .dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+    .dep-card{padding:18px 20px;text-decoration:none;color:inherit;display:grid;gap:6px}.dep-card:hover{border-color:#b6c5cf}
+    .dep-card h3{margin:0;font-family:Georgia,serif;font-size:1.2rem}.dep-card p{margin:0;color:var(--muted);font-size:.86rem}
+    .dep-card .area{font-size:.72rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+    @media(max-width:1100px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:1fr 1fr 1fr}.filters .field:first-child{grid-column:1/-1}}
+    @media(max-width:700px){.tiles{grid-template-columns:1fr 1fr}.tile strong{font-size:1.6rem}.filters{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
+    @media(max-width:560px){.board{grid-template-columns:1fr}.search-input{width:100%}}
+  </style>
+</head>
+<body>
+<header class="bar">
+  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong id="barTitle">Departamentos</strong></div>
+  <div class="bar-actions" id="barActions" hidden><select id="trocar" aria-label="Ir para outro departamento" hidden></select><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
+</header>
+
+<!-- Sem ?d= na endereço (ou departamento desconhecido): lista todos os departamentos -->
+<main id="escolha" hidden>
+  <div class="top"><div><h1>Departamentos</h1><p>Escolha a área. Cada departamento tem demandas, senhas e POP próprios, com acesso por login.</p></div></div>
+  <div id="escolhaLista"></div>
+</main>
+
+<section class="card gate" id="gate" hidden>
+  <h1 id="gateTitle">Departamento</h1>
+  <p>Área restrita. Entre com o seu e-mail e senha.</p>
+  <form id="loginForm">
+    <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
+    <button class="primary" type="submit">Entrar</button>
+    <p class="msg error" id="loginMsg" hidden></p>
+  </form>
+</section>
+
+<section class="card gate" id="denied" hidden>
+  <h1>Sem acesso</h1>
+  <p id="deniedText">Este login não tem permissão para este departamento. Fale com a gerência.</p>
+  <button class="secondary" id="deniedLogout">Entrar com outro e-mail</button>
+</section>
+
+<main id="app" hidden>
+  <div class="dept"><div><div class="area" id="depArea"></div><h1 id="depNome"></h1></div>
+    <nav class="tabs" id="tabs" aria-label="Seções do departamento"></nav></div>
+  <p class="preview-note" id="previewNote"></p>
+
+  <section id="tab-demandas" data-tab>
+    <div class="top">
+      <div><h2>Demandas</h2><p id="subtitle">Carregando…</p></div>
+      <div class="bar-actions"><button class="secondary" id="exportCsv">Baixar planilha</button><button class="primary" id="newDemanda">+ Nova demanda</button></div>
+    </div>
+    <div class="card filters" role="search">
+      <div class="field"><label for="fBusca">Buscar</label><input id="fBusca" type="search" placeholder="Assunto, referência ou observação"></div>
+      <div class="field"><label for="fAtividade">Atividade</label><select id="fAtividade"></select></div>
+      <div class="field"><label for="fResp">Responsável</label><select id="fResp"></select></div>
+      <div class="field"><label for="fConcl">Concluídas</label><select id="fConcl"><option value="30">Últimos 30 dias</option><option value="mes">Este mês</option><option value="tudo">Todas</option><option value="nao">Não mostrar</option></select></div>
+      <button class="secondary" id="clearFilters">Limpar</button>
+    </div>
+    <div id="dash">
+      <div class="tiles" id="tiles"></div>
+      <div class="board" id="board"></div>
+    </div>
+  </section>
+
+  <section id="tab-rescisao" data-tab hidden>
+    <div class="top">
+      <div><h2>Calculadora de rescisão</h2><p>Conferência e cálculo de distratos, com leitura do contrato e das cobranças em PDF. Nada do que é preenchido fica salvo: ao sair, trocar de departamento ou recarregar a página, o cálculo é apagado.</p></div>
+      <div class="bar-actions"><button class="secondary" id="rescisaoCheia">Tela cheia</button></div>
+    </div>
+    <div class="card ferramenta"><p class="empty" id="rescisaoMsg">Carregando a calculadora…</p><iframe id="rescisaoFrame" title="Calculadora de rescisão" hidden sandbox="allow-scripts allow-modals allow-popups allow-popups-to-escape-sandbox allow-downloads"></iframe></div>
+  </section>
+
+  <section id="tab-adm" data-tab hidden>
+    <div class="top"><div><h2>Administradoras de condomínio</h2><p>Relatório das administradoras de condomínio. É a mesma lista em Locatário · Boletos, Locatário · Renovação e Proprietário · Repasses: o que um departamento atualiza, os outros veem.</p></div></div>
+    <div class="empty-card">Em preparação. Esta aba vai seguir a planilha de administradoras que vocês já usam.</div>
+  </section>
+
+  <section id="tab-alpop" data-tab hidden>
+    <div class="top"><div><h2>Contratos Alpop</h2><p>Controle dos contratos com garantia Alpop.</p></div></div>
+    <div class="empty-card">Em preparação. Esta aba vai seguir o controle de contratos Alpop que vocês já usam.</div>
+  </section>
+
+  <section id="tab-energia" data-tab hidden>
+    <div class="top">
+      <div><h2>Energia</h2><p>Contratos com a chave já entregue que a Locação ainda não marcou com a etiqueta <strong>CELESC - OK</strong> no quadro de contratos. Ficam aqui até a energia ser transferida.</p></div>
+      <div class="bar-actions">
+        <label class="check"><input type="checkbox" id="eResolvidas"> Mostrar também os resolvidos</label>
+      </div>
+    </div>
+    <p class="preview-note" id="eInicio"></p>
+    <div class="tiles" id="eTiles"></div>
+    <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="energiaTable"></table></div></div>
+    <p class="msg">Quem sinaliza é a Locação, pela etiqueta no quadro. "ENERGIA RATEIO" e "NÃO TROCAR TITULARIDADE – MEDIDOR INTERNO" também tiram o contrato da lista. As anotações aparecem no histórico do cartão, para a Locação acompanhar.</p>
+  </section>
+
+  <section id="tab-atividades" data-tab hidden>
+    <div class="top"><div><h2>Atividades</h2><p>O que este departamento faz, conforme o organograma. Clique para ver as demandas de cada atividade.</p></div></div>
+    <div class="atv-grid" id="atvGrid"></div>
+  </section>
+
+  <section id="tab-senhas" data-tab hidden>
+    <div class="top">
+      <div><h2>Senhas</h2><p>Acessos aos sistemas usados pelo departamento. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".</p></div>
+      <div class="bar-actions"><input class="search-input" id="sBusca" type="search" placeholder="Buscar sistema ou usuário" aria-label="Buscar senha"><button class="primary" id="newSenha">+ Nova senha</button></div>
+    </div>
+    <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="senhasTable"></table></div></div>
+  </section>
+
+  <section id="tab-pop" data-tab hidden>
+    <div class="top">
+      <div><h2>POP e documentos</h2><p id="popSub">Procedimento operacional padrão do departamento e demais materiais.</p></div>
+      <div class="bar-actions"><button class="primary" id="newDoc">+ Enviar documento</button></div>
+    </div>
+    <h2 style="font-size:1.1rem">POP</h2>
+    <div class="doc-grid" id="docsPop"></div>
+    <h2 style="font-size:1.1rem">Outros documentos</h2>
+    <div class="doc-grid" id="docsOutros"></div>
+  </section>
+</main>
+
+<dialog id="demandaDialog">
+  <div class="dialog-head"><h2 id="demandaTitle">Nova demanda</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="demandaForm" novalidate>
+    <div class="field"><label for="mAtividade">Atividade</label><select id="mAtividade" name="atividade" required></select></div>
+    <div class="field"><label for="mTitulo">Assunto</label><input id="mTitulo" name="titulo" maxlength="160" required placeholder="O que precisa ser feito"></div>
+    <div class="row2">
+      <div class="field"><label for="mRef" id="mRefLabel">Referência</label><input id="mRef" name="referencia" maxlength="120"></div>
+      <div class="field"><label for="mResp">Responsável</label><input id="mResp" name="responsavel" maxlength="80" list="respList" autocomplete="off"><datalist id="respList"></datalist></div>
+    </div>
+    <div class="field" style="max-width:220px"><label for="mPrazo">Prazo</label><input id="mPrazo" name="prazo" type="date"></div>
+    <div class="field"><span class="lbl">Situação</span><div class="seg" id="mStatus"></div></div>
+    <div class="field"><label for="mObs">Observação</label><textarea id="mObs" name="observacao" rows="3" maxlength="2000"></textarea></div>
+    <p class="msg" id="demandaInfo" hidden></p>
+    <div class="actions"><button type="button" class="danger-btn" id="demandaDel" hidden>Excluir</button><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="demandaSubmit">Salvar</button></div>
+    <p class="msg error" id="demandaMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="notaDialog">
+  <div class="dialog-head"><h2>Anotar acompanhamento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="notaForm">
+    <p class="msg" id="notaContrato"></p>
+    <div class="field"><label for="nTexto">Anotação</label><textarea id="nTexto" name="texto" rows="3" maxlength="2000" required placeholder="Ex.: liguei para o locatário, vai transferir até sexta"></textarea></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="notaSubmit">Salvar</button></div>
+    <p class="msg error" id="notaMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="leitorDialog" class="leitor">
+  <div class="dialog-head"><h2 id="leitorTitulo">Documento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <iframe id="leitorFrame" title="Documento" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
+</dialog>
+
+<dialog id="senhaDialog">
+  <div class="dialog-head"><h2 id="senhaTitle">Nova senha</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="senhaForm" autocomplete="off">
+    <div class="field"><label for="sSistema">Sistema</label><input id="sSistema" name="sistema" maxlength="80" placeholder="Ex.: Superlógica, banco, portal da prefeitura" required></div>
+    <div class="field"><label for="sLink">Link do site</label><input id="sLink" name="link" type="url" maxlength="300" placeholder="https://"></div>
+    <div class="field"><label for="sUsuario">Usuário / login</label><input id="sUsuario" name="usuario" maxlength="150" autocomplete="off"></div>
+    <div class="field"><label for="sSenha">Senha</label><div class="pw-field"><input id="sSenha" name="senha" type="password" maxlength="200" autocomplete="new-password"><button type="button" class="secondary" id="sSenhaVer">Mostrar</button></div>
+      <p class="msg" id="sSenhaHint" hidden>Deixe em branco para manter a senha atual.</p></div>
+    <div class="field"><label for="sObs">Observação</label><textarea id="sObs" name="observacao" rows="2" maxlength="500"></textarea></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="senhaSubmit">Salvar</button></div>
+    <p class="msg error" id="senhaMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="docDialog">
+  <div class="dialog-head"><h2>Enviar documento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="docForm">
+    <div class="field"><label for="dTitulo">Título</label><input id="dTitulo" name="titulo" maxlength="120" required></div>
+    <div class="field"><span class="lbl">Onde fica</span>
+      <div class="seg"><label><input type="radio" name="categoria" value="POP" checked>POP</label><label><input type="radio" name="categoria" value="Outros">Outros documentos</label></div></div>
+    <div class="field"><label for="dArquivo">Arquivo (PDF, Word, Excel, imagem ou página HTML, até 25 MB)</label><input id="dArquivo" name="arquivo" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.html,.htm" required></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="docSubmit">Enviar</button></div>
+    <p class="msg error" id="docMsg" hidden></p>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Página única dos demais departamentos: departamento.html?d=<slug>. Os dados ficam no Supabase (ver supabase/departamentos.sql)
+  // e só são carregados depois do login; o banco confere o acesso por departamento (gestores + departamento_acesso).
+  // A lista abaixo é a mesma do organograma (público): nome, área e atividades de cada função.
+  const DEPS=[
+    // Reparos e manutenções ficam no sistema próprio de reparos, fora do portal.
+    {slug:'sac',nome:'SAC',area:'Atendimento',papel:'Suporte ao cliente',ref:'Imóvel (REF) / cliente',
+      atividades:['Atendimento em geral','Dúvidas gerais'],
+      nota:'Reparos e manutenções continuam no sistema de reparos que já usamos. Aqui ficam só os outros atendimentos.'},
+    // limpo = por enquanto sem demandas nem atividades: só as abas extras, POP e senhas (decisão da gerência em 25/09/2026).
+    {slug:'cadastro',nome:'Cadastro',area:'Captação de imóveis',papel:'Administrativo',ref:'Imóvel (REF) / proprietário',limpo:true,
+      atividades:['Cadastro do imóvel no Superlógica','Agendamento de visita de corretoras']},
+    {slug:'captacao',nome:'Corretoras de captação',area:'Captação de imóveis',papel:'Campo',ref:'Imóvel / proprietário',limpo:true,
+      atividades:['Captação de imóveis','Documentos de proprietários','Chaveiro']},
+    {slug:'corretoras-locacao',nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,
+      atividades:['Responsável pela locação dos imóveis']},
+    // extras = abas próprias da área. "adm" (administradoras de condomínio) é a mesma lista em Boletos, Renovação e Repasses.
+    {slug:'boletos',limpo:true,nome:'Locatário · Boletos',area:'Financeiro',papel:'Boletos',ref:'Contrato / locatário',extras:['adm','alpop'],
+      atividades:['Atendimento específico','Boletos Alpop','Boletos sem condomínio','Suporte a boletos com condomínio']},
+    {slug:'renovacao',limpo:true,nome:'Locatário · Renovação',area:'Financeiro',papel:'Renovação',ref:'Contrato / locatário',extras:['adm'],
+      atividades:['Boletos com condomínio','Renovação de contrato','Renovação da garantia','Notificação de não renovação','Reajuste']},
+    {slug:'cobranca',limpo:true,nome:'Cobrança',area:'Financeiro',papel:'Inadimplência',ref:'Contrato / locatário',
+      atividades:['Cobrança','Acionamento de garantia','Notificação de cobrança','Notificação de desocupação por inadimplência','Negativação','Retirada de negativação']},
+    // publicado = já está no portal (28/09/2026). Os demais seguem como prévia, só para a gerência.
+    {slug:'repasses',publicado:true,limpo:true,nome:'Proprietário · Repasses',area:'Financeiro',papel:'Repasses',ref:'Imóvel (REF) / proprietário',extras:['rescisao','adm'],
+      atividades:['Repasse','Extrato','Cálculo de rescisão','IR / DIMOB','Nota fiscal','Recibos']},
+    // recebe = atividades que só entram quando outra área envia (ainda sem envio: ficam vazias).
+    // energia = aba Energia, com os contratos que a Locação não marcou como transferidos (ver supabase/pos_locacao_energia.sql).
+    {slug:'pos-locacao',nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
+      recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
+      atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
+    {slug:'financeiro-rh',limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',
+      atividades:['Colaboradores (admissão/demissão/folha)','Contas a pagar da empresa','Suporte direto à equipe financeira']},
+    {slug:'supervisao',limpo:true,nome:'Supervisão',area:'Liderança',papel:'Administrativo',ref:'Referência',
+      atividades:['Resposta a notificações direcionadas à imobiliária','Monitoramento da demanda do administrativo','Reuniões semanais']},
+  ];
+  const AREAS=['Atendimento','Captação de imóveis','Comercial','Operação','Financeiro','Liderança'];
+  const STATUS=[['A fazer','#6f8faf'],['Em andamento','#2a78d6'],['Aguardando','#b97822'],['Concluída','#24705a']];
+  const OUTROS='Outros';
+  const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
+  const BUCKET='departamentos';
+  const $=s=>document.querySelector(s);
+  const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  const pad=n=>String(n).padStart(2,'0');
+  const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const br=s=>s?s.split('-').reverse().join('/'):'';
+  const hoje=()=>iso(new Date());
+  function toast(text){const t=document.createElement('div');t.className='toast';t.textContent=text;document.body.append(t);setTimeout(()=>t.remove(),2200)}
+  async function copiar(text,oque){try{await navigator.clipboard.writeText(text);toast(oque+' copiado')}catch{prompt('Copie abaixo:',text)}}
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+
+  const DEP=DEPS.find(d=>d.slug===new URLSearchParams(location.search).get('d'));
+  const abasDoDep=()=>DEP.limpo?[...(DEP.extras||[]),'pop','senhas']:['demandas',...(DEP.extras||[]),...(DEP.energia?['energia']:[]),'atividades','senhas','pop'];
+
+  // ---------- Sem departamento: lista para escolher ----------
+  // Só os publicados aparecem na lista; ?previa mostra todos (a gerência revisando os demais).
+  if(!DEP){
+    $('#escolha').hidden=false;
+    const lista=new URLSearchParams(location.search).has('previa')?DEPS:DEPS.filter(d=>d.publicado);
+    $('#escolhaLista').innerHTML=AREAS.map(a=>{const ds=lista.filter(d=>d.area===a);if(!ds.length)return '';
+      return `<section class="dep-area"><h2>${safe(a)}</h2><div class="dep-grid">${ds.map(d=>`<a class="card dep-card" href="?d=${d.slug}"><span class="area">${safe(d.papel)}</span><h3>${safe(d.nome)}</h3><p>${d.atividades.slice(0,3).map(safe).join(' · ')}${d.atividades.length>3?` e mais ${d.atividades.length-3}`:''}</p></a>`).join('')}</div></section>`}).join('');
+  }else{
+    document.title=`${DEP.nome} | Araujo Locação`;
+    $('#barTitle').textContent=DEP.nome;$('#gateTitle').textContent=DEP.nome;
+    $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
+    $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
+    $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
+    const nomes={demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',energia:'Energia',atividades:'Atividades',senhas:'Senhas',pop:'POP e documentos'};
+    $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
+    $('#previewNote').hidden=!!DEP.publicado;
+    $('#previewNote').innerHTML=DEP.limpo
+      ?`<strong>Prévia.</strong> Painel limpo por enquanto: ${DEP.extras?'as abas da área, ':''}POP e senhas. As demais ferramentas entram depois.`
+      :'<strong>Prévia.</strong> Esta é a estrutura inicial do departamento, com as atividades do organograma. As ferramentas próprias da área (planilhas, calculadoras, relatórios) entram depois, como foi feito na Locação.'+(DEP.nota?`<br>${safe(DEP.nota)}`:'');
+    iniciar();
+  }
+
+  function iniciar(){
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  // Atividades que recebem de outra área ou que têm aba própria (energia) não entram na "Nova demanda".
+  const automatica=a=>(DEP.recebe||[]).includes(a)||a===DEP.energia;
+  const ATIVIDADES=[...DEP.atividades.filter(a=>!automatica(a)),OUTROS];
+  const ABAS=abasDoDep();
+  let demandas=[],senhas=[],docs=[],energia=[],booted=false,editId=null,senhaEditId=null,verTodas={};
+
+  // ---------- Acesso ----------
+  async function refreshSession(){
+    const {data:{session}}=await db.auth.getSession();
+    $('#barActions').hidden=!session;
+    if(!session){show('gate');return}
+    $('#who').textContent=session.user.email;
+    const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
+    if(error||data!==true){show('denied');return}
+    show('app');
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),DEP.energia?loadEnergia():null,ABAS.includes('rescisao')?loadRescisao():null,loadSenhas(),loadDocs()])}
+  }
+  function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
+  // A gerência vê todos os departamentos: um seletor no topo troca de um para outro.
+  async function montarTrocar(){
+    const {data}=await db.rpc('is_gestor');if(data!==true)return;
+    const sel=$('#trocar');
+    sel.innerHTML=AREAS.map(a=>`<optgroup label="${safe(a)}">${DEPS.filter(d=>d.area===a).map(d=>`<option value="${d.slug}"${d===DEP?' selected':''}>${safe(d.nome)}${d.publicado?'':' (prévia)'}</option>`).join('')}</optgroup>`).join('');
+    sel.hidden=false;sel.onchange=()=>{location.href='?d='+sel.value};
+  }
+  $('#loginForm').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,f=new FormData(form),msg=$('#loginMsg');msg.hidden=true;
+    const {error}=await db.auth.signInWithPassword({email:String(f.get('email')).trim(),password:String(f.get('senha'))});
+    if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
+    form.reset();
+  };
+  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true};
+  $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
+
+  // Esta área tem senhas: sai sozinha depois de 30 minutos sem uso.
+  let ultimoUso=Date.now();
+  ['pointerdown','keydown','scroll'].forEach(ev=>addEventListener(ev,()=>ultimoUso=Date.now(),{passive:true}));
+  setInterval(()=>{if(booted&&Date.now()-ultimoUso>30*60*1000){sair();toast('Você saiu por inatividade.')}},60*1000);
+
+  // ---------- Calculadora de rescisão ----------
+  // O código da calculadora não fica no site (o repositório é público): está no bucket privado, em ferramentas/<departamento>/,
+  // que só quem tem acesso ao departamento lê. Roda num iframe isolado, sem acesso ao login do portal.
+  // O uso dentro da calculadora avisa a página (postMessage) para não contar como inatividade.
+  const AVISA_USO='<script>["pointerdown","keydown","input"].forEach(e=>addEventListener(e,()=>parent.postMessage("portal:uso","*"),{passive:true}))<\/script>';
+  addEventListener('message',e=>{if(e.source===$('#rescisaoFrame').contentWindow&&e.data==='portal:uso')ultimoUso=Date.now()});
+  async function loadRescisao(){
+    const msg=$('#rescisaoMsg'),fr=$('#rescisaoFrame');msg.hidden=false;msg.textContent='Carregando a calculadora…';
+    const {data,error}=await db.storage.from(BUCKET).download(`ferramentas/${DEP.slug}/calculadora-rescisao.html`);
+    if(error){msg.textContent='Não foi possível carregar a calculadora. Fale com a gerência.';return}
+    const html=await data.text();
+    fr.srcdoc=html.includes('</body>')?html.replace('</body>',AVISA_USO+'</body>'):html+AVISA_USO;fr.hidden=false;msg.hidden=true;
+  }
+  $('#rescisaoCheia').onclick=()=>{const fr=$('#rescisaoFrame');if(!fr.hidden)fr.requestFullscreen?.()};
+
+  // ---------- Abas ----------
+  // As abas trocam por JavaScript (não por link): o navegador bloqueia o "#aba" quando a página é aberta como arquivo/cópia.
+  function showTab(pedida){
+    const abas=ABAS,h=location.hash.slice(1),tab=abas.includes(pedida)?pedida:abas.includes(h)?h:abas[0];
+    if(pedida)try{history.replaceState(null,'','#'+tab)}catch{}
+    document.querySelectorAll('[data-tab]').forEach(s=>s.hidden=s.id!=='tab-'+tab);
+    document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
+  }
+  addEventListener('hashchange',()=>showTab());
+  $('#tabs').onclick=e=>{const b=e.target.closest('.tab-link');if(b)showTab(b.dataset.go)};
+
+  // ---------- Demandas ----------
+  async function loadDemandas(){
+    $('#dash').classList.add('loading');
+    const {data,error}=await db.from('dep_demandas').select('id,atividade,titulo,referencia,responsavel,prazo,status,observacao,criado_em,criado_por,atualizado_em,concluido_em').eq('departamento',DEP.slug).order('criado_em',{ascending:false});
+    $('#dash').classList.remove('loading');
+    if(error){$('#subtitle').textContent='Não foi possível carregar: '+error.message;return}
+    demandas=data;fillFilters();render();
+  }
+  const responsaveis=()=>[...new Set(demandas.map(d=>d.responsavel).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  function fillFilters(){
+    const keep=(sel,html)=>{const v=sel.value;sel.innerHTML=html;if([...sel.options].some(o=>o.value===v))sel.value=v};
+    const atvs=[...new Set([...ATIVIDADES,...demandas.map(d=>d.atividade)])];
+    keep($('#fAtividade'),'<option value="">Todas</option>'+atvs.map(a=>`<option value="${safe(a)}">${safe(a)}</option>`).join(''));
+    keep($('#fResp'),'<option value="">Todos</option>'+responsaveis().map(r=>`<option value="${safe(r)}">${safe(r)}</option>`).join(''));
+    $('#respList').innerHTML=responsaveis().map(r=>`<option value="${safe(r)}">`).join('');
+  }
+  const aberta=d=>d.status!=='Concluída';
+  const atrasada=d=>aberta(d)&&d.prazo&&d.prazo<hoje();
+  function filtradas(){
+    const q=$('#fBusca').value.trim().toLowerCase(),a=$('#fAtividade').value,r=$('#fResp').value,c=$('#fConcl').value;
+    const t=new Date(),lim=c==='30'?iso(new Date(t.getFullYear(),t.getMonth(),t.getDate()-30)):c==='mes'?iso(new Date(t.getFullYear(),t.getMonth(),1)):'';
+    return demandas.filter(d=>{
+      if(a&&d.atividade!==a)return false;if(r&&d.responsavel!==r)return false;
+      if(q&&!`${d.titulo} ${d.referencia||''} ${d.observacao||''} ${d.responsavel||''}`.toLowerCase().includes(q))return false;
+      if(!aberta(d)){if(c==='nao')return false;if(lim&&iso(new Date(d.concluido_em||d.atualizado_em))<lim)return false}
+      return true});
+  }
+  ['#fBusca','#fAtividade','#fResp','#fConcl'].forEach(s=>$(s).addEventListener('input',render));
+  $('#clearFilters').onclick=()=>{$('#fBusca').value='';$('#fAtividade').value='';$('#fResp').value='';$('#fConcl').value='30';render()};
+
+  function render(){
+    const list=filtradas(),abertas=list.filter(aberta),t=hoje();
+    const em7=iso(new Date(Date.now()+7*864e5)),mes=t.slice(0,7);
+    const filtros=[$('#fAtividade').value,$('#fResp').value].filter(Boolean);
+    $('#subtitle').textContent=`${filtros.length?filtros.join(' · '):'Todas as atividades'} · ${abertas.length} em aberto`;
+    const atr=abertas.filter(atrasada).length,prox=abertas.filter(d=>d.prazo&&d.prazo>=t&&d.prazo<=em7).length;
+    const concl=list.filter(d=>!aberta(d)&&(d.concluido_em||'').slice(0,7)===mes).length;
+    $('#tiles').innerHTML=`<div class="card tile"><span>Em aberto</span><strong>${abertas.length}</strong><small>a fazer, em andamento ou aguardando</small></div>
+      <div class="card tile ${atr?'alert':''}"><span>Atrasadas</span><strong>${atr}</strong><small>prazo já passou</small></div>
+      <div class="card tile ${prox?'warn':''}"><span>Vencem em 7 dias</span><strong>${prox}</strong><small>inclui hoje</small></div>
+      <div class="card tile"><span>Concluídas no mês</span><strong>${concl}</strong><small>&nbsp;</small></div>`;
+    // Ordem: atrasadas e com prazo mais perto primeiro; sem prazo por último.
+    const ordem=(a,b)=>(a.prazo||'9999')<(b.prazo||'9999')?-1:(a.prazo||'9999')>(b.prazo||'9999')?1:b.criado_em.localeCompare(a.criado_em);
+    $('#board').innerHTML=STATUS.map(([s,cor])=>{
+      let ds=list.filter(d=>d.status===s);
+      ds=s==='Concluída'?ds.sort((a,b)=>(b.concluido_em||'').localeCompare(a.concluido_em||'')):ds.sort(ordem);
+      const max=verTodas[s]?ds.length:12;
+      return `<section class="col" data-status="${s}" aria-label="${s}"><div class="col-head"><span><i style="background:${cor}"></i>${s}</span><b>${ds.length}</b></div>
+        ${ds.slice(0,max).map(cartao).join('')||'<div class="col-empty">Nenhuma demanda</div>'}
+        ${ds.length>max?`<button class="col-more" data-mais="${s}">Ver mais ${ds.length-max}</button>`:''}</section>`}).join('');
+    renderAtividades();
+  }
+  function cartao(d){
+    const t=hoje(),cls=atrasada(d)?'late':aberta(d)&&d.prazo===t?'today':'';
+    const prazo=d.prazo?`<span class="prazo ${cls}">${cls==='late'?'Atrasada · ':cls==='today'?'Hoje · ':''}${br(d.prazo).slice(0,5)}</span>`:'<span class="prazo">sem prazo</span>';
+    return `<button type="button" class="dm ${aberta(d)?'':'done'}" draggable="true" data-id="${d.id}"><span class="atv">${safe(d.atividade)}</span><span class="tt">${safe(d.titulo)}</span>
+      ${d.referencia?`<span class="ref">${safe(d.referencia)}</span>`:''}<span class="ft">${d.responsavel?`<span class="who-chip">${safe(d.responsavel)}</span>`:'<span class="muted">sem responsável</span>'}${prazo}</span></button>`;
+  }
+  $('#board').addEventListener('click',e=>{
+    const mais=e.target.dataset.mais;if(mais){verTodas[mais]=true;render();return}
+    const c=e.target.closest('.dm');if(c)openDemanda(demandas.find(d=>d.id===c.dataset.id));
+  });
+  // Arrastar o cartão para outra coluna muda a situação.
+  let arrastando=null;
+  $('#board').addEventListener('dragstart',e=>{const c=e.target.closest('.dm');if(!c)return;arrastando=c.dataset.id;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',arrastando)});
+  $('#board').addEventListener('dragover',e=>{const col=e.target.closest('.col');if(!col||!arrastando)return;e.preventDefault();document.querySelectorAll('.col.over').forEach(c=>c!==col&&c.classList.remove('over'));col.classList.add('over')});
+  $('#board').addEventListener('dragleave',e=>{const col=e.target.closest('.col');if(col&&!col.contains(e.relatedTarget))col.classList.remove('over')});
+  $('#board').addEventListener('drop',async e=>{
+    const col=e.target.closest('.col');if(!col||!arrastando)return;e.preventDefault();col.classList.remove('over');
+    const d=demandas.find(x=>x.id===arrastando);arrastando=null;if(!d||d.status===col.dataset.status)return;
+    await mudarStatus(d,col.dataset.status);
+  });
+  $('#board').addEventListener('dragend',()=>{arrastando=null;document.querySelectorAll('.col.over').forEach(c=>c.classList.remove('over'))});
+  async function mudarStatus(d,status){
+    const antes=d.status;d.status=status;render();
+    const {data,error}=await db.from('dep_demandas').update({status}).eq('id',d.id).select('status,atualizado_em,concluido_em').single();
+    if(error){d.status=antes;render();alert('Não foi possível mudar: '+error.message);return}
+    Object.assign(d,data||{});render();toast(`Movida para "${status}"`);
+  }
+
+  // ---------- Nova / editar demanda ----------
+  const demandaDialog=$('#demandaDialog');
+  $('#mStatus').innerHTML=STATUS.map(([s],i)=>`<label><input type="radio" name="status" value="${s}"${i?'':' checked'}>${s}</label>`).join('');
+  function openDemanda(d,atividade){
+    editId=d?.id||null;const f=$('#demandaForm');f.reset();$('#demandaMsg').hidden=true;
+    const atvs=[...new Set([...ATIVIDADES,...(d?[d.atividade]:[])])];
+    f.atividade.innerHTML='<option value="">Selecione…</option>'+atvs.map(a=>`<option>${safe(a)}</option>`).join('');
+    $('#demandaTitle').textContent=d?'Editar demanda':'Nova demanda';$('#demandaDel').hidden=!d;
+    if(d){f.atividade.value=d.atividade;f.titulo.value=d.titulo;f.referencia.value=d.referencia||'';f.responsavel.value=d.responsavel||'';f.prazo.value=d.prazo||'';f.status.value=d.status;f.observacao.value=d.observacao||'';
+      $('#demandaInfo').textContent=`Criada em ${br(iso(new Date(d.criado_em)))} por ${(d.criado_por||'').split('@')[0]||'–'}`+(d.concluido_em?` · concluída em ${br(iso(new Date(d.concluido_em)))}`:'');$('#demandaInfo').hidden=false}
+    else{f.atividade.value=atividade||$('#fAtividade').value||'';$('#demandaInfo').hidden=true}
+    demandaDialog.showModal();(d?f.titulo:f.atividade.value?f.titulo:f.atividade).focus();
+  }
+  $('#newDemanda').onclick=()=>openDemanda(null);
+  $('#demandaForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#demandaMsg'),erro=t=>{msg.textContent=t;msg.hidden=false};msg.hidden=true;
+    const row={atividade:String(f.get('atividade')),titulo:String(f.get('titulo')).trim(),referencia:String(f.get('referencia')).trim()||null,responsavel:String(f.get('responsavel')).trim()||null,
+      prazo:f.get('prazo')||null,status:String(f.get('status')),observacao:String(f.get('observacao')).trim()||null};
+    if(!row.atividade)return erro('Escolha a atividade.');if(!row.titulo)return erro('Informe o assunto.');
+    $('#demandaSubmit').disabled=true;
+    const q=editId?db.from('dep_demandas').update(row).eq('id',editId):db.from('dep_demandas').insert({...row,departamento:DEP.slug});
+    const {error}=await q;$('#demandaSubmit').disabled=false;
+    if(error)return erro('Não foi possível salvar: '+error.message);
+    demandaDialog.close();toast('Demanda salva');await loadDemandas();
+  };
+  $('#demandaDel').onclick=async()=>{
+    const d=demandas.find(x=>x.id===editId);if(!d||!confirm(`Excluir a demanda "${d.titulo}"?`))return;
+    const {error}=await db.from('dep_demandas').delete().eq('id',d.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+    demandaDialog.close();demandas=demandas.filter(x=>x.id!==d.id);fillFilters();render();
+  };
+
+  // ---------- Atividades ----------
+  function renderAtividades(){
+    const atvs=[...new Set([...DEP.atividades,...demandas.map(d=>d.atividade).filter(a=>a!==OUTROS),OUTROS])];
+    const mes=hoje().slice(0,7);
+    $('#atvGrid').innerHTML=atvs.map(a=>{
+      if((DEP.recebe||[]).includes(a))return `<article class="card atv-card auto"><h3>${safe(a)}</h3><p class="msg">Só entra aqui o que outra área enviar. Por enquanto fica vazio.</p></article>`;
+      if(a===DEP.energia){const pend=energia.filter(x=>!x.resolvida).length;
+        return `<article class="card atv-card auto"><h3>${safe(a)}</h3><p class="msg">Automático: os contratos que a Locação não marcou com "CELESC - OK" depois da entrega de chaves.</p>
+          <div class="atv-nums"><span class="${pend?'late':''}"><strong>${pend}</strong>para monitorar</span></div><div class="row-actions"><button class="link" data-go-energia>Ver na aba Energia</button></div></article>`}
+      const ds=demandas.filter(d=>d.atividade===a),ab=ds.filter(aberta).length,atr=ds.filter(atrasada).length,cm=ds.filter(d=>!aberta(d)&&(d.concluido_em||'').slice(0,7)===mes).length;
+      return `<article class="card atv-card"><h3>${safe(a)}</h3>${a===OUTROS?'<p class="msg" style="margin-top:-4px">Demandas que não se encaixam nas atividades acima.</p>':''}
+        <div class="atv-nums"><span><strong>${ab}</strong>em aberto</span><span class="${atr?'late':''}"><strong>${atr}</strong>atrasadas</span><span><strong>${cm}</strong>concluídas no mês</span></div>
+        <div class="row-actions"><button class="link" data-ver-atv="${safe(a)}">Ver demandas</button><button class="link" data-nova-atv="${safe(a)}">+ Nova demanda</button></div></article>`}).join('');
+  }
+  $('#atvGrid').onclick=e=>{
+    const {verAtv,novaAtv,goEnergia}=e.target.dataset;
+    if(goEnergia!==undefined)showTab('energia');
+    if(verAtv!==undefined){fillFilters();$('#fAtividade').value=verAtv;showTab('demandas');render()}
+    if(novaAtv!==undefined)openDemanda(null,novaAtv);
+  };
+
+  // ---------- Energia (só pós-locação) ----------
+  // Vem do quadro de contratos pela função pos_energia_lista: a pós-locação não acessa o quadro nem a planilha da Locação.
+  const PREFIXO_NOTA='[Pós-locação · energia] ';
+  const diasDesde=t=>Math.max(0,Math.floor((Date.now()-new Date(t))/864e5));
+  // O monitoramento começa no dia em que as equipes passam a usar o sistema (data guardada no banco; vazia = ainda não começou).
+  let energiaInicio=null;
+  async function loadEnergia(){
+    $('#energiaTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
+    const [ini,lista,gestor]=await Promise.all([db.rpc('pos_energia_inicio'),db.rpc('pos_energia_lista',{p_resolvidas:$('#eResolvidas').checked}),db.rpc('is_gestor')]);
+    const error=ini.error||lista.error;
+    if(error){$('#energiaTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
+    energiaInicio=ini.data;
+    $('#eInicio').innerHTML=(energiaInicio?`Monitorando os contratos com chave entregue a partir de <strong>${br(energiaInicio)}</strong>.`:'<strong>O monitoramento ainda não começou.</strong> Ele começa no dia em que as equipes passarem a usar o sistema.')+
+      (gestor.data===true?` <button class="link" id="eDefinir">${energiaInicio?'Alterar data de início':'Definir data de início'}</button>`:'');
+    energia=lista.data.sort((a,b)=>a.resolvida-b.resolvida||new Date(a.entrada_em)-new Date(b.entrada_em));renderEnergia();renderAtividades();
+  }
+  $('#eInicio').addEventListener('click',async e=>{
+    if(e.target.id!=='eDefinir')return;
+    const atual=energiaInicio?br(energiaInicio):br(hoje());
+    const r=prompt('A partir de que dia a pós-locação monitora a energia? (dd/mm/aaaa)\nContratos com chave entregue antes disso não entram.',atual);if(r===null)return;
+    const m=r.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);if(!m){alert('Use o formato dd/mm/aaaa.');return}
+    const {error}=await db.rpc('pos_energia_definir_inicio',{p_inicio:`${m[3]}-${m[2]}-${m[1]}`});if(error){alert('Não foi possível salvar: '+error.message);return}
+    toast('Data de início salva');await loadEnergia();
+  });
+  function renderEnergia(){
+    const pend=energia.filter(x=>!x.resolvida),antigos=pend.filter(x=>diasDesde(x.entrada_em)>30).length,semNota=pend.filter(x=>!x.nota).length;
+    $('#eTiles').innerHTML=`<div class="card tile ${pend.length?'warn':''}"><span>Para monitorar</span><strong>${pend.length}</strong><small>energia sem sinal da Locação</small></div>
+      <div class="card tile ${antigos?'alert':''}"><span>Há mais de 30 dias</span><strong>${antigos}</strong><small>desde a entrega de chaves</small></div>
+      <div class="card tile"><span>Sem anotação</span><strong>${semNota}</strong><small>ninguém acompanhou ainda</small></div>`;
+    if(!energia.length){$('#energiaTable').innerHTML=`<tbody><tr><td class="empty">${energiaInicio?'Nenhum contrato para monitorar.':'A lista começa a ser preenchida quando a data de início for definida.'}</td></tr></tbody>`;return}
+    const chip=n=>`<span class="chip ${/PENDENTE|FALTA TRASNFERIR|FALTA TRANSFERIR/i.test(n)?'warn':/CELESC - OK|RATEIO|NÃO TROCAR/i.test(n)?'ok':''}">${safe(n)}</span>`;
+    $('#energiaTable').innerHTML=`<thead><tr><th>Contrato</th><th>Chave entregue</th><th>Etapa no quadro</th><th>Etiquetas</th><th>Último acompanhamento</th><th></th></tr></thead><tbody>${energia.map(x=>{const d=diasDesde(x.entrada_em);
+      return `<tr${x.resolvida?' style="opacity:.6"':''}><td><strong>${safe(x.titulo)}</strong>${x.resolvida?'<br><span class="chip ok">Resolvida</span>':''}</td>
+      <td style="white-space:nowrap">${br(iso(new Date(x.entrada_em)))}<br><small class="${!x.resolvida&&d>30?'':'muted'}" style="${!x.resolvida&&d>30?'color:var(--red);font-weight:700':''}">há ${d} ${d===1?'dia':'dias'}</small></td>
+      <td><small>${safe(x.coluna)}</small></td>
+      <td><div class="chips">${(x.etiquetas||[]).filter(n=>/CELESC|LUZ|ENERGIA|TITULARIDADE/i.test(n)).map(chip).join('')||'<span class="muted">sem etiqueta de energia</span>'}</div></td>
+      <td class="nota">${x.nota?`${safe(x.nota.replace(PREFIXO_NOTA,''))}<small>${br(iso(new Date(x.nota_em)))} · ${safe((x.nota_por||'').split('@')[0])}</small>`:'<span class="muted">–</span>'}</td>
+      <td class="row-actions">${x.resolvida?'':`<button class="link" data-nota="${x.cartao_id}">Anotar</button><button class="link" data-transf="${x.cartao_id}">Transferida ✓</button>`}</td></tr>`}).join('')}</tbody>`;
+  }
+  $('#eResolvidas').addEventListener('change',loadEnergia);
+  let notaCartao=null;
+  $('#energiaTable').onclick=async e=>{
+    const {nota,transf}=e.target.dataset,x=energia.find(c=>c.cartao_id===(nota||transf));if(!x)return;
+    if(nota){notaCartao=x.cartao_id;$('#notaForm').reset();$('#notaMsg').hidden=true;$('#notaContrato').textContent=x.titulo;$('#notaDialog').showModal();$('#nTexto').focus()}
+    if(transf&&confirm(`Marcar a energia de "${x.titulo}" como transferida? A etiqueta "CELESC - OK" será colocada no cartão do quadro.`)){
+      const {error}=await db.rpc('pos_energia_transferida',{p_cartao:x.cartao_id});if(error){alert('Não foi possível marcar: '+error.message);return}
+      toast('Marcada como transferida');await loadEnergia()}
+  };
+  $('#notaForm').onsubmit=async e=>{
+    e.preventDefault();const texto=$('#nTexto').value.trim(),msg=$('#notaMsg');if(!texto)return;
+    $('#notaSubmit').disabled=true;const {error}=await db.rpc('pos_energia_anotar',{p_cartao:notaCartao,p_texto:texto});$('#notaSubmit').disabled=false;
+    if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
+    $('#notaDialog').close();toast('Anotação salva');await loadEnergia();
+  };
+
+  // ---------- Exportar ----------
+  $('#exportCsv').onclick=()=>{
+    const esc=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+    const csv=['Atividade;Assunto;'+DEP.ref+';Responsável;Prazo;Situação;Observação;Criada em;Concluída em',
+      ...filtradas().map(d=>[d.atividade,d.titulo,d.referencia,d.responsavel,br(d.prazo),d.status,d.observacao,br(iso(new Date(d.criado_em))),d.concluido_em?br(iso(new Date(d.concluido_em))):''].map(esc).join(';'))].join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`demandas-${DEP.slug}-${hoje()}.csv`;a.click();URL.revokeObjectURL(a.href);
+  };
+
+  // ---------- Senhas ----------
+  // A senha nunca vem na listagem: só pela função dep_senha_revelar, um registro por vez.
+  async function loadSenhas(){
+    const {data,error}=await db.from('dep_senhas').select('id,sistema,link,usuario,observacao,atualizado_em,atualizado_por').eq('departamento',DEP.slug).order('sistema');
+    if(error){$('#senhasTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
+    senhas=data;renderSenhas();
+  }
+  const siteOk=u=>/^https?:\/\//i.test(u||'');
+  function renderSenhas(){
+    const q=$('#sBusca').value.trim().toLowerCase();
+    const list=senhas.filter(s=>!q||(s.sistema+' '+(s.usuario||'')+' '+(s.observacao||'')).toLowerCase().includes(q));
+    if(!list.length){$('#senhasTable').innerHTML=`<tbody><tr><td class="empty">${senhas.length?'Nenhuma senha encontrada.':'Nenhuma senha cadastrada ainda. Clique em "+ Nova senha".'}</td></tr></tbody>`;return}
+    $('#senhasTable').innerHTML=`<thead><tr><th>Sistema</th><th>Usuário</th><th>Senha</th><th>Observação</th><th>Atualizado</th><th></th></tr></thead><tbody>${list.map(s=>`<tr>
+      <td><strong>${safe(s.sistema)}</strong>${siteOk(s.link)?`<br><a class="link" style="padding:0" href="${safe(s.link)}" target="_blank" rel="noopener noreferrer">Abrir site ↗</a>`:''}</td>
+      <td>${s.usuario?`${safe(s.usuario)} <button class="link" data-copy-user="${s.id}">Copiar</button>`:'<span class="muted">–</span>'}</td>
+      <td style="white-space:nowrap"><span class="pw" id="pw-${s.id}">••••••••</span><button class="link" data-show="${s.id}">Mostrar</button><button class="link" data-copy-pw="${s.id}">Copiar</button></td>
+      <td>${safe(s.observacao||'')}</td>
+      <td style="white-space:nowrap"><small class="muted">${br(iso(new Date(s.atualizado_em)))}<br>${safe((s.atualizado_por||'').split('@')[0])}</small></td>
+      <td class="row-actions"><button class="link" data-edit-senha="${s.id}">Editar</button><button class="link danger" data-del-senha="${s.id}">Excluir</button></td></tr>`).join('')}</tbody>`;
+  }
+  $('#sBusca').addEventListener('input',renderSenhas);
+  async function revelar(id){const {data,error}=await db.rpc('dep_senha_revelar',{p_id:id});if(error){alert('Não foi possível ver a senha: '+error.message);return null}return data}
+  const ocultarTimers={};
+  $('#senhasTable').onclick=async e=>{
+    const d=e.target.dataset,s=senhas.find(x=>x.id===(d.copyUser||d.show||d.copyPw||d.editSenha||d.delSenha));if(!s)return;
+    if(d.copyUser)copiar(s.usuario,'Usuário');
+    if(d.show){const span=$('#pw-'+s.id);
+      if(e.target.textContent==='Ocultar'){span.textContent='••••••••';e.target.textContent='Mostrar';return}
+      const pw=await revelar(s.id);if(pw===null)return;span.textContent=pw||'(sem senha)';e.target.textContent='Ocultar';
+      clearTimeout(ocultarTimers[s.id]);ocultarTimers[s.id]=setTimeout(()=>{span.textContent='••••••••';e.target.textContent='Mostrar'},30000)}
+    if(d.copyPw){const pw=await revelar(s.id);if(pw)copiar(pw,'Senha');else if(pw!==null)toast('Sem senha cadastrada')}
+    if(d.editSenha)openSenha(s);
+    if(d.delSenha&&confirm(`Excluir o acesso "${s.sistema}"? A senha será apagada.`)){
+      const {error}=await db.rpc('dep_senha_excluir',{p_id:s.id});if(error){alert('Não foi possível excluir: '+error.message);return}
+      senhas=senhas.filter(x=>x.id!==s.id);renderSenhas()}
+  };
+  const senhaDialog=$('#senhaDialog');
+  function openSenha(s){
+    senhaEditId=s?.id||null;const f=$('#senhaForm');f.reset();$('#senhaMsg').hidden=true;
+    $('#senhaTitle').textContent=s?'Editar senha':'Nova senha';$('#sSenhaHint').hidden=!s;
+    $('#sSenha').type='password';$('#sSenhaVer').textContent='Mostrar';
+    if(s){f.sistema.value=s.sistema;f.link.value=s.link||'';f.usuario.value=s.usuario||'';f.observacao.value=s.observacao||''}
+    senhaDialog.showModal();
+  }
+  $('#newSenha').onclick=()=>openSenha(null);
+  $('#sSenhaVer').onclick=()=>{const i=$('#sSenha'),ver=i.type==='password';i.type=ver?'text':'password';$('#sSenhaVer').textContent=ver?'Ocultar':'Mostrar'};
+  senhaDialog.addEventListener('close',()=>{$('#sSenha').value=''});
+  $('#senhaForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#senhaMsg');msg.hidden=true;
+    const args={p_departamento:DEP.slug,p_id:senhaEditId,p_sistema:String(f.get('sistema')).trim(),p_link:String(f.get('link')).trim(),p_usuario:String(f.get('usuario')).trim(),p_observacao:String(f.get('observacao')).trim(),p_senha:String(f.get('senha'))};
+    if(!args.p_sistema){msg.textContent='Informe o sistema.';msg.hidden=false;return}
+    $('#senhaSubmit').disabled=true;const {error}=await db.rpc('dep_senha_salvar',args);$('#senhaSubmit').disabled=false;
+    if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
+    senhaDialog.close();toast('Senha salva');await loadSenhas();
+  };
+
+  // ---------- POP e documentos ----------
+  async function loadDocs(){
+    const {data,error}=await db.from('dep_documentos').select('id,titulo,categoria,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').eq('departamento',DEP.slug).order('enviado_em',{ascending:false});
+    if(error){$('#docsPop').innerHTML=`<div class="empty-card">Não foi possível carregar: ${safe(error.message)}</div>`;return}
+    docs=data;renderDocs();
+  }
+  const tipoDoc=n=>{const x=(n.split('.').pop()||'').toLowerCase();return x==='pdf'?['pdf','PDF']:['html','htm'].includes(x)?['html','PÁGINA']:['doc','docx'].includes(x)?['doc','WORD']:['xls','xlsx'].includes(x)?['xls','EXCEL']:['img','IMAGEM']};
+  const tamanho=b=>b>=1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(b/1024))+' KB';
+  function renderDocs(){
+    const card=d=>{const [cls,label]=tipoDoc(d.nome_arquivo);return `<article class="card doc"><div class="doc-ico ${cls}">${label}</div><div><h3>${safe(d.titulo)}</h3>
+      <small>${safe(d.nome_arquivo)} · ${tamanho(d.tamanho||0)}</small><small>Enviado em ${br(iso(new Date(d.enviado_em)))} por ${safe((d.enviado_por||'').split('@')[0])}</small>
+      <div class="row-actions"><button class="link" data-abrir="${d.id}">Abrir</button><button class="link" data-baixar="${d.id}">Baixar</button><button class="link danger" data-del-doc="${d.id}">Excluir</button></div></div></article>`};
+    const pop=docs.filter(d=>d.categoria==='POP'),outros=docs.filter(d=>d.categoria!=='POP');
+    $('#docsPop').innerHTML=pop.map(card).join('')||'<div class="empty-card">Nenhum POP enviado ainda. Clique em "+ Enviar documento".</div>';
+    $('#docsOutros').innerHTML=outros.map(card).join('')||'<div class="empty-card">Nenhum outro documento.</div>';
+  }
+  $('#tab-pop').addEventListener('click',async e=>{
+    const d=e.target.dataset,doc=docs.find(x=>x.id===(d.abrir||d.baixar||d.delDoc));if(!doc)return;
+    // Página HTML (ex.: POP feito como página): abre dentro do portal, isolada, em vez de baixar.
+    if(d.abrir&&tipoDoc(doc.nome_arquivo)[0]==='html'){
+      const {data,error}=await db.storage.from(BUCKET).download(doc.caminho);if(error){alert('Não foi possível abrir: '+error.message);return}
+      $('#leitorTitulo').textContent=doc.titulo;$('#leitorFrame').srcdoc=await data.text();$('#leitorDialog').showModal();return}
+    if(d.abrir){const w=window.open('','_blank');const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,600);
+      if(error){w?.close();alert('Não foi possível abrir: '+error.message);return}if(w)w.location=data.signedUrl;else location.href=data.signedUrl}
+    if(d.baixar){const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,600,{download:doc.nome_arquivo});
+      if(error){alert('Não foi possível baixar: '+error.message);return}const a=document.createElement('a');a.href=data.signedUrl;a.click()}
+    if(d.delDoc&&confirm(`Excluir o documento "${doc.titulo}"?`)){
+      const r=await db.storage.from(BUCKET).remove([doc.caminho]);if(r.error){alert('Não foi possível excluir: '+r.error.message);return}
+      const {error}=await db.from('dep_documentos').delete().eq('id',doc.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+      docs=docs.filter(x=>x.id!==doc.id);renderDocs()}
+  });
+  const docDialog=$('#docDialog');
+  $('#newDoc').onclick=()=>{$('#docForm').reset();$('#docMsg').hidden=true;docDialog.showModal()};
+  $('#docForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#docMsg'),file=f.get('arquivo');msg.hidden=true;
+    if(!file||!file.size){msg.textContent='Escolha um arquivo.';msg.hidden=false;return}
+    if(file.size>25*1024*1024){msg.textContent='O arquivo passa de 25 MB.';msg.hidden=false;return}
+    const limpo=file.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-');
+    // A primeira pasta do caminho é o departamento: é por ela que o banco confere quem pode ler o arquivo.
+    const caminho=`${DEP.slug}/${crypto.randomUUID()}/${limpo}`;
+    $('#docSubmit').disabled=true;$('#docSubmit').textContent='Enviando…';
+    try{
+      const up=await db.storage.from(BUCKET).upload(caminho,file,{contentType:file.type||(/\.html?$/i.test(file.name)?'text/html':undefined)});if(up.error)throw up.error;
+      const {error}=await db.from('dep_documentos').insert({departamento:DEP.slug,titulo:String(f.get('titulo')).trim(),categoria:f.get('categoria'),caminho,nome_arquivo:file.name,tamanho:file.size});
+      if(error){await db.storage.from(BUCKET).remove([caminho]);throw error}
+      docDialog.close();toast('Documento enviado');await loadDocs();
+    }catch(err){msg.textContent='Não foi possível enviar: '+(/mime|type/i.test(err.message)?'tipo de arquivo não aceito.':err.message);msg.hidden=false}
+    $('#docSubmit').disabled=false;$('#docSubmit').textContent='Enviar';
+  };
+
+  db.auth.onAuthStateChange(()=>setTimeout(()=>refreshSession().catch(console.error),0));
+  }
+</script>
+</body>
+</html>
