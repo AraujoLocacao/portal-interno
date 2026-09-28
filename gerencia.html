@@ -662,11 +662,13 @@
   const COLS=[['leads','Leads'],['lc','Leads corretor'],['env','Análises'],['apr','Aprovadas'],['vis','Visitas'],['prop','Propostas'],['fech','Fechamentos'],['vgl','VGL']];
   const celula=(k,v)=>`<td class="num">${k==='vgl'?brl(v):fmtN(v)}</td>`;
   const semanasComDados=()=>[...new Set(fatos.map(f=>semanaDe(f.data)[0]))].sort();
+  // Sem o bloco OUTROS (lançamentos sem unidade), igual ao slide da apresentação.
+  const linhasRelatorio=(a,b)=>linhasSemana(a,b).filter(l=>l.unidade!=='OUTROS');
   function renderSemanal(){
     renderRelatorio();renderLista();
   }
   function renderRelatorio(){
-    const [a,b]=semanaDe(semRel),ls=linhasSemana(a,b),ws=semanasComDados(),lancada=resultados.some(r=>r.data===a);
+    const [a,b]=semanaDe(semRel),ls=linhasRelatorio(a,b),ws=semanasComDados(),lancada=resultados.some(r=>r.data===a);
     $('#relData').value=semRel;$('#relPrev').disabled=!ws.some(w=>w<a);$('#relNext').disabled=!ws.some(w=>w>a);$('#relCopy').disabled=!ls.length;
     $('#relEdit').textContent=lancada?'Editar semana':'Lançar esta semana';
     const head=`<div class="rel-day">${tituloSemana(a,b)}</div>`;
@@ -686,7 +688,7 @@
   $('#relData').addEventListener('change',e=>{if(e.target.value){semRel=semanaDe(e.target.value)[0];renderRelatorio()}});
   $('#relEdit').onclick=()=>openSemana(semRel);
   $('#relCopy').onclick=()=>{
-    const [a,b]=semanaDe(semRel),ls=linhasSemana(a,b),us=[...new Set(ls.map(l=>l.unidade))];
+    const [a,b]=semanaDe(semRel),ls=linhasRelatorio(a,b),us=[...new Set(ls.map(l=>l.unidade))];
     const txt=l=>`${fmtN(l.leads)} leads · ${l.lc} leads corretor · ${l.env} análises (${l.apr} aprov.) · ${l.vis} visitas · ${l.prop} propostas · ${l.fech} fechamentos · VGL ${brl(l.vgl)}`;
     copiar([`*RESUMO SEMANAL – ${tituloSemana(a,b)}*`,...us.flatMap(u=>{const r=ls.filter(l=>l.unidade===u);return ['',`*${u}*`,...r.map(l=>`${l.corretora}: ${txt(l)}`),`_Subtotal: ${txt(r.reduce(somar,zero()))}_`]}),'',`*RESUMO DA SEMANA:* ${txt(ls.reduce(somar,zero()))}`].join('\n'),'Relatório');
   };
