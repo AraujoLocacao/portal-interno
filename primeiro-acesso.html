@@ -194,6 +194,28 @@
     .m-actions{display:flex;justify-content:flex-end;gap:8px}
     .m-toast{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 18px;border-radius:10px;font-weight:650;z-index:8}
     .m-pressed{filter:brightness(.9);transform:scale(.97)}
+    .m-bar{position:relative;z-index:3}
+    #mApp{transition:transform .9s cubic-bezier(.4,0,.2,1)}
+    /* Atendimento: relatório do dia e lançamento */
+    .m-rel{padding:14px 16px}
+    .m-rel-head{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:10px}.m-rel-head h2{font-size:1.15rem}.m-rel-head p{margin:2px 0 0;color:var(--muted);font-size:.84rem}
+    .m-rel-nav{display:flex;gap:6px;align-items:center}.m-rel-nav .m-in{height:34px;font-size:.88rem}.m-rel-nav .m-btn{padding:6px 11px}
+    .m-rel-day{background:#c9d8ea;text-align:center;font-weight:800;font-size:.8rem;padding:5px;border-radius:8px 8px 0 0;letter-spacing:.02em}
+    .m-rel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+    .m-rel-unit{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    .m-rel-unit h3{margin:0;padding:6px 12px;font-size:.86rem;font-weight:800;display:flex;align-items:center}
+    .m-rel-unit table{width:100%;border-collapse:collapse;font-size:.84rem}.m-rel-unit th{background:var(--navy);color:#fff;padding:4px 12px;text-align:left;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase}
+    .m-rel-unit td{padding:4px 12px;font-weight:650;border-bottom:1px solid #eef1f2}.m-rel-unit .num{text-align:right}.m-rel-unit tr.sub td{background:#eef2f4;font-weight:800}
+    .m-rel-total{margin-top:10px;display:flex;justify-content:space-between;align-items:center;background:var(--navy);color:#fff;border-radius:10px;padding:7px 16px;font-weight:800;letter-spacing:.03em}.m-rel-total strong{font-size:1.25rem}
+    .m-unit-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .m-unit{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:7px;align-content:start}
+    .m-unit-head{font-weight:800;font-size:.86rem;letter-spacing:.03em;display:flex;align-items:center}
+    .m-lead-row{display:grid;grid-template-columns:1fr 80px 30px;gap:8px;align-items:center}.m-lead-row input{text-align:right}
+    .m-lead-row.m-cols span{font-size:.68rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .m-rm{height:30px;border-radius:8px;background:#f3f5f6;display:grid;place-items:center;color:var(--muted)}
+    .m-unit-sub{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:6px;font-weight:800;font-size:.86rem}
+    .m-total-bar{display:flex;justify-content:space-between;align-items:center;background:var(--navy);color:#fff;border-radius:10px;padding:8px 16px;font-weight:800;letter-spacing:.03em}.m-total-bar strong{font-size:1.3rem}
+    .other a{color:var(--blue);font-weight:650}
     /* cartões de abertura e encerramento */
     .m-title{position:absolute;inset:0;z-index:15;background:linear-gradient(135deg,#173552 0%,#1f4262 60%,#24705a 140%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 110px}
     .m-title .lab{font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9fd3bf}
@@ -229,6 +251,7 @@
     <span class="label" id="dLabel">Passo a passo em vídeo</span>
     <h1 id="dTitulo">Primeiro acesso</h1>
     <p id="dDesc"></p>
+    <p class="other" id="outros"></p>
   </div>
 
   <div class="layout">
@@ -297,7 +320,7 @@
                 </div>
               </div>
               <div class="m-gate" id="mDenied" hidden>
-                <h1>Sem acesso</h1><p>Este login não tem permissão para a <span class="dNomeMin"></span>. Fale com a gerência.</p>
+                <h1>Sem acesso</h1><p>Este login não tem permissão para <span class="dNomeMin"></span>. Fale com a gerência.</p>
                 <span class="m-btn">Entrar com outro e-mail</span>
               </div>
             </section>
@@ -352,9 +375,46 @@
 
   // ================= Roteiros por departamento =================
   // Cada departamento tem: textos do cartão em Funções, a página, a tela interna (mApp) e os passos da parte 2.
+  // Abas iguais em todos os departamentos: Senhas e POP (tela e passo).
+  const telaSenhas=desc=>`<div data-mtab="senhas">
+          <div class="m-top"><div><h2>Senhas</h2><p>${desc}</p></div><div class="acts"><div class="m-in" style="width:230px"><span class="ph">Buscar sistema ou usuário</span></div><span class="m-btn pri">+ Nova senha</span></div></div>
+          <div class="m-card m-table"><table><thead><tr><th>Sistema</th><th>Usuário</th><th>Senha</th><th>Observação</th><th>Atualizado</th></tr></thead><tbody>
+            <tr><td><strong>Sistema de exemplo A</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw" id="mPw1">••••••••</span><span class="m-link" id="mMostrar">Mostrar</span><span class="m-link" id="mCopiar">Copiar</span></td><td style="color:var(--muted)">–</td><td>20/09/2026</td></tr>
+            <tr><td><strong>Sistema de exemplo B</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td style="color:var(--muted)">–</td><td>12/09/2026</td></tr>
+            <tr><td><strong>Sistema de exemplo C</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td style="color:var(--muted)">–</td><td>02/09/2026</td></tr>
+          </tbody></table></div>
+        </div>`;
+  const telaPop=(desc,pop)=>`<div data-mtab="pop">
+          <div class="m-top"><div><h2>POP e documentos</h2><p>${desc}</p></div><div class="acts"><span class="m-btn pri">+ Enviar documento</span></div></div>
+          <h2 style="font-size:1.05rem">POP</h2>
+          <div class="m-docs"><div class="m-card m-doc" id="mPop"><i>PDF</i><div><strong>${pop}</strong><small>Documento de exemplo</small><span class="m-link" style="margin-left:-4px">Abrir</span><span class="m-link">Baixar</span></div></div></div>
+          <h2 style="font-size:1.05rem">Outros documentos</h2>
+          <div class="m-docs"><div class="m-card m-doc"><i class="x">XLS</i><div><strong>Planilha de exemplo</strong><small>Documento de exemplo</small></div></div><div class="m-card m-doc"><i>PDF</i><div><strong>Modelo de exemplo</strong><small>Documento de exemplo</small></div></div></div>
+        </div>`;
+  const passoSenhas=anterior=>({titulo:'Aba Senhas',texto:'Na aba <b>Senhas</b> ficam os acessos dos sistemas. A senha só aparece quando você clica em <b>Mostrar</b> e se esconde sozinha depois de 30 segundos. Use <b>Copiar</b> para colar no sistema, sem anotar em papel.',
+    setup(){tela('app');aba(anterior)},
+    async acts(A){await A.click('[data-t="senhas"]');aba('senhas');await A.pause(500);await A.click('#mMostrar');$('#mPw1').textContent='Exemplo@2026';$('#mMostrar').textContent='Ocultar';await A.pause(900);await A.hl('#mCopiar','Copiar e colar no sistema','below');await A.pause(2600);A.unhl()}});
+  const passoPop=anterior=>({titulo:'Aba POP e documentos',texto:'Em <b>POP e documentos</b> está o procedimento do departamento e os outros materiais. Clique em <b>Abrir</b> para ler.',
+    setup(){tela('app');aba(anterior)},
+    async acts(A){await A.click('[data-t="pop"]');aba('pop');await A.pause(500);await A.hl('#mPop','O POP do departamento','below');await A.pause(2600);A.unhl()}});
+  function zerarSenhas(){if($('#mPw1')){$('#mPw1').textContent='••••••••';$('#mMostrar').textContent='Mostrar'}}
+
+  // Atendimento: relatório do dia no formato da planilha (dados de exemplo).
+  const SEMANA=['DOMINGO','SEGUNDA-FEIRA','TERÇA-FEIRA','QUARTA-FEIRA','QUINTA-FEIRA','SEXTA-FEIRA','SÁBADO'];
+  const diaTitulo=d=>`${SEMANA[d.getDay()]} ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} DE ${d.getFullYear()}`;
+  const UNIDADES=[['ITAJAÍ','#2a78d6',['Corretor A','Corretor B','Corretor C']],['NAVEGANTES','#1f9e89',['Corretor D','Corretor E']]];
+  function relatorio(data,qtds){
+    let total=0;
+    const unid=UNIDADES.map(([u,cor,cs],i)=>{const q=qtds[i],sub=q.reduce((a,b)=>a+b,0);total+=sub;
+      return `<div class="m-rel-unit"><h3><i class="m-dot" style="background:${cor}"></i>LEADS ${u}</h3><table><thead><tr><th>Corretor</th><th class="num">Leads</th></tr></thead><tbody>${cs.map((c,j)=>`<tr><td>${c}</td><td class="num">${q[j]}</td></tr>`).join('')}<tr class="sub"><td>SUBTOTAL</td><td class="num">${sub}</td></tr></tbody></table></div>`}).join('');
+    return `<div class="m-rel-day">${diaTitulo(data)}</div><div class="m-rel-grid">${unid}</div><div class="m-rel-total"><span>TOTAL</span><strong>${total}</strong></div>`;
+  }
+  const ontem=new Date(Date.now()-864e5), LEADS_ONTEM=[[7,5,4],[4,3]], LEADS_HOJE=[[6,4,3],[5,2]];
+  function somarDlg(){let total=0;$$('#mDlgLeads .m-unit').forEach(u=>{const s=$$('input',u).reduce((a,i)=>a+(parseInt(i.value,10)||0),0);$('[data-sub]',u).textContent=s;total+=s});$('#mDlgTotal').textContent=total}
+
   const GUIAS={
     'pre-analise':{
-      nome:'Pré-análise',pagina:'pre-analise.html',rotulo:'Locação · Acesso restrito',
+      nome:'Pré-análise',a:'a',na:'na',da:'da',pagina:'pre-analise.html',rotulo:'Locação · Acesso restrito',posicao:1,verde:true,abaInicial:'analises',
       desc:'Área do departamento de pré-análise: controle das análises, senhas dos sistemas e POP.',
       itens:['Análises com filtros e gráficos por corretora','Senhas dos sistemas (criptografadas)','POP e documentos do departamento'],
       abrir:'Abrir pré-análise →',vizinho:['Atendimento','Abrir atendimento →'],
@@ -414,22 +474,8 @@
           </div>
         </div>
 
-        <div data-mtab="senhas">
-          <div class="m-top"><div><h2>Senhas</h2><p>Acessos aos sistemas usados pela pré-análise. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".</p></div><div class="acts"><div class="m-in" style="width:230px"><span class="ph">Buscar sistema ou usuário</span></div><span class="m-btn pri">+ Nova senha</span></div></div>
-          <div class="m-card m-table"><table><thead><tr><th>Sistema</th><th>Usuário</th><th>Senha</th><th>Observação</th><th>Atualizado</th></tr></thead><tbody>
-            <tr><td><strong>Sistema de exemplo A</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw" id="mPw1">••••••••</span><span class="m-link" id="mMostrar">Mostrar</span><span class="m-link" id="mCopiar">Copiar</span></td><td style="color:var(--muted)">–</td><td>20/09/2026</td></tr>
-            <tr><td><strong>Sistema de exemplo B</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td style="color:var(--muted)">–</td><td>12/09/2026</td></tr>
-            <tr><td><strong>Sistema de exemplo C</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td style="color:var(--muted)">–</td><td>02/09/2026</td></tr>
-          </tbody></table></div>
-        </div>
-
-        <div data-mtab="pop">
-          <div class="m-top"><div><h2>POP e documentos</h2><p>Procedimento operacional padrão e demais materiais do departamento.</p></div><div class="acts"><span class="m-btn pri">+ Enviar documento</span></div></div>
-          <h2 style="font-size:1.05rem">POP</h2>
-          <div class="m-docs"><div class="m-card m-doc" id="mPop"><i>PDF</i><div><strong>POP da Pré-análise</strong><small>Documento de exemplo</small><span class="m-link" style="margin-left:-4px">Abrir</span><span class="m-link">Baixar</span></div></div></div>
-          <h2 style="font-size:1.05rem">Outros documentos</h2>
-          <div class="m-docs"><div class="m-card m-doc"><i class="x">XLS</i><div><strong>Planilha de exemplo</strong><small>Documento de exemplo</small></div></div><div class="m-card m-doc"><i>PDF</i><div><strong>Modelo de exemplo</strong><small>Documento de exemplo</small></div></div></div>
-        </div>
+        ${telaSenhas('Acessos aos sistemas usados pela pré-análise. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".')}
+        ${telaPop('Procedimento operacional padrão e demais materiais do departamento.','POP da Pré-análise')}
 
         <div class="m-dlg-back" id="mDlg" hidden><div class="m-dlg">
           <div class="m-dlg-head"><h2>Nova análise</h2><span class="m-x">×</span></div>
@@ -467,19 +513,94 @@
         {titulo:'Aba Validações',texto:'A aba <b>Validações</b> reúne os sites de consulta (SPC, certidões e processos). Clique no nome do site e ele abre numa nova aba. Use a busca para achar um estado.',
           setup(){tela('app');aba('locacoes')},
           async acts(A){await A.click('[data-t="validacoes"]');aba('validacoes');await A.pause(500);await A.hl('#mLinkSpc','Clique para abrir o site','below');await A.pause(2600);A.unhl()}},
-        {titulo:'Aba Senhas',texto:'Na aba <b>Senhas</b> ficam os acessos dos sistemas. A senha só aparece quando você clica em <b>Mostrar</b> e se esconde sozinha depois de 30 segundos. Use <b>Copiar</b> para colar no sistema, sem anotar em papel.',
-          setup(){tela('app');aba('validacoes')},
-          async acts(A){await A.click('[data-t="senhas"]');aba('senhas');await A.pause(500);await A.click('#mMostrar');$('#mPw1').textContent='Exemplo@2026';$('#mMostrar').textContent='Ocultar';await A.pause(900);await A.hl('#mCopiar','Copiar e colar no sistema','below');await A.pause(2600);A.unhl()}},
-        {titulo:'Aba POP e documentos',texto:'Em <b>POP e documentos</b> está o procedimento do departamento e os outros materiais. Clique em <b>Abrir</b> para ler.',
-          setup(){tela('app');aba('senhas')},
-          async acts(A){await A.click('[data-t="pop"]');aba('pop');await A.pause(500);await A.hl('#mPop','O POP do departamento','below');await A.pause(2600);A.unhl()}},
+        passoSenhas('validacoes'),
+        passoPop('senhas'),
         {titulo:'Quadro de contratos',texto:'O último item, <b>Quadro ↗</b>, abre o quadro de contratos (o antigo Trello), com um cartão para cada locação.',
           voz:'O último item, Quadro, abre o quadro de contratos, o antigo Trello, com um cartão para cada locação.',
           setup(){tela('app');aba('pop')},
           async acts(A){await A.hl('#mTabQuadro','Abre o quadro','below');await A.pause(2800);A.unhl()}},
-      ]
+      ],
+      zerar(){
+        this.lista??=$('#mLista').innerHTML;$('#mLista').innerHTML=this.lista;
+        $('#mDlg').hidden=true;$('#dCorretora').innerHTML='<span class="ph">Escolha…</span>';$$('#dAprov,#dCaucao').forEach(e=>e.classList.remove('on'));
+        for(const id of ['#dCliente','#dRef'])$(id).value='';
+      }
+    },
+
+    'atendimento':{
+      nome:'Atendimento',a:'o',na:'no',da:'do',pagina:'atendimento.html',rotulo:'Atendimento · Acesso restrito',posicao:2,verde:false,abaInicial:'leads',
+      desc:'Área do atendimento: leads do dia por corretor e unidade, senhas dos sistemas e POP.',
+      itens:['Leads de Itajaí e Navegantes com relatório do dia','Gráficos e resumo por corretor','Senhas dos sistemas (criptografadas) e POP'],
+      abrir:'Abrir atendimento →',vizinho:['Pré-análise','Abrir pré-análise →'],
+      app:`<div class="m-app">
+        <div class="m-dept"><h1>Atendimento</h1><div class="m-tabs" id="mTabs"><span data-t="leads">Leads</span><span data-t="senhas">Senhas</span><span data-t="pop">POP e documentos</span></div></div>
+
+        <div data-mtab="leads">
+          <div class="m-top"><div><h2>Leads</h2><p>Setembro de 2026 · 412 leads</p></div><div class="acts"><span class="m-btn">Corretores e unidades</span><span class="m-btn">Baixar planilha</span><span class="m-btn pri" id="mNovoDia">+ Lançar leads do dia</span></div></div>
+          <div class="m-card m-filters" id="mFiltros" style="grid-template-columns:repeat(3,1fr) auto">
+            <div class="m-field"><span class="l">Unidade</span><div class="m-in">Todas</div></div>
+            <div class="m-field"><span class="l">Corretor</span><div class="m-in">Todos</div></div>
+            <div class="m-field"><span class="l">Período</span><div class="m-in">Este mês</div></div>
+            <span class="m-btn">Limpar</span>
+          </div>
+          <div class="m-tiles" id="mTiles">
+            <div class="m-card m-tile"><span>Total de leads</span><strong>412</strong><small>em 23 dias</small></div>
+            <div class="m-card m-tile"><span><i class="m-dot" style="background:#2a78d6"></i>Itajaí</span><strong>251</strong><small>61% do total</small></div>
+            <div class="m-card m-tile"><span><i class="m-dot" style="background:#1f9e89"></i>Navegantes</span><strong>161</strong><small>39% do total</small></div>
+            <div class="m-card m-tile"><span>Média por dia</span><strong>17,9</strong><small>leads por dia com lançamento</small></div>
+          </div>
+          <div class="m-card m-rel" id="mRel">
+            <div class="m-rel-head"><div><h2>Relatório do dia</h2><p>Igual à planilha diária. Use as setas para trocar o dia.</p></div>
+              <div class="m-rel-nav" id="mRelNav"><span class="m-btn">←</span><div class="m-in" id="mRelData" style="width:130px"></div><span class="m-btn">→</span><span class="m-btn" id="mZap">Copiar para WhatsApp</span></div></div>
+            <div id="mRelBody"></div>
+          </div>
+        </div>
+
+        ${telaSenhas('Acessos aos sistemas usados pelo atendimento. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".')}
+        ${telaPop('Procedimento operacional padrão do atendimento e demais materiais.','POP do Atendimento')}
+
+        <div class="m-dlg-back" id="mDlg" hidden><div class="m-dlg" style="width:780px">
+          <div class="m-dlg-head"><h2>Lançar leads do dia</h2><span class="m-x">×</span></div>
+          <div class="m-dlg-body">
+            <div class="m-field" style="max-width:200px"><span class="l">Dia</span><div class="m-in" id="mDlgDia"></div></div>
+            <div class="m-unit-grid" id="mDlgLeads">${UNIDADES.map(([u,cor,cs],i)=>`<div class="m-unit"><div class="m-unit-head"><i class="m-dot" style="background:${cor}"></i>LEADS ${u}</div>
+              <div class="m-lead-row m-cols"><span>Corretor</span><span style="text-align:right">Leads</span><span></span></div>
+              ${cs.map((c,j)=>`<div class="m-lead-row"><div class="m-in">${c}</div><input class="m-in" id="q${i}${j}" tabindex="-1" readonly><span class="m-rm">×</span></div>`).join('')}
+              <span class="m-link" style="margin-left:-4px"${i===0?' id="mAddCorretor"':''}>+ Adicionar corretor</span>
+              <div class="m-unit-sub"><span>SUBTOTAL</span><span data-sub>0</span></div></div>`).join('')}</div>
+            <div class="m-total-bar" id="mDlgTotalBar"><span>TOTAL</span><strong id="mDlgTotal">0</strong></div>
+            <div class="m-actions"><span class="m-btn">Cancelar</span><span class="m-btn pri" id="mDlgSalvar">Salvar</span></div>
+          </div>
+        </div></div>
+      </div>`,
+      passos:[
+        {titulo:'Aba Leads',texto:'A aba <b>Leads</b> abre primeiro. Os quadros mostram o total de leads do período, quanto veio de cada unidade (Itajaí e Navegantes) e a média por dia. Use os filtros para ver só uma unidade, um corretor ou outro período.',
+          setup(){tela('app');aba('leads')},
+          async acts(A){await A.hl('#mTiles','Totais do período','below');await A.pause(2800);await A.hl('#mFiltros','Filtros','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Lançar os leads do dia',texto:'Clique em <b>+ Lançar leads do dia</b>. O dia de hoje e os corretores do último lançamento já vêm preenchidos: digite só quantos leads cada um recebeu. Se faltar alguém, clique em <b>+ Adicionar corretor</b>; para tirar uma linha, clique no <b>×</b>. Confira o <b>TOTAL</b> e clique em <b>Salvar</b>.',
+          voz:'Clique em Lançar leads do dia. O dia de hoje e os corretores do último lançamento já vêm preenchidos: digite só quantos leads cada um recebeu. Se faltar alguém, clique em Adicionar corretor. Para tirar uma linha, clique no xis. Confira o total e clique em Salvar.',
+          setup(){tela('app');aba('leads')},
+          async acts(A){
+            await A.click('#mNovoDia');$('#mDlg').hidden=false;await A.pause(600);
+            for(const [i,qs] of LEADS_HOJE.entries())for(const [j,q] of qs.entries()){await A.click('#q'+i+j);await A.type('#q'+i+j,String(q));somarDlg()}
+            await A.hl('#mAddCorretor','Se faltar alguém','below');await A.pause(1800);
+            await A.hl('#mDlgTotalBar','Confira o total','above');await A.pause(1800);A.unhl();
+            await A.click('#mDlgSalvar');$('#mDlg').hidden=true;$('#mRelData').textContent=hoje.toLocaleDateString('pt-BR');$('#mRelBody').innerHTML=relatorio(hoje,LEADS_HOJE);toast('Leads salvos');
+            await A.pause(1800);toast('')}},
+        {titulo:'Relatório do dia',texto:'Logo abaixo fica o <b>Relatório do dia</b>, igual à planilha, com o subtotal de cada unidade e o total. Use as setas ← → para ver outro dia. Clique em <b>Copiar para WhatsApp</b> e cole na conversa com <b>Ctrl + V</b>: o relatório vai pronto.',
+          voz:'Logo abaixo fica o Relatório do dia, igual à planilha, com o subtotal de cada unidade e o total. Use as setas para ver outro dia. Clique em Copiar para WhatsApp e cole na conversa com Control V: o relatório vai pronto.',
+          setup(){tela('app');aba('leads');$('#mRelData').textContent=hoje.toLocaleDateString('pt-BR');$('#mRelBody').innerHTML=relatorio(hoje,LEADS_HOJE);rolarApp(true)},
+          async acts(A){await A.pause(1300);await A.hl('#mRelBody');await A.pause(2200);await A.hl('#mRelNav','Setas: outro dia','below');await A.pause(2000);A.unhl();await A.click('#mZap');toast('Relatório copiado');await A.pause(900);toast('');await A.keys(['Ctrl','V'],1300)}},
+        passoSenhas('leads'),
+        passoPop('senhas'),
+      ],
+      zerar(){
+        $('#mDlg').hidden=true;$('#mDlgDia').textContent=hoje.toLocaleDateString('pt-BR');$$('#mDlgLeads input').forEach(i=>i.value='');somarDlg();
+        $('#mRelData').textContent=ontem.toLocaleDateString('pt-BR');$('#mRelBody').innerHTML=relatorio(ontem,LEADS_ONTEM);rolarApp(false);
+      }
     }
   };
+  const LISTA_GUIAS=Object.entries(GUIAS).map(([s,g])=>[s,g.nome]);
 
   const slug=new URLSearchParams(location.search).get('d')||'pre-analise';
   const G=GUIAS[slug]||GUIAS['pre-analise'];
@@ -489,15 +610,17 @@
   // ================= Tela simulada =================
   const shot=$('#shot'), stage=$('#stage');
   $('#mApp').innerHTML=G.app;
-  $$('.dNome').forEach(e=>e.textContent=G.nome);$$('.dNomeMin').forEach(e=>e.textContent=minusc);
+  $$('.dNome').forEach(e=>e.textContent=G.nome);$$('.dNomeMin').forEach(e=>e.textContent=G.a+' '+minusc);
   $('#mCardLab').textContent=G.rotulo;$('#mCardNome').textContent=G.nome;$('#mCardDesc').textContent=G.desc;
   $('#mCardItens').innerHTML=G.itens.map(i=>'<li>'+i+'</li>').join('');$('#mOpenDep').textContent=G.abrir;
   $('#mOutroNome').textContent=G.vizinho[0];$('#mOutroAbrir').textContent=G.vizinho[1];
+  // Cartão na mesma posição e cor do portal de verdade.
+  $('#mCardDep').classList.toggle('green',G.verde);$('#mCardOutro').classList.toggle('green',!G.verde);
+  if(G.posicao===2)$('#mCardDep').style.order=2;
   $('#mWhoMail').textContent=EMAIL;$('#popPwUser').textContent=EMAIL;$('#cIntroLab').textContent='Primeiro acesso · '+G.nome;
   const hoje=new Date();
   $('#mHoje').textContent=hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
   function hojeBR(){return hoje.toLocaleDateString('pt-BR')}
-  const listaOriginal=$('#mLista')?.innerHTML;
 
   let scale=1;
   function fit(){scale=stage.clientWidth/1200;shot.style.transform=`scale(${scale})`}
@@ -514,6 +637,12 @@
   function aba(nome){$$('[data-mtab]',shot).forEach(s=>s.hidden=s.dataset.mtab!==nome);$$('#mTabs [data-t]',shot).forEach(t=>t.classList.toggle('active',t.dataset.t===nome))}
   function menu(nome){$$('.m-nav [data-nav]',shot).forEach(n=>n.classList.toggle('active',n.dataset.nav===nome))}
   function rolarPortal(fim){$('#mPortalIn').style.transform=fim?`translateY(${-($('#mSecFuncoes').offsetTop-24)}px)`:''}
+  // Desce a página do departamento até o fim do elemento pedido (ex.: relatório do Atendimento).
+  function rolarApp(fim,sel='#mRel'){
+    // Mede a posição do elemento dentro do #mApp (não muda com a animação) e soma o topo do #mApp na tela simulada (670px de altura).
+    const a=$('#mApp');if(!fim){a.style.transition='none';a.style.transform='';a.offsetHeight;a.style.transition='';return}
+    const r=$(sel).getBoundingClientRect(),ra=a.getBoundingClientRect(),fundo=a.offsetTop+(r.bottom-ra.top)/scale;
+    a.style.transform=`translateY(${-Math.max(0,fundo-670+18)}px)`}
   function toast(t){const e=$('#mToast');e.textContent=t;e.hidden=!t}
 
   // Volta tudo ao estado inicial; cada passo monta o que precisa (assim dá para pular para qualquer passo).
@@ -521,13 +650,11 @@
     tela('blank');$('#brAddr').classList.remove('focus');$('#brStar').textContent='☆';$('#brStar').classList.remove('on');
     $('#popFav').hidden=true;$('#popPw').hidden=true;
     const pi=$('#mPortalIn');pi.style.transition='none';rolarPortal(false);pi.offsetHeight;pi.style.transition='';menu('mural');
-    for(const id of ['#gEmail','#gSenha','#dCliente','#dRef'])$(id).value='';
+    for(const id of ['#gEmail','#gSenha'])$(id).value='';
     $$('.m-in.focus',shot).forEach(e=>e.classList.remove('focus'));
     $('#gMsg').hidden=true;$('#mGate').hidden=false;$('#mDenied').hidden=true;
-    if($('#mLista'))$('#mLista').innerHTML=listaOriginal;
-    $('#mDlg').hidden=true;$('#dCorretora').innerHTML='<span class="ph">Escolha…</span>';$$('#dAprov,#dCaucao').forEach(e=>e.classList.remove('on'));
-    if($('#mPw1')){$('#mPw1').textContent='••••••••';$('#mMostrar').textContent='Mostrar'}
-    aba('analises');toast('');A.unhl();$('#keys').hidden=true;$$('.ripple',shot).forEach(r=>r.remove());
+    zerarSenhas();G.zerar();
+    aba(G.abaInicial);toast('');A.unhl();$('#keys').hidden=true;$$('.ripple',shot).forEach(r=>r.remove());
   }
 
   // ================= Motor do vídeo =================
@@ -569,7 +696,7 @@
 
   // Parte 1 é igual para todos os departamentos; parte 2 vem do roteiro do departamento.
   const parte1=[
-    {titulo:'Antes de começar',texto:`Neste vídeo você aprende a entrar na ${G.nome} pela primeira vez. Tenha em mãos o <b>e-mail e a senha</b> que a gerência entregou para você.`,
+    {titulo:'Antes de começar',texto:`Neste vídeo você aprende a entrar ${G.na} ${G.nome} pela primeira vez. Tenha em mãos o <b>e-mail e a senha</b> que a gerência entregou para você.`,
       setup(){cartao('intro');cursorEm(1250,800,false)},async acts(A){await A.pause(800)}},
     {titulo:'Abra o portal',texto:`Abra o <b>Google Chrome</b> (ou o Edge), clique na barra de endereço lá em cima, digite <b>${SITE}</b> e aperte <b>Enter</b>.`,
       voz:'Abra o Google Chrome, ou o Edge, clique na barra de endereço lá em cima, digite o endereço do portal, que aparece na tela, e aperte Enter.',
@@ -582,7 +709,7 @@
     {titulo:'Entre em Funções',texto:'No menu azul à esquerda, clique em <b>Funções</b>. A página desce até as ferramentas de cada departamento.',
       setup(){tela('portal')},
       async acts(A){await A.click('#mNavFuncoes');menu('funcoes');rolarPortal(true);await A.pause(1000);await A.hl('#mSecFuncoes');await A.pause(1400);A.unhl()}},
-    {titulo:`Abra a ${G.nome}`,texto:`No cartão <b>${G.nome}</b>, clique em <b>${G.abrir}</b>`,voz:`No cartão ${G.nome}, clique em ${G.abrir.replace(' →','')}.`,
+    {titulo:`Abra ${G.a} ${G.nome}`,texto:`No cartão <b>${G.nome}</b>, clique em <b>${G.abrir}</b>`,voz:`No cartão ${G.nome}, clique em ${G.abrir.replace(' →','')}.`,
       setup(){tela('portal');menu('funcoes');const pi=$('#mPortalIn');pi.style.transition='none';rolarPortal(true);pi.offsetHeight;pi.style.transition=''},
       async acts(A){await A.hl('#mCardDep');await A.pause(1300);A.unhl();await A.click('#mOpenDep');tela('login');await A.pause(900)}},
     {titulo:'Digite o seu e-mail',texto:'Clique no campo <b>E-MAIL</b> e digite o e-mail que a gerência passou para você, sem espaços.',
@@ -591,7 +718,7 @@
     {titulo:'Digite a sua senha',texto:'Clique no campo <b>SENHA</b> e digite a senha. Ela aparece como bolinhas, e isso é normal. Cuidado com letras maiúsculas e minúsculas: a senha diferencia as duas.',
       setup(){tela('login');$('#gEmail').value=EMAIL},
       async acts(A){await A.click('#gSenha');await A.type('#gSenha','exemplo123')}},
-    {titulo:'Clique em Entrar',texto:`Clique no botão verde <b>Entrar</b>. Em poucos segundos abre a área da ${G.nome}.`,
+    {titulo:'Clique em Entrar',texto:`Clique no botão verde <b>Entrar</b>. Em poucos segundos abre a área ${G.da} ${G.nome}.`,
       setup(){tela('login');$('#gEmail').value=EMAIL;$('#gSenha').value='exemplo123'},
       async acts(A){await A.click('#gEntrar');await A.pause(700);tela('app');await A.pause(1200)}},
     {titulo:'Salvar a senha no navegador?',texto:'O navegador pode perguntar se você quer salvar a senha. Só clique em <b>Salvar</b> se o computador for só seu. Em computador usado por outras pessoas, clique em <b>Nunca</b>.',
@@ -606,7 +733,7 @@
       async acts(A){await A.hl('#mWho','O seu e-mail','below');await A.pause(2400);await A.hl('#mTabs','As abas','below');await A.pause(2600);A.unhl()}},
   ];
   const parte3=[
-    {titulo:'Ao terminar, clique em Sair',texto:`Quando terminar, clique em <b>Sair</b>, no canto de cima à direita. Por segurança, a ${G.nome} também sai sozinha depois de 30 minutos sem uso.`,
+    {titulo:'Ao terminar, clique em Sair',texto:`Quando terminar, clique em <b>Sair</b>, no canto de cima à direita. Por segurança, a área também sai sozinha depois de 30 minutos sem uso.`,
       setup(){tela('app')},
       async acts(A){await A.click('#mSair');tela('login');await A.pause(1200)}},
     {titulo:'Pronto!',texto:'Da próxima vez é só abrir o portal pelos favoritos, ir em <b>Funções</b> e entrar. Não passe a sua senha para ninguém. Dúvidas? Fale com a gerência.',
@@ -677,7 +804,9 @@
   // Monta lista de passos, barra, texto escrito e cabeçalho.
   document.title='Primeiro acesso · '+G.nome+' | Araujo Locação';
   $('#dTitulo').textContent='Primeiro acesso · '+G.nome;
-  $('#dDesc').textContent=`Como entrar na ${G.nome} pela primeira vez e conhecer cada aba. Assista em vídeo ou leia o passo a passo por escrito, mais abaixo.`;
+  $('#dDesc').textContent=`Como entrar ${G.na} ${G.nome} pela primeira vez e conhecer cada aba. Assista em vídeo ou leia o passo a passo por escrito, mais abaixo.`;
+  // Links para os guias dos outros departamentos.
+  $('#outros').innerHTML='Outros guias: '+LISTA_GUIAS.filter(([s])=>GUIAS[s]!==G).map(([s,n])=>`<a href="primeiro-acesso.html?d=${s}">${n}</a>`).join(' · ');
   const minutos=Math.round(passos.reduce((s,p)=>s+Math.max(9000,limpo(p.texto).length*70+5000),0)/60000);
   $('#coverSub').textContent=`${passos.length} passos · cerca de ${minutos} minutos`;
   $('#progress').innerHTML=passos.map((p,i)=>`<button type="button" aria-label="Passo ${i+1}: ${p.titulo}"><i></i></button>`).join('');
