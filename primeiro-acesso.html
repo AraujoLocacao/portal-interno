@@ -125,6 +125,7 @@
     .m-res ul{padding-left:18px;color:#52616c;font-size:.86rem;margin:10px 0 12px}
     .m-open{margin-top:auto;align-self:flex-start;color:var(--blue);font-weight:800;border-bottom:2px solid #b6c5cf;padding:6px 0 1px}
     .m-res.green .m-open{color:var(--green);border-color:#b4d0c6}
+    .m-guia{margin-top:10px;font-size:.8rem;font-weight:650;color:var(--muted);text-decoration:underline}
     .m-btn{display:inline-block;border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:10px;font-weight:650;font-size:.9rem;white-space:nowrap}
     .m-btn.pri{border:0;background:var(--green);color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(36,112,90,.2)}
     .m-btn.ghost{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;padding:5px 12px;font-size:.84rem}
@@ -216,6 +217,27 @@
     .m-unit-sub{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:6px;font-weight:800;font-size:.86rem}
     .m-total-bar{display:flex;justify-content:space-between;align-items:center;background:var(--navy);color:#fff;border-radius:10px;padding:8px 16px;font-weight:800;letter-spacing:.03em}.m-total-bar strong{font-size:1.3rem}
     .other a{color:var(--blue);font-weight:650}
+    /* Locação: planilha, quadros, calculadoras e nova locação */
+    .m-tiles5{grid-template-columns:repeat(5,1fr)}.m-tiles5 .m-tile strong{font-size:1.35rem}
+    .m-alerta{border:1px solid #efc4c4;background:#fdecec;color:#6e2323;border-radius:12px;padding:9px 14px;margin-bottom:14px;font-size:.86rem}.m-alerta>strong{color:var(--red)}.m-alerta ul{margin:3px 0 0;padding-left:20px}
+    .m-loc table{font-size:.7rem}.m-loc th{font-size:.6rem;padding:5px 4px;letter-spacing:.02em}.m-loc td{padding:5px 4px;vertical-align:top}
+    .m-loc td:nth-child(5){white-space:nowrap}.m-loc tr.m-semana td,.m-loc tr.m-total td{white-space:nowrap}
+    .m-loc tr.erro td{background:#fdecec}.m-loc tr.erro td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+    .m-loc tr.m-total td{background:var(--navy);color:#fff;font-weight:800;border:0}
+    .m-tag{display:inline-block;border-radius:6px;padding:0 6px;font-size:.66rem;font-weight:800;white-space:nowrap}
+    .m-tag.sim{background:#e3f1ec;color:#1d604d}.m-tag.nao{background:#fdf1dc;color:#8a5a12}.m-tag.bad{background:var(--red);color:#fff}.m-tag.pos{background:#eef2f4;color:var(--blue)}
+    .m-etapa{display:inline-block;margin-top:2px;font-size:.62rem;font-weight:700;color:var(--blue);background:#eef2f6;border-radius:5px;padding:0 5px}
+    .m-acoes{white-space:nowrap}.m-acoes .m-link{font-size:.7rem}
+    .m-quadros{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:12px;margin-top:14px}
+    .m-msg{margin:2px 0 0;color:var(--muted);font-size:.8rem}.m-mini{display:inline-flex;height:26px;width:80px;justify-content:flex-end;padding:3px 8px;font-size:.8rem}
+    .m-calcs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .m-calc{padding:16px 18px}.m-calc h2{font-size:1.15rem}.m-calc>p{margin:3px 0 12px;color:var(--muted);font-size:.86rem}
+    .m-calc .m-in{height:36px;font-size:.9rem}
+    .m-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .m-resultados{margin-top:12px;display:grid;gap:4px}.m-resultados div{display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px;background:#f6f8f9;font-size:.88rem}
+    .m-resultados div.dest{background:#e3f1ec;color:#1d604d;font-weight:800}
+    .m-prev{background:#f6f8f9;border:1px solid var(--line);border-radius:12px;padding:8px 14px}.m-prev h3{margin:0 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+    .m-prev dl{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:4px 18px}.m-prev dl div{display:flex;justify-content:space-between;gap:6px;font-size:.8rem;white-space:nowrap}.m-prev dt{color:var(--muted)}.m-prev dd{margin:0;font-weight:750}
     /* cartões de abertura e encerramento */
     .m-title{position:absolute;inset:0;z-index:15;background:linear-gradient(135deg,#173552 0%,#1f4262 60%,#24705a 140%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 110px}
     .m-title .lab{font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9fd3bf}
@@ -300,10 +322,7 @@
                 </div>
                 <div id="mSecFuncoes">
                   <div class="m-sec-head"><div><h2>Funções</h2><p>Ferramentas de trabalho de cada departamento. Acesso com login.</p></div></div>
-                  <div class="m-res-grid">
-                    <div class="m-res green" id="mCardDep"><span class="lab" id="mCardLab"></span><h3 id="mCardNome"></h3><p id="mCardDesc"></p><ul id="mCardItens"></ul><span class="m-open" id="mOpenDep"></span></div>
-                    <div class="m-res" id="mCardOutro"><span class="lab">Acesso restrito</span><h3 id="mOutroNome"></h3><p>Cada departamento tem o seu cartão, com login próprio.</p><ul><li>Ferramentas do dia a dia</li><li>Senhas e POP</li></ul><span class="m-open" id="mOutroAbrir"></span></div>
-                  </div>
+                  <div class="m-res-grid" id="mCartoes"></div>
                 </div>
               </div></div>
             </div></section>
@@ -397,6 +416,17 @@
   const passoPop=anterior=>({titulo:'Aba POP e documentos',texto:'Em <b>POP e documentos</b> está o procedimento do departamento e os outros materiais. Clique em <b>Abrir</b> para ler.',
     setup(){tela('app');aba(anterior)},
     async acts(A){await A.click('[data-t="pop"]');aba('pop');await A.pause(500);await A.hl('#mPop','O POP do departamento','below');await A.pause(2600);A.unhl()}});
+  const passoQuadro=(texto='O último item, <b>Quadro ↗</b>, abre o quadro de contratos (o antigo Trello), com um cartão para cada locação.')=>({titulo:'Quadro de contratos',texto,
+    voz:texto.replace(/<[^>]+>/g,'').replace(' ↗',''),
+    setup(){tela('app');aba('pop')},
+    async acts(A){await A.hl('#mTabQuadro','Abre o quadro','below');await A.pause(2800);A.unhl()}});
+  // Cartões da seção Funções do portal, na mesma ordem: [guia, rótulo, nome, descrição, itens, botão, verde?]
+  const CARTOES=[
+    ['pre-analise','Locação · Acesso restrito','Pré-análise','Área do departamento de pré-análise: controle das análises, senhas dos sistemas e POP.',['Análises com filtros e gráficos por corretora','Senhas dos sistemas (criptografadas)','POP e documentos do departamento'],'Abrir pré-análise →',true],
+    ['atendimento','Atendimento · Acesso restrito','Atendimento','Área do atendimento: leads do dia por corretor e unidade, senhas dos sistemas e POP.',['Leads de Itajaí e Navegantes com relatório do dia','Gráficos e resumo por corretor','Senhas dos sistemas (criptografadas) e POP'],'Abrir atendimento →',false],
+    ['locacao','Operação · Acesso restrito','Locação','Área da locação: contratos do mês com os cálculos da planilha, ranking, calculadoras, senhas dos sistemas e POP.',['Locações por semana com taxa, base e comissões automáticas','Ranking por corretora, garantias e captadoras','Calculadoras de aluguel proporcional e ALPOP'],'Abrir locação →',true],
+    ['quadro','Locação e Pré-análise · Acesso restrito','Quadro de contratos','A esteira dos contratos de locação, no formato do Trello, compartilhada entre a Locação e a Pré-análise.',['Cada locação lançada na planilha vira um cartão','Arrastar entre as etapas, etiquetas e comentários','Histórico completo, inclusive o que veio do Trello'],'Abrir quadro →',false],
+  ];
   function zerarSenhas(){if($('#mPw1')){$('#mPw1').textContent='••••••••';$('#mMostrar').textContent='Mostrar'}}
 
   // Atendimento: relatório do dia no formato da planilha (dados de exemplo).
@@ -410,14 +440,40 @@
     return `<div class="m-rel-day">${diaTitulo(data)}</div><div class="m-rel-grid">${unid}</div><div class="m-rel-total"><span>TOTAL</span><strong>${total}</strong></div>`;
   }
   const ontem=new Date(Date.now()-864e5), LEADS_ONTEM=[[7,5,4],[4,3]], LEADS_HOJE=[[6,4,3],[5,2]];
+  // Locação: planilha do mês com as mesmas contas da página (dados de exemplo).
+  const num=v=>v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), brl=v=>'R$ '+num(v);
+  // [REF, cidade, corretora, assinado, proponente, garantia, VGL, %, captadora, pós?]
+  const LOCS=[['AP0101','Itajaí','Corretora A',1,'CLIENTE EXEMPLO 1','CAUÇÃO',2500,100,'',0],['SA0202','Navegantes','Corretora B',1,'CLIENTE EXEMPLO 2','SEGURO FIANÇA',1800,60,'',0],
+    ['CA0303','Itajaí','Corretora A',0,'CLIENTE EXEMPLO 3','',3200,50,'',0],['AP0404','Itajaí','Corretora C',1,'CLIENTE EXEMPLO 4','FIADOR',2300,100,'CAPTADORA X',1]];
+  const LOC_NOVA=['AP0000','Itajaí','Corretora A',1,'CLIENTE EXEMPLO','CAUÇÃO',2500,60,'',0];
+  const contas=r=>{const tx=r[6]*r[7]/100,base=tx*.9;return {tx,base,corr:base*.25,stef:base*.1,du:base*.01,cap:tx*.05,age:tx*.08}};
+  function planilha(lista){
+    const soma=k=>lista.reduce((a,r)=>a+contas(r)[k],0),vgl=lista.reduce((a,r)=>a+r[6],0),ass=lista.filter(r=>r[3]).length;
+    $('#mTiles').innerHTML=[['Locações',lista.length,'contratos'],['VGL',brl(vgl),'soma dos aluguéis'],['Taxa de locação',brl(soma('tx')),'VGL × %'],['Base de cálculo',brl(soma('base')),'taxa × 90%'],['Assinados',`${ass} de ${lista.length}`,lista.length-ass?`${lista.length-ass} ainda sem assinatura`:'todos assinados']]
+      .map(([a,b,c])=>`<div class="m-card m-tile"><span>${a}</span><strong>${b}</strong><small>${c}</small></div>`).join('');
+    const linha=(r,i)=>{const c=contas(r),erro=!r[5];return `<tr${erro?' class="erro" id="mLinhaErro"':''}${r===LOC_NOVA?' class="new" id="mLinhaNova"':''}><td><strong>${r[0]}</strong></td><td>${r[1]}</td><td>${r[2]}</td><td><span class="m-tag ${r[3]?'sim':'nao'}">${r[3]?'SIM':'NÃO'}</span></td>
+      <td>${r[4]}<br><span class="m-etapa">▸ ENTRADA DA SEMANA</span></td><td>${r[5]||'<span class="m-tag bad">NÃO INFORMADA</span>'}</td><td class="num"><strong>${num(r[6])}</strong></td><td class="num">${r[7]}%</td>
+      <td class="num">${num(c.tx)}</td><td class="num">${num(c.base)}</td><td class="num">${num(c.corr)}</td><td class="num">${num(c.stef)}</td><td class="num">${num(c.du)}</td><td class="num">${r[9]?num(c.cap):'–'}</td>
+      <td>${r[8]?r[8]+' ':''}<span class="m-tag pos">${r[9]?'PÓS':'NOVA'}</span></td><td class="num">${r[9]?'–':num(c.age)}</td><td class="m-acoes"><span class="m-link"${erro?' id="mEditarErro"':''}>Editar</span><span class="m-link" style="color:var(--red)">Excluir</span></td></tr>`};
+    $('#mPlanilha').innerHTML=`<tr class="m-semana"><td colspan="17">SEMANA 04 <span style="font-weight:600">22/09 a 28/09</span></td></tr>${lista.map(linha).join('')}<tr class="m-total"><td colspan="6">TOTAL DO MÊS</td><td class="num">${num(vgl)}</td><td></td><td class="num">${num(soma('tx'))}</td><td class="num">${num(soma('base'))}</td><td class="num">${num(soma('corr'))}</td><td class="num">${num(soma('stef'))}</td><td class="num">${num(soma('du'))}</td><td></td><td></td><td></td><td></td></tr>`;
+    const nomes=[...new Set(lista.map(r=>r[2]))].map(n=>{const ls=lista.filter(r=>r[2]===n),v=ls.reduce((a,r)=>a+r[6],0);return [n,ls.length,v]}).sort((a,b)=>b[2]-a[2]);
+    $('#mRankBody').innerHTML=nomes.map(([n,q,v])=>`<tr><td>${n}</td><td class="num">${q}</td><td class="num">${num(v)}</td><td class="num">${num(v*.1)}</td><td class="num"><span class="m-in m-mini">0,00</span></td></tr>`).join('');
+  }
+  function preverLoc(){const vgl=parseFloat(($('#lVgl').value||'0').replace(/\./g,'').replace(',','.'))||0,pct=parseFloat($('#lPct').value)||0,c=contas([0,0,0,0,0,0,vgl,pct]);
+    $('#lPrev').innerHTML=[['Tx de loc.',c.tx],['Base de cálculo',c.base],['Corretora 25%',c.corr],['Stefani 10%',c.stef],['Du 1%',c.du],['Age. novo 8%',c.age],['Ajuda de custo 10%',vgl*.1]].map(([a,v])=>`<div><dt>${a}</dt><dd>${brl(v)}</dd></div>`).join('')}
+  function calcular(){
+    const n=s=>parseFloat(($(s).textContent||$(s).value||'0').replace(/\./g,'').replace(',','.'))||0;
+    const a1=n('#pA1'),d1=n('#pD1'),a2=n('#pA2'),d2=n('#pD2'),p=n('#pPct')/100,prop1=a1/30*d1,taxa=a2*p,taxa1=prop1*p;
+    const res=l=>l.map(([a,v,d])=>`<div${d?' class="dest"':''}><span>${a}</span><strong>${brl(v)}</strong></div>`).join('');
+    $('#pRes').innerHTML=res([['Valor proporcional do 1º mês',prop1],['Valor proporcional do 2º mês',a2/30*d2],['Taxa 1 de 2',taxa1],['Taxa 2 de 2',taxa-taxa1],['Taxa de locação total',taxa,true]]);
+    const al=n('#aAluguel'),adm=al*n('#aAdm')/100,prim=al*n('#aCom')/100,ano=prim+adm*11;
+    $('#aRes').innerHTML=res([['Administração mensal',adm],['Comissão do 1º aluguel',prim],['Total de administração no ano',ano],['Total que o locador recebe no ano',al*12-ano,true]]);
+  }
   function somarDlg(){let total=0;$$('#mDlgLeads .m-unit').forEach(u=>{const s=$$('input',u).reduce((a,i)=>a+(parseInt(i.value,10)||0),0);$('[data-sub]',u).textContent=s;total+=s});$('#mDlgTotal').textContent=total}
 
   const GUIAS={
     'pre-analise':{
-      nome:'Pré-análise',a:'a',na:'na',da:'da',pagina:'pre-analise.html',rotulo:'Locação · Acesso restrito',posicao:1,verde:true,abaInicial:'analises',
-      desc:'Área do departamento de pré-análise: controle das análises, senhas dos sistemas e POP.',
-      itens:['Análises com filtros e gráficos por corretora','Senhas dos sistemas (criptografadas)','POP e documentos do departamento'],
-      abrir:'Abrir pré-análise →',vizinho:['Atendimento','Abrir atendimento →'],
+      nome:'Pré-análise',a:'a',na:'na',da:'da',pagina:'pre-analise.html',abaInicial:'analises',abrir:'Abrir pré-análise →',
       app:`<div class="m-app">
         <div class="m-dept"><h1>Pré-análise</h1><div class="m-tabs" id="mTabs"><span data-t="analises">Análises</span><span data-t="locacoes">Locações</span><span data-t="validacoes">Validações</span><span data-t="senhas">Senhas</span><span data-t="pop">POP e documentos</span><span id="mTabQuadro">Quadro ↗</span></div></div>
 
@@ -515,10 +571,7 @@
           async acts(A){await A.click('[data-t="validacoes"]');aba('validacoes');await A.pause(500);await A.hl('#mLinkSpc','Clique para abrir o site','below');await A.pause(2600);A.unhl()}},
         passoSenhas('validacoes'),
         passoPop('senhas'),
-        {titulo:'Quadro de contratos',texto:'O último item, <b>Quadro ↗</b>, abre o quadro de contratos (o antigo Trello), com um cartão para cada locação.',
-          voz:'O último item, Quadro, abre o quadro de contratos, o antigo Trello, com um cartão para cada locação.',
-          setup(){tela('app');aba('pop')},
-          async acts(A){await A.hl('#mTabQuadro','Abre o quadro','below');await A.pause(2800);A.unhl()}},
+        passoQuadro(),
       ],
       zerar(){
         this.lista??=$('#mLista').innerHTML;$('#mLista').innerHTML=this.lista;
@@ -528,10 +581,7 @@
     },
 
     'atendimento':{
-      nome:'Atendimento',a:'o',na:'no',da:'do',pagina:'atendimento.html',rotulo:'Atendimento · Acesso restrito',posicao:2,verde:false,abaInicial:'leads',
-      desc:'Área do atendimento: leads do dia por corretor e unidade, senhas dos sistemas e POP.',
-      itens:['Leads de Itajaí e Navegantes com relatório do dia','Gráficos e resumo por corretor','Senhas dos sistemas (criptografadas) e POP'],
-      abrir:'Abrir atendimento →',vizinho:['Pré-análise','Abrir pré-análise →'],
+      nome:'Atendimento',a:'o',na:'no',da:'do',pagina:'atendimento.html',abaInicial:'leads',abrir:'Abrir atendimento →',
       app:`<div class="m-app">
         <div class="m-dept"><h1>Atendimento</h1><div class="m-tabs" id="mTabs"><span data-t="leads">Leads</span><span data-t="senhas">Senhas</span><span data-t="pop">POP e documentos</span></div></div>
 
@@ -598,6 +648,108 @@
         $('#mDlg').hidden=true;$('#mDlgDia').textContent=hoje.toLocaleDateString('pt-BR');$$('#mDlgLeads input').forEach(i=>i.value='');somarDlg();
         $('#mRelData').textContent=ontem.toLocaleDateString('pt-BR');$('#mRelBody').innerHTML=relatorio(ontem,LEADS_ONTEM);rolarApp(false);
       }
+    },
+
+    'locacao':{
+      nome:'Locação',a:'a',na:'na',da:'da',pagina:'locacao.html',abaInicial:'locacoes',abrir:'Abrir locação →',
+      app:`<div class="m-app">
+        <div class="m-dept"><h1>Locação</h1><div class="m-tabs" id="mTabs"><span data-t="locacoes">Locações</span><span data-t="calculadoras">Calculadoras</span><span data-t="senhas">Senhas</span><span data-t="pop">POP e documentos</span><span id="mTabQuadro">Quadro ↗</span></div></div>
+
+        <div data-mtab="locacoes">
+          <div class="m-top"><div><h2>Locações do mês</h2><p>setembro de 2026</p></div><div class="acts"><span class="m-btn">Baixar planilha</span><span class="m-btn pri" id="mNovaLoc">+ Nova locação</span></div></div>
+          <div class="m-card m-filters" id="mFiltros" style="grid-template-columns:auto 1fr 1fr 1.3fr auto">
+            <div class="m-field"><span class="l">Mês</span><div style="display:flex;gap:6px" id="mMes"><span class="m-btn">←</span><div class="m-in" style="width:170px;font-weight:700">setembro de 2026</div><span class="m-btn">→</span></div></div>
+            <div class="m-field"><span class="l">Corretora</span><div class="m-in">Todas</div></div>
+            <div class="m-field"><span class="l">Cidade</span><div class="m-in">Todas</div></div>
+            <div class="m-field"><span class="l">Buscar</span><div class="m-in"><span class="ph">REF ou proponente</span></div></div>
+            <span class="m-btn">Limpar</span>
+          </div>
+          <div class="m-alerta" id="mAlerta"><strong>Atenção: 1 ponto para conferir neste mês</strong> (linhas em vermelho na planilha)<ul><li><strong>CA0303</strong> (CLIENTE EXEMPLO 3) está sem garantia. Clique em "Editar" para informar.</li></ul></div>
+          <div class="m-tiles m-tiles5" id="mTiles"></div>
+          <div class="m-card m-table m-loc" id="mPlanilhaCard"><div class="head"><h2>Planilha do mês</h2></div>
+            <table><thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th><th class="num">Tx de loc.</th><th class="num">Base de cálculo</th><th class="num">Corretora 25%</th><th class="num">Stefani 10%</th><th class="num">Du 1%</th><th class="num">Cap. imob. 5%</th><th>Nome cap.</th><th class="num">Age. novo 8%</th><th></th></tr></thead><tbody id="mPlanilha"></tbody></table></div>
+          <div class="m-quadros" id="mQuadros">
+            <div class="m-card m-table" id="mRanking"><div class="head"><h2>Ranking por corretora</h2></div><p class="m-msg">Ajuda de custo = VGL × 10%. A bonificação é digitada aqui e fica salva para o mês.</p>
+              <table><thead><tr><th>Corretora</th><th class="num">Locações</th><th class="num">VGL</th><th class="num">Ajuda de custo</th><th class="num">Bonificação</th></tr></thead><tbody id="mRankBody"></tbody></table></div>
+            <div class="m-card m-table"><div class="head"><h2>Garantias</h2></div><table><thead><tr><th>Garantia</th><th class="num">Locações</th></tr></thead><tbody><tr><td>CAUÇÃO</td><td class="num">1</td></tr><tr><td>SEGURO FIANÇA</td><td class="num">1</td></tr><tr><td>FIADOR</td><td class="num">1</td></tr><tr><td>NÃO INFORMADA</td><td class="num">1</td></tr></tbody></table></div>
+            <div class="m-card m-table"><div class="head"><h2>Captadoras</h2></div><table><thead><tr><th>Captadora</th><th class="num">Locações</th></tr></thead><tbody><tr><td>CAPTADORA X</td><td class="num">1</td></tr></tbody></table></div>
+          </div>
+        </div>
+
+        <div data-mtab="calculadoras">
+          <div class="m-top"><div><h2>Calculadoras</h2><p>As mesmas contas das abas "Calculadora de aluguel proporcional" e "ALPOP" da planilha. Nada aqui é salvo.</p></div></div>
+          <div class="m-calcs">
+            <div class="m-card m-calc" id="mCalcProp"><h2>Aluguel proporcional</h2><p>Divide a taxa de locação e as comissões em duas parcelas, pelo número de dias do primeiro mês.</p>
+              <div class="m-grid2"><div class="m-field"><span class="l">Aluguel do 1º mês (R$)</span><div class="m-in" id="pA1">1.300,00</div></div><div class="m-field"><span class="l">Dias no 1º mês</span><div class="m-in" id="pD1">21</div></div>
+                <div class="m-field"><span class="l">Aluguel do 2º mês (R$)</span><div class="m-in" id="pA2">1.300,00</div></div><div class="m-field"><span class="l">Dias no 2º mês</span><div class="m-in" id="pD2">8</div></div>
+                <div class="m-field"><span class="l">Taxa de locação (%)</span><div class="m-in" id="pPct">50</div></div></div>
+              <div class="m-resultados" id="pRes"></div></div>
+            <div class="m-card m-calc" id="mCalcAlpop"><h2>ALPOP</h2><p>Quanto a imobiliária recebe no ano e quanto sobra para o locador.</p>
+              <div class="m-grid3"><div class="m-field"><span class="l">Aluguel (R$)</span><input class="m-in" id="aAluguel" tabindex="-1" readonly></div><div class="m-field"><span class="l">Administração (%)</span><div class="m-in" id="aAdm">15</div></div><div class="m-field"><span class="l">1º aluguel (%)</span><div class="m-in" id="aCom">50</div></div></div>
+              <div class="m-resultados" id="aRes"></div></div>
+          </div>
+        </div>
+
+        ${telaSenhas('Acessos aos sistemas usados pela locação. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".')}
+        ${telaPop('Procedimento operacional padrão da locação e demais materiais.','POP da Locação')}
+
+        <div class="m-dlg-back" id="mDlg" hidden><div class="m-dlg" style="width:780px">
+          <div class="m-dlg-head"><h2>Nova locação</h2><span class="m-x">×</span></div>
+          <div class="m-dlg-body">
+            <div class="m-grid3"><div class="m-field"><span class="l">Data</span><div class="m-in" id="lData"></div></div><div class="m-field"><span class="l">REF (código do imóvel)</span><input class="m-in" id="lRef" tabindex="-1" readonly placeholder="Ex.: AP1620"></div><div class="m-field"><span class="l">Cidade</span><div class="m-in" id="lCidade"></div></div></div>
+            <div class="m-field"><span class="l">Proponente</span><input class="m-in" id="lProp" tabindex="-1" readonly></div>
+            <div class="m-grid3"><div class="m-field"><span class="l">Corretora</span><div class="m-in" id="lCorretora"></div></div><div class="m-field"><span class="l">Garantia</span><div class="m-in" id="lGarantia"></div></div><div class="m-field"><span class="l">Contrato assinado?</span><div class="m-seg"><span id="lSim">Sim</span><span id="lNao">Não</span></div></div></div>
+            <div class="m-grid3"><div class="m-field"><span class="l">VGL (valor do aluguel, R$)</span><input class="m-in" id="lVgl" tabindex="-1" readonly placeholder="0,00" style="text-align:right"></div><div class="m-field"><span class="l">% da taxa de locação</span><input class="m-in" id="lPct" tabindex="-1" readonly placeholder="60" style="text-align:right"></div><div class="m-field"><span class="l">Nome da captadora</span><div class="m-in"><span class="ph">Opcional</span></div></div></div>
+            <div class="m-field"><span class="l">Tipo de captação</span><div class="m-seg"><span class="on">Captação nova (Age. novo 8%)</span><span>Cap. imobiliária – pós (5%)</span></div></div>
+            <div class="m-prev" id="mPrev"><h3>Cálculo automático</h3><dl id="lPrev"></dl></div>
+            <div class="m-actions"><span class="m-btn">Cancelar</span><span class="m-btn pri" id="lSalvar">Salvar</span></div>
+          </div>
+        </div></div>
+      </div>`,
+      passos:[
+        {titulo:'Aba Locações',texto:'A aba <b>Locações</b> é a planilha do mês. Os quadros somam as locações, o VGL, a taxa de locação, a base de cálculo e quantos contratos já foram assinados. Use as setas ← → para trocar o mês e os filtros para achar uma corretora, cidade ou REF.',
+          voz:'A aba Locações é a planilha do mês. Os quadros somam as locações, o VGL, a taxa de locação, a base de cálculo e quantos contratos já foram assinados. Use as setas para trocar o mês e os filtros para achar uma corretora, cidade ou REF.',
+          setup(){tela('app');aba('locacoes')},
+          async acts(A){await A.hl('#mTiles','Totais do mês','below');await A.pause(2800);await A.hl('#mMes','Trocar o mês','below');await A.pause(2400);A.unhl()}},
+        {titulo:'Lançar uma nova locação',texto:'Clique em <b>+ Nova locação</b> e preencha a data, a REF do imóvel, a cidade, o proponente, a corretora, a garantia, se o contrato já foi assinado, o <b>VGL</b> (valor do aluguel) e a <b>%</b> da taxa de locação. Se tiver captadora, informe o nome e o tipo de captação. O <b>Cálculo automático</b> mostra a taxa, a base e as comissões antes de salvar. Clique em <b>Salvar</b>: a locação entra na planilha e vira um cartão no Quadro.',
+          voz:'Clique em Nova locação e preencha a data, a REF do imóvel, a cidade, o proponente, a corretora, a garantia, se o contrato já foi assinado, o VGL, que é o valor do aluguel, e a porcentagem da taxa de locação. Se tiver captadora, informe o nome e o tipo de captação. O cálculo automático mostra a taxa, a base e as comissões antes de salvar. Clique em Salvar: a locação entra na planilha e vira um cartão no Quadro.',
+          setup(){tela('app');aba('locacoes')},
+          async acts(A){
+            await A.click('#mNovaLoc');$('#mDlg').hidden=false;await A.pause(500);
+            await A.click('#lRef');await A.type('#lRef','AP0000');
+            await A.click('#lCidade');$('#lCidade').textContent='Itajaí';await A.pause(200);
+            await A.click('#lProp');await A.type('#lProp','CLIENTE EXEMPLO');
+            await A.click('#lCorretora');$('#lCorretora').textContent='Corretora A';await A.pause(200);
+            await A.click('#lGarantia');$('#lGarantia').textContent='CAUÇÃO';await A.pause(200);
+            await A.click('#lSim');$('#lSim').classList.add('on');$('#lNao').classList.remove('on');await A.pause(200);
+            await A.click('#lVgl');await A.type('#lVgl','2.500,00');preverLoc();
+            await A.click('#lPct');await A.type('#lPct','60');preverLoc();
+            await A.hl('#mPrev','Calculado sozinho','above');await A.pause(2600);A.unhl();
+            await A.click('#lSalvar');$('#mDlg').hidden=true;planilha([...LOCS,LOC_NOVA]);toast('Locação salva');rolarApp(true,'#mLinhaNova');
+            await A.pause(1200);toast('');await A.hl('#mLinhaNova','A locação nova','above');await A.pause(2400);A.unhl()}},
+        {titulo:'Linhas em vermelho',texto:'Uma linha em <b>vermelho</b> tem algo a conferir: REF repetida no mês ou locação sem garantia. O aviso no alto da planilha diz o que é. Para corrigir, clique em <b>Editar</b> no fim da linha.',
+          setup(){tela('app');aba('locacoes')},
+          async acts(A){await A.hl('#mAlerta','O que conferir','below');await A.pause(2600);A.unhl();rolarApp(true,'#mLinhaErro');await A.pause(1100);
+            await A.hl('#mLinhaErro','Linha em vermelho','above');await A.pause(2000);A.unhl();await A.click('#mEditarErro');await A.pause(600)}},
+        {titulo:'Ranking, garantias e captadoras',texto:'Mais abaixo ficam o <b>Ranking por corretora</b>, com a ajuda de custo (VGL × 10%) e a bonificação, que você digita e fica salva no mês, e os quadros de <b>Garantias</b> e <b>Captadoras</b>.',
+          voz:'Mais abaixo ficam o Ranking por corretora, com a ajuda de custo, que é dez por cento do VGL, e a bonificação, que você digita e fica salva no mês, e os quadros de Garantias e Captadoras.',
+          setup(){tela('app');aba('locacoes')},
+          async acts(A){rolarApp(true,'#mQuadros');await A.pause(1200);await A.hl('#mRanking','Ranking do mês','above');await A.pause(2800);A.unhl()}},
+        {titulo:'Aba Calculadoras',texto:'Na aba <b>Calculadoras</b> estão o <b>Aluguel proporcional</b> e o <b>ALPOP</b>, as mesmas contas da planilha. Troque um valor e o resultado muda na hora. Nada aqui é salvo.',
+          setup(){tela('app');aba('locacoes')},
+          async acts(A){await A.click('[data-t="calculadoras"]');aba('calculadoras');await A.pause(500);await A.hl('#mCalcProp','Aluguel proporcional','below');await A.pause(2400);
+            A.unhl();await A.click('#aAluguel');$('#aAluguel').value='';await A.type('#aAluguel','3.000,00');calcular();await A.hl('#aRes','Resultado na hora','above');await A.pause(2400);A.unhl()}},
+        passoSenhas('calculadoras'),
+        passoPop('senhas'),
+        passoQuadro('O último item, <b>Quadro ↗</b>, abre o quadro de contratos (o antigo Trello). Cada locação nova vira um cartão lá, e a etapa do cartão aparece embaixo do nome do proponente, na planilha.'),
+      ],
+      zerar(){
+        $('#mDlg').hidden=true;planilha(LOCS);rolarApp(false);
+        for(const id of ['#lRef','#lProp','#lVgl','#lPct'])$(id).value='';
+        $('#lData').textContent=hoje.toLocaleDateString('pt-BR');for(const id of ['#lCidade','#lCorretora','#lGarantia'])$(id).innerHTML='<span class="ph">Selecione…</span>';
+        $('#lSim').classList.remove('on');$('#lNao').classList.add('on');preverLoc();
+        $('#aAluguel').value='2.700,00';calcular();
+      }
     }
   };
   const LISTA_GUIAS=Object.entries(GUIAS).map(([s,g])=>[s,g.nome]);
@@ -611,12 +763,9 @@
   const shot=$('#shot'), stage=$('#stage');
   $('#mApp').innerHTML=G.app;
   $$('.dNome').forEach(e=>e.textContent=G.nome);$$('.dNomeMin').forEach(e=>e.textContent=G.a+' '+minusc);
-  $('#mCardLab').textContent=G.rotulo;$('#mCardNome').textContent=G.nome;$('#mCardDesc').textContent=G.desc;
-  $('#mCardItens').innerHTML=G.itens.map(i=>'<li>'+i+'</li>').join('');$('#mOpenDep').textContent=G.abrir;
-  $('#mOutroNome').textContent=G.vizinho[0];$('#mOutroAbrir').textContent=G.vizinho[1];
-  // Cartão na mesma posição e cor do portal de verdade.
-  $('#mCardDep').classList.toggle('green',G.verde);$('#mCardOutro').classList.toggle('green',!G.verde);
-  if(G.posicao===2)$('#mCardDep').style.order=2;
+  // Cartões de Funções como no portal de verdade (mesma ordem, cor e textos); o do departamento ganha os ids usados no vídeo.
+  $('#mCartoes').innerHTML=CARTOES.map(([s,rot,nome,desc,itens,abrir,verde])=>{const eu=GUIAS[s]===G;
+    return `<div class="m-res${verde?' green':''}"${eu?' id="mCardDep"':''}><span class="lab">${rot}</span><h3>${nome}</h3><p>${desc}</p><ul>${itens.map(i=>'<li>'+i+'</li>').join('')}</ul><span class="m-open"${eu?' id="mOpenDep"':''}>${abrir}</span>${GUIAS[s]?'<span class="m-guia">▶ Primeiro acesso? Veja o passo a passo em vídeo</span>':''}</div>`}).join('');
   $('#mWhoMail').textContent=EMAIL;$('#popPwUser').textContent=EMAIL;$('#cIntroLab').textContent='Primeiro acesso · '+G.nome;
   const hoje=new Date();
   $('#mHoje').textContent=hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
@@ -636,7 +785,8 @@
   function endereco(t){$('#brUrl').innerHTML=t?t.replace(/^[^/]+/,'<b style="font-weight:500">$&</b>'):'<span class="ph">Pesquise no Google ou digite um URL</span>'}
   function aba(nome){$$('[data-mtab]',shot).forEach(s=>s.hidden=s.dataset.mtab!==nome);$$('#mTabs [data-t]',shot).forEach(t=>t.classList.toggle('active',t.dataset.t===nome))}
   function menu(nome){$$('.m-nav [data-nav]',shot).forEach(n=>n.classList.toggle('active',n.dataset.nav===nome))}
-  function rolarPortal(fim){$('#mPortalIn').style.transform=fim?`translateY(${-($('#mSecFuncoes').offsetTop-24)}px)`:''}
+  // Desce até Funções; se o cartão do departamento estiver mais embaixo (2ª linha), desce até ele aparecer inteiro.
+  function rolarPortal(fim){const c=$('#mCardDep');$('#mPortalIn').style.transform=fim?`translateY(${-Math.max($('#mSecFuncoes').offsetTop-24,c.offsetTop+c.offsetHeight-670+24)}px)`:''}
   // Desce a página do departamento até o fim do elemento pedido (ex.: relatório do Atendimento).
   function rolarApp(fim,sel='#mRel'){
     // Mede a posição do elemento dentro do #mApp (não muda com a animação) e soma o topo do #mApp na tela simulada (670px de altura).
