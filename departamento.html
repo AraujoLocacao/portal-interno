@@ -69,6 +69,8 @@
     .nota{font-size:.84rem}.nota small{display:block;color:var(--muted);font-size:.76rem}
     .atv-card.auto{border-style:dashed;box-shadow:none;background:#fbfbf9}
     .ferramenta{overflow:hidden}.ferramenta iframe{display:block;width:100%;height:calc(100vh - 150px);min-height:640px;border:0;background:#fff}.ferramenta iframe:fullscreen{height:100vh}
+    .salvas{padding:14px 20px;margin-bottom:14px}.salvas summary{cursor:pointer;font-weight:800;color:var(--navy)}.salvas tr.aberta{background:#eef6f2}
+    .atual{background:#eef6f2;color:#1d4d3f;border:1px solid #cfe3da;border-radius:12px;padding:9px 14px;font-size:.88rem;margin:0 0 14px}
     .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}.doc .row-actions{text-align:left;margin-top:8px;margin-left:-4px}
     .empty-card{border:1px dashed #bac5cc;border-radius:14px;padding:26px;text-align:center;color:var(--muted);grid-column:1/-1}
     .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow)}
@@ -161,9 +163,14 @@
 
   <section id="tab-rescisao" data-tab hidden>
     <div class="top">
-      <div><h2>Calculadora de rescisão</h2><p>Conferência e cálculo de distratos, com leitura do contrato e das cobranças em PDF. Nada do que é preenchido fica salvo: ao sair, trocar de departamento ou recarregar a página, o cálculo é apagado.</p></div>
-      <div class="bar-actions"><button class="secondary" id="rescisaoCheia">Tela cheia</button></div>
+      <div><h2>Calculadora de rescisão</h2><p>Conferência e cálculo de distratos, com leitura do contrato e das cobranças em PDF. Para guardar, clique em "Salvar rescisão", no resumo da calculadora. O cálculo fica em "Rescisões salvas" para abrir de novo. Os PDFs e prints anexados não são salvos.</p></div>
+      <div class="bar-actions"><button class="secondary" id="rescisaoNova">+ Nova rescisão</button><button class="secondary" id="rescisaoCheia">Tela cheia</button></div>
     </div>
+    <details class="card salvas" id="salvasWrap"><summary id="salvasTitulo">Rescisões salvas</summary>
+      <input class="search-input" id="rBusca" type="search" placeholder="Buscar locatário ou imóvel" aria-label="Buscar rescisão salva" style="margin-top:12px">
+      <div class="table-wrap"><table id="salvasTable"></table></div>
+    </details>
+    <p class="atual" id="rescisaoAtual" hidden></p>
     <div class="card ferramenta"><p class="empty" id="rescisaoMsg">Carregando a calculadora…</p><iframe id="rescisaoFrame" title="Calculadora de rescisão" hidden sandbox="allow-scripts allow-modals allow-popups allow-popups-to-escape-sandbox allow-downloads"></iframe></div>
   </section>
 
@@ -385,7 +392,7 @@
     if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
     form.reset();
   };
-  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true};
+  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];rescisoes=[];rescAtual=null;pendente=null;alterado=false;$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true};
   $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
 
   // Esta área tem senhas: sai sozinha depois de 30 minutos sem uso.
@@ -396,17 +403,84 @@
   // ---------- Calculadora de rescisão ----------
   // O código da calculadora não fica no site (o repositório é público): está no bucket privado, em ferramentas/<departamento>/,
   // que só quem tem acesso ao departamento lê. Roda num iframe isolado, sem acesso ao login do portal.
-  // O uso dentro da calculadora avisa a página (postMessage) para não contar como inatividade.
-  const AVISA_USO='<script>["pointerdown","keydown","input"].forEach(e=>addEventListener(e,()=>parent.postMessage("portal:uso","*"),{passive:true}))<\/script>';
-  addEventListener('message',e=>{if(e.source===$('#rescisaoFrame').contentWindow&&e.data==='portal:uso')ultimoUso=Date.now()});
+  // O uso dentro da calculadora avisa a página (postMessage): não conta como inatividade e marca o cálculo como alterado.
+  // Salvar: a calculadora manda {tipo:'rescisao:salvar', estado, resumo}; a página grava em dep_rescisoes (supabase/repasses_rescisao.sql)
+  // e responde 'rescisao:salva'. Abrir: a página recarrega a calculadora e, quando ela avisa 'rescisao:pronta', manda 'rescisao:abrir'.
+  const AVISA_USO='<script>addEventListener("pointerdown",()=>parent.postMessage("portal:uso","*"),{passive:true});["keydown","input","change"].forEach(e=>addEventListener(e,()=>parent.postMessage("portal:alterou","*"),{passive:true}))<\/script>';
+  let calcHtml=null,rescisoes=[],rescAtual=null,pendente=null,alterado=false;
+  const frame=()=>$('#rescisaoFrame');
+  const quando=ts=>{const d=new Date(ts);return `${br(iso(d))} às ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+  const quem=e=>safe((e||'').split('@')[0]);
+  const saldoTxt=v=>v==null?'–':`${v<0?'A devolver':'A pagar'} ${Math.abs(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}`;
   async function loadRescisao(){
-    const msg=$('#rescisaoMsg'),fr=$('#rescisaoFrame');msg.hidden=false;msg.textContent='Carregando a calculadora…';
+    const msg=$('#rescisaoMsg');msg.hidden=false;msg.textContent='Carregando a calculadora…';
     const {data,error}=await db.storage.from(BUCKET).download(`ferramentas/${DEP.slug}/calculadora-rescisao.html`);
     if(error){msg.textContent='Não foi possível carregar a calculadora. Fale com a gerência.';return}
-    const html=await data.text();
-    fr.srcdoc=html.includes('</body>')?html.replace('</body>',AVISA_USO+'</body>'):html+AVISA_USO;fr.hidden=false;msg.hidden=true;
+    const html=await data.text();calcHtml=html.includes('</body>')?html.replace('</body>',AVISA_USO+'</body>'):html+AVISA_USO;
+    carregarCalc(null);msg.hidden=true;await loadSalvas();
   }
-  $('#rescisaoCheia').onclick=()=>{const fr=$('#rescisaoFrame');if(!fr.hidden)fr.requestFullscreen?.()};
+  function carregarCalc(reg){
+    if(!calcHtml)return;pendente=reg;rescAtual=null;alterado=false;
+    const fr=frame();fr.srcdoc=calcHtml;fr.hidden=false;mostrarAtual();
+  }
+  addEventListener('message',e=>{
+    const fr=frame();if(!fr.contentWindow||e.source!==fr.contentWindow)return;
+    ultimoUso=Date.now();const m=e.data;
+    if(m==='portal:alterou'){alterado=true;return}
+    if(m?.tipo==='rescisao:pronta'){
+      if(pendente){rescAtual=pendente.id;fr.contentWindow.postMessage({tipo:'rescisao:abrir',estado:pendente.estado,
+        info:`Rescisão salva aberta (última alteração em ${quando(pendente.atualizado_em)}${pendente.atualizado_por?' por '+pendente.atualizado_por.split('@')[0]:''}). Os anexos não ficam salvos: para ler um PDF de novo, envie o arquivo outra vez.`},'*')}
+      else rescAtual=null;
+      pendente=null;alterado=false;mostrarAtual();renderSalvas();
+    }
+    if(m?.tipo==='rescisao:salvar')salvarRescisao(m.estado,m.resumo);
+  });
+  async function salvarRescisao(estado,r){
+    const responder=(ok,info,erro)=>frame().contentWindow?.postMessage({tipo:'rescisao:salva',ok,info,erro},'*');
+    if(!r?.locatario&&!r?.imovel){responder(false,'','preencha o locatário ou o imóvel.');return}
+    const reg={locatario:r.locatario.slice(0,200)||null,imovel:r.imovel.slice(0,300)||null,entrega_chaves:r.chaves||null,saldo:Number.isFinite(r.saldo)?r.saldo:null,estado};
+    const q=rescAtual?db.from('dep_rescisoes').update(reg).eq('id',rescAtual):db.from('dep_rescisoes').insert({departamento:DEP.slug,...reg});
+    const {data,error}=await q.select('id,atualizado_em').single();
+    if(error){responder(false,'',error.message);return}
+    rescAtual=data.id;alterado=false;
+    responder(true,`Salvo em ${quando(data.atualizado_em)}. Para abrir de novo, use "Rescisões salvas", no alto da página.`);
+    toast('Rescisão salva');await loadSalvas();
+  }
+  async function loadSalvas(){
+    const {data,error}=await db.from('dep_rescisoes').select('id,locatario,imovel,entrega_chaves,saldo,criado_por,atualizado_em,atualizado_por').eq('departamento',DEP.slug).order('atualizado_em',{ascending:false});
+    if(error){$('#salvasTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
+    rescisoes=data;renderSalvas();
+  }
+  function renderSalvas(){
+    const q=$('#rBusca').value.trim().toLowerCase();
+    const list=rescisoes.filter(r=>!q||`${r.locatario||''} ${r.imovel||''}`.toLowerCase().includes(q));
+    $('#salvasTitulo').textContent=`Rescisões salvas (${rescisoes.length})`;mostrarAtual();
+    if(!list.length){$('#salvasTable').innerHTML=`<tbody><tr><td class="empty">${rescisoes.length?'Nenhuma rescisão encontrada.':'Nenhuma rescisão salva ainda. Preencha a calculadora e clique em "Salvar rescisão".'}</td></tr></tbody>`;return}
+    $('#salvasTable').innerHTML=`<thead><tr><th>Locatário</th><th>Imóvel</th><th>Entrega das chaves</th><th class="num">Saldo</th><th>Última alteração</th><th></th></tr></thead><tbody>${list.map(r=>`<tr${r.id===rescAtual?' class="aberta"':''}>
+      <td><strong>${safe(r.locatario||'–')}</strong>${r.id===rescAtual?' <span class="chip ok">aberta</span>':''}</td><td>${safe(r.imovel||'–')}</td><td>${br(r.entrega_chaves)||'–'}</td>
+      <td style="white-space:nowrap">${saldoTxt(r.saldo)}</td><td style="white-space:nowrap"><small class="muted">${quando(r.atualizado_em)}<br>${quem(r.atualizado_por||r.criado_por)}</small></td>
+      <td class="row-actions"><button class="link" data-abrir="${r.id}">Abrir</button><button class="link danger" data-del-resc="${r.id}">Excluir</button></td></tr>`).join('')}</tbody>`;
+  }
+  function mostrarAtual(){
+    const r=rescisoes.find(x=>x.id===rescAtual),el=$('#rescisaoAtual');el.hidden=!r;
+    if(r)el.innerHTML=`Aberta: <strong>${safe(r.locatario||r.imovel)}</strong>${r.locatario&&r.imovel?` · ${safe(r.imovel)}`:''}. "Salvar rescisão" atualiza esta mesma rescisão. Para começar outra, clique em "+ Nova rescisão".`;
+  }
+  $('#rBusca').addEventListener('input',renderSalvas);
+  $('#salvasTable').onclick=async e=>{
+    const d=e.target.dataset,r=rescisoes.find(x=>x.id===(d.abrir||d.delResc));if(!r)return;
+    if(d.abrir){
+      if(alterado&&!confirm('O cálculo que está na tela não foi salvo. Abrir outra rescisão mesmo assim?'))return;
+      const {data,error}=await db.from('dep_rescisoes').select('id,estado,atualizado_em,atualizado_por').eq('id',r.id).single();
+      if(error){alert('Não foi possível abrir: '+error.message);return}
+      carregarCalc(data);$('#salvasWrap').open=false;frame().scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    if(d.delResc&&confirm(`Excluir a rescisão de "${r.locatario||r.imovel}"? Não dá para desfazer.`)){
+      const {error}=await db.from('dep_rescisoes').delete().eq('id',r.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+      if(rescAtual===r.id)rescAtual=null;toast('Rescisão excluída');await loadSalvas();
+    }
+  };
+  $('#rescisaoNova').onclick=()=>{if(alterado&&!confirm('O cálculo que está na tela não foi salvo. Começar uma nova rescisão mesmo assim?'))return;carregarCalc(null)};
+  $('#rescisaoCheia').onclick=()=>{const fr=frame();if(!fr.hidden)fr.requestFullscreen?.()};
 
   // ---------- Abas ----------
   // As abas trocam por JavaScript (não por link): o navegador bloqueia o "#aba" quando a página é aberta como arquivo/cópia.
