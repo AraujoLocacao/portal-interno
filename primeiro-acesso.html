@@ -236,6 +236,29 @@
     .m-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
     .m-resultados{margin-top:12px;display:grid;gap:4px}.m-resultados div{display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px;background:#f6f8f9;font-size:.88rem}
     .m-resultados div.dest{background:#e3f1ec;color:#1d604d;font-weight:800}
+    /* Quadro de contratos */
+    .m-tools{display:flex;gap:10px;align-items:end;padding:14px 32px 10px}.m-tools .grow{flex:1}.m-tools h1{font-size:1.7rem}.m-tools p{margin:3px 0 0;color:var(--muted);font-size:.84rem}
+    .m-tools .m-in{height:36px;font-size:.86rem}.m-busca{width:230px}
+    .m-board{display:flex;gap:12px;align-items:flex-start;padding:4px 32px 20px;overflow:hidden}
+    .m-kcol{background:#e9edf0;border-radius:14px;width:282px;flex:none;display:flex;flex-direction:column}.m-kcol.entrada{box-shadow:inset 0 3px 0 var(--green)}
+    .m-kcol-head{padding:10px 12px 6px;display:flex;justify-content:space-between;gap:8px;align-items:start}.m-kcol-head h3{margin:0;font-size:.74rem;font-weight:800;line-height:1.3}.m-kcol-head small{color:var(--muted)}
+    .m-kcol-head span{background:#fff;border-radius:999px;padding:0 8px;font-size:.72rem;font-weight:800;color:var(--muted)}
+    .m-kcol-body{padding:4px 8px 8px;display:flex;flex-direction:column;gap:8px;min-height:40px}
+    .m-kcard{background:#fff;border-radius:10px;padding:8px 10px;box-shadow:0 1px 0 rgba(9,30,66,.18);border:1px solid transparent}
+    .m-kcard .t{font-size:.82rem;font-weight:650;line-height:1.35}.m-kcard .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:.72rem;color:var(--muted);align-items:center}
+    .m-kcard .plan{background:#e3f1ec;color:#1d604d;border-radius:5px;padding:0 6px;font-weight:750}.m-kcard .velho{color:var(--red);font-weight:750}
+    .m-qchips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}.m-qchip{display:inline-block;border-radius:5px;padding:1px 7px;font-size:.64rem;font-weight:800;line-height:1.5;white-space:nowrap}
+    .m-kcol-foot{padding:0 16px 10px;color:var(--muted);font-weight:650;font-size:.8rem}
+    .m-voando{position:absolute;z-index:23;transition:transform 1s cubic-bezier(.45,.05,.25,1);box-shadow:0 14px 34px rgba(0,0,0,.28)}.m-drag{opacity:.35}
+    .m-cgrid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px}
+    .m-row{display:flex;justify-content:space-between;align-items:center}.m-lbl{font-size:.7rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .m-desc{white-space:pre-wrap;background:#f6f8f9;border-radius:10px;padding:10px 12px;font-size:.86rem;margin-top:4px}
+    .m-coment{height:54px!important;margin-top:4px;resize:none;font-size:.86rem}
+    .m-hist{display:grid;gap:8px;margin-top:6px}.m-hist .h{font-size:.8rem}.m-hist .h small{color:var(--muted)}.m-hist .mov{color:#52616c}
+    .m-hist .com .txt{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin-top:3px}.m-hist .novo .txt{animation:novo 2.4s ease-out}
+    .m-av{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:.6rem;font-weight:800;margin-right:6px;vertical-align:middle}
+    .m-etq-picker{border:1px solid var(--line);border-radius:10px;padding:6px 8px;display:grid;gap:2px;margin-top:6px;font-size:.78rem}
+    .m-plan-box{border:1px solid #cfe3da;background:#f2f8f5;border-radius:10px;padding:8px 12px;font-size:.82rem;margin-top:4px}.m-plan-box dl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0 0}.m-plan-box dt{color:var(--muted)}.m-plan-box dd{margin:0;font-weight:700}
     .m-prev{background:#f6f8f9;border:1px solid var(--line);border-radius:12px;padding:8px 14px}.m-prev h3{margin:0 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
     .m-prev dl{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:4px 18px}.m-prev dl div{display:flex;justify-content:space-between;gap:6px;font-size:.8rem;white-space:nowrap}.m-prev dt{color:var(--muted)}.m-prev dd{margin:0;font-weight:750}
     /* cartões de abertura e encerramento */
@@ -330,7 +353,7 @@
             <section class="m-screen" data-screen="login">
               <div class="m-bar"><div><span class="back">← Portal interno</span> &nbsp;·&nbsp; <strong class="dNome"></strong></div></div>
               <div class="m-gate" id="mGate">
-                <h1 class="dNome"></h1><p>Área restrita. Entre com o seu e-mail e senha.</p>
+                <h1 class="dNome"></h1><p id="mGateTexto">Área restrita. Entre com o seu e-mail e senha.</p>
                 <div class="m-form">
                   <div class="m-field"><label>E-mail</label><input class="m-in" id="gEmail" tabindex="-1" readonly></div>
                   <div class="m-field"><label>Senha</label><input class="m-in" id="gSenha" type="password" tabindex="-1" readonly autocomplete="off"></div>
@@ -345,7 +368,7 @@
             </section>
 
             <section class="m-screen" data-screen="app">
-              <div class="m-bar"><div><span class="back">← Portal interno</span> &nbsp;·&nbsp; <strong class="dNome"></strong></div><div class="right" id="mWho"><span class="who" id="mWhoMail"></span><span class="m-btn ghost" id="mSair">Sair</span></div></div>
+              <div class="m-bar"><div><span class="back">← Portal interno</span> &nbsp;·&nbsp; <strong class="dNome"></strong><span class="back" id="mBarLinks"></span></div><div class="right" id="mWho"><span class="who" id="mWhoMail"></span><span class="m-btn ghost" id="mSair">Sair</span></div></div>
               <div id="mApp"></div>
             </section>
 
@@ -354,7 +377,7 @@
           <div class="br-pop" id="popFav" hidden><h4>Favorito adicionado</h4><div class="row"><span>Nome</span><div class="val">Portal Interno | Araujo Locação</div></div><div class="row"><span>Pasta</span><div class="val">Barra de favoritos</div></div><div class="btns"><span>Remover</span><span class="main" id="favOk">Concluído</span></div></div>
           <div class="br-pop" id="popPw" hidden><h4>Salvar senha?</h4><div class="row"><span>Usuário</span><div class="val" id="popPwUser"></div></div><div class="row"><span>Senha</span><div class="val">••••••••••</div></div><div class="btns"><span id="pwNunca">Nunca</span><span class="main" id="pwSalvar">Salvar</span></div></div>
 
-          <section class="m-title" data-card="intro" hidden><span class="lab" id="cIntroLab"></span><h1>Antes de começar</h1><ul><li>E-mail e senha entregues pela gerência</li><li>Computador com internet</li><li>Google Chrome ou Microsoft Edge</li></ul></section>
+          <section class="m-title" data-card="intro" hidden><span class="lab" id="cIntroLab"></span><h1>Antes de começar</h1><ul><li id="cIntroLogin">E-mail e senha entregues pela gerência</li><li>Computador com internet</li><li>Google Chrome ou Microsoft Edge</li></ul></section>
           <section class="m-title" data-card="fim" hidden><span class="lab">Pronto!</span><h1>Você já sabe entrar</h1><p>Da próxima vez: favoritos → Funções → <span class="dNome"></span> → e-mail e senha → Entrar.</p><ul><li>Não passe a sua senha para ninguém</li><li>Clique em Sair ao terminar</li><li>Dúvidas? Fale com a gerência</li></ul></section>
 
           <div id="ring" hidden></div><div id="tip" hidden></div><div id="keys" hidden></div>
@@ -469,6 +492,20 @@
     const al=n('#aAluguel'),adm=al*n('#aAdm')/100,prim=al*n('#aCom')/100,ano=prim+adm*11;
     $('#aRes').innerHTML=res([['Administração mensal',adm],['Comissão do 1º aluguel',prim],['Total de administração no ano',ano],['Total que o locador recebe no ano',al*12-ano,true]]);
   }
+  // Quadro de contratos: colunas e cartões de exemplo (nomes de colunas e cores de etiquetas iguais aos do quadro).
+  const COR_ETQ={URGENTE:['#c9372c','#fff'],'CAUÇÃO PENDENTE':['#6e5dc6','#fff'],'SOLICITADO VISTORIA':['#94c748','#37471f'],'VISTORIA AGENDADA':['#94c748','#37471f'],'CERTIDÃO PENDENTE':['#c9372c','#fff'],'MINUTA ENVIADA P/ SEGURO':['#5b7f24','#fff'],'COM PRAZO':['#f5cd47','#533f04']};
+  const chipQ=n=>`<span class="m-qchip" style="background:${COR_ETQ[n][0]};color:${COR_ETQ[n][1]}">${n}</span>`;
+  const kcard=(id,etqs,titulo,vgl,com,dias)=>`<article class="m-kcard" id="${id}">${etqs.length?`<div class="m-qchips">${etqs.map(chipQ).join('')}</div>`:''}<div class="t">${titulo}</div><div class="meta"><span class="plan">Planilha · ${brl(vgl)}</span>${com?`<span>💬 ${com}</span>`:''}<span class="${dias>=7?'velho':''}">${dias===0?'hoje':dias===1?'há 1 dia':`há ${dias} dias`}</span></div></article>`;
+  const COLS_Q=[
+    ['EMISSÃO DE CERTIDÕES',true,[['kNova',[],'AP0000 - CLIENTE EXEMPLO - '+new Date().toLocaleDateString('pt-BR').slice(0,5),2500,0,0],['k5',['CERTIDÃO PENDENTE'],'SA0505 - CLIENTE EXEMPLO 5 - 25/09',1900,0,2]]],
+    ['DOCUMENTOS, VISTORIA E/OU INFORMAÇÕES PENDENTE',false,[['k1',['SOLICITADO VISTORIA'],'AP0101 - CLIENTE EXEMPLO 1 - 22/09',2500,2,3],['k3',['URGENTE','CAUÇÃO PENDENTE'],'CA0303 - CLIENTE EXEMPLO 3 - 15/09',3200,4,9]]],
+    ['FALTA ATIVAÇÃO DA GARANTIA',false,[['k2',['MINUTA ENVIADA P/ SEGURO'],'SA0202 - CLIENTE EXEMPLO 2 - 20/09',1800,1,4]]],
+    ['PARA ELABORAÇÃO DE CONTRATO',false,[['k4',['COM PRAZO'],'AP0404 - CLIENTE EXEMPLO 4 - 18/09',2300,1,1]]],
+    ['CONTRATOS EM ANDAMENTO/',false,[['k6',[],'AP0606 - CLIENTE EXEMPLO 6 - 10/09',2100,0,5]]],
+  ];
+  const quadroHtml=()=>COLS_Q.map(([nome,entrada,cs],i)=>`<section class="m-kcol${entrada?' entrada':''}" id="mCol${i}"><div class="m-kcol-head"><h3>${nome}${entrada?' <small>· entrada</small>':''}</h3><span data-n>${cs.length}</span></div>
+    <div class="m-kcol-body" id="mColBody${i}">${cs.map(c=>kcard(...c)).join('')}</div><div class="m-kcol-foot">+ Adicionar cartão</div></section>`).join('');
+  const contarColunas=()=>$$('.m-kcol').forEach(c=>$('[data-n]',c).textContent=$$('.m-kcard:not([hidden])',c).length);
   function somarDlg(){let total=0;$$('#mDlgLeads .m-unit').forEach(u=>{const s=$$('input',u).reduce((a,i)=>a+(parseInt(i.value,10)||0),0);$('[data-sub]',u).textContent=s;total+=s});$('#mDlgTotal').textContent=total}
 
   const GUIAS={
@@ -750,6 +787,73 @@
         $('#lSim').classList.remove('on');$('#lNao').classList.add('on');preverLoc();
         $('#aAluguel').value='2.700,00';calcular();
       }
+    },
+
+    'quadro':{
+      nome:'Quadro de contratos',a:'o',na:'no',da:'do',pagina:'quadro.html',abaInicial:'',abrir:'Abrir quadro →',
+      intro:'Neste vídeo você aprende a entrar no Quadro de contratos pela primeira vez. O quadro usa o <b>mesmo e-mail e senha da Locação ou da Pré-análise</b>. Se você já entrou numa delas neste computador, o quadro abre direto, sem pedir senha.',
+      introLogin:'O mesmo e-mail e senha da Locação ou da Pré-análise',
+      gateTexto:'Área restrita da Locação e da Pré-análise. Entre com o seu e-mail e senha.',
+      linksBarra:' · Locação · Pré-análise',
+      entrou:{sel:'#mBarLinks',dica:'Atalhos',texto:'No alto, à direita, aparece o e-mail com que você entrou. Ao lado do nome do quadro ficam os atalhos para voltar à Locação ou à Pré-análise.'},
+      app:`<div class="m-tools"><div class="grow"><h1>Contratos de locação</h1><p>Cartões de exemplo em 17 colunas. Arraste os cartões entre as colunas ou clique para abrir.</p></div>
+          <input class="m-in m-busca" id="mBusca" tabindex="-1" readonly placeholder="Buscar REF, nome ou texto"><div class="m-in" id="mFiltroEtq" style="width:190px">Todas as etiquetas</div><span class="m-btn" id="mColunas">Colunas</span><span class="m-btn pri" id="mNovoCartao">+ Novo cartão</span></div>
+        <div class="m-board" id="mBoard"></div>
+
+        <div class="m-dlg-back" id="mDlg" hidden><div class="m-dlg" style="width:900px">
+          <div class="m-dlg-head" style="align-items:start"><div><h2>CA0303 - CLIENTE EXEMPLO 3 - 15/09</h2><p class="m-msg" style="margin:2px 0 0">na coluna DOCUMENTOS, VISTORIA E/OU INFORMAÇÕES PENDENTE · há 9 dia(s) nesta coluna</p></div><span class="m-x">×</span></div>
+          <div class="m-dlg-body"><div class="m-cgrid">
+            <div style="display:grid;gap:12px;align-content:start;min-width:0">
+              <div class="m-qchips" id="cChips">${chipQ('URGENTE')}${chipQ('CAUÇÃO PENDENTE')}</div>
+              <div><div class="m-row"><span class="m-lbl">Descrição</span><span class="m-link">Editar</span></div><div class="m-desc">Proponente: CLIENTE EXEMPLO 3\nGarantia: a definir</div></div>
+              <div><span class="m-lbl">Comentário</span><textarea class="m-in m-coment" id="cComent" tabindex="-1" readonly placeholder="Escreva um comentário…"></textarea><div style="margin-top:6px"><span class="m-btn pri" id="cComentar">Comentar</span></div></div>
+              <div><div class="m-row"><span class="m-lbl">Histórico</span><span class="m-msg">☐ Só comentários</span></div>
+                <div class="m-hist" id="cHist"></div></div>
+            </div>
+            <div style="display:grid;gap:12px;align-content:start">
+              <div class="m-field"><span class="l">Coluna</span><div class="m-in" style="font-size:.78rem">DOCUMENTOS, VISTORIA E/OU INFORMAÇÕES PENDENTE</div></div>
+              <div><div class="m-row"><span class="m-lbl">Etiquetas</span><span class="m-link" id="cEtqAbrir">Escolher</span></div>
+                <div class="m-etq-picker" id="cEtqBox" hidden><label>☑ URGENTE</label><label>☑ CAUÇÃO PENDENTE</label><label id="cEtqVist">☐ VISTORIA AGENDADA</label><label>☐ VISTORIA FEITA</label><label>☐ ASSINADO</label></div></div>
+              <div><span class="m-lbl">Planilha de locações</span><div class="m-plan-box" id="cPlan"><strong>CA0303</strong> · CLIENTE EXEMPLO 3<dl><dt>Corretora</dt><dd>Corretora A</dd><dt>Cidade</dt><dd>Itajaí</dd><dt>Garantia</dt><dd>Não informada</dd><dt>VGL</dt><dd>R$ 3.200,00</dd><dt>Assinado</dt><dd>Não</dd></dl></div></div>
+              <div class="m-msg">Criado em 15/09/2026<br><span class="m-link" style="color:var(--red);margin-left:-4px">Excluir cartão</span></div>
+            </div>
+          </div></div>
+        </div></div>`,
+      passos:[
+        {titulo:'As colunas',texto:'Cada coluna é uma etapa do contrato, como no Trello. A coluna marcada com <b>· entrada</b> recebe sozinha as locações novas lançadas na planilha. Role para o lado para ver as outras colunas.',
+          voz:'Cada coluna é uma etapa do contrato, como no Trello. A coluna marcada com entrada recebe sozinha as locações novas lançadas na planilha. Role para o lado para ver as outras colunas.',
+          setup(){tela('app')},
+          async acts(A){await A.hl('#mBoard','Cada coluna é uma etapa','above');await A.pause(2600);await A.hl('#mCol0','Locações novas entram aqui','above');await A.pause(2600);A.unhl()}},
+        {titulo:'Os cartões',texto:'Cada cartão mostra as etiquetas, o título (REF, nome e data de entrada), o valor da planilha, quantos comentários tem e há quanto tempo está na coluna. Tempo em <b>vermelho</b> quer dizer parado há 7 dias ou mais.',
+          setup(){tela('app')},
+          async acts(A){await A.hl('#k3','Etiquetas, título e valor','below');await A.pause(3000);await A.hl('#k3 .velho','Parado há 7 dias ou mais','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Mudar de etapa',texto:'Para mudar um cartão de etapa, clique nele, segure, arraste até a outra coluna e solte. No celular, abra o cartão e troque a <b>Coluna</b>.',
+          setup(){tela('app')},
+          async acts(A){await A.drag('#k1','#mColBody2',()=>{$('#mColBody2').prepend($('#k1'));$('#k1 .meta span:last-child').textContent='hoje';contarColunas()});await A.hl('#k1','Nova etapa','below');await A.pause(2400);A.unhl()}},
+        {titulo:'Abrir um cartão',texto:'Clique no cartão para abrir. À esquerda ficam a descrição, os comentários e o <b>histórico</b> de tudo o que aconteceu com ele. À direita, a coluna, as etiquetas e os dados da planilha de locações.',
+          setup(){tela('app')},
+          async acts(A){await A.click('#k3');$('#mDlg').hidden=false;await A.pause(700);await A.hl('#cHist','Tudo o que aconteceu','above');await A.pause(2600);await A.hl('#cPlan','Dados da planilha','above');await A.pause(2600);A.unhl()}},
+        {titulo:'Comentar e pôr etiqueta',texto:'Para registrar algo, escreva em <b>Comentário</b> e clique em <b>Comentar</b>: fica no histórico, com o seu nome e a data. Em <b>Etiquetas</b>, clique em <b>Escolher</b> e marque as que valem para o cartão.',
+          setup(){tela('app');$('#mDlg').hidden=false},
+          async acts(A){await A.click('#cComent');await A.type('#cComent','Vistoria agendada para sexta.');await A.click('#cComentar');
+            $('#cHist').insertAdjacentHTML('afterbegin',`<div class="h com novo"><div><span class="m-av">SN</span><strong>seunome</strong> <small>${hojeBR()} agora</small></div><div class="txt">Vistoria agendada para sexta.</div></div>`);$('#cComent').value='';await A.pause(900);
+            await A.click('#cEtqAbrir');$('#cEtqBox').hidden=false;await A.pause(500);await A.click('#cEtqVist');$('#cEtqVist').textContent='☑ VISTORIA AGENDADA';$('#cChips').insertAdjacentHTML('beforeend',chipQ('VISTORIA AGENDADA'));
+            await A.hl('#cChips','Etiqueta nova','below');await A.pause(2200);A.unhl()}},
+        {titulo:'Buscar e filtrar',texto:'Para achar um cartão, digite a REF ou o nome em <b>Buscar</b>: só ficam os cartões que combinam. Para ver só os cartões com uma etiqueta, escolha no filtro ao lado.',
+          setup(){tela('app')},
+          async acts(A){await A.click('#mBusca');await A.type('#mBusca','AP0404');$$('.m-kcard').forEach(k=>k.hidden=!k.textContent.includes('AP0404'));contarColunas();await A.pause(600);await A.hl('#k4','Achou','below');await A.pause(2400);A.unhl();await A.hl('#mFiltroEtq','Filtrar por etiqueta','below');await A.pause(2200);A.unhl()}},
+        {titulo:'Novo cartão e colunas',texto:'As locações lançadas na planilha viram cartão sozinhas. Use <b>+ Novo cartão</b> só para o que não está na planilha. Em <b>Colunas</b> dá para renomear, mudar a ordem e escolher a coluna de entrada.',
+          voz:'As locações lançadas na planilha viram cartão sozinhas. Use Novo cartão só para o que não está na planilha. Em Colunas dá para renomear, mudar a ordem e escolher a coluna de entrada.',
+          setup(){tela('app')},
+          async acts(A){await A.hl('#mNovoCartao','Só o que não está na planilha','below');await A.pause(2800);await A.hl('#mColunas','Organizar as colunas','below');await A.pause(2600);A.unhl()}},
+      ],
+      zerar(){
+        $('#mDlg').hidden=true;$('#mBoard').innerHTML=quadroHtml();$('#mBusca').value='';
+        $('#cHist').innerHTML=`<div class="h com"><div><span class="m-av">EQ</span><strong>equipe</strong> <small>há 2 dias</small></div><div class="txt">Aguardando documento do fiador.</div></div>
+          <div class="h mov"><div><span class="m-av">EQ</span><strong>equipe</strong> moveu de <em>EMISSÃO DE CERTIDÕES</em> para <em>DOCUMENTOS, VISTORIA E/OU INFORMAÇÕES PENDENTE</em> <small>· há 9 dias</small></div></div>
+          <div class="h mov"><div><span class="m-av">PL</span><strong>planilha</strong> criou o cartão em <em>EMISSÃO DE CERTIDÕES</em> <small>· 15/09</small></div></div>`;
+        $('#cChips').innerHTML=chipQ('URGENTE')+chipQ('CAUÇÃO PENDENTE');$('#cEtqBox').hidden=true;$('#cEtqVist').textContent='☐ VISTORIA AGENDADA';$('#cComent').value='';
+      }
     }
   };
   const LISTA_GUIAS=Object.entries(GUIAS).map(([s,g])=>[s,g.nome]);
@@ -761,7 +865,8 @@
 
   // ================= Tela simulada =================
   const shot=$('#shot'), stage=$('#stage');
-  $('#mApp').innerHTML=G.app;
+  $('#mApp').innerHTML=G.app;$('#mBarLinks').innerHTML=G.linksBarra||'';
+  if(G.gateTexto)$('#mGateTexto').textContent=G.gateTexto;if(G.introLogin)$('#cIntroLogin').textContent=G.introLogin;
   $$('.dNome').forEach(e=>e.textContent=G.nome);$$('.dNomeMin').forEach(e=>e.textContent=G.a+' '+minusc);
   // Cartões de Funções como no portal de verdade (mesma ordem, cor e textos); o do departamento ganha os ids usados no vídeo.
   $('#mCartoes').innerHTML=CARTOES.map(([s,rot,nome,desc,itens,abrir,verde])=>{const eu=GUIAS[s]===G;
@@ -842,11 +947,17 @@
       await wait(450);
     },
     unhl(){$('#ring').hidden=true;$('#tip').hidden=true},
+    // Arrasta um cartão até outra coluna: uma cópia acompanha o cursor e, ao soltar, "mover()" coloca o original no destino.
+    async drag(sel,destino,mover){
+      await A.move(sel);const el=$(sel,shot),b=caixa(el),d=caixa(destino);cursor.classList.add('down');await wait(300);
+      const f=el.cloneNode(true);f.removeAttribute('id');f.classList.add('m-voando');Object.assign(f.style,{left:b.x+'px',top:b.y+'px',width:b.w+'px'});shot.append(f);el.classList.add('m-drag');
+      const dx=d.x+8-b.x,dy=d.y+4-b.y;f.offsetHeight;f.style.transform=`translate(${dx}px,${dy}px) rotate(3deg)`;cursorEm(cx+dx,cy+dy);await wait(1000);
+      cursor.classList.remove('down');f.remove();el.classList.remove('m-drag');mover();await wait(400)},
   };
 
   // Parte 1 é igual para todos os departamentos; parte 2 vem do roteiro do departamento.
   const parte1=[
-    {titulo:'Antes de começar',texto:`Neste vídeo você aprende a entrar ${G.na} ${G.nome} pela primeira vez. Tenha em mãos o <b>e-mail e a senha</b> que a gerência entregou para você.`,
+    {titulo:'Antes de começar',texto:G.intro||`Neste vídeo você aprende a entrar ${G.na} ${G.nome} pela primeira vez. Tenha em mãos o <b>e-mail e a senha</b> que a gerência entregou para você.`,
       setup(){cartao('intro');cursorEm(1250,800,false)},async acts(A){await A.pause(800)}},
     {titulo:'Abra o portal',texto:`Abra o <b>Google Chrome</b> (ou o Edge), clique na barra de endereço lá em cima, digite <b>${SITE}</b> e aperte <b>Enter</b>.`,
       voz:'Abra o Google Chrome, ou o Edge, clique na barra de endereço lá em cima, digite o endereço do portal, que aparece na tela, e aperte Enter.',
@@ -878,9 +989,9 @@
       voz:'Se aparecer: e-mail ou senha incorretos, confira o que digitou e tente de novo. Se aparecer: sem acesso, o seu e-mail ainda não foi liberado. Fale com a gerência.',
       setup(){tela('login');$('#gEmail').value=EMAIL;$('#gSenha').value='exemplo12';$('#gMsg').hidden=false;cursorEm(900,560,false)},
       async acts(A){await A.hl('#gMsg','Confira e tente de novo','below');await A.pause(3000);A.unhl();$('#mGate').hidden=true;$('#mDenied').hidden=false;await A.pause(300);await A.hl('#mDenied','Fale com a gerência','below');await A.pause(2800);A.unhl()}},
-    {titulo:'Você entrou!',texto:'No alto, à direita, aparece o e-mail com que você entrou. Logo abaixo do título ficam as abas: cada uma é uma parte do trabalho.',
+    {titulo:'Você entrou!',texto:G.entrou?.texto||'No alto, à direita, aparece o e-mail com que você entrou. Logo abaixo do título ficam as abas: cada uma é uma parte do trabalho.',
       setup(){tela('app');cursorEm(900,560,false)},
-      async acts(A){await A.hl('#mWho','O seu e-mail','below');await A.pause(2400);await A.hl('#mTabs','As abas','below');await A.pause(2600);A.unhl()}},
+      async acts(A){await A.hl('#mWho','O seu e-mail','below');await A.pause(2400);await A.hl(G.entrou?.sel||'#mTabs',G.entrou?.dica||'As abas','below');await A.pause(2600);A.unhl()}},
   ];
   const parte3=[
     {titulo:'Ao terminar, clique em Sair',texto:`Quando terminar, clique em <b>Sair</b>, no canto de cima à direita. Por segurança, a área também sai sozinha depois de 30 minutos sem uso.`,
