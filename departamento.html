@@ -175,7 +175,7 @@
   </section>
 
   <section id="tab-adm" data-tab hidden>
-    <div class="top"><div><h2>Administradoras de condomínio</h2><p>Relatório das administradoras de condomínio. É a mesma lista em Locatário · Boletos, Locatário · Renovação e Proprietário · Repasses: o que um departamento atualiza, os outros veem.</p></div></div>
+    <div class="top"><div><h2>Administradoras de condomínio</h2><p>Relatório das administradoras de condomínio. É a mesma lista em Locatário · Boletos, Locatário · Renovação e Proprietário · Contas a Pagar: o que um departamento atualiza, os outros veem.</p></div></div>
     <div class="empty-card">Em preparação. Esta aba vai seguir a planilha de administradoras que vocês já usam.</div>
   </section>
 
@@ -298,7 +298,7 @@
       atividades:['Captação de imóveis','Documentos de proprietários','Chaveiro']},
     {slug:'corretoras-locacao',nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,
       atividades:['Responsável pela locação dos imóveis']},
-    // extras = abas próprias da área. "adm" (administradoras de condomínio) é a mesma lista em Boletos, Renovação e Repasses.
+    // extras = abas próprias da área. "adm" (administradoras de condomínio) é a mesma lista em Boletos, Renovação e Contas a Pagar.
     {slug:'boletos',limpo:true,nome:'Locatário · Boletos',area:'Financeiro',papel:'Boletos',ref:'Contrato / locatário',extras:['adm','alpop'],
       atividades:['Atendimento específico','Boletos Alpop','Boletos sem condomínio','Suporte a boletos com condomínio']},
     {slug:'renovacao',limpo:true,nome:'Locatário · Renovação',area:'Financeiro',papel:'Renovação',ref:'Contrato / locatário',extras:['adm'],
@@ -306,7 +306,8 @@
     {slug:'cobranca',limpo:true,nome:'Cobrança',area:'Financeiro',papel:'Inadimplência',ref:'Contrato / locatário',
       atividades:['Cobrança','Acionamento de garantia','Notificação de cobrança','Notificação de desocupação por inadimplência','Negativação','Retirada de negativação']},
     // publicado = já está no portal (28/09/2026). Os demais seguem como prévia, só para a gerência.
-    {slug:'repasses',publicado:true,limpo:true,nome:'Proprietário · Repasses',area:'Financeiro',papel:'Repasses',ref:'Imóvel (REF) / proprietário',extras:['rescisao','adm'],
+    // Nome trocado de "Proprietário · Repasses" em 28/09/2026. O slug continua "repasses" (link, acessos e arquivos no banco dependem dele).
+    {slug:'repasses',publicado:true,limpo:true,nome:'Proprietário · Contas a Pagar',area:'Financeiro',papel:'Contas a pagar',ref:'Imóvel (REF) / proprietário',extras:['rescisao','adm'],
       atividades:['Repasse','Extrato','Cálculo de rescisão','IR / DIMOB','Nota fiscal','Recibos']},
     // recebe = atividades que só entram quando outra área envia (ainda sem envio: ficam vazias).
     // energia = aba Energia, com os contratos que a Locação não marcou como transferidos (ver supabase/pos_locacao_energia.sql).
