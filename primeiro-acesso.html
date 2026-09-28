@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Primeiro acesso | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--navy:#173552;--blue:#294b68;--green:#24705a;--cream:#f5f5f0;--white:#fff;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10);--hl:#ffb21e}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+    button{font:inherit;color:inherit;cursor:pointer} [hidden]{display:none!important}
+    header.bar{background:var(--navy);color:#fff;padding:14px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .bar a{color:#cbd8e1;text-decoration:none;font-weight:600;font-size:.9rem}.bar a:hover{color:#fff}.bar strong{font-size:1.02rem}
+    main{padding:28px clamp(16px,4vw,48px) 64px;max-width:1500px;margin:0 auto}
+    h1{font-family:Georgia,serif;font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.1;margin:0}
+    h2{font-family:Georgia,serif;font-size:1.3rem;margin:0}
+    .intro{margin:0 0 22px}.intro p{margin:6px 0 0;color:var(--muted);max-width:760px}
+    .label{font-size:.75rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.11em}
+    .primary{border:0;background:var(--green);color:#fff;padding:10px 15px;border-radius:10px;font-weight:700;box-shadow:0 6px 18px rgba(36,112,90,.2)}.primary:hover{background:#1d604d}
+    .secondary{border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:10px;font-weight:650}.secondary:hover{border-color:#b6c5cf}
+    .secondary[aria-pressed="true"]{background:#e3f1ec;border-color:#b4d0c6;color:#1d604d}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+
+    /* ---------- Player ---------- */
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+    #player{padding:14px;min-width:0}
+    #stage{position:relative;width:100%;aspect-ratio:1200/750;overflow:hidden;border-radius:10px;background:#dfe3e6;box-shadow:inset 0 0 0 1px var(--line)}
+    .cover{position:absolute;inset:0;z-index:30;display:grid;place-items:center;background:rgba(15,35,55,.55);backdrop-filter:blur(2px);border:0;padding:0;width:100%;color:#fff;text-align:center}
+    .cover span{display:inline-flex;align-items:center;gap:12px;background:var(--green);padding:16px 26px;border-radius:999px;font-weight:800;font-size:clamp(1rem,2vw,1.25rem);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+    .cover span svg{width:22px;height:22px;fill:#fff}
+    .cover small{display:block;margin-top:12px;font-size:.9rem;color:#dbe6ee}
+    .cover:hover span{background:#1d604d}
+    .caption{padding:16px 6px 6px;min-height:118px}
+    .caption .label{display:block}
+    .caption h2{font-size:1.35rem;margin:3px 0 4px}
+    .caption p{margin:0;font-size:1.02rem;color:#33424e;max-width:900px}
+    .progress{display:flex;gap:3px;margin:12px 0 2px}.progress button{flex:1;height:7px;border:0;border-radius:4px;background:#e2e7ea;padding:0;position:relative;overflow:hidden}
+    .progress button.done{background:var(--green)}.progress button i{position:absolute;inset:0 auto 0 0;width:0;background:var(--green)}
+    .progress button:hover{background:#cfd8dd}.progress button.done:hover{background:#1d604d}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .controls .grow{flex:1}
+    .controls svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px;fill:currentColor}
+    .controls .primary{min-width:130px}
+    .steps{padding:16px 12px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+    .steps h3{margin:10px 8px 6px;font-size:.75rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.1em}.steps h3:first-child{margin-top:0}
+    .steps ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+    .steps button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;border:0;background:none;padding:7px 8px;border-radius:9px;font-weight:600;font-size:.9rem;color:#33424e}
+    .steps button:hover{background:#f1f4f5}
+    .steps button b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;background:#eef2f4;color:var(--blue)}
+    .steps button.done b{background:#e3f1ec;color:var(--green)}
+    .steps button.current{background:#e9eff4;color:var(--navy)}.steps button.current b{background:var(--navy);color:#fff}
+    .written{padding:24px 26px;margin-top:20px}
+    .written-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .written ol{margin:14px 0 0;padding-left:22px;display:grid;gap:10px;max-width:900px}
+    .written li strong{display:block}.written li span{color:#3b4a55}
+    .written .part{list-style:none;margin:12px 0 0 -22px;font-size:.75rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+    .note{margin:14px 0 0;color:var(--muted);font-size:.85rem}
+    .other{margin-top:14px;color:var(--muted);font-size:.9rem}
+    #player:fullscreen{background:#0d1f30;display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:0;border:0;padding:16px}
+    #player:fullscreen #stage{width:min(100%,calc((100vh - 230px) * 1.6))}
+    #player:fullscreen .caption,#player:fullscreen .controls,#player:fullscreen .progress{width:min(100%,calc((100vh - 230px) * 1.6))}
+    #player:fullscreen .caption h2,#player:fullscreen .caption p{color:#fff}#player:fullscreen .caption p{color:#d6e1e9}
+    @media(max-width:1000px){.layout{grid-template-columns:1fr}.steps{position:static;max-height:none}}
+    @media(max-width:560px){.caption h2{font-size:1.15rem}.caption p{font-size:.95rem}}
+    @media print{header.bar,.layout,.intro .other,.written-head button{display:none!important}body{background:#fff}.written{box-shadow:none;border:0;padding:0}}
+
+    /* ---------- Tela simulada (tudo com prefixo m- ou br-) ---------- */
+    #shot{position:absolute;left:0;top:0;width:1200px;height:750px;transform-origin:0 0;background:#fff;overflow:hidden;pointer-events:none;user-select:none;font-size:15px;line-height:1.5;color:var(--ink)}
+    .br-top{height:80px;background:#dee3e8;border-bottom:1px solid #c9d0d6}
+    .br-tabs{height:36px;display:flex;align-items:flex-end;padding:0 10px;gap:6px}
+    .br-tab{height:30px;width:250px;background:#fff;border-radius:9px 9px 0 0;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:12.5px;color:#333}
+    .br-tab span:nth-child(2){flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .br-fav{width:16px;height:16px;border-radius:4px;background:#294468 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E") center/100% no-repeat}
+    .br-fav.blank{background:#c9d0d6}
+    .br-plus{font-size:20px;color:#555;padding:0 0 4px 4px}
+    .br-bar{height:44px;background:#fff;display:flex;align-items:center;gap:14px;padding:0 14px}
+    .br-bar svg{width:18px;height:18px;stroke:#5f6368;fill:none;stroke-width:2}
+    .br-addr{flex:1;height:32px;border-radius:16px;background:#eef1f4;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:14px;color:#202124;border:2px solid transparent}
+    .br-addr.focus{background:#fff;border-color:#6da7ec}
+    .br-addr .ph{color:#80868b}
+    .br-addr .fill{flex:1}
+    .br-star{font-size:18px;color:#5f6368;line-height:1}.br-star.on{color:#1a73e8}
+    .br-prof{width:26px;height:26px;border-radius:50%;background:#b8c7d4}
+    .br-pop{position:absolute;right:52px;top:74px;width:330px;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.25);padding:16px 18px;z-index:12;font-size:13.5px}
+    .br-pop h4{margin:0 0 10px;font-size:15px}.br-pop .row{display:flex;gap:10px;align-items:center;margin-bottom:8px}.br-pop .row span{width:70px;color:#5f6368}
+    .br-pop .val{flex:1;border:1px solid #c9d0d6;border-radius:6px;padding:5px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .br-pop .btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+    .br-pop .btns span{border:1px solid #c9d0d6;border-radius:16px;padding:5px 16px;color:#1a73e8;font-weight:600}
+    .br-pop .btns span.main{background:#1a73e8;border-color:#1a73e8;color:#fff}
+    .vp{position:absolute;left:0;top:80px;width:1200px;height:670px;overflow:hidden;background:var(--cream)}
+    .m-screen{position:absolute;inset:0;overflow:hidden}
+    .m-blank{background:#fff;display:grid;place-items:center;align-content:center;gap:22px;height:100%}
+    .m-blank .logo{font-size:64px;font-weight:700;color:#c9d0d6;letter-spacing:-2px;font-family:Arial,sans-serif}
+    .m-blank .search{width:560px;height:46px;border-radius:23px;border:1px solid #dfe1e5;display:flex;align-items:center;padding:0 20px;color:#80868b;font-size:14px}
+    /* portal */
+    .m-portal{display:grid;grid-template-columns:240px 1fr;height:100%}
+    .m-side{background:var(--navy);color:#fff;padding:24px 16px;display:flex;flex-direction:column}
+    .m-brand{display:flex;align-items:center;gap:12px;padding:0 6px 22px;border-bottom:1px solid rgba(255,255,255,.14)}
+    .m-mark{width:42px;height:42px;border-radius:11px;background:#fff;display:block;object-fit:cover}
+    .m-brand strong{display:block;font-size:1rem}.m-brand span{display:block;color:#b9cad7;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase}
+    .m-nav{padding-top:18px;display:grid;gap:5px}
+    .m-nav div{color:#cbd8e1;padding:9px 11px;border-radius:10px;display:flex;gap:10px;align-items:center;font-weight:600;font-size:.92rem}
+    .m-nav div.active{background:rgba(255,255,255,.11);color:#fff}
+    .m-nav svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+    .m-side-foot{margin-top:auto;color:#9fb4c2;font-size:.74rem;padding:14px 6px 0}
+    .m-main{overflow:hidden;position:relative}
+    .m-main-in{padding:28px 44px 60px;position:relative;transition:transform .9s cubic-bezier(.4,0,.2,1)}
+    .m-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .m-topbar h1{font-size:2.1rem}.m-topbar p{margin:6px 0 0;color:var(--muted)}
+    .m-pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--blue);font-size:.85rem}
+    .m-cover{aspect-ratio:3/1;border-radius:16px;overflow:hidden;background:#84a6ce;margin-bottom:28px;box-shadow:var(--shadow)}
+    .m-cover img{display:block;width:100%;height:100%;object-fit:cover}
+    .m-sec-head{display:flex;justify-content:space-between;align-items:end;margin:0 0 14px}.m-sec-head h2{font-size:1.45rem}.m-sec-head p{margin:3px 0 0;color:var(--muted);font-size:.86rem}
+    .m-notices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:34px}
+    .m-notice{background:#fff;border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:14px;padding:16px;min-height:150px}
+    .m-notice.pri{border-top-color:var(--red)}.m-notice.ev{border-top-color:var(--amber)}
+    .m-tag{display:inline-block;border-radius:999px;background:#e7eef3;color:var(--blue);padding:3px 9px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+    .pri .m-tag{background:#f7e7e7;color:var(--red)}.ev .m-tag{background:#f7eedf;color:#8c5b18}
+    .m-notice h3{margin:0 0 6px;font-size:1rem}.m-notice p{margin:0;color:#52616c;font-size:.86rem}
+    .m-res-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:34px}
+    .m-res{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:236px}
+    .m-res .lab{font-size:.7rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.11em}
+    .m-res h3{font-family:Georgia,serif;font-size:1.4rem;margin:8px 0 6px}.m-res p{color:var(--muted);margin:0;font-size:.92rem}
+    .m-res ul{padding-left:18px;color:#52616c;font-size:.86rem;margin:10px 0 12px}
+    .m-open{margin-top:auto;align-self:flex-start;color:var(--blue);font-weight:800;border-bottom:2px solid #b6c5cf;padding:6px 0 1px}
+    .m-res.green .m-open{color:var(--green);border-color:#b4d0c6}
+    .m-btn{display:inline-block;border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:10px;font-weight:650;font-size:.9rem;white-space:nowrap}
+    .m-btn.pri{border:0;background:var(--green);color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(36,112,90,.2)}
+    .m-btn.ghost{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;padding:5px 12px;font-size:.84rem}
+    /* páginas de departamento */
+    .m-bar{background:var(--navy);color:#fff;padding:13px 40px;display:flex;justify-content:space-between;align-items:center;height:54px}
+    .m-bar .back{color:#cbd8e1;font-weight:600;font-size:.88rem}.m-bar strong{font-size:1rem}
+    .m-bar .right{display:flex;align-items:center;gap:10px}.m-bar .who{color:#b9cad7;font-size:.8rem}
+    .m-gate{width:420px;margin:48px auto 0;padding:28px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .m-gate h1{font-size:1.6rem;margin-bottom:4px}.m-gate p{color:var(--muted);margin:0 0 16px}
+    .m-form{display:grid;gap:13px}
+    .m-field{display:grid;gap:5px}.m-field>label,.m-field>span.l{font-size:.72rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .m-in{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:8px 11px;background:#fff;font:inherit;color:var(--ink);height:40px;display:flex;align-items:center}
+    input.m-in{display:block}
+    .m-in.focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .m-in .ph{color:#9aa4ab}
+    .m-gate .m-btn.pri{text-align:center;padding:10px}
+    .m-err{margin:0;font-size:.85rem;color:var(--red)}
+    .m-app{padding:20px 40px 0}
+    .m-dept{display:flex;justify-content:space-between;align-items:end;border-bottom:1px solid var(--line);margin-bottom:18px}
+    .m-dept h1{font-size:2rem;padding-bottom:10px}
+    .m-tabs{display:flex;gap:2px}.m-tabs span{padding:9px 14px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;font-size:.93rem}
+    .m-tabs span.active{color:var(--navy);border-bottom-color:var(--green)}
+    .m-top{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px;gap:16px}
+    .m-top h2{font-size:1.4rem}.m-top p{margin:3px 0 0;color:var(--muted);font-size:.88rem;max-width:620px}
+    .m-top .acts{display:flex;gap:8px;align-items:center}
+    .m-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(23,53,82,.06)}
+    .m-filters{display:grid;grid-template-columns:2fr repeat(4,1fr) auto;gap:10px;padding:12px 14px;margin-bottom:14px;align-items:end}
+    .m-filters .m-in{height:36px;font-size:.88rem}
+    .m-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+    .m-tile{padding:12px 16px}.m-tile span{display:block;font-size:.7rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .m-tile strong{display:block;font-size:1.7rem;line-height:1.15;margin-top:3px}.m-tile small{color:var(--muted);font-size:.78rem}
+    .m-dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+    .m-table{padding:14px 16px}.m-table .head{display:flex;justify-content:space-between;align-items:center}.m-table h2{font-size:1.15rem}
+    .m-table table{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:6px}
+    .m-table th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:6px 9px;border-bottom:1px solid var(--line)}
+    .m-table td{padding:7px 9px;border-bottom:1px solid #eef1f2}.m-table td.num,.m-table th.num{text-align:right}
+    .m-table tr.new td{animation:novo 2.4s ease-out}
+    @keyframes novo{0%,40%{background:#fff3cf}100%{background:transparent}}
+    .m-badge{display:inline-block;border-radius:999px;padding:1px 8px;font-size:.7rem;font-weight:800;letter-spacing:.03em}
+    .m-badge.a{background:#e3eefb;color:#1c5cab}.m-badge.r{background:#fdece4;color:#a2411a}.m-badge.e{background:#efeeea;color:#52514e}
+    .m-chip{display:inline-block;background:#eef2f4;color:var(--blue);border-radius:6px;padding:0 7px;font-size:.72rem;font-weight:700}
+    .m-link{color:var(--blue);font-weight:700;font-size:.8rem;padding:1px 4px;border-radius:5px;margin-left:2px}
+    .m-pw{font-family:Consolas,"Courier New",monospace;letter-spacing:.04em;margin-right:4px}
+    .m-semana td{background:#c9d8ea;font-weight:800;font-size:.8rem}.m-sub td{background:#eef2f4;font-weight:800}
+    .m-groups{display:grid;gap:12px}
+    .m-group{padding:14px 16px}.m-group h2{font-size:1.1rem}
+    .m-lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+    .m-ltile{border:1px solid var(--line);border-radius:12px;padding:11px 14px}.m-ltile strong{display:block;font-size:.96rem}.m-ltile strong:after{content:" ↗";color:var(--blue)}
+    .m-ltile span{display:block;color:#52616c;font-size:.82rem}
+    .m-docs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0 20px}
+    .m-doc{padding:14px;display:flex;gap:12px;align-items:flex-start}
+    .m-doc i{width:40px;height:48px;border-radius:8px;display:grid;place-items:center;font-size:.66rem;font-weight:800;color:#fff;font-style:normal;background:var(--red);flex:none}
+    .m-doc i.x{background:var(--green)}.m-doc strong{display:block;font-size:.95rem}.m-doc small{display:block;color:var(--muted);font-size:.8rem}
+    .m-dlg-back{position:absolute;inset:0;background:rgba(10,30,45,.62);display:grid;place-items:center;z-index:5}
+    .m-dlg{width:560px;background:#fff;border-radius:18px;box-shadow:0 28px 90px rgba(10,30,45,.3)}
+    .m-dlg-head{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;border-bottom:1px solid var(--line)}.m-dlg-head h2{font-size:1.2rem}
+    .m-x{width:30px;height:30px;border-radius:50%;background:#eef2f4;display:grid;place-items:center;font-size:1.1rem}
+    .m-dlg-body{padding:14px 20px 16px;display:grid;gap:10px}
+    .m-dlg .m-in{height:36px;font-size:.9rem}
+    .m-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .m-seg{display:flex;gap:8px}.m-seg span{flex:1;border:1px solid #cbd5da;border-radius:10px;padding:6px;text-align:center;font-weight:700;font-size:.84rem}
+    .m-seg span.on{background:var(--navy);border-color:var(--navy);color:#fff}
+    .m-checks{display:flex;flex-wrap:wrap;gap:7px}.m-checks span{border:1px solid #cbd5da;border-radius:8px;padding:4px 10px;font-size:.82rem;font-weight:650}
+    .m-checks span:before{content:"";display:inline-block;width:11px;height:11px;border:1.5px solid #8a969e;border-radius:3px;margin-right:6px;vertical-align:-1px}
+    .m-checks span.on{background:#e3eefb;border-color:#6da7ec}.m-checks span.on:before{background:#2a78d6;border-color:#2a78d6}
+    .m-area{height:46px!important;align-items:flex-start!important}
+    .m-actions{display:flex;justify-content:flex-end;gap:8px}
+    .m-toast{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 18px;border-radius:10px;font-weight:650;z-index:8}
+    .m-pressed{filter:brightness(.9);transform:scale(.97)}
+    /* cartões de abertura e encerramento */
+    .m-title{position:absolute;inset:0;z-index:15;background:linear-gradient(135deg,#173552 0%,#1f4262 60%,#24705a 140%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 110px}
+    .m-title .lab{font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9fd3bf}
+    .m-title h1{font-size:58px;margin:10px 0 18px;color:#fff}
+    .m-title ul{list-style:none;margin:0;padding:0;display:grid;gap:14px;font-size:24px}
+    .m-title li{display:flex;gap:14px;align-items:center}.m-title li:before{content:"✓";width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:18px;color:#9fd3bf;flex:none}
+    .m-title p{font-size:22px;color:#cbd8e1;max-width:820px;margin:0 0 22px}
+    /* camadas do vídeo */
+    #ring{position:absolute;z-index:20;border:4px solid var(--hl);border-radius:12px;box-shadow:0 0 0 9999px rgba(10,25,40,.28),0 0 22px rgba(255,178,30,.8);transition:all .45s cubic-bezier(.4,0,.2,1);animation:pulsa 1.3s ease-in-out infinite}
+    @keyframes pulsa{50%{border-color:#ffd27a}}
+    #tip{position:absolute;z-index:21;background:#10263b;color:#fff;font-weight:700;font-size:17px;padding:9px 15px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.3);white-space:nowrap;transition:opacity .3s}
+    #tip:after{content:"";position:absolute;left:24px;border:9px solid transparent}
+    #tip.below:after{top:-17px;border-bottom-color:#10263b}#tip.above:after{bottom:-17px;border-top-color:#10263b}
+    #keys{position:absolute;z-index:22;left:50%;bottom:44px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;font-size:26px;font-weight:800;color:#fff}
+    #keys kbd{font:inherit;background:#fff;color:var(--ink);border-radius:10px;padding:8px 20px;box-shadow:0 5px 0 #aab4bb,0 10px 30px rgba(0,0,0,.35);border:1px solid #cdd6db}
+    #keys em{font-style:normal;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+    #cursor{position:absolute;left:0;top:0;z-index:25;width:30px;height:30px;transition:transform .8s cubic-bezier(.45,.05,.25,1)}
+    #cursor svg{width:30px;height:30px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));transition:transform .12s}
+    #cursor.down svg{transform:scale(.82)}
+    .ripple{position:absolute;z-index:24;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:3px solid var(--hl);animation:ripple .6s ease-out forwards}
+    @keyframes ripple{to{transform:scale(3.6);opacity:0}}
+    .sample{position:absolute;right:12px;bottom:10px;z-index:26;background:rgba(16,38,59,.82);color:#fff;font-size:13px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.02em}
+    @media (prefers-reduced-motion:reduce){#cursor,.m-main-in,#ring{transition-duration:.01s}#ring{animation:none}}
+  </style>
+</head>
+<body>
+<header class="bar">
+  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Primeiro acesso</strong></div>
+</header>
+
+<main>
+  <div class="intro">
+    <span class="label" id="dLabel">Passo a passo em vídeo</span>
+    <h1 id="dTitulo">Primeiro acesso</h1>
+    <p id="dDesc"></p>
+  </div>
+
+  <div class="layout">
+    <section class="card" id="player" aria-label="Vídeo do passo a passo">
+      <div id="stage">
+        <div id="shot" aria-hidden="true">
+          <div class="br-top">
+            <div class="br-tabs"><div class="br-tab"><span class="br-fav" id="brFav"></span><span id="brTitle">Nova guia</span><span>×</span></div><span class="br-plus">+</span></div>
+            <div class="br-bar">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>
+              <div class="br-addr" id="brAddr"><span class="fill" id="brUrl"></span><span class="br-star" id="brStar">☆</span></div>
+              <span class="br-prof"></span>
+            </div>
+          </div>
+          <div class="vp">
+            <section class="m-screen" data-screen="blank"><div class="m-blank"><div class="logo">Nova guia</div><div class="search">Pesquise no Google ou digite um URL</div></div></section>
+
+            <section class="m-screen" data-screen="portal"><div class="m-portal">
+              <aside class="m-side">
+                <div class="m-brand"><img class="m-mark" src="logo-portal.jpg" alt=""><div><strong>Araujo Locação</strong><span>Portal interno</span></div></div>
+                <div class="m-nav">
+                  <div data-nav="mural" class="active"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg>Mural de avisos</div>
+                  <div><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h6"/></svg>Materiais internos</div>
+                  <div><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6zM9 10h6M9 14h6M9 18h4"/></svg>Política de atendimento</div>
+                  <div><svg viewBox="0 0 24 24"><path d="M12 3v5M5 8h14M5 8v4M19 8v4M12 8v4M2 12h6v5H2zM9 12h6v5H9zM16 12h6v5h-6z"/></svg>Organograma</div>
+                  <div data-nav="funcoes" id="mNavFuncoes"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Funções</div>
+                  <div><svg viewBox="0 0 24 24"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg>Regras de convivência</div>
+                  <div><svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/></svg>O que esperamos de você</div>
+                  <div><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16V8l6-4 6 4v8M9 16v-5h6v5"/></svg>Nossa história</div>
+                </div>
+                <div class="m-side-foot">Conteúdo de uso interno<br>Araujo Locação</div>
+              </aside>
+              <div class="m-main"><div class="m-main-in" id="mPortalIn">
+                <div class="m-topbar"><div><h1>Olá, equipe!</h1><p>Informações importantes para manter todos alinhados.</p></div><span class="m-pill" id="mHoje"></span></div>
+                <div class="m-cover"><img src="capa-portal.jpg" alt=""></div>
+                <div class="m-sec-head"><div><h2>Mural de avisos</h2><p>Comunicados e atualizações da equipe.</p></div><span class="m-btn">Entrar (gerência)</span></div>
+                <div class="m-notices">
+                  <div class="m-notice"><span class="m-tag">Informativo</span><h3>Bem-vindos ao Portal Interno</h3><p>Este espaço reúne os avisos e materiais importantes da Araujo Locação.</p></div>
+                  <div class="m-notice pri"><span class="m-tag">Importante</span><h3>Política de atendimento disponível</h3><p>A política de atendimento já pode ser consultada na área de materiais internos.</p></div>
+                  <div class="m-notice ev"><span class="m-tag">Aviso</span><h3>Aviso de exemplo</h3><p>Os avisos da gerência aparecem aqui, no mural.</p></div>
+                </div>
+                <div class="m-sec-head"><div><h2>Materiais internos</h2><p>Consulte os materiais da equipe.</p></div></div>
+                <div class="m-res-grid">
+                  <div class="m-res green"><span class="lab">Atendimento</span><h3>Política de Atendimento</h3><p>Diretrizes para oferecer um atendimento ágil, humano e consistente.</p><ul><li>Fluxos e responsabilidades</li><li>Padrões por tipo de atendimento</li></ul><span class="m-open">Consultar material →</span></div>
+                  <div class="m-res"><span class="lab">Equipe</span><h3>Organograma por Função</h3><p>Visualize áreas, lideranças, responsabilidades e atividades.</p><ul><li>Estrutura da equipe</li><li>Responsáveis por área</li></ul><span class="m-open">Ver organograma →</span></div>
+                </div>
+                <div id="mSecFuncoes">
+                  <div class="m-sec-head"><div><h2>Funções</h2><p>Ferramentas de trabalho de cada departamento. Acesso com login.</p></div></div>
+                  <div class="m-res-grid">
+                    <div class="m-res green" id="mCardDep"><span class="lab" id="mCardLab"></span><h3 id="mCardNome"></h3><p id="mCardDesc"></p><ul id="mCardItens"></ul><span class="m-open" id="mOpenDep"></span></div>
+                    <div class="m-res" id="mCardOutro"><span class="lab">Acesso restrito</span><h3 id="mOutroNome"></h3><p>Cada departamento tem o seu cartão, com login próprio.</p><ul><li>Ferramentas do dia a dia</li><li>Senhas e POP</li></ul><span class="m-open" id="mOutroAbrir"></span></div>
+                  </div>
+                </div>
+              </div></div>
+            </div></section>
+
+            <section class="m-screen" data-screen="login">
+              <div class="m-bar"><div><span class="back">← Portal interno</span> &nbsp;·&nbsp; <strong class="dNome"></strong></div></div>
+              <div class="m-gate" id="mGate">
+                <h1 class="dNome"></h1><p>Área restrita. Entre com o seu e-mail e senha.</p>
+                <div class="m-form">
+                  <div class="m-field"><label>E-mail</label><input class="m-in" id="gEmail" tabindex="-1" readonly></div>
+                  <div class="m-field"><label>Senha</label><input class="m-in" id="gSenha" type="password" tabindex="-1" readonly autocomplete="off"></div>
+                  <span class="m-btn pri" id="gEntrar">Entrar</span>
+                  <p class="m-err" id="gMsg" hidden>Não foi possível entrar: e-mail ou senha incorretos.</p>
+                </div>
+              </div>
+              <div class="m-gate" id="mDenied" hidden>
+                <h1>Sem acesso</h1><p>Este login não tem permissão para a <span class="dNomeMin"></span>. Fale com a gerência.</p>
+                <span class="m-btn">Entrar com outro e-mail</span>
+              </div>
+            </section>
+
+            <section class="m-screen" data-screen="app">
+              <div class="m-bar"><div><span class="back">← Portal interno</span> &nbsp;·&nbsp; <strong class="dNome"></strong></div><div class="right" id="mWho"><span class="who" id="mWhoMail"></span><span class="m-btn ghost" id="mSair">Sair</span></div></div>
+              <div id="mApp"></div>
+            </section>
+
+            <div class="m-toast" id="mToast" hidden></div>
+          </div>
+          <div class="br-pop" id="popFav" hidden><h4>Favorito adicionado</h4><div class="row"><span>Nome</span><div class="val">Portal Interno | Araujo Locação</div></div><div class="row"><span>Pasta</span><div class="val">Barra de favoritos</div></div><div class="btns"><span>Remover</span><span class="main" id="favOk">Concluído</span></div></div>
+          <div class="br-pop" id="popPw" hidden><h4>Salvar senha?</h4><div class="row"><span>Usuário</span><div class="val" id="popPwUser"></div></div><div class="row"><span>Senha</span><div class="val">••••••••••</div></div><div class="btns"><span id="pwNunca">Nunca</span><span class="main" id="pwSalvar">Salvar</span></div></div>
+
+          <section class="m-title" data-card="intro" hidden><span class="lab" id="cIntroLab"></span><h1>Antes de começar</h1><ul><li>E-mail e senha entregues pela gerência</li><li>Computador com internet</li><li>Google Chrome ou Microsoft Edge</li></ul></section>
+          <section class="m-title" data-card="fim" hidden><span class="lab">Pronto!</span><h1>Você já sabe entrar</h1><p>Da próxima vez: favoritos → Funções → <span class="dNome"></span> → e-mail e senha → Entrar.</p><ul><li>Não passe a sua senha para ninguém</li><li>Clique em Sair ao terminar</li><li>Dúvidas? Fale com a gerência</li></ul></section>
+
+          <div id="ring" hidden></div><div id="tip" hidden></div><div id="keys" hidden></div>
+          <div id="cursor"><svg viewBox="0 0 24 24"><path d="M4 2.5 19.5 14l-7 .9 4 7.3-2.6 1.3-4-7.4L5 20.6z" fill="#fff" stroke="#10263b" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+          <span class="sample">Dados de exemplo</span>
+        </div>
+        <button class="cover" id="cover" type="button"><div><span><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg>Assistir o passo a passo</span><small id="coverSub"></small></div></button>
+      </div>
+
+      <div class="progress" id="progress" aria-label="Passos"></div>
+      <div class="caption" aria-live="polite"><span class="label" id="capNum"></span><h2 id="capTitle"></h2><p id="capText"></p></div>
+      <div class="controls">
+        <button class="secondary" id="bPrev" type="button"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7z"/></svg>Voltar</button>
+        <button class="primary" id="bPlay" type="button"></button>
+        <button class="secondary" id="bNext" type="button">Avançar<svg viewBox="0 0 24 24" style="margin:0 0 0 6px"><path d="m9 5 7 7-7 7z"/></svg></button>
+        <span class="grow"></span>
+        <button class="secondary" id="bVoz" type="button" aria-pressed="false"></button>
+        <button class="secondary" id="bFull" type="button">Tela cheia</button>
+      </div>
+    </section>
+
+    <aside class="card steps" aria-label="Lista de passos"><div id="stepList"></div></aside>
+  </div>
+
+  <section class="card written">
+    <div class="written-head"><h2>Passo a passo por escrito</h2><button class="secondary" type="button" onclick="print()">Imprimir</button></div>
+    <ol id="written"></ol>
+    <p class="note">As telas do vídeo usam dados de exemplo. No dia a dia aparecem os dados reais do departamento.</p>
+  </section>
+</main>
+
+<script>
+(()=>{
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const SITE='portal-interno-rust.vercel.app';
+  const EMAIL='seunome@araujolocacao.com.br';
+
+  // ================= Roteiros por departamento =================
+  // Cada departamento tem: textos do cartão em Funções, a página, a tela interna (mApp) e os passos da parte 2.
+  const GUIAS={
+    'pre-analise':{
+      nome:'Pré-análise',pagina:'pre-analise.html',rotulo:'Locação · Acesso restrito',
+      desc:'Área do departamento de pré-análise: controle das análises, senhas dos sistemas e POP.',
+      itens:['Análises com filtros e gráficos por corretora','Senhas dos sistemas (criptografadas)','POP e documentos do departamento'],
+      abrir:'Abrir pré-análise →',vizinho:['Atendimento','Abrir atendimento →'],
+      app:`<div class="m-app">
+        <div class="m-dept"><h1>Pré-análise</h1><div class="m-tabs" id="mTabs"><span data-t="analises">Análises</span><span data-t="locacoes">Locações</span><span data-t="validacoes">Validações</span><span data-t="senhas">Senhas</span><span data-t="pop">POP e documentos</span><span id="mTabQuadro">Quadro ↗</span></div></div>
+
+        <div data-mtab="analises">
+          <div class="m-top"><div><h2>Controle de análises</h2><p>Setembro de 2026 · 42 análises</p></div><div class="acts"><span class="m-btn">Corretoras e garantias</span><span class="m-btn">Baixar planilha</span><span class="m-btn pri" id="mNova">+ Nova análise</span></div></div>
+          <div class="m-card m-filters" id="mFiltros">
+            <div class="m-field"><span class="l">Nome do cliente</span><div class="m-in"><span class="ph">Buscar por nome ou referência</span></div></div>
+            <div class="m-field"><span class="l">Corretora</span><div class="m-in">Todas</div></div>
+            <div class="m-field"><span class="l">Garantia</span><div class="m-in">Todas</div></div>
+            <div class="m-field"><span class="l">Situação</span><div class="m-in">Todas</div></div>
+            <div class="m-field"><span class="l">Período</span><div class="m-in">Este mês</div></div>
+            <span class="m-btn">Limpar</span>
+          </div>
+          <div class="m-tiles" id="mTiles">
+            <div class="m-card m-tile"><span>Análises</span><strong>42</strong><small>no período</small></div>
+            <div class="m-card m-tile"><span><i class="m-dot" style="background:#2a78d6"></i>Aprovadas</span><strong>30</strong><small>71% do total</small></div>
+            <div class="m-card m-tile"><span><i class="m-dot" style="background:#eb6834"></i>Recusadas</span><strong>9</strong><small>21% do total</small></div>
+            <div class="m-card m-tile"><span>Taxa de aprovação</span><strong>77%</strong><small>entre as concluídas</small></div>
+          </div>
+          <div class="m-card m-table"><div class="head"><h2>Análises</h2><span style="color:var(--muted);font-size:.85rem">mostrando as mais recentes</span></div>
+            <table><thead><tr><th>Dia</th><th>Corretora</th><th>Nome do cliente</th><th>Referência</th><th>Situação</th><th>Onde</th></tr></thead>
+            <tbody id="mLista">
+              <tr><td>26/09</td><td>Corretora A</td><td>Cliente Exemplo 1</td><td>AP0101</td><td><span class="m-badge a">APROVADO</span></td><td><span class="m-chip">Caução</span></td></tr>
+              <tr><td>25/09</td><td>Corretora B</td><td>Cliente Exemplo 2</td><td>CA0202</td><td><span class="m-badge r">RECUSADO</span></td><td></td></tr>
+              <tr><td>25/09</td><td>Corretora C</td><td>Cliente Exemplo 3</td><td>AP0303</td><td><span class="m-badge e">EM ANÁLISE</span></td><td></td></tr>
+              <tr><td>24/09</td><td>Corretora A</td><td>Cliente Exemplo 4</td><td>SA0404</td><td><span class="m-badge a">APROVADO</span></td><td><span class="m-chip">Seguro fiança</span></td></tr>
+            </tbody></table></div>
+        </div>
+
+        <div data-mtab="locacoes">
+          <div class="m-top"><div><h2>Locações</h2><p>A mesma planilha do departamento Locação. Aqui aparecem só os dados do contrato; taxa de locação e comissões ficam na Locação.</p></div><div class="acts"><span class="m-btn pri">+ Nova locação</span></div></div>
+          <div class="m-card m-filters" style="grid-template-columns:auto 1fr 1fr auto">
+            <div class="m-field"><span class="l">Mês</span><div style="display:flex;gap:6px" id="mMes"><span class="m-btn">←</span><div class="m-in" style="width:170px;font-weight:700">setembro de 2026</div><span class="m-btn">→</span></div></div>
+            <div class="m-field"><span class="l">Corretora</span><div class="m-in">Todas</div></div>
+            <div class="m-field"><span class="l">Buscar</span><div class="m-in"><span class="ph">REF ou proponente</span></div></div>
+            <span class="m-btn">Limpar</span>
+          </div>
+          <div class="m-card m-table"><div class="head"><h2>Planilha do mês</h2></div>
+            <table><thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th></tr></thead>
+            <tbody><tr class="m-semana"><td colspan="8">SEMANA 4 · 22/09 a 28/09</td></tr>
+              <tr><td>AP0101</td><td>Itajaí</td><td>Corretora A</td><td>Sim</td><td>Cliente Exemplo 1</td><td>Caução</td><td class="num">R$ 2.500,00</td><td class="num">100%</td></tr>
+              <tr><td>SA0404</td><td>Navegantes</td><td>Corretora A</td><td>Sim</td><td>Cliente Exemplo 4</td><td>Seguro fiança</td><td class="num">R$ 1.800,00</td><td class="num">100%</td></tr>
+              <tr><td>CA0505</td><td>Itajaí</td><td>Corretora B</td><td>Não</td><td>Cliente Exemplo 5</td><td>Fiador</td><td class="num">R$ 3.200,00</td><td class="num">50%</td></tr>
+              <tr class="m-sub"><td colspan="6">Total da semana · 3 locações</td><td class="num">R$ 7.500,00</td><td></td></tr>
+            </tbody></table></div>
+        </div>
+
+        <div data-mtab="validacoes">
+          <div class="m-top"><div><h2>Validações</h2><p>Atalhos para os sites de consulta usados na análise. Cada link abre numa nova aba.</p></div><div class="acts"><div class="m-in" style="width:250px"><span class="ph">Buscar (ex.: SP, Bahia, federal)</span></div><span class="m-btn pri">+ Novo link</span></div></div>
+          <div class="m-groups" id="mGrupos">
+            <div class="m-card m-group"><h2>Crédito</h2><div class="m-lgrid"><div class="m-ltile" id="mLinkSpc"><strong>SPC</strong><span>Consulta de CPF e CNPJ</span></div><div class="m-ltile"><strong>Serasa</strong><span>Consulta de crédito</span></div><div class="m-ltile"><strong>Boa Vista</strong><span>Consulta de crédito</span></div></div></div>
+            <div class="m-card m-group"><h2>Certidões federais</h2><div class="m-lgrid"><div class="m-ltile"><strong>Receita Federal</strong><span>Situação cadastral do CPF</span></div><div class="m-ltile"><strong>Justiça Federal</strong><span>Certidão de distribuição</span></div><div class="m-ltile"><strong>TST</strong><span>Certidão trabalhista</span></div></div></div>
+            <div class="m-card m-group"><h2>Processos</h2><div class="m-lgrid"><div class="m-ltile"><strong>Escavador</strong><span>Busca de processos por nome</span></div></div></div>
+          </div>
+        </div>
+
+        <div data-mtab="senhas">
+          <div class="m-top"><div><h2>Senhas</h2><p>Acessos aos sistemas usados pela pré-análise. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".</p></div><div class="acts"><div class="m-in" style="width:230px"><span class="ph">Buscar sistema ou usuário</span></div><span class="m-btn pri">+ Nova senha</span></div></div>
+          <div class="m-card m-table"><table><thead><tr><th>Sistema</th><th>Usuário</th><th>Senha</th><th>Observação</th><th>Atualizado</th></tr></thead><tbody>
+            <tr><td><strong>Sistema de exemplo A</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw" id="mPw1">••••••••</span><span class="m-link" id="mMostrar">Mostrar</span><span class="m-link" id="mCopiar">Copiar</span></td><td style="color:var(--muted)">–</td><td>20/09/2026</td></tr>
+            <tr><td><strong>Sistema de exemplo B</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td style="color:var(--muted)">–</td><td>12/09/2026</td></tr>
+            <tr><td><strong>Sistema de exemplo C</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td style="color:var(--muted)">–</td><td>02/09/2026</td></tr>
+          </tbody></table></div>
+        </div>
+
+        <div data-mtab="pop">
+          <div class="m-top"><div><h2>POP e documentos</h2><p>Procedimento operacional padrão e demais materiais do departamento.</p></div><div class="acts"><span class="m-btn pri">+ Enviar documento</span></div></div>
+          <h2 style="font-size:1.05rem">POP</h2>
+          <div class="m-docs"><div class="m-card m-doc" id="mPop"><i>PDF</i><div><strong>POP da Pré-análise</strong><small>Documento de exemplo</small><span class="m-link" style="margin-left:-4px">Abrir</span><span class="m-link">Baixar</span></div></div></div>
+          <h2 style="font-size:1.05rem">Outros documentos</h2>
+          <div class="m-docs"><div class="m-card m-doc"><i class="x">XLS</i><div><strong>Planilha de exemplo</strong><small>Documento de exemplo</small></div></div><div class="m-card m-doc"><i>PDF</i><div><strong>Modelo de exemplo</strong><small>Documento de exemplo</small></div></div></div>
+        </div>
+
+        <div class="m-dlg-back" id="mDlg" hidden><div class="m-dlg">
+          <div class="m-dlg-head"><h2>Nova análise</h2><span class="m-x">×</span></div>
+          <div class="m-dlg-body">
+            <div class="m-grid2"><div class="m-field"><span class="l">Dia</span><div class="m-in" id="dDia"></div></div><div class="m-field"><span class="l">Corretora</span><div class="m-in" id="dCorretora"><span class="ph">Escolha…</span></div></div></div>
+            <div class="m-field"><span class="l">Nome do cliente</span><input class="m-in" id="dCliente" tabindex="-1" readonly></div>
+            <div class="m-field"><span class="l">Referência do imóvel</span><input class="m-in" id="dRef" tabindex="-1" readonly placeholder="Ex.: AP0506"></div>
+            <div class="m-field"><span class="l">Situação da análise</span><div class="m-seg"><span id="dAprov">Aprovado</span><span>Recusado</span><span>Em análise</span></div></div>
+            <div class="m-field"><span class="l">Onde foi aprovado (garantias)</span><div class="m-checks"><span id="dCaucao">Caução</span><span>Fiador</span><span>Seguro fiança</span><span>Título de capitalização</span></div></div>
+            <div class="m-field"><span class="l">Observação</span><div class="m-in m-area"></div></div>
+            <div class="m-actions"><span class="m-btn">Cancelar</span><span class="m-btn pri" id="dSalvar">Salvar</span></div>
+          </div>
+        </div></div>
+      </div>`,
+      passos:[
+        {titulo:'Aba Análises',texto:'A aba <b>Análises</b> abre primeiro. Os quadros mostram os totais do período e a taxa de aprovação. Use os filtros (cliente, corretora, garantia, situação e período) para encontrar uma análise.',
+          setup(){tela('app');aba('analises')},
+          async acts(A){await A.hl('#mTiles','Totais do período','below');await A.pause(2600);await A.hl('#mFiltros','Filtros','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Lançar uma nova análise',texto:'Para lançar, clique em <b>+ Nova análise</b>. Preencha o dia, a corretora, o nome do cliente e a referência do imóvel, marque a situação e onde foi aprovado, e clique em <b>Salvar</b>. A análise aparece no topo da lista.',
+          setup(){tela('app');aba('analises')},
+          async acts(A){
+            await A.click('#mNova');$('#mDlg').hidden=false;$('#dDia').textContent=hojeBR();await A.pause(500);
+            await A.click('#dCorretora');$('#dCorretora').textContent='Corretora A';await A.pause(250);
+            await A.click('#dCliente');await A.type('#dCliente','Cliente Exemplo');
+            await A.click('#dRef');await A.type('#dRef','AP0000');
+            await A.click('#dAprov');$('#dAprov').classList.add('on');await A.pause(250);
+            await A.click('#dCaucao');$('#dCaucao').classList.add('on');await A.pause(250);
+            await A.click('#dSalvar');$('#mDlg').hidden=true;
+            $('#mLista').insertAdjacentHTML('afterbegin',`<tr class="new"><td>${hojeBR().slice(0,5)}</td><td>Corretora A</td><td>Cliente Exemplo</td><td>AP0000</td><td><span class="m-badge a">APROVADO</span></td><td><span class="m-chip">Caução</span></td></tr>`);
+            await A.hl('#mLista tr','A análise salva','above');await A.pause(2800);A.unhl()}},
+        {titulo:'Aba Locações',texto:'Na aba <b>Locações</b> fica a planilha do mês, a mesma da Locação, só com os dados do contrato. Use as setas para trocar o mês e <b>+ Nova locação</b> para lançar. Cada locação nova também vira um cartão no Quadro.',
+          voz:'Na aba Locações fica a planilha do mês, a mesma da Locação, só com os dados do contrato. Use as setas para trocar o mês, e Nova locação para lançar. Cada locação nova também vira um cartão no Quadro.',
+          setup(){tela('app');aba('analises')},
+          async acts(A){await A.click('[data-t="locacoes"]');aba('locacoes');await A.pause(500);await A.hl('#mMes','Trocar o mês','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Aba Validações',texto:'A aba <b>Validações</b> reúne os sites de consulta (SPC, certidões e processos). Clique no nome do site e ele abre numa nova aba. Use a busca para achar um estado.',
+          setup(){tela('app');aba('locacoes')},
+          async acts(A){await A.click('[data-t="validacoes"]');aba('validacoes');await A.pause(500);await A.hl('#mLinkSpc','Clique para abrir o site','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Aba Senhas',texto:'Na aba <b>Senhas</b> ficam os acessos dos sistemas. A senha só aparece quando você clica em <b>Mostrar</b> e se esconde sozinha depois de 30 segundos. Use <b>Copiar</b> para colar no sistema, sem anotar em papel.',
+          setup(){tela('app');aba('validacoes')},
+          async acts(A){await A.click('[data-t="senhas"]');aba('senhas');await A.pause(500);await A.click('#mMostrar');$('#mPw1').textContent='Exemplo@2026';$('#mMostrar').textContent='Ocultar';await A.pause(900);await A.hl('#mCopiar','Copiar e colar no sistema','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Aba POP e documentos',texto:'Em <b>POP e documentos</b> está o procedimento do departamento e os outros materiais. Clique em <b>Abrir</b> para ler.',
+          setup(){tela('app');aba('senhas')},
+          async acts(A){await A.click('[data-t="pop"]');aba('pop');await A.pause(500);await A.hl('#mPop','O POP do departamento','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Quadro de contratos',texto:'O último item, <b>Quadro ↗</b>, abre o quadro de contratos (o antigo Trello), com um cartão para cada locação.',
+          voz:'O último item, Quadro, abre o quadro de contratos, o antigo Trello, com um cartão para cada locação.',
+          setup(){tela('app');aba('pop')},
+          async acts(A){await A.hl('#mTabQuadro','Abre o quadro','below');await A.pause(2800);A.unhl()}},
+      ]
+    }
+  };
+
+  const slug=new URLSearchParams(location.search).get('d')||'pre-analise';
+  const G=GUIAS[slug]||GUIAS['pre-analise'];
+  const pagina=SITE+'/'+G.pagina, tituloPag=G.nome+' | Araujo Locação';
+  const minusc=G.nome.charAt(0).toLowerCase()+G.nome.slice(1);
+
+  // ================= Tela simulada =================
+  const shot=$('#shot'), stage=$('#stage');
+  $('#mApp').innerHTML=G.app;
+  $$('.dNome').forEach(e=>e.textContent=G.nome);$$('.dNomeMin').forEach(e=>e.textContent=minusc);
+  $('#mCardLab').textContent=G.rotulo;$('#mCardNome').textContent=G.nome;$('#mCardDesc').textContent=G.desc;
+  $('#mCardItens').innerHTML=G.itens.map(i=>'<li>'+i+'</li>').join('');$('#mOpenDep').textContent=G.abrir;
+  $('#mOutroNome').textContent=G.vizinho[0];$('#mOutroAbrir').textContent=G.vizinho[1];
+  $('#mWhoMail').textContent=EMAIL;$('#popPwUser').textContent=EMAIL;$('#cIntroLab').textContent='Primeiro acesso · '+G.nome;
+  const hoje=new Date();
+  $('#mHoje').textContent=hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  function hojeBR(){return hoje.toLocaleDateString('pt-BR')}
+  const listaOriginal=$('#mLista')?.innerHTML;
+
+  let scale=1;
+  function fit(){scale=stage.clientWidth/1200;shot.style.transform=`scale(${scale})`}
+  new ResizeObserver(fit).observe(stage);fit();
+
+  function tela(nome){
+    $$('.m-screen',shot).forEach(s=>s.hidden=s.dataset.screen!==nome);
+    $$('.m-title',shot).forEach(s=>s.hidden=true);
+    if(nome==='blank'){endereco('');$('#brTitle').textContent='Nova guia';$('#brFav').classList.add('blank')}
+    else{$('#brFav').classList.remove('blank');$('#brTitle').textContent=nome==='portal'?'Portal Interno | Araujo Locação':tituloPag;endereco(nome==='portal'?SITE:pagina)}
+  }
+  function cartao(nome){$$('.m-title',shot).forEach(s=>s.hidden=s.dataset.card!==nome)}
+  function endereco(t){$('#brUrl').innerHTML=t?t.replace(/^[^/]+/,'<b style="font-weight:500">$&</b>'):'<span class="ph">Pesquise no Google ou digite um URL</span>'}
+  function aba(nome){$$('[data-mtab]',shot).forEach(s=>s.hidden=s.dataset.mtab!==nome);$$('#mTabs [data-t]',shot).forEach(t=>t.classList.toggle('active',t.dataset.t===nome))}
+  function menu(nome){$$('.m-nav [data-nav]',shot).forEach(n=>n.classList.toggle('active',n.dataset.nav===nome))}
+  function rolarPortal(fim){$('#mPortalIn').style.transform=fim?`translateY(${-($('#mSecFuncoes').offsetTop-24)}px)`:''}
+  function toast(t){const e=$('#mToast');e.textContent=t;e.hidden=!t}
+
+  // Volta tudo ao estado inicial; cada passo monta o que precisa (assim dá para pular para qualquer passo).
+  function zerar(){
+    tela('blank');$('#brAddr').classList.remove('focus');$('#brStar').textContent='☆';$('#brStar').classList.remove('on');
+    $('#popFav').hidden=true;$('#popPw').hidden=true;
+    const pi=$('#mPortalIn');pi.style.transition='none';rolarPortal(false);pi.offsetHeight;pi.style.transition='';menu('mural');
+    for(const id of ['#gEmail','#gSenha','#dCliente','#dRef'])$(id).value='';
+    $$('.m-in.focus',shot).forEach(e=>e.classList.remove('focus'));
+    $('#gMsg').hidden=true;$('#mGate').hidden=false;$('#mDenied').hidden=true;
+    if($('#mLista'))$('#mLista').innerHTML=listaOriginal;
+    $('#mDlg').hidden=true;$('#dCorretora').innerHTML='<span class="ph">Escolha…</span>';$$('#dAprov,#dCaucao').forEach(e=>e.classList.remove('on'));
+    if($('#mPw1')){$('#mPw1').textContent='••••••••';$('#mMostrar').textContent='Mostrar'}
+    aba('analises');toast('');A.unhl();$('#keys').hidden=true;$$('.ripple',shot).forEach(r=>r.remove());
+  }
+
+  // ================= Motor do vídeo =================
+  let run=0, paused=true, cur=0, elapsed=0, est=1;
+  const done=new Set();
+  class Parou{}
+  // Espera "ms" de vídeo: fica parada enquanto estiver pausado e desiste se o passo mudar.
+  function wait(ms){
+    const id=run;
+    return new Promise((res,rej)=>{let left=ms,last=performance.now();
+      (function tick(){if(id!==run)return rej(new Parou);const now=performance.now();if(!paused)left-=now-last;last=now;
+        if(!paused&&left<=0)return res();setTimeout(tick,30)})()});
+  }
+  const cursor=$('#cursor');let cx=600,cy=430;
+  function cursorEm(x,y,anim=true){cx=x;cy=y;if(!anim){cursor.style.transition='none'}cursor.style.transform=`translate(${x-5}px,${y-3}px)`;if(!anim){cursor.offsetHeight;cursor.style.transition=''}}
+  function caixa(sel){const el=typeof sel==='string'?$(sel,shot):sel,r=el.getBoundingClientRect(),R=shot.getBoundingClientRect();
+    return {x:(r.left-R.left)/scale,y:(r.top-R.top)/scale,w:r.width/scale,h:r.height/scale}}
+  const A={
+    async pause(ms){await wait(ms)},
+    async move(sel){await wait(1);const b=caixa(sel);cursorEm(b.x+Math.min(b.w/2,60),b.y+b.h/2);await wait(850)},
+    async click(sel){
+      await A.move(sel);const el=$(sel,shot);cursor.classList.add('down');el.classList.add('m-pressed');
+      const r=document.createElement('span');r.className='ripple';r.style.left=cx+'px';r.style.top=cy+'px';shot.append(r);setTimeout(()=>r.remove(),700);
+      if(el.matches('.m-in'))el.classList.add('focus');
+      await wait(200);cursor.classList.remove('down');el.classList.remove('m-pressed');await wait(250);
+    },
+    async type(sel,texto){const el=$(sel,shot);el.classList.add('focus');for(const c of texto){await wait(45+Math.random()*55);el.value+=c}await wait(350);el.classList.remove('focus')},
+    async typeUrl(texto){const u=$('#brUrl');u.textContent='';for(const c of texto){await wait(40+Math.random()*50);u.textContent+=c}await wait(300)},
+    async keys(lista,ms=1100){await wait(1);const k=$('#keys');k.innerHTML=lista.map(t=>'<kbd>'+t+'</kbd>').join('<em>+</em>');k.hidden=false;await wait(ms);k.hidden=true},
+    async hl(sel,dica,lado='below'){
+      await wait(1);const b=caixa(sel),ring=$('#ring'),tip=$('#tip');
+      Object.assign(ring.style,{left:b.x-8+'px',top:b.y-8+'px',width:b.w+16+'px',height:b.h+16+'px'});ring.hidden=false;
+      if(dica){tip.textContent=dica;tip.className=lado;tip.hidden=false;const tw=tip.offsetWidth;
+        tip.style.left=Math.max(10,Math.min(1190-tw,b.x-4))+'px';tip.style.top=(lado==='below'?b.y+b.h+22:b.y-58)+'px'}else tip.hidden=true;
+      await wait(450);
+    },
+    unhl(){$('#ring').hidden=true;$('#tip').hidden=true},
+  };
+
+  // Parte 1 é igual para todos os departamentos; parte 2 vem do roteiro do departamento.
+  const parte1=[
+    {titulo:'Antes de começar',texto:`Neste vídeo você aprende a entrar na ${G.nome} pela primeira vez. Tenha em mãos o <b>e-mail e a senha</b> que a gerência entregou para você.`,
+      setup(){cartao('intro');cursorEm(1250,800,false)},async acts(A){await A.pause(800)}},
+    {titulo:'Abra o portal',texto:`Abra o <b>Google Chrome</b> (ou o Edge), clique na barra de endereço lá em cima, digite <b>${SITE}</b> e aperte <b>Enter</b>.`,
+      voz:'Abra o Google Chrome, ou o Edge, clique na barra de endereço lá em cima, digite o endereço do portal, que aparece na tela, e aperte Enter.',
+      setup(){tela('blank')},
+      async acts(A){await A.click('#brAddr');$('#brAddr').classList.add('focus');await A.typeUrl(SITE);await A.keys(['Enter'],900);$('#brAddr').classList.remove('focus');tela('portal');await A.pause(900)}},
+    {titulo:'Salve nos favoritos',texto:'Para não precisar digitar o endereço toda vez, aperte <b>Ctrl + D</b> (ou clique na estrela ☆ no fim da barra de endereço) e depois em <b>Concluído</b>.',
+      voz:'Para não precisar digitar o endereço toda vez, aperte Control e D, ou clique na estrela no fim da barra de endereço, e depois em Concluído.',
+      setup(){tela('portal')},
+      async acts(A){await A.move('#brStar');await A.keys(['Ctrl','D']);$('#brStar').textContent='★';$('#brStar').classList.add('on');$('#popFav').hidden=false;await A.pause(1400);await A.click('#favOk');$('#popFav').hidden=true;await A.pause(500)}},
+    {titulo:'Entre em Funções',texto:'No menu azul à esquerda, clique em <b>Funções</b>. A página desce até as ferramentas de cada departamento.',
+      setup(){tela('portal')},
+      async acts(A){await A.click('#mNavFuncoes');menu('funcoes');rolarPortal(true);await A.pause(1000);await A.hl('#mSecFuncoes');await A.pause(1400);A.unhl()}},
+    {titulo:`Abra a ${G.nome}`,texto:`No cartão <b>${G.nome}</b>, clique em <b>${G.abrir}</b>`,voz:`No cartão ${G.nome}, clique em ${G.abrir.replace(' →','')}.`,
+      setup(){tela('portal');menu('funcoes');const pi=$('#mPortalIn');pi.style.transition='none';rolarPortal(true);pi.offsetHeight;pi.style.transition=''},
+      async acts(A){await A.hl('#mCardDep');await A.pause(1300);A.unhl();await A.click('#mOpenDep');tela('login');await A.pause(900)}},
+    {titulo:'Digite o seu e-mail',texto:'Clique no campo <b>E-MAIL</b> e digite o e-mail que a gerência passou para você, sem espaços.',
+      setup(){tela('login')},
+      async acts(A){await A.click('#gEmail');await A.type('#gEmail',EMAIL)}},
+    {titulo:'Digite a sua senha',texto:'Clique no campo <b>SENHA</b> e digite a senha. Ela aparece como bolinhas, e isso é normal. Cuidado com letras maiúsculas e minúsculas: a senha diferencia as duas.',
+      setup(){tela('login');$('#gEmail').value=EMAIL},
+      async acts(A){await A.click('#gSenha');await A.type('#gSenha','exemplo123')}},
+    {titulo:'Clique em Entrar',texto:`Clique no botão verde <b>Entrar</b>. Em poucos segundos abre a área da ${G.nome}.`,
+      setup(){tela('login');$('#gEmail').value=EMAIL;$('#gSenha').value='exemplo123'},
+      async acts(A){await A.click('#gEntrar');await A.pause(700);tela('app');await A.pause(1200)}},
+    {titulo:'Salvar a senha no navegador?',texto:'O navegador pode perguntar se você quer salvar a senha. Só clique em <b>Salvar</b> se o computador for só seu. Em computador usado por outras pessoas, clique em <b>Nunca</b>.',
+      setup(){tela('app')},
+      async acts(A){await A.pause(400);$('#popPw').hidden=false;await A.pause(700);await A.hl('#pwNunca','Computador compartilhado','below');await A.pause(2600);A.unhl();await A.click('#pwNunca');$('#popPw').hidden=true;await A.pause(400)}},
+    {titulo:'Se não conseguir entrar',texto:'Se aparecer <b>“e-mail ou senha incorretos”</b>, confira o que digitou e tente de novo. Se aparecer <b>“Sem acesso”</b>, o seu e-mail ainda não foi liberado: fale com a gerência.',
+      voz:'Se aparecer: e-mail ou senha incorretos, confira o que digitou e tente de novo. Se aparecer: sem acesso, o seu e-mail ainda não foi liberado. Fale com a gerência.',
+      setup(){tela('login');$('#gEmail').value=EMAIL;$('#gSenha').value='exemplo12';$('#gMsg').hidden=false;cursorEm(900,560,false)},
+      async acts(A){await A.hl('#gMsg','Confira e tente de novo','below');await A.pause(3000);A.unhl();$('#mGate').hidden=true;$('#mDenied').hidden=false;await A.pause(300);await A.hl('#mDenied','Fale com a gerência','below');await A.pause(2800);A.unhl()}},
+    {titulo:'Você entrou!',texto:'No alto, à direita, aparece o e-mail com que você entrou. Logo abaixo do título ficam as abas: cada uma é uma parte do trabalho.',
+      setup(){tela('app');cursorEm(900,560,false)},
+      async acts(A){await A.hl('#mWho','O seu e-mail','below');await A.pause(2400);await A.hl('#mTabs','As abas','below');await A.pause(2600);A.unhl()}},
+  ];
+  const parte3=[
+    {titulo:'Ao terminar, clique em Sair',texto:`Quando terminar, clique em <b>Sair</b>, no canto de cima à direita. Por segurança, a ${G.nome} também sai sozinha depois de 30 minutos sem uso.`,
+      setup(){tela('app')},
+      async acts(A){await A.click('#mSair');tela('login');await A.pause(1200)}},
+    {titulo:'Pronto!',texto:'Da próxima vez é só abrir o portal pelos favoritos, ir em <b>Funções</b> e entrar. Não passe a sua senha para ninguém. Dúvidas? Fale com a gerência.',
+      voz:'Pronto! Da próxima vez é só abrir o portal pelos favoritos, ir em Funções e entrar. Não passe a sua senha para ninguém. Dúvidas? Fale com a gerência.',
+      setup(){cartao('fim');cursorEm(1250,800,false)},async acts(A){await A.pause(800)}},
+  ];
+  const passos=[...parte1.map(p=>({...p,parte:1})),...G.passos.map(p=>({...p,parte:2})),...parte3.map(p=>({...p,parte:3}))];
+  const PARTES={1:'Parte 1 · Entrar',2:'Parte 2 · Conhecendo a área',3:'Parte 3 · Sair'};
+  const limpo=h=>h.replace(/<[^>]+>/g,'').replace(/[“”]/g,'');
+
+  // ================= Narração (voz do navegador) =================
+  let voz=false, vozPt=null;
+  function acharVoz(){const vs=speechSynthesis.getVoices();vozPt=vs.find(v=>v.lang==='pt-BR')||vs.find(v=>/^pt/i.test(v.lang))||null}
+  if('speechSynthesis' in window){acharVoz();speechSynthesis.onvoiceschanged=acharVoz}
+  try{voz=localStorage.getItem('guiaVoz')==='1'}catch{}
+  function falar(texto){
+    if(!voz||!('speechSynthesis' in window))return null;
+    speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(texto);u.lang='pt-BR';if(vozPt)u.voice=vozPt;u.rate=1.02;
+    const id=run;
+    return new Promise(res=>{let fim=false;const ok=()=>{if(!fim){fim=true;res()}};u.onend=ok;u.onerror=ok;speechSynthesis.speak(u);
+      // Segurança: se o navegador não avisar o fim, segue depois de um tempo proporcional ao texto.
+      wait(texto.length*95+3000).then(ok,()=>{})}).then(()=>{if(id!==run)throw new Parou});
+  }
+  function calar(){if('speechSynthesis' in window)speechSynthesis.cancel()}
+
+  // ================= Controle =================
+  async function ir(i){
+    run++;const id=run;calar();
+    cur=Math.max(0,Math.min(passos.length-1,i));elapsed=0;
+    const p=passos[cur];est=Math.max(6500,limpo(p.voz||p.texto).length*62+2500);
+    zerar();p.setup&&p.setup();pintar();
+    const t0=Date.now();
+    try{
+      const fala=paused?null:falar(p.voz||limpo(p.texto));
+      await p.acts(A);
+      if(fala)await fala;
+      else await wait(Math.max(1800,limpo(p.texto).length*55+1200-elapsed));
+      await wait(900);
+      done.add(cur);
+      if(cur<passos.length-1)ir(cur+1);else{paused=true;elapsed=est;pintar()}
+    }catch(e){if(!(e instanceof Parou))throw e}
+  }
+  function tocar(){
+    $('#cover').hidden=true;
+    if(cur===passos.length-1&&done.has(cur)){paused=false;done.clear();ir(0);return}
+    paused=false;pintar();
+    // Se a narração foi ligada com o vídeo parado, recomeça o passo para falar desde o início.
+    if(voz&&'speechSynthesis' in window&&!speechSynthesis.speaking)ir(cur);
+    else if('speechSynthesis' in window)speechSynthesis.resume();
+  }
+  function pausar(){paused=true;if('speechSynthesis' in window)speechSynthesis.pause();pintar()}
+
+  // Barra de progresso do passo atual (conta só o tempo tocando).
+  let last=performance.now();
+  (function loop(now){if(!paused)elapsed+=now-last;last=now;const i=$('#progress button.current i');if(i)i.style.width=Math.min(100,elapsed/est*100)+'%';requestAnimationFrame(loop)})(last);
+
+  function pintar(){
+    const p=passos[cur];
+    $('#capNum').textContent=`Passo ${cur+1} de ${passos.length} · ${PARTES[p.parte]}`;
+    $('#capTitle').textContent=p.titulo;$('#capText').innerHTML=p.texto;
+    $$('#progress button').forEach((b,i)=>{b.className=i===cur?'current':done.has(i)||i<cur?'done':''});
+    $$('#stepList button').forEach((b,i)=>{b.className=i===cur?'current':done.has(i)?'done':'';b.toggleAttribute('aria-current',i===cur)});
+    const fim=cur===passos.length-1&&done.has(cur);
+    $('#bPlay').innerHTML=paused?`<svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg>${fim?'Assistir de novo':'Assistir'}`:'<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>Pausar';
+    $('#bVoz').textContent=voz?'Narração: ligada':'Narração: desligada';$('#bVoz').setAttribute('aria-pressed',voz);
+  }
+
+  // Monta lista de passos, barra, texto escrito e cabeçalho.
+  document.title='Primeiro acesso · '+G.nome+' | Araujo Locação';
+  $('#dTitulo').textContent='Primeiro acesso · '+G.nome;
+  $('#dDesc').textContent=`Como entrar na ${G.nome} pela primeira vez e conhecer cada aba. Assista em vídeo ou leia o passo a passo por escrito, mais abaixo.`;
+  const minutos=Math.round(passos.reduce((s,p)=>s+Math.max(9000,limpo(p.texto).length*70+5000),0)/60000);
+  $('#coverSub').textContent=`${passos.length} passos · cerca de ${minutos} minutos`;
+  $('#progress').innerHTML=passos.map((p,i)=>`<button type="button" aria-label="Passo ${i+1}: ${p.titulo}"><i></i></button>`).join('');
+  let html='',ult=0;passos.forEach((p,i)=>{if(p.parte!==ult){if(ult)html+='</ol>';html+=`<h3>${PARTES[p.parte]}</h3><ol>`;ult=p.parte}html+=`<li><button type="button"><b>${i+1}</b>${p.titulo}</button></li>`});
+  $('#stepList').innerHTML=html+'</ol>';
+  ult=0;$('#written').innerHTML=passos.map(p=>{let h='';if(p.parte!==ult){h=`<li class="part">${PARTES[p.parte]}</li>`;ult=p.parte}return h+`<li><strong>${p.titulo}</strong><span>${p.texto}</span></li>`}).join('');
+  // No texto escrito o endereço vira link.
+  $$('#written b').forEach(b=>{if(b.textContent===SITE)b.innerHTML=`<a href="https://${SITE}">${SITE}</a>`});
+
+  // Escolher um passo já começa a tocar.
+  const pular=i=>{$('#cover').hidden=true;paused=false;if('speechSynthesis' in window)speechSynthesis.resume();ir(i)};
+  $$('#progress button').forEach((b,i)=>b.onclick=()=>pular(i));
+  $$('#stepList button').forEach((b,i)=>b.onclick=()=>pular(i));
+  $('#cover').onclick=tocar;
+  $('#bPlay').onclick=()=>paused?tocar():pausar();
+  $('#bPrev').onclick=()=>pular(cur-1);
+  $('#bNext').onclick=()=>pular(cur+1);
+  $('#bVoz').onclick=()=>{
+    if(!('speechSynthesis' in window)){alert('Este navegador não tem narração. Use o Chrome ou o Edge.');return}
+    voz=!voz;try{localStorage.setItem('guiaVoz',voz?'1':'0')}catch{}
+    if(!voz)calar();else if(!paused)ir(cur);
+    pintar();
+  };
+  $('#bFull').onclick=()=>{const pl=$('#player');document.fullscreenElement?document.exitFullscreen():pl.requestFullscreen?.()};
+  addEventListener('keydown',e=>{if(e.target.closest('input,textarea'))return;
+    if(e.key===' '){e.preventDefault();paused?tocar():pausar()}else if(e.key==='ArrowRight')pular(cur+1);else if(e.key==='ArrowLeft')pular(cur-1)});
+
+  cursorEm(600,430,false);
+  ir(0);
+})();
+</script>
+</body>
+</html>
