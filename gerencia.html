@@ -60,6 +60,17 @@
     .dept{display:flex;justify-content:space-between;align-items:end;gap:10px 24px;flex-wrap:wrap;margin-bottom:24px;border-bottom:1px solid var(--line)}.dept h1{padding-bottom:12px}
     .tabs{display:flex;gap:2px;overflow-x:auto;max-width:100%}.tab-link{padding:10px 16px;font-weight:700;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;white-space:nowrap}
     .tab-link:hover{color:var(--ink)}.tab-link.active{color:var(--navy);border-bottom-color:var(--green)}
+    /* Áreas (Captação | Locação) e as abas de cada uma */
+    .areas{display:flex;gap:8px;padding-bottom:12px;flex-wrap:wrap}
+    .area-link{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 22px;font-weight:800;font-size:1rem;color:var(--muted)}
+    .area-link:hover{color:var(--ink);border-color:#b6c5cf}.area-link.active{background:var(--navy);border-color:var(--navy);color:#fff}
+    .subtabs{margin:-12px 0 20px;border-bottom:1px solid var(--line)}
+    .cr{display:grid;gap:22px}
+    .cap-tools{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+    .cap-tools .field input,.cap-tools .field select{width:auto}
+    #contratos tr.erro td{background:#fdecec}#contratos tr.erro td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+    .tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:.72rem;font-weight:800}.tag.sim{background:#e3f1ec;color:#1d604d}.tag.nao{background:#fdf0dc;color:#8a5a12}.tag.bad{background:#fbe3e3;color:var(--red)}.tag.pos{background:#eef2f7;color:#3b5577}
+    .semana-row td{background:#f3f6f8;font-weight:800;font-size:.8rem;letter-spacing:.03em}
     .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow)}
     /* Relatório semanal: mesmo formato da planilha */
     .rel-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.rel-nav input{border:1px solid #cbd5da;border-radius:10px;padding:7px 9px;background:#fff}
@@ -220,7 +231,10 @@
 
 <main id="app" hidden>
   <div class="dept"><h1>Meu painel</h1>
-    <nav class="tabs" aria-label="Seções do painel"><button type="button" class="tab-link" data-go="painel">Painel</button><button type="button" class="tab-link" data-go="semanal">Relatório semanal</button><button type="button" class="tab-link" data-go="apresentacao">Apresentação</button></nav></div>
+    <nav class="areas" aria-label="Áreas do painel"><button type="button" class="area-link" data-area="captacao">Captação</button><button type="button" class="area-link" data-area="locacao">Locação</button></nav></div>
+  <nav class="tabs subtabs" aria-label="Seções da área">
+    <button type="button" class="tab-link" data-go="cap-relatorio" data-area="captacao">Relatório</button><button type="button" class="tab-link" data-go="cap-quadros" data-area="captacao">Quadros</button>
+    <button type="button" class="tab-link" data-go="painel" data-area="locacao">Painel</button><button type="button" class="tab-link" data-go="semanal" data-area="locacao">Relatório semanal</button><button type="button" class="tab-link" data-go="apresentacao" data-area="locacao">Apresentação</button><button type="button" class="tab-link" data-go="contratos" data-area="locacao">Contratos do mês</button></nav>
 
   <div class="card filters" role="search">
     <div class="field"><label for="fPeriodo">Período</label><select id="fPeriodo"><option value="mes">Este mês</option><option value="mespassado">Mês passado</option><option value="90">Últimos 90 dias</option><option value="ano">Este ano</option><option value="tudo">Tudo</option><option value="custom">Escolher datas…</option></select>
@@ -312,6 +326,34 @@
       <div class="gal" id="galeria"></div>
     </div>
   </section>
+
+  <section id="tab-contratos" data-tab hidden>
+    <div class="top">
+      <div><h2>Contratos do mês</h2><p>A planilha de locações (RANKING 2026). Linhas em vermelho: REF repetida no mês ou garantia não informada.</p></div>
+      <div class="cap-tools"><div class="field"><label for="ctMes">Mês</label><input type="month" id="ctMes"></div><a class="secondary" href="locacao.html" style="text-decoration:none">Abrir a Locação ↗</a></div>
+    </div>
+    <div class="tiles" id="ctTiles"></div>
+    <div class="card table-card"><div class="list-head"><h2>Contratos</h2><span class="muted" id="ctCount"></span></div>
+      <div class="table-wrap"><table id="contratos"></table></div></div>
+  </section>
+
+  <section id="tab-cap-relatorio" data-tab hidden>
+    <div class="top">
+      <div><h2>Relatório de captação</h2><p>O que cada captadora lança na Captação. Os totais são calculados; os erros aparecem em vermelho.</p></div>
+      <div class="cap-tools"><div class="field"><label for="crMes">Mês</label><input type="month" id="crMes"></div>
+        <div class="field"><label for="crCidade">Cidade</label><select id="crCidade"><option value="">Itajaí e Navegantes</option><option>Itajaí</option><option>Navegantes</option></select></div>
+        <a class="secondary" href="captacao.html" style="text-decoration:none">Abrir a Captação ↗</a></div>
+    </div>
+    <div class="cr" id="crBody"><p class="msg">Carregando…</p></div>
+  </section>
+
+  <section id="tab-cap-quadros" data-tab hidden>
+    <div class="top">
+      <div><h2>Quadros das captadoras</h2><p>Quantos cartões cada captadora tem em cada coluna. "Parados" = 7 dias ou mais na mesma coluna (sem contar a última).</p></div>
+      <div class="cap-tools"><a class="secondary" href="captacao.html" style="text-decoration:none">Abrir os quadros ↗</a></div>
+    </div>
+    <div class="cr" id="cqBody"><p class="msg">Carregando…</p></div>
+  </section>
 </main>
 
 <div id="show" hidden>
@@ -363,6 +405,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="captacao-relatorio.js"></script>
 <script>
   // Dados ficam no Supabase (ver supabase/gerencia.sql). Esta página não contém nenhum dado:
   // tudo é carregado depois do login e o banco só entrega para a gerência (tabela "gestores").
@@ -422,23 +465,34 @@
     if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
     form.reset();
   };
-  const sair=async()=>{if(apSujo&&!confirm('Os textos da apresentação não foram salvos. Sair mesmo assim?'))return;await db.auth.signOut();booted=false;leads=[];analises=[];resultados=[];locacoes=[];fatos=[];equipe=[];fotos={};apresentacoes=[];apPronto=false;apSujo=false};
+  const sair=async()=>{if(apSujo&&!confirm('Os textos da apresentação não foram salvos. Sair mesmo assim?'))return;await db.auth.signOut();booted=false;leads=[];analises=[];resultados=[];locacoes=[];fatos=[];equipe=[];fotos={};apresentacoes=[];apPronto=false;apSujo=false;contratos=null;capQuadros=null;capRel=[];capAno=null};
   $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
 
   // ---------- Abas ----------
+  // Duas áreas: Captação (relatório e quadros das captadoras) e Locação (painel, relatório semanal, apresentação e contratos).
+  const AREAS={captacao:['cap-relatorio','cap-quadros'],locacao:['painel','semanal','apresentacao','contratos']};
+  const ABAS=Object.values(AREAS).flat();
+  const areaDe=tab=>Object.keys(AREAS).find(a=>AREAS[a].includes(tab));
+  const ultimaDaArea={};
   function showTab(pedida){
-    const abas=['painel','semanal','apresentacao'],tab=abas.includes(pedida)?pedida:abas.includes(location.hash.slice(1))?location.hash.slice(1):'painel';
+    const tab=ABAS.includes(pedida)?pedida:ABAS.includes(location.hash.slice(1))?location.hash.slice(1):'painel',area=areaDe(tab);
+    ultimaDaArea[area]=tab;
     if(pedida)try{history.replaceState(null,'','#'+tab)}catch{}
     document.querySelectorAll('[data-tab]').forEach(s=>s.hidden=s.id!=='tab-'+tab);
-    document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
+    document.querySelectorAll('.area-link').forEach(a=>{const on=a.dataset.area===area;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
+    document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.hidden=a.dataset.area!==area;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
     // Gráfico desenhado com a aba escondida fica com tamanho zero: redesenha ao voltar.
     if(tab==='painel'&&fatos.length)render();
-    // Os filtros do painel não valem para a apresentação (ela é sempre de uma semana inteira).
-    $('.filters').hidden=tab==='apresentacao';
+    // Os filtros (período, unidade, corretor) valem só para o painel e o relatório semanal.
+    $('.filters').hidden=!['painel','semanal'].includes(tab);
     if(tab==='apresentacao'&&apPronto)renderThumbs();
+    if(tab==='contratos')abrirContratos();
+    if(area==='captacao')abrirCaptacao(tab);
   }
   addEventListener('hashchange',()=>showTab());
   document.querySelectorAll('.tab-link').forEach(b=>b.onclick=()=>showTab(b.dataset.go));
+  // Clicar numa área abre a primeira aba dela (ou a última usada nela).
+  document.querySelectorAll('.area-link').forEach(b=>b.onclick=()=>showTab(ultimaDaArea[b.dataset.area]||AREAS[b.dataset.area][0]));
   function toast(text){const t=document.createElement('div');t.className='toast';t.textContent=text;document.body.append(t);setTimeout(()=>t.remove(),2200)}
   async function copiar(text,oque){try{await navigator.clipboard.writeText(text);toast(oque+' copiado')}catch{prompt('Copie abaixo:',text)}}
 
@@ -1090,6 +1144,82 @@
     }
     $('#pesSubmit').disabled=false;
   };
+
+  // ---------- Locação · Contratos do mês ----------
+  // A planilha de locações (tabela locacoes) sem comissões: só os dados do contrato. Erros do mês como na Locação.
+  let contratos=null;
+  const ymHoje=()=>iso(new Date()).slice(0,7);
+  async function abrirContratos(){
+    if(!$('#ctMes').value)$('#ctMes').value=ymHoje();
+    if(!contratos){
+      $('#contratos').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
+      try{const all=[];
+        for(let from=0;;from+=1000){const {data,error}=await db.from('locacoes').select('id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,captadora,captacao_pos,observacao,ordem,criado_em').order('data').order('ordem').order('criado_em').range(from,from+999);
+          if(error)throw error;all.push(...data);if(data.length<1000)break}
+        contratos=all.map(l=>({...l,vgl:Number(l.vgl)}));
+      }catch(err){$('#contratos').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(err.message)}</td></tr></tbody>`;return}
+    }
+    renderContratos();
+  }
+  $('#ctMes').addEventListener('change',()=>{if(!$('#ctMes').value)$('#ctMes').value=ymHoje();renderContratos()});
+  function renderContratos(){
+    const ym=$('#ctMes').value,list=contratos.filter(l=>l.data.startsWith(ym)),porRef={};
+    const refN=r=>String(r||'').toUpperCase().replace(/\s+/g,'');
+    list.forEach(l=>(porRef[refN(l.referencia)]??=[]).push(l));
+    const erros=l=>[...(porRef[refN(l.referencia)].length>1?[`REF repetida (${porRef[refN(l.referencia)].length}×)`]:[]),...(l.garantia?[]:['Garantia não informada'])];
+    const vgl=list.reduce((s,l)=>s+l.vgl,0),ass=list.filter(l=>l.assinado).length,comErro=list.filter(l=>erros(l).length).length;
+    $('#ctTiles').innerHTML=[['Locações',list.length,list.length===1?'contrato':'contratos'],['VGL',brl(vgl),'soma dos aluguéis'],['Assinados',`${ass} de ${list.length}`,list.length-ass?`${list.length-ass} ainda sem assinatura`:'todos assinados'],
+      ['Para conferir',comErro,comErro?'linhas em vermelho':'nenhum erro']].map(([a,b,c])=>`<div class="card tile"><span>${a}</span><strong>${b}</strong><small>${c}</small></div>`).join('');
+    $('#ctCount').textContent=`${list.length} ${list.length===1?'locação':'locações'}`;
+    if(!list.length){$('#contratos').innerHTML='<tbody><tr><td class="empty">Nenhuma locação lançada neste mês.</td></tr></tbody>';return}
+    $('#contratos').innerHTML=`<thead><tr><th>Data</th><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th><th>Captadora</th></tr></thead><tbody>
+      ${list.map(l=>{const e=erros(l);return `<tr${e.length?' class="erro"':''}><td>${br(l.data).slice(0,5)}</td>
+        <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${e.filter(x=>x.startsWith('REF')).map(x=>` <span class="tag bad">${safe(x)}</span>`).join('')}</td>
+        <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td><td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
+        <td>${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}</td>
+        <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
+        <td class="num"><strong>${brl(l.vgl)}</strong></td><td class="num">${String(Number(l.percentual)).replace('.',',')}%</td>
+        <td style="white-space:nowrap">${l.captadora?safe(l.captadora)+' ':''}<span class="tag pos">${l.captacao_pos?'PÓS':'NOVA'}</span></td></tr>`}).join('')}</tbody>
+      <tfoot><tr class="tot"><td colspan="7">Total</td><td class="num">${brl(vgl)}</td><td colspan="2"></td></tr></tfoot>`;
+  }
+
+  // ---------- Captação (relatório e quadros das captadoras) ----------
+  // As regras e a visão total vêm de captacao-relatorio.js (as mesmas da página da Captação). Carrega ao abrir a área.
+  let capQuadros=null,capRel=[],capAno=null;
+  async function abrirCaptacao(tab){
+    if(!$('#crMes').value)$('#crMes').value=ymHoje();
+    try{
+      if(!capQuadros){const {data,error}=await db.from('captacao_quadros').select('id,nome,email,modelo,ativo,posicao').order('posicao');if(error)throw error;capQuadros=data}
+      // De outubro/2026 em diante, parte dos números vem dos quadros (CapRel.efetivas). Recarrega sempre que abre a aba.
+      if(tab==='cap-relatorio'){const ano=$('#crMes').value.slice(0,4);$('#crBody').innerHTML='<p class="msg">Carregando…</p>';
+        const [r,d]=await Promise.all([CapRel.carregarAno(db,ano),CapRel.ehAuto(`${ano}-12`)?CapRel.carregarQuadros(db):null]);capRel=CapRel.efetivas(r,d,ano);capAno=ano;renderCapRel()}
+      else await renderCapQuadros();
+    }catch(err){$(tab==='cap-relatorio'?'#crBody':'#cqBody').innerHTML=`<p class="msg error">Não foi possível carregar: ${safe(err.message)}</p>`}
+  }
+  const capCaps=()=>capQuadros.filter(q=>!q.modelo&&(q.ativo||capRel.some(r=>r.quadro_id===q.id)));
+  function renderCapRel(){$('#crBody').innerHTML=CapRel.htmlTotal({rel:capRel,caps:capCaps(),ym:$('#crMes').value,cidade:$('#crCidade').value})}
+  $('#crMes').addEventListener('change',()=>{if(!$('#crMes').value)$('#crMes').value=ymHoje();if($('#crMes').value.slice(0,4)===capAno)renderCapRel();else abrirCaptacao('cap-relatorio')});
+  $('#crCidade').addEventListener('change',renderCapRel);
+  // O nome da captadora no resumo abre o relatório dela na página da Captação.
+  $('#crBody').addEventListener('click',e=>{const b=e.target.closest('[data-rq]');if(b)location.href=`captacao.html?rel=${encodeURIComponent(b.dataset.rq)}&mes=${$('#crMes').value}`});
+  async function renderCapQuadros(){
+    const pega=async(t,c)=>{const all=[];for(let from=0;;from+=1000){const {data,error}=await db.from(t).select(c).range(from,from+999);if(error)throw error;all.push(...data);if(data.length<1000)break}return all};
+    const [cols,todos]=await Promise.all([pega('captacao_colunas','id,quadro_id,nome,posicao'),pega('captacao_cartoes','quadro_id,coluna_id,modelo,movido_em,arquivado_em')]);
+    const cards=todos.filter(k=>!k.arquivado_em); // arquivados não estão mais no quadro
+    const mod=capQuadros.find(q=>q.modelo),lista=capQuadros.filter(q=>!q.modelo&&q.ativo);
+    const nomes=[];const add=n=>{if(!nomes.some(x=>x.toLowerCase()===n.toLowerCase()))nomes.push(n)};
+    cols.filter(c=>c.quadro_id===mod?.id).sort((a,b)=>a.posicao-b.posicao).forEach(c=>add(c.nome));cols.filter(c=>c.quadro_id!==mod?.id).forEach(c=>add(c.nome));
+    const colNome=Object.fromEntries(cols.map(c=>[c.id,c.nome.toLowerCase()]));
+    const ultimaDe={};cols.forEach(c=>{const u=ultimaDe[c.quadro_id];if(!u||c.posicao>u.posicao)ultimaDe[c.quadro_id]=c});
+    const reais=q=>cards.filter(k=>k.quadro_id===q&&!k.modelo);
+    const dias=s=>Math.floor((Date.now()-new Date(s))/864e5);
+    const parados=q=>reais(q).filter(k=>k.coluna_id!==ultimaDe[q]?.id&&dias(k.movido_em)>=7).length;
+    const cel=v=>`<td class="n${v?'':' z'}">${v}</td>`;
+    if(!lista.length){$('#cqBody').innerHTML='<p class="msg">Nenhum quadro de captadora ainda.</p>';return}
+    $('#cqBody').innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>Captadora</th>${nomes.map(n=>`<th>${safe(n)}</th>`).join('')}<th>Total</th><th>Parados 7+ dias</th></tr></thead><tbody>
+      ${lista.map(q=>`<tr><td><strong>${safe(q.nome)}</strong>${q.email?'':' <small class="muted">(sem login)</small>'}</td>${nomes.map(n=>cel(reais(q.id).filter(k=>colNome[k.coluna_id]===n.toLowerCase()).length)).join('')}${cel(reais(q.id).length)}${cel(parados(q.id))}</tr>`).join('')}</tbody>
+      <tfoot><tr><td>Total</td>${nomes.map(n=>cel(lista.reduce((s,q)=>s+reais(q.id).filter(k=>colNome[k.coluna_id]===n.toLowerCase()).length,0))).join('')}${cel(lista.reduce((s,q)=>s+reais(q.id).length,0))}${cel(lista.reduce((s,q)=>s+parados(q.id),0))}</tr></tfoot></table></div>`;
+  }
 
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
   db.auth.onAuthStateChange(()=>setTimeout(()=>refreshSession().catch(console.error),0));

@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Captação | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--navy:#173552;--blue:#294b68;--green:#24705a;--cream:#f5f5f0;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10);--col:#e9edf0}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+    button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer} [hidden]{display:none!important}
+    header.bar{background:var(--navy);color:#fff;padding:14px clamp(16px,3vw,32px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .bar a{color:#cbd8e1;text-decoration:none;font-weight:600;font-size:.9rem}.bar a:hover{color:#fff}
+    .bar strong{font-size:1.02rem}.bar .who{color:#b9cad7;font-size:.82rem;margin-right:8px}
+    .bar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    h1{font-family:Georgia,serif;font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.1;margin:0}
+    h2{font-family:Georgia,serif;font-size:1.25rem;margin:0}
+    .primary{border:0;background:var(--green);color:#fff;padding:9px 14px;border-radius:10px;font-weight:700}.primary:hover{background:#1d604d}.primary:disabled{opacity:.6}
+    .secondary{border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:10px;font-weight:650}.secondary:hover{border-color:#b6c5cf}
+    .ghost{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;font-size:.85rem}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .gate{max-width:420px;margin:60px auto;padding:28px}.gate h1{font-size:1.6rem;margin-bottom:6px}.gate p{color:var(--muted);margin:0 0 18px}.gate form{display:grid;gap:14px}
+    .field{display:grid;gap:5px}.field label,.lbl{font-size:.74rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;min-width:0}
+    input:focus,select:focus,textarea:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .msg{margin:0;font-size:.85rem;color:var(--muted)}.msg.error{color:var(--red)}
+    .muted{color:var(--muted)}.link{border:0;background:none;color:var(--blue);font-weight:700;padding:2px 4px;border-radius:6px;font-size:.82rem}.link:hover{background:#eef2f4}.link.danger{color:var(--red)}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow)}
+    /* Abas */
+    .tabs{display:flex;gap:4px;padding:14px clamp(16px,3vw,32px) 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+    .tabs button{border:0;background:transparent;padding:9px 14px;border-radius:10px 10px 0 0;font-weight:700;color:var(--muted);border-bottom:3px solid transparent}
+    .tabs button.on{color:var(--ink);border-bottom-color:var(--green);background:#fff}
+    /* Barra de ferramentas */
+    .tools{display:flex;gap:10px;align-items:end;flex-wrap:wrap;padding:16px clamp(16px,3vw,32px) 10px}
+    .tools .grow{flex:1;min-width:220px}.tools input,.tools select{border:1px solid #cbd5da;border-radius:10px;padding:8px 10px;background:#fff;min-width:0}
+    .tools .busca{width:240px;max-width:100%}
+    .sub{margin:4px 0 0;color:var(--muted);font-size:.88rem}
+    .qsel{font-family:Georgia,serif;font-size:1.3rem;font-weight:700;border:1px solid var(--line)!important;border-radius:10px;padding:4px 8px!important;background:#fff;max-width:100%}
+    .tag-modelo{display:inline-block;background:#fff3dc;color:#7a4b0c;border-radius:6px;padding:1px 8px;font-size:.75rem;font-weight:800;margin-left:6px;vertical-align:middle}
+    /* Quadro */
+    .board{display:flex;gap:12px;align-items:flex-start;overflow-x:auto;padding:6px clamp(16px,3vw,32px) 24px;min-height:calc(100vh - 240px)}
+    .kcol{background:var(--col);border-radius:14px;width:282px;flex:none;display:flex;flex-direction:column;max-height:calc(100vh - 250px)}
+    .kcol-head{padding:10px 12px 6px;display:flex;justify-content:space-between;gap:8px;align-items:start}
+    .kcol-head h3{margin:0;font-size:.8rem;font-weight:800;letter-spacing:.02em;line-height:1.3}
+    .kcol-head span{background:#fff;border-radius:999px;padding:0 8px;font-size:.75rem;font-weight:800;color:var(--muted);flex:none}
+    .kcol-body{overflow-y:auto;padding:4px 8px 8px;display:flex;flex-direction:column;gap:8px;min-height:40px}
+    .kcol-body.over{background:#dde6ec;border-radius:0 0 14px 14px}
+    .kcard{background:#fff;border-radius:10px;padding:8px 10px;box-shadow:0 1px 0 rgba(9,30,66,.18);cursor:pointer;border:1px solid transparent;text-align:left;width:100%}
+    .kcard:hover{border-color:#9ec5f4}.kcard.drag{opacity:.4}.kcard.modelo{border:1px dashed #c9a25a;background:#fffaf0}.kcard.arq{opacity:.6;background:#f3f4f5}
+    .kcard .t{font-size:.86rem;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+    .kcard .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:.74rem;color:var(--muted);align-items:center}
+    .kcard .meta .velho{color:var(--red);font-weight:750}
+    .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+    .chip{display:inline-block;border-radius:5px;padding:1px 7px;font-size:.68rem;font-weight:800;line-height:1.5;letter-spacing:.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .placeholder{height:6px;border-radius:4px;background:#6da7ec;flex:none}
+    .mais{border:0;background:transparent;color:var(--blue);font-weight:700;font-size:.82rem;padding:6px}
+    .kcol-foot{padding:0 8px 8px}.kcol-foot button{width:100%;border:0;background:transparent;text-align:left;padding:6px 8px;border-radius:8px;color:var(--muted);font-weight:650;font-size:.85rem}.kcol-foot button:hover{background:#dde3e8;color:var(--ink)}
+    .vazio{margin:30px clamp(16px,3vw,32px);padding:24px;max-width:640px}
+    /* Visão geral */
+    .wrap{padding:6px clamp(16px,3vw,32px) 30px}
+    .tbl-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:14px}
+    table{border-collapse:collapse;width:100%;font-size:.86rem}
+    th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+    th{font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);background:#f6f8f9;white-space:normal;min-width:70px;vertical-align:bottom}
+    td.n{text-align:right;font-variant-numeric:tabular-nums}td.z{color:#b7c0c7}
+    tr:last-child td{border-bottom:0}tfoot td{font-weight:800;background:#f6f8f9}
+    /* Janelas */
+    dialog{border:0;border-radius:18px;padding:0;box-shadow:0 28px 90px rgba(10,30,45,.3);width:min(600px,calc(100% - 24px));overflow-x:hidden}dialog::backdrop{background:rgba(10,30,45,.62)}
+    dialog.wide{width:min(900px,calc(100% - 24px))}
+    .dialog-head{display:flex;justify-content:space-between;align-items:start;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}.close{border:0;background:#eef2f4;width:34px;height:34px;border-radius:50%;font-size:1.2rem;flex:none}
+    .dialog-body{padding:16px 20px 20px;display:grid;gap:16px}
+    .ctitle{width:100%;border:1px solid transparent;border-radius:8px;padding:4px 6px;font-family:Georgia,serif;font-size:1.25rem;font-weight:700;background:transparent}
+    .ctitle:hover{border-color:var(--line)}
+    .cgrid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px}
+    .side{display:grid;gap:14px;align-content:start}
+    .desc{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f8f9;border-radius:10px;padding:12px 14px;font-size:.9rem;min-height:60px}
+    .desc:empty:before{content:"Sem descrição.";color:var(--muted)}
+    textarea.edit{width:100%;min-height:260px;border:1px solid #cbd5da;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:.9rem}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .etq-picker{border:1px solid var(--line);border-radius:10px;padding:8px;display:grid;gap:4px;max-height:280px;overflow-y:auto}
+    .etq-picker label{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.82rem}
+    .hist{display:grid;gap:10px}
+    .hist .h{font-size:.84rem;display:grid;gap:3px}.hist .h small{color:var(--muted)}
+    .hist .h.com .txt{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere}
+    .hist .h.mov{color:#52616c}
+    .av{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:.68rem;font-weight:800;margin-right:6px;vertical-align:middle}
+    .colunas-lista{display:grid;gap:8px}.colunas-lista .cl{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center}
+    .colunas-lista input[type=text]{border:1px solid #cbd5da;border-radius:8px;padding:6px 8px;min-width:0}
+    .mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;font-size:.8rem}
+    .qlista{display:grid;gap:10px}
+    .qitem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px}
+    .qitem input{border:1px solid #cbd5da;border-radius:8px;padding:6px 8px;min-width:0;width:100%}
+    .qitem.off{opacity:.55}
+    .aviso{border:1px solid #ecd9b0;background:#fff8ea;border-radius:10px;padding:10px 12px;font-size:.86rem}
+    /* Relatório */
+    .grade input{width:74px;border:1px solid #cbd5da;border-radius:8px;padding:5px 7px;text-align:right;background:#fff}
+    .grade input.refs{width:100%;min-width:220px;text-align:left}
+    .grade input::placeholder{color:#8a959d;opacity:1}.grade input.aj{background:#fff6dc;border-color:#e0c27a}
+    .grade td{vertical-align:top}.grade td.tot{font-weight:800;text-align:right;padding-top:12px}
+    .grade .st{font-size:.72rem;color:var(--green);font-weight:700;display:block;min-height:1em}
+    .prob{color:var(--red);font-size:.78rem;font-weight:650;white-space:normal}
+    tr.erro td{background:#fdf0f0}td.erro{background:#fdf0f0;color:var(--red);font-weight:750}
+    .semana h3{margin:0 0 8px;font-size:1rem}
+    /* Materiais */
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin:12px 0 28px}
+    .doc{padding:18px;display:flex;gap:14px;align-items:flex-start;min-width:0}.doc>div{min-width:0}
+    .doc-ico{width:44px;height:52px;border-radius:8px;display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#fff;flex:none;background:var(--blue)}
+    .doc-ico.pdf{background:var(--red)}.doc-ico.xls{background:var(--green)}.doc-ico.img{background:var(--amber)}.doc-ico.html{background:var(--navy)}.doc-ico.ppt{background:#c25100}
+    .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}
+    .vazio-doc{border:1px dashed #bac5cc;border-radius:12px;padding:22px;text-align:center;color:var(--muted);grid-column:1/-1}
+    .seg{display:flex;gap:8px;flex-wrap:wrap}.seg label{flex:1;min-width:110px;border:1px solid #cbd5da;border-radius:10px;padding:9px 10px;text-align:center;font-weight:700;font-size:.85rem;cursor:pointer;position:relative}
+    .seg input{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none}.seg label:has(input:checked){background:var(--navy);border-color:var(--navy);color:#fff}
+    dialog.leitor{width:min(1100px,calc(100% - 26px));height:min(90vh,940px)}dialog.leitor .dialog-head{padding:12px 18px}dialog.leitor iframe{width:100%;height:calc(100% - 60px);border:0;background:#fff}
+    @media(max-width:760px){.cgrid{grid-template-columns:1fr}.kcol{width:260px}.qitem{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header class="bar">
+  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Captação</strong></div>
+  <div class="bar-actions" id="barActions" hidden><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
+</header>
+
+<section class="card gate" id="gate" hidden>
+  <h1>Captação</h1>
+  <p>Área restrita das captadoras e da gerência. Entre com o seu e-mail e senha.</p>
+  <form id="loginForm">
+    <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
+    <button class="primary" type="submit">Entrar</button>
+    <p class="msg error" id="loginMsg" hidden></p>
+  </form>
+</section>
+
+<section class="card gate" id="denied" hidden>
+  <h1>Sem acesso</h1>
+  <p>Este login ainda não tem um quadro de captação. Fale com a gerência.</p>
+  <button class="secondary" id="deniedLogout">Entrar com outro e-mail</button>
+</section>
+
+<main id="app" hidden>
+  <nav class="tabs" id="tabs">
+    <button data-tab="quadro" class="on">Quadro</button>
+    <button data-tab="relatorio">Relatório</button>
+    <button data-tab="materiais">Materiais</button>
+    <button data-tab="acessos">Acessos</button>
+    <button data-tab="minhas">Minhas senhas</button>
+    <button data-tab="geral" data-gestor hidden>Visão geral</button>
+  </nav>
+
+  <section id="tab-quadro">
+    <div class="tools">
+      <div class="grow">
+        <div id="qTitulo"></div>
+        <p class="sub" id="resumo">Carregando…</p>
+      </div>
+      <input class="busca" id="fBusca" type="search" placeholder="Buscar REF, nome ou texto" aria-label="Buscar cartão">
+      <select id="fEtiqueta" aria-label="Filtrar por etiqueta"></select>
+      <label class="msg" style="align-self:center"><input type="checkbox" id="fArquivados"> Ver arquivados</label>
+      <button class="secondary" id="btnColunas" data-gestor hidden>Colunas</button>
+      <button class="secondary" id="btnQuadros" data-gestor hidden>Quadros das captadoras</button>
+      <button class="primary" id="btnNovo">+ Novo cartão</button>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="card vazio" id="semColunas" hidden></div>
+  </section>
+
+  <section id="tab-relatorio" hidden>
+    <div class="tools">
+      <div class="grow"><h1>Relatório de captação</h1><p class="sub" id="rSub"></p></div>
+      <div class="field"><label for="rMes">Mês</label><input type="month" id="rMes"></div>
+      <div class="field" data-gestor hidden><label for="rQuem">Captadora</label><select id="rQuem"></select></div>
+      <div class="field" id="rCidadeBox"><label for="rCidade">Cidade</label><select id="rCidade"><option value="">Itajaí e Navegantes</option><option>Itajaí</option><option>Navegantes</option></select></div>
+    </div>
+    <div class="wrap cr" id="rConteudo" style="display:grid;gap:22px"></div>
+  </section>
+
+  <section id="tab-acessos" hidden>
+    <div class="tools"><div class="grow"><h1>Acessos</h1><p class="sub">Sistemas e links usados na captação. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".</p></div>
+      <button class="primary" id="newSenha">+ Novo acesso</button></div>
+    <div class="wrap" style="display:grid;gap:22px">
+      <div><h2 style="margin-bottom:8px">Sistemas</h2><div class="tbl-wrap"><table id="senhasTable" data-grupo=""></table></div></div>
+      <div>
+        <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Cursos</h2><button class="secondary" id="newCurso">+ Novo curso</button></div>
+        <div class="tbl-wrap"><table id="cursosTable" data-grupo="curso"></table></div>
+      </div>
+      <div>
+        <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Links úteis</h2><button class="secondary" id="newLink">+ Novo link</button></div>
+        <div class="links" id="linksLista"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-materiais" hidden>
+    <div class="tools"><div class="grow"><h1>Materiais</h1><p class="sub">Materiais da captação para todas as captadoras: apresentações, modelos, POP e documentos. Vídeos e sites ficam em Acessos → Links úteis.</p></div>
+      <button class="primary" id="newDoc">+ Enviar material</button></div>
+    <div class="wrap">
+      <h2>Materiais</h2><div class="doc-grid" id="docsMat"></div>
+      <h2>POP</h2><div class="doc-grid" id="docsPop"></div>
+    </div>
+  </section>
+
+  <section id="tab-minhas" hidden>
+    <div class="tools"><div class="grow"><h1>Minhas senhas</h1><p class="sub">Suas senhas pessoais, criptografadas. <strong>Só você vê</strong> esta lista: nem as outras captadoras, nem a gerência.</p></div>
+      <button class="primary" id="newMinha">+ Nova senha</button></div>
+    <div class="wrap"><div class="tbl-wrap"><table id="minhasTable"></table></div></div>
+  </section>
+
+  <section id="tab-geral" hidden>
+    <div class="tools"><div class="grow"><h1>Visão geral</h1><p class="sub">Quantos cartões cada captadora tem em cada coluna. Clique no nome para abrir o quadro dela.</p></div></div>
+    <div class="wrap"><div class="tbl-wrap" id="geral"></div></div>
+  </section>
+</main>
+
+<dialog id="cardDialog" class="wide">
+  <div class="dialog-head"><div style="flex:1;min-width:0"><input class="ctitle" id="cTitulo" maxlength="300" aria-label="Título do cartão"><p class="msg" id="cOnde" style="margin:2px 6px 0"></p></div><button class="close" data-close aria-label="Fechar">×</button></div>
+  <div class="dialog-body">
+    <div class="cgrid">
+      <div style="display:grid;gap:16px;align-content:start;min-width:0">
+        <div class="chips" id="cChips"></div>
+        <div>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Descrição</span><button class="link" id="cDescEditar">Editar</button></div>
+          <div class="desc" id="cDesc"></div>
+          <div id="cDescForm" hidden><textarea class="edit" id="cDescTxt" maxlength="20000"></textarea>
+            <div class="row" style="margin-top:8px"><button class="primary" id="cDescSalvar">Salvar</button><button class="secondary" id="cDescCancelar">Cancelar</button></div></div>
+        </div>
+        <div>
+          <span class="lbl">Comentário</span>
+          <textarea class="edit" id="cComentario" style="min-height:70px;margin-top:5px" maxlength="5000" placeholder="Escreva um comentário…"></textarea>
+          <div class="row" style="margin-top:6px"><button class="primary" id="cComentar">Comentar</button></div>
+        </div>
+        <div>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Histórico</span><label class="msg"><input type="checkbox" id="cSoComent"> Só comentários</label></div>
+          <div class="hist" id="cHist" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="field"><label for="cColuna">Coluna</label><select id="cColuna"></select></div>
+        <div>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Etiquetas</span><button class="link" id="cEtqAbrir">Escolher</button></div>
+          <div id="cEtqBox" hidden style="margin-top:6px"><input id="cEtqBusca" type="search" placeholder="Buscar etiqueta" style="width:100%;border:1px solid #cbd5da;border-radius:8px;padding:6px 8px;margin-bottom:6px"><div class="etq-picker" id="cEtqLista"></div>
+            <div class="row" style="margin-top:6px"><input id="cEtqNova" placeholder="Nova etiqueta" maxlength="60" style="flex:1;min-width:0;border:1px solid #cbd5da;border-radius:8px;padding:6px 8px"><select id="cEtqCor" class="mini"></select><button class="mini" id="cEtqCriar">Criar</button></div></div>
+        </div>
+        <label class="msg" id="cModeloBox"><input type="checkbox" id="cModelo"> Cartão-modelo (serve de base para cartões novos)</label>
+        <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <a class="link" id="cTrello" target="_blank" rel="noopener noreferrer" hidden>Abrir no Trello ↗</a>
+          <span class="msg" id="cAnexos" hidden></span>
+          <span class="msg" id="cCriado"></span>
+          <button class="link" id="cArquivar">Arquivar cartão</button>
+          <button class="link danger" id="cExcluir">Excluir cartão</button>
+          <span class="msg" style="font-size:.76rem">Arquivar ou excluir tira o cartão do quadro, mas a captação já feita continua no relatório.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="novoDialog">
+  <div class="dialog-head"><h2>Novo cartão</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="novoForm" class="dialog-body">
+    <div class="field"><label for="nTitulo">Título</label><input id="nTitulo" maxlength="300" required placeholder="Ex.: AP1650 - Rua tal, 123 - Proprietário"></div>
+    <div class="field"><label for="nColuna">Coluna</label><select id="nColuna"></select></div>
+    <div class="field" id="nModeloBox"><label for="nModelo">Começar a partir do modelo</label><select id="nModelo"></select></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button class="primary" id="nSalvar">Criar</button></div>
+    <p class="msg error" id="nMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="colDialog">
+  <div class="dialog-head"><h2>Colunas</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <div class="dialog-body">
+    <p class="msg" id="colAjuda"></p>
+    <div class="colunas-lista" id="colLista"></div>
+    <form class="row" id="colNova"><input name="nome" maxlength="120" placeholder="Nova coluna" required style="flex:1;border:1px solid #cbd5da;border-radius:8px;padding:7px 9px"><button class="secondary">Adicionar</button></form>
+    <div id="colTodos" hidden class="aviso"><strong>Levar para todos os quadros</strong><p class="msg" style="margin:4px 0 8px">Cria nos quadros das captadoras as colunas do modelo que faltam e põe todas na ordem do modelo. Nenhum cartão é mexido.</p><button class="secondary" id="colAplicar">Aplicar em todos os quadros</button></div>
+    <p class="msg error" id="colMsg" hidden></p>
+  </div>
+</dialog>
+
+<dialog id="quadrosDialog" class="wide">
+  <div class="dialog-head"><h2>Quadros das captadoras</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <div class="dialog-body">
+    <p class="msg">Cada captadora vê <strong>só o próprio quadro</strong>, entrando com o e-mail cadastrado aqui. A gerência vê todos. Um quadro novo já nasce com as colunas, as etiquetas e os cartões-modelo do <strong>quadro modelo</strong>.</p>
+    <form class="aviso" id="qNovo" style="display:grid;gap:10px">
+      <strong>Criar quadro</strong>
+      <div class="row"><input name="nome" maxlength="80" required placeholder="Nome da captadora" style="flex:1;min-width:160px;border:1px solid #cbd5da;border-radius:8px;padding:7px 9px">
+        <input name="email" type="email" maxlength="200" placeholder="E-mail de login (pode deixar para depois)" style="flex:1.4;min-width:200px;border:1px solid #cbd5da;border-radius:8px;padding:7px 9px">
+        <button class="primary">Criar quadro</button></div>
+    </form>
+    <div class="qlista" id="qLista"></div>
+    <p class="msg">O login (e-mail e senha) de cada captadora é criado no Supabase, em <em>Authentication → Users → Add user</em>. O e-mail tem de ser o mesmo cadastrado aqui.</p>
+    <p class="msg error" id="qMsg" hidden></p>
+  </div>
+</dialog>
+
+<dialog id="senhaDialog">
+  <div class="dialog-head"><h2 id="senhaTitle">Novo acesso</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="senhaForm" class="dialog-body" autocomplete="off">
+    <div class="field"><label for="sGrupo">Tipo</label><select id="sGrupo" name="grupo"><option value="">Sistema</option><option value="curso">Curso</option></select></div>
+    <div class="field"><label for="sSistema">Nome</label><input id="sSistema" name="sistema" maxlength="80" placeholder="Ex.: CRM, Superlógica, Treinamento comercial" required></div>
+    <div class="field"><label for="sLink">Link do site</label><input id="sLink" name="link" type="url" maxlength="300" placeholder="https://"></div>
+    <div class="field"><label for="sUsuario">Usuário / login</label><input id="sUsuario" name="usuario" maxlength="150" autocomplete="off"></div>
+    <div class="field"><label for="sSenha">Senha</label><div class="row" style="flex-wrap:nowrap"><input id="sSenha" name="senha" type="password" maxlength="200" autocomplete="new-password" style="flex:1"><button type="button" class="secondary" id="sSenhaVer">Mostrar</button></div>
+      <p class="msg" id="sSenhaHint" hidden>Deixe em branco para manter a senha atual.</p></div>
+    <div class="field"><label for="sObs">Observação</label><textarea id="sObs" name="observacao" rows="2" maxlength="500"></textarea></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="senhaSubmit">Salvar</button></div>
+    <p class="msg error" id="senhaMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="docDialog">
+  <div class="dialog-head"><h2>Enviar material</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="docForm" class="dialog-body">
+    <div class="field"><label for="dTitulo">Título</label><input id="dTitulo" name="titulo" maxlength="120" required placeholder="Ex.: Apresentação para proprietários"></div>
+    <div class="field"><span class="lbl">Onde fica</span>
+      <div class="seg"><label><input type="radio" name="categoria" value="Outros" checked>Materiais</label><label><input type="radio" name="categoria" value="POP">POP</label></div></div>
+    <div class="field"><label for="dArquivo">Arquivo (PDF, Word, Excel, PowerPoint, imagem ou página HTML, até 25 MB)</label><input id="dArquivo" name="arquivo" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.html,.htm" required></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="docSubmit">Enviar</button></div>
+    <p class="msg error" id="docMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="leitorDialog" class="leitor">
+  <div class="dialog-head"><h2 id="leitorTitulo">Documento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <iframe id="leitorFrame" title="Documento" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
+</dialog>
+
+<dialog id="linkDialog">
+  <div class="dialog-head"><h2 id="linkTitle">Novo link</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="linkForm" class="dialog-body" autocomplete="off">
+    <div class="field"><label for="lTitulo">Nome</label><input id="lTitulo" name="titulo" maxlength="120" required placeholder="Ex.: Vídeo da cidade de Itajaí"></div>
+    <div class="field"><label for="lUrl">Link</label><input id="lUrl" name="url" type="url" maxlength="1000" required placeholder="https://"></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary">Salvar</button></div>
+    <p class="msg error" id="linkMsg" hidden></p>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="captacao-relatorio.js"></script>
+<script>
+  // Captação (ver supabase/captacao.sql): um quadro privado por captadora, com a estrutura do antigo Trello "Captação Itajaí".
+  // A gerência escolhe o quadro, cria quadros novos (a partir do quadro modelo) e vê a visão geral; a captadora só vê o dela.
+  const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const $=s=>document.querySelector(s);
+  const LIMITE=40;
+  const CORES={green:['#4bce97','#164b35'],green_dark:['#1f845a','#fff'],green_light:['#baf3db','#164b35'],yellow:['#f5cd47','#533f04'],yellow_dark:['#946f00','#fff'],yellow_light:['#f8e6a0','#533f04'],
+    orange:['#fea362','#702e00'],orange_dark:['#c25100','#fff'],orange_light:['#fedec8','#702e00'],red:['#f87168','#5d1f1a'],red_dark:['#c9372c','#fff'],red_light:['#ffd5d2','#5d1f1a'],
+    purple:['#9f8fef','#352c63'],purple_dark:['#6e5dc6','#fff'],purple_light:['#dfd8fd','#352c63'],blue:['#579dff','#09326c'],blue_dark:['#0c66e4','#fff'],blue_light:['#cce0ff','#09326c'],
+    sky:['#6cc3e0','#164555'],sky_dark:['#227d9b','#fff'],sky_light:['#c6edfb','#164555'],lime:['#94c748','#37471f'],lime_dark:['#5b7f24','#fff'],lime_light:['#d3f1a7','#37471f'],
+    pink:['#e774bb','#50253f'],pink_dark:['#ae4787','#fff'],pink_light:['#fdd0ec','#50253f'],black:['#8590a2','#fff'],black_dark:['#626f86','#fff'],black_light:['#dcdfe4','#172b4d'],gray:['#dcdfe4','#172b4d']};
+  const CARTAO='id,quadro_id,coluna_id,posicao,titulo,referencia,descricao,etiquetas,modelo,trello_url,anexos_trello,criado_em,criado_por,movido_em,arquivado_em';
+  let quadros=[],quadroId=null,colunas=[],etiquetas=[],cartoes=[],comentarios={},booted=false,gestor=false,meuEmail='',mostrar={},aberto=null,hist=[];
+
+  const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  // Confirmação desenhada na própria página: alguns navegadores (como o do painel do app) bloqueiam a janela confirm() do sistema.
+  function confirmar(texto,ok='Excluir'){return new Promise(res=>{const d=document.createElement('dialog');
+    d.innerHTML=`<div style="padding:22px;display:grid;gap:16px;max-width:460px"><p style="margin:0;font-weight:600">${safe(texto)}</p><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" class="secondary" value="n">Cancelar</button><button type="button" class="primary" style="background:var(--red);box-shadow:none" value="s">${safe(ok)}</button></div></div>`;
+    let feito=false;const fim=v=>{if(!feito){feito=true;res(v)}};
+    d.addEventListener('click',e=>{const v=e.target.closest('button')?.value;if(v){fim(v==='s');d.close()}});
+    d.addEventListener('close',()=>{fim(false);d.remove()});document.body.append(d);d.showModal();d.querySelector('[value=n]').focus()})}
+  const pad=n=>String(n).padStart(2,'0');
+  const dataHora=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+  const dataBr=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`};
+  const refDe=t=>(String(t).match(/^\s*([A-Za-z]{2,4}\d{3,5})/)||[])[1]?.toUpperCase()||null;
+  const nome=a=>!a?'—':a.includes('@')?a.split('@')[0].replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):a;
+  const iniciais=a=>nome(a).split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
+  const diasDesde=s=>Math.floor((Date.now()-new Date(s))/864e5);
+  const md=s=>safe(s).replace(/\\([*_#\-\[\]()])/g,'$1').replace(/\*\*([^*]+?)\*\*/g,'<strong>$1</strong>').replace(/(^|[\s(])_([^_\n]+?)_(?=[\s).,:;!?]|$)/g,'$1<em>$2</em>');
+  const chip=e=>{const [bg,fg]=CORES[e.cor]||CORES.gray;return `<span class="chip" style="background:${bg};color:${fg}" title="${safe(e.nome)}">${safe(e.nome)}</span>`};
+  function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),2200)}
+  const quadro=()=>quadros.find(q=>q.id===quadroId);
+
+  // ---------- Acesso ----------
+  async function refreshSession(){
+    const {data:{session}}=await db.auth.getSession();
+    $('#barActions').hidden=!session;
+    if(!session){show('gate');return}
+    meuEmail=session.user.email;$('#who').textContent=meuEmail;
+    const [p,g]=await Promise.all([db.rpc('pode_captacao'),db.rpc('is_gestor')]);
+    if(p.error||p.data!==true){show('denied');return}
+    gestor=g.data===true;document.querySelectorAll('[data-gestor]').forEach(el=>el.hidden=!gestor);
+    show('app');
+    if(!booted){booted=true;await carregarQuadros()}
+  }
+  function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
+  $('#loginForm').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,f=new FormData(form),msg=$('#loginMsg');msg.hidden=true;
+    const {error}=await db.auth.signInWithPassword({email:String(f.get('email')).trim(),password:String(f.get('senha'))});
+    if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
+    form.reset();
+  };
+  const sair=async()=>{await db.auth.signOut();booted=false;cartoes=[];quadros=[];quadroId=null;senhas=[];links=[];minhas=[];docs=[];$('#minhasTable').innerHTML='';document.querySelectorAll('dialog[open]').forEach(d=>d.close());abrirAba('quadro')};
+  $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
+
+  // Esta área tem senhas: sai sozinha depois de 30 minutos sem uso.
+  let ultimoUso=Date.now();
+  ['pointerdown','keydown','scroll'].forEach(ev=>addEventListener(ev,()=>ultimoUso=Date.now(),{passive:true}));
+  setInterval(()=>{if(booted&&Date.now()-ultimoUso>30*60*1000){sair();toast('Você saiu por inatividade.')}},60*1000);
+
+  // Abas
+  $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)abrirAba(b.dataset.tab)});
+  function abrirAba(t){document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+    for(const s of ['quadro','relatorio','materiais','acessos','minhas','geral'])$('#tab-'+s).hidden=s!==t;
+    if(t==='geral')visaoGeral();if(t==='acessos')carregarAcessos();if(t==='relatorio')abrirRelatorio();if(t==='materiais')carregarDocs();if(t==='minhas')carregarMinhas()}
+
+  // ---------- Dados ----------
+  async function tudo(tabela,campos,ordem,filtro){
+    const all=[];
+    for(let from=0;;from+=1000){
+      let q=db.from(tabela).select(campos);if(filtro)q=q.eq(...filtro);if(ordem)q=q.order(ordem);
+      const {data,error}=await q.range(from,from+999);
+      if(error)throw error;all.push(...data);if(data.length<1000)break;
+    }
+    return all;
+  }
+  async function carregarQuadros(){
+    try{
+      quadros=(await tudo('captacao_quadros','id,nome,email,modelo,ativo,posicao','posicao'));
+      // Captadora: o próprio quadro. Gerência: o último aberto, ou o primeiro quadro de captadora.
+      let guardado=null;try{guardado=localStorage.getItem('captacao.quadro')}catch{}
+      const vis=quadrosVisiveis();
+      quadroId=(vis.find(q=>q.id===guardado)||vis.find(q=>!q.modelo)||vis[0])?.id||null;
+      // Link do Meu painel (captacao.html?rel=<quadro>&mes=AAAA-MM): abre o relatório daquela captadora.
+      const pede=new URLSearchParams(location.search);
+      if(pede.get('rel')){if(/^\d{4}-\d{2}$/.test(pede.get('mes')||''))$('#rMes').value=pede.get('mes');abrirAba('relatorio');$('#rQuem').value=pede.get('rel');renderRel();try{history.replaceState(null,'',location.pathname)}catch{}}
+      pintarTitulo();if(!$('#tab-relatorio').hidden&&!pede.get('rel'))abrirRelatorio();await carregar();
+    }catch(err){$('#resumo').textContent='Não foi possível carregar os quadros: '+err.message}
+  }
+  const quadrosVisiveis=()=>quadros.filter(q=>gestor||(!q.modelo&&q.ativo)).sort((a,b)=>(a.modelo-b.modelo)||(b.ativo-a.ativo)||a.posicao-b.posicao);
+  function pintarTitulo(){
+    const vis=quadrosVisiveis(),q=quadro();
+    if(vis.length>1)$('#qTitulo').innerHTML=`<select class="qsel" id="qSel" aria-label="Quadro">${vis.map(x=>`<option value="${x.id}"${x.id===quadroId?' selected':''}>${x.modelo?'★ ':''}${safe(x.nome)}${x.ativo?'':' (desativado)'}</option>`).join('')}</select>${q?.modelo?'<span class="tag-modelo">modelo</span>':''}`;
+    else $('#qTitulo').innerHTML=`<h1>${safe(q?.nome||'Captação')}</h1>`;
+  }
+  $('#qTitulo').addEventListener('change',async e=>{if(e.target.id!=='qSel')return;quadroId=e.target.value;try{localStorage.setItem('captacao.quadro',quadroId)}catch{};mostrar={};$('#fBusca').value='';pintarTitulo();await carregar()});
+  async function carregar(){
+    if(!quadroId){$('#board').innerHTML='';$('#resumo').textContent='Nenhum quadro.';return}
+    const id=quadroId;
+    try{
+      const [c,e,k]=await Promise.all([tudo('captacao_colunas','id,nome,posicao','posicao',['quadro_id',id]),tudo('captacao_etiquetas','id,nome,cor','nome',['quadro_id',id]),tudo('captacao_cartoes',CARTAO,'posicao',['quadro_id',id])]);
+      if(id!==quadroId)return;
+      const m=k.length?await tudo('captacao_comentarios','cartao_id,comentarios'):[];
+      colunas=c;etiquetas=e;cartoes=k;comentarios=Object.fromEntries(m.map(x=>[x.cartao_id,x.comentarios]));
+      preencherFiltros();render();
+    }catch(err){$('#resumo').textContent='Não foi possível carregar o quadro: '+err.message}
+  }
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&booted&&!document.querySelector('dialog[open]')&&!$('#tab-quadro').hidden)carregar()});
+
+  function preencherFiltros(){
+    $('#fEtiqueta').innerHTML='<option value="">Todas as etiquetas</option>'+etiquetas.map(e=>`<option value="${e.id}">${safe(e.nome)}</option>`).join('');
+  }
+  ['#fBusca','#fEtiqueta','#fArquivados'].forEach(s=>$(s).addEventListener('input',()=>{mostrar={};render()}));
+  const etq=id=>etiquetas.find(e=>e.id===id);
+  // No quadro aparecem só os cartões de trabalho: o cartão-modelo fica escondido (serve de base no "+ Novo cartão"; aparece no ★ Modelo)
+  // e os arquivados só com "Ver arquivados". Arquivar tira do quadro sem mexer no relatório.
+  const noQuadro=c=>(quadro()?.modelo||!c.modelo)&&(!c.arquivado_em||$('#fArquivados').checked);
+  const doColuna=id=>cartoes.filter(c=>c.coluna_id===id&&noQuadro(c)).sort((a,b)=>a.posicao-b.posicao);
+  function filtrados(list){
+    const q=$('#fBusca').value.trim().toUpperCase(),e=$('#fEtiqueta').value;
+    return list.filter(c=>!(e&&!c.etiquetas.includes(e))&&!(q&&!(c.titulo+' '+c.descricao).toUpperCase().includes(q)));
+  }
+
+  // ---------- Quadro ----------
+  const ultima=id=>colunas.length&&colunas[colunas.length-1].id===id;
+  function cardHtml(c){
+    const d=diasDesde(c.movido_em),n=comentarios[c.id]||0,parado=d>=7&&!ultima(c.coluna_id)&&!c.modelo;
+    return `<article class="kcard${c.modelo?' modelo':''}${c.arquivado_em?' arq':''}" draggable="${!c.arquivado_em}" data-id="${c.id}" tabindex="0">
+      ${c.etiquetas.length?`<div class="chips">${c.etiquetas.map(etq).filter(Boolean).map(chip).join('')}</div>`:''}
+      <div class="t">${safe(c.titulo)}</div>${c.arquivado_em?`<div class="meta"><span>arquivado em ${dataBr(c.arquivado_em)}</span></div>`:''}
+      <div class="meta">${n?`<span title="Comentários">💬 ${n}</span>`:''}${c.anexos_trello?`<span title="Anexos no Trello">📎 ${c.anexos_trello}</span>`:''}
+        ${c.modelo?'<span>cartão-modelo</span>':`<span class="${parado?'velho':''}" title="Tempo nesta coluna${parado?' (parado há 7 dias ou mais)':''}">${d<=0?'hoje':d===1?'há 1 dia':`há ${d} dias`}</span>`}</div></article>`;
+  }
+  function render(){
+    const q=quadro();
+    $('#btnNovo').hidden=!colunas.length;
+    if(!colunas.length){
+      $('#board').innerHTML='';$('#semColunas').hidden=false;
+      $('#semColunas').innerHTML=q?.modelo?'<h2>Quadro modelo vazio</h2><p class="msg" style="margin-top:6px">A estrutura do Trello (colunas, etiquetas e cartões-modelo) ainda vai ser copiada para cá. Você também pode criar as colunas em <strong>Colunas</strong>.</p>'
+        :'<h2>Quadro sem colunas</h2><p class="msg" style="margin-top:6px">'+(gestor?'Este quadro foi criado antes do modelo ter colunas. Abra o quadro <strong>★ Modelo</strong>, clique em <strong>Colunas</strong> e depois em <strong>Aplicar em todos os quadros</strong>.':'A gerência ainda está montando o seu quadro.')+'</p>';
+      $('#resumo').textContent=q?.modelo?'Estrutura que todo quadro novo recebe.':'';return;
+    }
+    $('#semColunas').hidden=true;
+    const filtro=$('#fBusca').value.trim()||$('#fEtiqueta').value;
+    const reais=cartoes.filter(c=>!c.modelo&&!c.arquivado_em).length,vis=filtrados(cartoes.filter(noQuadro)).length,arq=cartoes.filter(c=>c.arquivado_em).length;
+    $('#resumo').textContent=(q?.modelo?'Quadro modelo: tudo o que está aqui é copiado para cada quadro novo. ':'')+`${reais} cartões em ${colunas.length} colunas`+(arq?` · ${arq} arquivado${arq===1?'':'s'}`:'')+(filtro?` · ${vis} encontrados`:'')+(q&&!q.modelo&&gestor?` · ${q.email?'login: '+q.email:'sem e-mail de login ainda'}`:'')+'. Arraste os cartões entre as colunas ou clique para abrir.';
+    $('#board').innerHTML=colunas.map(col=>{
+      const todos=doColuna(col.id),list=filtrados(todos),lim=mostrar[col.id]||LIMITE,parte=list.slice(0,lim);
+      return `<section class="kcol" data-col="${col.id}"><div class="kcol-head"><h3>${safe(col.nome)}</h3><span>${filtro?`${list.length}/`:''}${todos.length}</span></div>
+        <div class="kcol-body" data-col="${col.id}">${parte.map(cardHtml).join('')}${list.length>lim?`<button class="mais" data-mais="${col.id}">Mostrar mais (${list.length-lim})</button>`:''}</div>
+        <div class="kcol-foot"><button data-novo="${col.id}">+ Adicionar cartão</button></div></section>`;
+    }).join('');
+  }
+  $('#board').addEventListener('click',e=>{
+    const m=e.target.closest('[data-mais]');if(m){mostrar[m.dataset.mais]=(mostrar[m.dataset.mais]||LIMITE)+100;render();return}
+    const n=e.target.closest('[data-novo]');if(n){abrirNovo(n.dataset.novo);return}
+    const k=e.target.closest('.kcard');if(k)abrirCartao(k.dataset.id);
+  });
+  $('#board').addEventListener('keydown',e=>{const k=e.target.closest('.kcard');if(k&&e.key==='Enter')abrirCartao(k.dataset.id)});
+
+  // Arrastar e soltar entre colunas (no celular, use o campo "Coluna" dentro do cartão).
+  let arrastando=null;const ph=document.createElement('div');ph.className='placeholder';
+  $('#board').addEventListener('dragstart',e=>{const k=e.target.closest('.kcard');if(!k)return;arrastando=k.dataset.id;k.classList.add('drag');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',arrastando)});
+  $('#board').addEventListener('dragend',e=>{e.target.closest?.('.kcard')?.classList.remove('drag');ph.remove();document.querySelectorAll('.kcol-body.over').forEach(b=>b.classList.remove('over'));arrastando=null});
+  $('#board').addEventListener('dragover',e=>{
+    const body=e.target.closest('.kcol')?.querySelector('.kcol-body');if(!body||!arrastando)return;e.preventDefault();
+    document.querySelectorAll('.kcol-body.over').forEach(b=>b!==body&&b.classList.remove('over'));body.classList.add('over');
+    const depois=[...body.querySelectorAll('.kcard:not(.drag)')].find(k=>{const r=k.getBoundingClientRect();return e.clientY<r.top+r.height/2});
+    if(depois)body.insertBefore(ph,depois);else{const mais=body.querySelector('.mais');mais?body.insertBefore(ph,mais):body.append(ph)}
+  });
+  $('#board').addEventListener('drop',async e=>{
+    const body=e.target.closest('.kcol')?.querySelector('.kcol-body');if(!body||!arrastando)return;e.preventDefault();
+    const col=body.dataset.col,prev=ph.previousElementSibling?.closest('.kcard'),next=ph.nextElementSibling?.closest?.('.kcard');
+    const id=arrastando;ph.remove();body.classList.remove('over');
+    const cp=prev&&cartoes.find(c=>c.id===prev.dataset.id),cn=next&&cartoes.find(c=>c.id===next.dataset.id);
+    let pos;
+    if(cp&&cn)pos=(cp.posicao+cn.posicao)/2;
+    else if(cp){const resto=doColuna(col).filter(c=>c.posicao>cp.posicao&&c.id!==id);pos=resto.length?(cp.posicao+resto[0].posicao)/2:cp.posicao+1024}
+    else if(cn)pos=cn.posicao-1024;
+    else pos=1024;
+    if(prev?.dataset.id===id||next?.dataset.id===id){const c=cartoes.find(x=>x.id===id);if(c.coluna_id===col)return}
+    await mover(id,col,pos);
+  });
+  async function mover(id,col,pos){
+    const c=cartoes.find(x=>x.id===id),antes={coluna_id:c.coluna_id,posicao:c.posicao,movido_em:c.movido_em};
+    if(c.coluna_id!==col)c.movido_em=new Date().toISOString();c.coluna_id=col;c.posicao=pos;render();
+    const {error}=await db.rpc('captacao_mover',{p_cartao:id,p_coluna:col,p_posicao:pos});
+    if(error){Object.assign(c,antes);render();alert('Não foi possível mover: '+error.message);return false}
+    if(antes.coluna_id!==col)toast('Movido para '+colunas.find(x=>x.id===col).nome.toLowerCase());
+    return true;
+  }
+  const topoDe=col=>{const l=doColuna(col);return l.length?l[0].posicao-1024:1024};
+
+  // ---------- Cartão ----------
+  const cd=$('#cardDialog');
+  async function abrirCartao(id){
+    const c=cartoes.find(x=>x.id===id);if(!c)return;aberto=c;
+    $('#cTitulo').value=c.titulo;$('#cDescForm').hidden=true;$('#cDesc').hidden=false;$('#cDescEditar').hidden=false;$('#cComentario').value='';$('#cEtqBox').hidden=true;
+    $('#cColuna').innerHTML=colunas.map(x=>`<option value="${x.id}"${x.id===c.coluna_id?' selected':''}>${safe(x.nome)}</option>`).join('');
+    $('#cTrello').hidden=!c.trello_url;if(c.trello_url)$('#cTrello').href=c.trello_url;
+    $('#cAnexos').hidden=!c.anexos_trello;$('#cAnexos').textContent=`${c.anexos_trello} ${c.anexos_trello===1?'anexo ficou':'anexos ficaram'} no Trello`;
+    $('#cCriado').textContent=`Criado em ${dataBr(c.criado_em)}${c.criado_por?' por '+nome(c.criado_por):''}`;
+    $('#cModelo').checked=c.modelo;$('#cArquivar').textContent=c.arquivado_em?'Restaurar para o quadro':'Arquivar cartão';$('#cArquivar').hidden=c.modelo;
+    pintarCartao();if(!cd.open)cd.showModal();
+    $('#cHist').innerHTML='<p class="msg">Carregando histórico…</p>';
+    const {data,error}=await db.from('captacao_historico').select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').eq('cartao_id',id).order('criado_em',{ascending:false});
+    if(aberto!==c)return;
+    if(error){$('#cHist').innerHTML=`<p class="msg error">Não foi possível carregar o histórico: ${safe(error.message)}</p>`;return}
+    hist=data;pintarHist();
+  }
+  function pintarCartao(){
+    const c=aberto,col=colunas.find(x=>x.id===c.coluna_id);
+    $('#cOnde').textContent=c.modelo?`cartão-modelo na coluna ${col?.nome||'?'}`:`na coluna ${col?.nome||'?'} · há ${diasDesde(c.movido_em)} dia(s) nesta coluna`;
+    $('#cChips').innerHTML=c.etiquetas.map(etq).filter(Boolean).map(chip).join('');
+    $('#cDesc').innerHTML=md(c.descricao);
+  }
+  function pintarHist(){
+    const so=$('#cSoComent').checked,list=hist.filter(h=>!so||h.tipo==='comentario');
+    if(!list.length){$('#cHist').innerHTML='<p class="msg">Nada no histórico.</p>';return}
+    $('#cHist').innerHTML=list.map(h=>{
+      const quem=`<span class="av" title="${safe(h.autor||'')}">${safe(iniciais(h.autor))}</span><strong>${safe(nome(h.autor))}</strong>`;
+      if(h.tipo==='comentario')return `<div class="h com"><div>${quem} <small>${dataHora(h.criado_em)}</small>${h.autor===meuEmail?` <button class="link danger" data-del-com="${h.id}">Excluir</button>`:''}</div><div class="txt">${md(h.texto||'')}</div></div>`;
+      const acao=h.tipo==='movido'?`moveu de <em>${safe(h.de_coluna||'?')}</em> para <em>${safe(h.para_coluna||'?')}</em>`:h.tipo==='criado'?`criou o cartão${h.para_coluna?` em <em>${safe(h.para_coluna)}</em>`:''}${h.texto?` (${safe(h.texto)})`:''}`:h.tipo==='arquivado'?'arquivou o cartão':h.tipo==='restaurado'?'restaurou o cartão':safe(h.texto||'editou o cartão');
+      return `<div class="h mov"><div>${quem} ${acao} <small>· ${dataHora(h.criado_em)}</small></div></div>`;
+    }).join('');
+  }
+  $('#cSoComent').onchange=pintarHist;
+  async function salvarCartao(campos,oque){
+    const c=aberto,antes={...c};Object.assign(c,campos,{atualizado_em:new Date().toISOString()});
+    const {error}=await db.from('captacao_cartoes').update({...campos,atualizado_em:c.atualizado_em}).eq('id',c.id);
+    if(error){Object.assign(c,antes);alert('Não foi possível salvar: '+error.message);pintarCartao();return false}
+    render();if(oque)toast(oque);return true;
+  }
+  $('#cTitulo').addEventListener('change',()=>{const t=$('#cTitulo').value.trim();if(!t){$('#cTitulo').value=aberto.titulo;return}if(t!==aberto.titulo)salvarCartao({titulo:t,referencia:refDe(t)},'Título salvo')});
+  $('#cColuna').onchange=async e=>{if(await mover(aberto.id,e.target.value,topoDe(e.target.value)))abrirCartao(aberto.id);else e.target.value=aberto.coluna_id};
+  $('#cModelo').onchange=e=>salvarCartao({modelo:e.target.checked},e.target.checked?'Agora é um cartão-modelo':'Deixou de ser modelo').then(pintarCartao);
+  $('#cDescEditar').onclick=()=>{$('#cDescTxt').value=aberto.descricao;$('#cDescForm').hidden=false;$('#cDesc').hidden=true;$('#cDescEditar').hidden=true;$('#cDescTxt').focus()};
+  $('#cDescCancelar').onclick=()=>{$('#cDescForm').hidden=true;$('#cDesc').hidden=false;$('#cDescEditar').hidden=false};
+  $('#cDescSalvar').onclick=async()=>{if(await salvarCartao({descricao:$('#cDescTxt').value},'Descrição salva')){$('#cDescCancelar').onclick();pintarCartao()}};
+  $('#cComentar').onclick=async()=>{
+    const t=$('#cComentario').value.trim();if(!t)return;$('#cComentar').disabled=true;
+    const {data,error}=await db.from('captacao_historico').insert({cartao_id:aberto.id,tipo:'comentario',texto:t,autor:meuEmail}).select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').single();
+    $('#cComentar').disabled=false;if(error){alert('Não foi possível comentar: '+error.message);return}
+    $('#cComentario').value='';hist.unshift(data);comentarios[aberto.id]=(comentarios[aberto.id]||0)+1;pintarHist();render();
+  };
+  $('#cHist').addEventListener('click',async e=>{
+    const id=e.target.dataset.delCom;if(!id||!await confirmar('Excluir este comentário?'))return;
+    const {error}=await db.from('captacao_historico').delete().eq('id',id);if(error){alert('Não foi possível excluir: '+error.message);return}
+    hist=hist.filter(h=>h.id!==id);comentarios[aberto.id]=Math.max(0,(comentarios[aberto.id]||1)-1);pintarHist();render();
+  });
+  // Arquivar: sai do quadro (e deixa de contar como "em andamento" dali em diante), mas continua no banco e no relatório.
+  $('#cArquivar').onclick=async()=>{
+    const c=aberto,arquivar=!c.arquivado_em,col=colunas.find(x=>x.id===c.coluna_id)?.nome||null;
+    if(arquivar&&!await confirmar(`Arquivar "${c.titulo}"? Ele sai do quadro, mas continua no relatório. Dá para ver e restaurar marcando "Ver arquivados".`,'Arquivar'))return;
+    if(!await salvarCartao({arquivado_em:arquivar?new Date().toISOString():null},arquivar?'Cartão arquivado':'Cartão restaurado'))return;
+    await db.from('captacao_historico').insert({cartao_id:c.id,tipo:arquivar?'arquivado':'restaurado',para_coluna:arquivar?null:col,autor:meuEmail});
+    if(arquivar)cd.close();else abrirCartao(c.id);
+  };
+  $('#cExcluir').onclick=async()=>{
+    if(!await confirmar(`Excluir o cartão "${aberto.titulo}"? O cartão e os comentários serão apagados. Se ele já foi captado, a captação continua no relatório. Para só tirar do quadro, prefira "Arquivar".`))return;
+    const {error}=await db.from('captacao_cartoes').delete().eq('id',aberto.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+    cartoes=cartoes.filter(x=>x.id!==aberto.id);cd.close();render();toast('Cartão excluído');
+  };
+  // Etiquetas (de cada quadro)
+  $('#cEtqAbrir').onclick=()=>{$('#cEtqBox').hidden=!$('#cEtqBox').hidden;$('#cEtqBusca').value='';pintarEtq();$('#cEtqCor').innerHTML=Object.keys(CORES).filter(k=>k!=='gray').map(k=>`<option value="${k}" style="background:${CORES[k][0]}">${k.replace('_',' ')}</option>`).join('')};
+  function pintarEtq(){
+    const q=$('#cEtqBusca').value.trim().toUpperCase();
+    $('#cEtqLista').innerHTML=etiquetas.filter(e=>!q||e.nome.toUpperCase().includes(q)).map(e=>`<label><input type="checkbox" value="${e.id}"${aberto.etiquetas.includes(e.id)?' checked':''}>${chip(e)}</label>`).join('')||'<p class="msg">Nenhuma etiqueta.</p>';
+  }
+  $('#cEtqBusca').addEventListener('input',pintarEtq);
+  $('#cEtqLista').addEventListener('change',e=>{const id=e.target.value,set=new Set(aberto.etiquetas);e.target.checked?set.add(id):set.delete(id);salvarCartao({etiquetas:[...set]}).then(pintarCartao)});
+  $('#cEtqCriar').onclick=async()=>{
+    const n=$('#cEtqNova').value.trim().toUpperCase();if(!n)return;
+    const {data,error}=await db.from('captacao_etiquetas').insert({quadro_id:quadroId,nome:n,cor:$('#cEtqCor').value}).select('id,nome,cor').single();
+    if(error){alert('Não foi possível criar: '+(error.code==='23505'?'já existe uma etiqueta com esse nome.':error.message));return}
+    etiquetas.push(data);etiquetas.sort((a,b)=>a.nome.localeCompare(b.nome));$('#cEtqNova').value='';preencherFiltros();
+    await salvarCartao({etiquetas:[...aberto.etiquetas,data.id]});pintarCartao();pintarEtq();
+  };
+
+  // ---------- Novo cartão ----------
+  function abrirNovo(col){
+    const ent=col||colunas[0]?.id,modelos=cartoes.filter(c=>c.modelo);
+    $('#nColuna').innerHTML=colunas.map(x=>`<option value="${x.id}"${x.id===ent?' selected':''}>${safe(x.nome)}</option>`).join('');
+    $('#nModelo').innerHTML='<option value="">Cartão em branco</option>'+modelos.map(m=>`<option value="${m.id}">${safe(m.titulo)}</option>`).join('');
+    $('#nModeloBox').hidden=!modelos.length;
+    $('#novoForm').reset();$('#nColuna').value=ent;if(modelos.length)$('#nModelo').value=modelos[0].id;$('#nMsg').hidden=true;$('#novoDialog').showModal();$('#nTitulo').focus();
+  }
+  $('#btnNovo').onclick=()=>abrirNovo(null);
+  $('#novoForm').onsubmit=async e=>{
+    e.preventDefault();const t=$('#nTitulo').value.trim(),col=$('#nColuna').value,m=cartoes.find(c=>c.id===$('#nModelo').value);if(!t)return;
+    $('#nSalvar').disabled=true;
+    const {data,error}=await db.from('captacao_cartoes').insert({quadro_id:quadroId,coluna_id:col,posicao:topoDe(col),titulo:t,referencia:refDe(t),descricao:m?.descricao||'',etiquetas:m?.etiquetas||[],criado_por:meuEmail}).select(CARTAO).single();
+    $('#nSalvar').disabled=false;
+    if(error){$('#nMsg').textContent='Não foi possível criar: '+error.message;$('#nMsg').hidden=false;return}
+    await db.from('captacao_historico').insert({cartao_id:data.id,tipo:'criado',para_coluna:colunas.find(x=>x.id===col).nome,autor:meuEmail});
+    cartoes.push(data);$('#novoDialog').close();render();abrirCartao(data.id);
+  };
+
+  // ---------- Colunas (só a gerência) ----------
+  function pintarColunas(){
+    const q=quadro();
+    $('#colAjuda').innerHTML=q?.modelo?'Estas são as colunas do <strong>modelo</strong>: todo quadro novo nasce com elas. Para levar uma mudança aos quadros que já existem, use o botão abaixo.'
+      :`Colunas só do quadro <strong>${safe(q?.nome||'')}</strong>. Para mudar a estrutura de todas as captadoras, mude no quadro <strong>★ Modelo</strong>. Só dá para excluir coluna vazia.`;
+    $('#colTodos').hidden=!q?.modelo;
+    $('#colLista').innerHTML=colunas.map((c,i)=>`<div class="cl" data-id="${c.id}">
+      <input type="text" value="${safe(c.nome)}" maxlength="120" aria-label="Nome da coluna"><button class="mini" data-up ${i?'':'disabled'} aria-label="Subir">↑</button><button class="mini" data-down ${i<colunas.length-1?'':'disabled'} aria-label="Descer">↓</button>
+      <button class="mini" data-del ${doColuna(c.id).length?'disabled title="Só dá para excluir coluna vazia"':''} aria-label="Excluir">×</button></div>`).join('')||'<p class="msg">Nenhuma coluna ainda.</p>';
+  }
+  const colErro=t=>{$('#colMsg').textContent=t;$('#colMsg').hidden=false};
+  $('#btnColunas').onclick=()=>{$('#colMsg').hidden=true;pintarColunas();$('#colDialog').showModal()};
+  $('#colLista').addEventListener('change',async e=>{
+    const row=e.target.closest('.cl'),c=colunas.find(x=>x.id===row.dataset.id);
+    const n=e.target.value.trim();if(!n){e.target.value=c.nome;return}
+    const {error}=await db.from('captacao_colunas').update({nome:n}).eq('id',c.id);if(error)return colErro('Não foi possível renomear: '+error.message);c.nome=n;render();toast('Coluna renomeada');
+  });
+  $('#colLista').addEventListener('click',async e=>{
+    const b=e.target.closest('button');if(!b)return;const row=b.closest('.cl'),i=colunas.findIndex(x=>x.id===row.dataset.id),c=colunas[i];
+    if(b.hasAttribute('data-del')){if(!await confirmar(`Excluir a coluna "${c.nome}"?`))return;const {error}=await db.from('captacao_colunas').delete().eq('id',c.id);if(error)return colErro('Não foi possível excluir: '+error.message);colunas.splice(i,1)}
+    else{const j=b.hasAttribute('data-up')?i-1:i+1,o=colunas[j];
+      const r=await Promise.all([db.from('captacao_colunas').update({posicao:o.posicao}).eq('id',c.id),db.from('captacao_colunas').update({posicao:c.posicao}).eq('id',o.id)]);
+      if(r.some(x=>x.error))return colErro('Não foi possível mudar a ordem.');[c.posicao,o.posicao]=[o.posicao,c.posicao];colunas.sort((a,b)=>a.posicao-b.posicao)}
+    pintarColunas();render();
+  });
+  $('#colNova').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,n=form.nome.value.trim();if(!n)return;
+    const {data,error}=await db.from('captacao_colunas').insert({quadro_id:quadroId,nome:n,posicao:Math.max(0,...colunas.map(c=>c.posicao))+1}).select('id,nome,posicao').single();
+    if(error)return colErro('Não foi possível adicionar: '+error.message);colunas.push(data);form.reset();pintarColunas();render();
+  };
+  $('#colAplicar').onclick=async()=>{
+    if(!await confirmar('Levar as colunas do modelo para todos os quadros das captadoras?','Aplicar'))return;
+    const {error}=await db.rpc('captacao_aplicar_colunas_do_modelo');if(error)return colErro('Não foi possível aplicar: '+error.message);toast('Colunas aplicadas em todos os quadros');
+  };
+
+  // ---------- Quadros das captadoras (só a gerência) ----------
+  function pintarQuadros(){
+    const lista=quadros.filter(q=>!q.modelo).sort((a,b)=>(b.ativo-a.ativo)||a.posicao-b.posicao);
+    $('#qLista').innerHTML=lista.map(q=>`<div class="qitem${q.ativo?'':' off'}" data-id="${q.id}">
+      <input data-campo="nome" value="${safe(q.nome)}" maxlength="80" aria-label="Nome">
+      <input data-campo="email" type="email" value="${safe(q.email||'')}" maxlength="200" placeholder="E-mail de login" aria-label="E-mail de login">
+      <div class="row"><button class="mini" data-abrir>Abrir</button><button class="mini" data-ativo>${q.ativo?'Desativar':'Reativar'}</button></div></div>`).join('')||'<p class="msg">Nenhum quadro de captadora ainda.</p>';
+  }
+  const qErro=t=>{$('#qMsg').textContent=t;$('#qMsg').hidden=!t};
+  $('#btnQuadros').onclick=()=>{qErro('');pintarQuadros();$('#quadrosDialog').showModal()};
+  $('#qNovo').onsubmit=async e=>{
+    e.preventDefault();const form=e.currentTarget,n=form.nome.value.trim(),em=form.email.value.trim().toLowerCase();if(!n)return;
+    if(em&&quadros.some(q=>!q.modelo&&(q.email||'').toLowerCase()===em))return qErro('Esse e-mail já é de outro quadro.');
+    const {data,error}=await db.rpc('captacao_criar_quadro',{p_nome:n,p_email:em});if(error)return qErro('Não foi possível criar: '+error.message);
+    form.reset();qErro('');const {data:q}=await db.from('captacao_quadros').select('id,nome,email,modelo,ativo,posicao').eq('id',data).single();
+    if(q)quadros.push(q);pintarQuadros();pintarTitulo();toast('Quadro criado');
+  };
+  $('#qLista').addEventListener('change',async e=>{
+    const campo=e.target.dataset.campo;if(!campo)return;const q=quadros.find(x=>x.id===e.target.closest('.qitem').dataset.id);
+    let v=e.target.value.trim();if(campo==='email')v=v.toLowerCase()||null;if(campo==='nome'&&!v){e.target.value=q.nome;return}
+    if(campo==='email'&&v&&quadros.some(x=>x.id!==q.id&&!x.modelo&&(x.email||'').toLowerCase()===v)){e.target.value=q.email||'';return qErro('Esse e-mail já é de outro quadro.')}
+    const {error}=await db.from('captacao_quadros').update({[campo]:v}).eq('id',q.id);if(error){e.target.value=q[campo]||'';return qErro('Não foi possível salvar: '+error.message)}
+    q[campo]=v;qErro('');pintarTitulo();render();toast(campo==='email'?'E-mail salvo':'Nome salvo');
+  });
+  $('#qLista').addEventListener('click',async e=>{
+    const b=e.target.closest('button');if(!b)return;const q=quadros.find(x=>x.id===b.closest('.qitem').dataset.id);
+    if(b.hasAttribute('data-abrir')){$('#quadrosDialog').close();abrirAba('quadro');quadroId=q.id;try{localStorage.setItem('captacao.quadro',q.id)}catch{};mostrar={};pintarTitulo();carregar();return}
+    if(q.ativo&&!await confirmar(`Desativar o quadro de ${q.nome}? Ela deixa de entrar, mas nada é apagado e você pode reativar depois.`,'Desativar'))return;
+    const {error}=await db.from('captacao_quadros').update({ativo:!q.ativo}).eq('id',q.id);if(error)return qErro('Não foi possível salvar: '+error.message);
+    q.ativo=!q.ativo;pintarQuadros();pintarTitulo();
+  });
+
+  // ---------- Relatório (antiga planilha "RELATÓRIO DE CAPTAÇÃO") ----------
+  // Cada captadora preenche as próprias semanas (Itajaí e Navegantes); a gerência vê o total ou corrige uma captadora.
+  // As regras (semanas, totais, erros em vermelho) e a visão total ficam em captacao-relatorio.js, usado também no Meu painel.
+  // De outubro/2026 em diante, novas, pós, em andamento e referências vêm do quadro (CapRel.efetivas); o que for digitado vale no lugar.
+  const {CIDADES,CAMPOS,COLUNAS:REL,AUTO,ehAuto,semanasDoMes,problemas,totCap,soma}=CapRel;
+  let rel=[],relAno=null,dadosQuadro=null,relEf=[];
+  const recalcular=()=>{relEf=CapRel.efetivas(rel,dadosQuadro,relAno)};
+  const hojeYm=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}`};
+  const nomeQ=id=>quadros.find(q=>q.id===id)?.nome||'?';
+  const capVisiveis=()=>quadros.filter(q=>!q.modelo&&(q.ativo||rel.some(r=>r.quadro_id===q.id))).sort((a,b)=>a.posicao-b.posicao);
+
+  function abrirRelatorio(){
+    if(!$('#rMes').value)$('#rMes').value=hojeYm();
+    const v=$('#rQuem').value,caps=capVisiveis();
+    $('#rQuem').innerHTML=(gestor?'<option value="">Todas (visão total)</option>':'')+caps.map(q=>`<option value="${q.id}">${safe(q.nome)}</option>`).join('');
+    if([...$('#rQuem').options].some(o=>o.value===v))$('#rQuem').value=v;
+    carregarRel(true);
+  }
+  async function carregarRel(forcar){
+    const ano=$('#rMes').value.slice(0,4);
+    if(forcar||relAno!==ano){
+      $('#rConteudo').innerHTML='<p class="msg">Carregando…</p>';
+      try{[rel,dadosQuadro]=await Promise.all([CapRel.carregarAno(db,ano),ehAuto(`${ano}-12`)?CapRel.carregarQuadros(db):null]);relAno=ano}
+      catch(err){$('#rConteudo').innerHTML=`<p class="msg error">Não foi possível carregar o relatório: ${safe(err.message)}</p>`;return}
+    }
+    recalcular();renderRel();
+  }
+  $('#rMes').addEventListener('change',()=>{if(!$('#rMes').value)$('#rMes').value=hojeYm();carregarRel(false)});
+  $('#rQuem').addEventListener('change',renderRel);$('#rCidade').addEventListener('change',renderRel);
+  function renderRel(){
+    const ym=$('#rMes').value,[a,m]=ym.split('-').map(Number),quem=gestor?$('#rQuem').value:(capVisiveis()[0]?.id||'');
+    const mesNome=new Date(a,m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    $('#rCidadeBox').hidden=!!quem;
+    if(!quem&&!gestor){$('#rConteudo').innerHTML='<p class="msg">Você ainda não tem um quadro de captação.</p>';return}
+    if(quem){$('#rSub').textContent=`${nomeQ(quem)} · ${mesNome}. `+(ehAuto(ym)?'Novas, pós, em andamento e referências vêm do quadro (número cinza); digite só a prospecção e os atendimentos. Salva sozinho ao sair do campo.':'Preencha os números de cada semana: salva sozinho ao sair do campo.');renderGrade(quem,ym)}
+    else{$('#rSub').textContent=`Visão total de ${mesNome}: todas as captadoras.`;renderTotal(ym)}
+  }
+
+  // Grade da captadora: uma tabela por semana, uma linha por cidade.
+  function renderGrade(q,ym){
+    const sems=semanasDoMes(ym),doMes=rel.filter(r=>r.inicio.startsWith(ym)),auto=ehAuto(ym);
+    // Mês automático: campo vazio = número do quadro (placeholder cinza); digitado = ajustado à mão (fundo amarelo).
+    const linha=(s,c)=>{const r=doMes.find(x=>x.quadro_id===q&&x.inicio===s.inicio&&x.cidade===c)||{};
+      const a=auto?(relEf.find(x=>x.quadro_id===q&&x.inicio===s.inicio&&x.cidade===c)?._auto||{em_andamento:0,pos_captados:0,novas_captacoes:0,referencias:''}):null;
+      const ph=f=>a&&AUTO.includes(f)?` placeholder="${safe(a[f]??'')}" title="Vem do quadro. Digite só para corrigir; apague para voltar ao número do quadro."`:'';
+      return `<tr data-key="${q}|${s.inicio}|${c}"><td><strong>${c}</strong><span class="st"></span></td>
+        ${CAMPOS.map(([f])=>`<td><input type="number" min="0" max="9999" step="1" inputmode="numeric" data-f="${f}" value="${r[f]??''}" aria-label="${f}"${ph(f)}></td>`).join('')}
+        <td class="tot">0</td><td><input class="refs" data-f="referencias" maxlength="2000" value="${safe(r.referencias||'')}"${a?ph('referencias'):' placeholder="Ex.: AP1650 / SA0800"'}><div class="prob"></div></td></tr>`};
+    $('#rConteudo').innerHTML=(auto?`<p class="aviso" style="margin:0">A partir de outubro, <strong>novas captações, pós captados, em andamento e referências</strong> vêm do seu quadro: o número em cinza é o do quadro. Para isso dar certo, o cartão precisa ter a REF no começo do título, as etiquetas <strong>NOVA CAPTAÇÃO</strong> ou <strong>PÓS</strong> e <strong>ITAJAÍ</strong> ou <strong>NAVEGANTES</strong>, e ir para a última coluna no dia em que a captação fecha. Se precisar corrigir, digite por cima (fica amarelo); apagando, volta o número do quadro.</p>`:'')
+      +sems.map(s=>`<div class="semana"><h3>Semana de ${s.nome}</h3><div class="tbl-wrap"><table class="grade">
+      <thead><tr><th>Cidade</th>${CAMPOS.map(([,n])=>`<th>${n}</th>`).join('')}<th>Total captado</th><th>Referências</th></tr></thead>
+      <tbody>${CIDADES.map(c=>linha(s,c)).join('')}</tbody><tfoot><tr data-sub="${s.inicio}"></tr></tfoot></table></div></div>`).join('')
+      +`<div><h2 style="margin-bottom:8px">Resumo do mês</h2><div class="tbl-wrap" id="rResumoProprio"></div></div>`;
+    document.querySelectorAll('#rConteudo tr[data-key]').forEach(pintarLinha);sems.forEach(s=>pintarSub(q,s.inicio));pintarResumoProprio(q,ym);
+  }
+  const chave=(l,k)=>{const [q,inicio,cidade]=k.split('|');return l.find(r=>r.quadro_id===q&&r.inicio===inicio&&r.cidade===cidade)};
+  const achar=k=>chave(rel,k);
+  function pintarLinha(tr){
+    const r=chave(relEf,tr.dataset.key),ym=$('#rMes').value,p=r?problemas(r,relEf.filter(x=>x.inicio.startsWith(ym))):[];
+    tr.querySelector('.tot').textContent=r?totCap(r):0;tr.querySelector('.prob').textContent=p.join(' · ');tr.classList.toggle('erro',!!p.length);
+    if(ehAuto(ym))tr.querySelectorAll('input').forEach(i=>i.classList.toggle('aj',AUTO.includes(i.dataset.f)&&i.value.trim()!==''));
+  }
+  function pintarSub(q,inicio){
+    const list=relEf.filter(r=>r.quadro_id===q&&r.inicio===inicio),tr=document.querySelector(`#rConteudo tr[data-sub="${inicio}"]`);if(!tr)return;
+    tr.innerHTML=`<td>Semana</td>${CAMPOS.map(([f])=>`<td class="n">${soma(list,f)}</td>`).join('')}<td class="n">${soma(list,'total')}</td><td></td>`;
+  }
+  function pintarResumoProprio(q,ym){
+    const doMes=relEf.filter(r=>r.quadro_id===q&&r.inicio.startsWith(ym));
+    const lin=(nome,list)=>`<tr><td>${nome}</td>${CAMPOS.map(([f])=>`<td class="n">${soma(list,f)}</td>`).join('')}<td class="n"><strong>${soma(list,'total')}</strong></td></tr>`;
+    $('#rResumoProprio').innerHTML=`<table><thead><tr><th>Cidade</th>${CAMPOS.map(([,n])=>`<th>${n}</th>`).join('')}<th>Total captado</th></tr></thead><tbody>
+      ${CIDADES.map(c=>lin(c,doMes.filter(r=>r.cidade===c))).join('')}</tbody><tfoot>${lin('Total',doMes)}</tfoot></table>`;
+  }
+  // Salva a linha ao sair de um campo; linha toda vazia = apaga.
+  $('#rConteudo').addEventListener('change',async e=>{
+    const tr=e.target.closest('tr[data-key]');if(!tr)return;
+    const [q,inicio,cidade]=tr.dataset.key.split('|'),p={quadro_id:q,inicio,cidade};let vazio=true;
+    for(const [f] of CAMPOS){const v=tr.querySelector(`[data-f=${f}]`).value.trim();p[f]=v===''?null:Math.min(9999,Math.max(0,Math.round(+v)||0));if(p[f]!==null)vazio=false}
+    p.referencias=tr.querySelector('[data-f=referencias]').value.trim()||null;if(p.referencias)vazio=false;
+    const ex=achar(tr.dataset.key),st=tr.querySelector('.st');st.textContent='salvando…';
+    let error;
+    if(vazio){if(ex){({error}=await db.from('captacao_relatorio').delete().eq('id',ex.id));if(!error)rel=rel.filter(r=>r!==ex)}}
+    else{p.atualizado_em=new Date().toISOString();p.atualizado_por=meuEmail;
+      const res=await db.from('captacao_relatorio').upsert(p,{onConflict:'quadro_id,inicio,cidade'}).select(REL).single();error=res.error;
+      if(!error){if(ex)Object.assign(ex,res.data);else rel.push(res.data)}}
+    if(error){st.textContent='';alert('Não foi possível salvar: '+error.message);return}
+    st.textContent='salvo ✓';setTimeout(()=>{if(st.textContent==='salvo ✓')st.textContent=''},2500);
+    // A REF repetida pode aparecer em outra semana: recalcula e repinta todas as linhas.
+    recalcular();document.querySelectorAll('#rConteudo tr[data-key]').forEach(pintarLinha);pintarSub(q,inicio);pintarResumoProprio(q,$('#rMes').value);
+  });
+
+  // Visão total da gerência: números do mês, por captadora, por semana, acumulado do ano e o detalhe com os erros.
+  function renderTotal(ym){$('#rConteudo').innerHTML=CapRel.htmlTotal({rel:relEf,caps:capVisiveis(),ym,cidade:$('#rCidade').value})}
+  $('#rConteudo').addEventListener('click',e=>{const b=e.target.closest('[data-rq]');if(b){$('#rQuem').value=b.dataset.rq;renderRel()}});
+
+  // ---------- Acessos ----------
+  // Senhas dos departamentos (dep_senhas, slug 'captacao'): a senha nunca vem na listagem, só pela função dep_senha_revelar.
+  // Links úteis em dep_links. Os dois ficam no banco, não aqui, porque o repositório é público.
+  const DEP='captacao';
+  let senhas=[],links=[],senhaEditId=null,linkEditId=null;
+  const siteOk=u=>/^https?:\/\//i.test(u||'');
+  async function copiar(t,oque){try{await navigator.clipboard.writeText(t);toast(oque+' copiado')}catch{prompt('Copie:',t)}}
+  async function carregarAcessos(){
+    const [s,l]=await Promise.all([db.from('dep_senhas').select('id,sistema,link,usuario,observacao,grupo,atualizado_em,atualizado_por').eq('departamento',DEP).order('sistema'),
+      db.from('dep_links').select('id,titulo,url,posicao').eq('departamento',DEP).order('posicao')]);
+    if(s.error){$('#senhasTable').innerHTML=`<tbody><tr><td>Não foi possível carregar: ${safe(s.error.message)}</td></tr></tbody>`}else{senhas=s.data;renderSenhas()}
+    if(l.error){$('#linksLista').innerHTML=`<p class="msg error">Não foi possível carregar: ${safe(l.error.message)}</p>`}else{links=l.data;renderLinks()}
+  }
+  // Duas tabelas com o mesmo formato: sistemas (grupo vazio) e cursos (grupo 'curso').
+  function renderSenhas(){
+    for(const [sel,grupo,nomeCol,vazio] of [['#senhasTable','','Sistema','Nenhum sistema cadastrado ainda. Clique em "+ Novo acesso".'],['#cursosTable','curso','Curso','Nenhum curso cadastrado ainda. Clique em "+ Novo curso".']]){
+      const list=senhas.filter(s=>(s.grupo||'')===grupo);
+      if(!list.length){$(sel).innerHTML=`<tbody><tr><td class="muted">${vazio}</td></tr></tbody>`;continue}
+      $(sel).innerHTML=`<thead><tr><th>${nomeCol}</th><th>Usuário</th><th>Senha</th><th>Observação</th><th></th></tr></thead><tbody>${list.map(s=>`<tr>
+        <td><strong>${safe(s.sistema)}</strong>${siteOk(s.link)?` <a class="link" href="${safe(s.link)}" target="_blank" rel="noopener noreferrer">Abrir ↗</a>`:''}</td>
+        <td>${s.usuario?`${safe(s.usuario)} <button class="link" data-copy-user="${s.id}">Copiar</button>`:'<span class="muted">–</span>'}</td>
+        <td><span id="pw-${s.id}">••••••••</span> <button class="link" data-show="${s.id}">Mostrar</button><button class="link" data-copy-pw="${s.id}">Copiar</button></td>
+        <td style="white-space:normal">${safe(s.observacao||'')}</td>
+        <td><button class="link" data-edit-senha="${s.id}">Editar</button><button class="link danger" data-del-senha="${s.id}">Excluir</button></td></tr>`).join('')}</tbody>`;
+    }
+  }
+  async function revelar(id){const {data,error}=await db.rpc('dep_senha_revelar',{p_id:id});if(error){alert('Não foi possível ver a senha: '+error.message);return null}return data}
+  const ocultarTimers={};
+  $('#senhasTable').onclick=$('#cursosTable').onclick=async e=>{
+    const d=e.target.dataset,s=senhas.find(x=>x.id===(d.copyUser||d.show||d.copyPw||d.editSenha||d.delSenha));if(!s)return;
+    if(d.copyUser)copiar(s.usuario,'Usuário');
+    if(d.show){const span=$('#pw-'+s.id);
+      if(e.target.textContent==='Ocultar'){span.textContent='••••••••';e.target.textContent='Mostrar';return}
+      const pw=await revelar(s.id);if(pw===null)return;span.textContent=pw||'(sem senha)';e.target.textContent='Ocultar';
+      clearTimeout(ocultarTimers[s.id]);ocultarTimers[s.id]=setTimeout(()=>{span.textContent='••••••••';e.target.textContent='Mostrar'},30000)}
+    if(d.copyPw){const pw=await revelar(s.id);if(pw)copiar(pw,'Senha');else if(pw!==null)toast('Sem senha cadastrada')}
+    if(d.editSenha)abrirSenha(s);
+    if(d.delSenha&&await confirmar(`Excluir o acesso "${s.sistema}"? A senha será apagada.`)){
+      const {error}=await db.rpc('dep_senha_excluir',{p_id:s.id});if(error){alert('Não foi possível excluir: '+error.message);return}
+      senhas=senhas.filter(x=>x.id!==s.id);renderSenhas()}
+  };
+  const senhaDialog=$('#senhaDialog');
+  // A mesma janela serve para os acessos da equipe e para "Minhas senhas" (pessoal = só a dona vê).
+  let modoPessoal=false;
+  function abrirSenha(s,grupo='',pessoal=false){
+    senhaEditId=s?.id||null;modoPessoal=pessoal;const f=$('#senhaForm');f.reset();$('#senhaMsg').hidden=true;
+    const g=s?(s.grupo||''):grupo;$('#sGrupo').closest('.field').hidden=pessoal;
+    $('#senhaTitle').textContent=pessoal?(s?'Editar minha senha':'Nova senha pessoal'):(s?'Editar ':'Novo ')+(g==='curso'?'curso':'acesso');$('#sSenhaHint').hidden=!s;
+    $('#sSenha').type='password';$('#sSenhaVer').textContent='Mostrar';f.grupo.value=g;
+    if(s){f.sistema.value=s.sistema;f.link.value=s.link||'';f.usuario.value=s.usuario||'';f.observacao.value=s.observacao||''}
+    senhaDialog.showModal();
+  }
+  $('#newSenha').onclick=()=>abrirSenha(null);
+  $('#newCurso').onclick=()=>abrirSenha(null,'curso');
+  $('#sSenhaVer').onclick=()=>{const i=$('#sSenha'),ver=i.type==='password';i.type=ver?'text':'password';$('#sSenhaVer').textContent=ver?'Ocultar':'Mostrar'};
+  senhaDialog.addEventListener('close',()=>{$('#sSenha').value=''});
+  $('#senhaForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#senhaMsg');msg.hidden=true;
+    const args={p_departamento:DEP,p_id:senhaEditId,p_sistema:String(f.get('sistema')).trim(),p_link:String(f.get('link')).trim(),p_usuario:String(f.get('usuario')).trim(),p_observacao:String(f.get('observacao')).trim(),p_senha:String(f.get('senha'))};
+    if(!args.p_sistema){msg.textContent='Informe o sistema.';msg.hidden=false;return}
+    if(modoPessoal){delete args.p_departamento;$('#senhaSubmit').disabled=true;const {error}=await db.rpc('pessoal_senha_salvar',args);$('#senhaSubmit').disabled=false;
+      if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
+      senhaDialog.close();toast('Senha salva');await carregarMinhas();return}
+    $('#senhaSubmit').disabled=true;const {data:id,error}=await db.rpc('dep_senha_salvar',args);
+    // O tipo (sistema ou curso) é gravado à parte, só quando muda.
+    const grupo=String(f.get('grupo')||''),antes=senhas.find(x=>x.id===senhaEditId);
+    const r2=!error&&id&&(antes?.grupo||'')!==grupo?await db.rpc('dep_senha_grupo',{p_id:id,p_grupo:grupo}):{};
+    $('#senhaSubmit').disabled=false;
+    if(error||r2.error){msg.textContent='Não foi possível salvar: '+(error||r2.error).message;msg.hidden=false;return}
+    senhaDialog.close();toast(grupo==='curso'?'Curso salvo':'Acesso salvo');await carregarAcessos();
+  };
+  // ---------- Minhas senhas (pessoais: só a dona vê; ver supabase/captacao.sql) ----------
+  let minhas=[];
+  async function carregarMinhas(){
+    const {data,error}=await db.from('senhas_pessoais').select('id,sistema,link,usuario,observacao,atualizado_em').order('sistema');
+    if(error){$('#minhasTable').innerHTML=`<tbody><tr><td>Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
+    minhas=data;
+    $('#minhasTable').innerHTML=!minhas.length?'<tbody><tr><td class="muted">Nenhuma senha sua ainda. Clique em "+ Nova senha".</td></tr></tbody>'
+      :`<thead><tr><th>Sistema</th><th>Usuário</th><th>Senha</th><th>Observação</th><th></th></tr></thead><tbody>${minhas.map(s=>`<tr>
+        <td><strong>${safe(s.sistema)}</strong>${siteOk(s.link)?` <a class="link" href="${safe(s.link)}" target="_blank" rel="noopener noreferrer">Abrir ↗</a>`:''}</td>
+        <td>${s.usuario?`${safe(s.usuario)} <button class="link" data-m-user="${s.id}">Copiar</button>`:'<span class="muted">–</span>'}</td>
+        <td><span id="mpw-${s.id}">••••••••</span> <button class="link" data-m-show="${s.id}">Mostrar</button><button class="link" data-m-pw="${s.id}">Copiar</button></td>
+        <td style="white-space:normal">${safe(s.observacao||'')}</td>
+        <td><button class="link" data-m-edit="${s.id}">Editar</button><button class="link danger" data-m-del="${s.id}">Excluir</button></td></tr>`).join('')}</tbody>`;
+  }
+  $('#newMinha').onclick=()=>abrirSenha(null,'',true);
+  $('#minhasTable').onclick=async e=>{
+    const d=e.target.dataset,s=minhas.find(x=>x.id===(d.mUser||d.mShow||d.mPw||d.mEdit||d.mDel));if(!s)return;
+    const ver=async()=>{const {data,error}=await db.rpc('pessoal_senha_revelar',{p_id:s.id});if(error){alert('Não foi possível ver a senha: '+error.message);return null}return data};
+    if(d.mUser)copiar(s.usuario,'Usuário');
+    if(d.mShow){const span=$('#mpw-'+s.id);if(e.target.textContent==='Ocultar'){span.textContent='••••••••';e.target.textContent='Mostrar';return}
+      const pw=await ver();if(pw===null)return;span.textContent=pw||'(sem senha)';e.target.textContent='Ocultar';
+      setTimeout(()=>{span.textContent='••••••••';e.target.textContent='Mostrar'},30000)}
+    if(d.mPw){const pw=await ver();if(pw)copiar(pw,'Senha');else if(pw!==null)toast('Sem senha cadastrada')}
+    if(d.mEdit)abrirSenha(s,'',true);
+    if(d.mDel&&await confirmar(`Excluir a sua senha de "${s.sistema}"?`)){const {error}=await db.rpc('pessoal_senha_excluir',{p_id:s.id});if(error){alert('Não foi possível excluir: '+error.message);return}carregarMinhas()}
+  };
+
+  // ---------- Materiais (documentos do departamento "captacao": dep_documentos + bucket "departamentos") ----------
+  const BUCKET='departamentos';
+  let docs=[];
+  const tipoDoc=n=>{const x=(n.split('.').pop()||'').toLowerCase();return x==='pdf'?['pdf','PDF']:['html','htm'].includes(x)?['html','PÁGINA']:['doc','docx'].includes(x)?['doc','WORD']:['xls','xlsx'].includes(x)?['xls','EXCEL']:['ppt','pptx'].includes(x)?['ppt','PPT']:['img','IMAGEM']};
+  const tamanho=b=>b>=1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(b/1024))+' KB';
+  async function carregarDocs(){
+    const {data,error}=await db.from('dep_documentos').select('id,titulo,categoria,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').eq('departamento',DEP).order('enviado_em',{ascending:false});
+    if(error){$('#docsMat').innerHTML=`<div class="vazio-doc">Não foi possível carregar: ${safe(error.message)}</div>`;return}
+    docs=data;
+    // Excluir: a gerência ou quem enviou.
+    const card=d=>{const [cls,label]=tipoDoc(d.nome_arquivo),pode=gestor||(d.enviado_por||'').toLowerCase()===meuEmail.toLowerCase();return `<article class="card doc"><div class="doc-ico ${cls}">${label}</div><div><h3>${safe(d.titulo)}</h3>
+      <small>${safe(d.nome_arquivo)} · ${tamanho(d.tamanho||0)}</small><small>Enviado em ${dataBr(d.enviado_em)} por ${safe(nome(d.enviado_por))}</small>
+      <div class="row" style="margin:8px 0 0 -4px;gap:2px"><button class="link" data-abrir="${d.id}">Abrir</button><button class="link" data-baixar="${d.id}">Baixar</button>${pode?`<button class="link danger" data-del-doc="${d.id}">Excluir</button>`:''}</div></div></article>`};
+    $('#docsMat').innerHTML=docs.filter(d=>d.categoria!=='POP').map(card).join('')||'<div class="vazio-doc">Nenhum material ainda. Clique em "+ Enviar material".</div>';
+    $('#docsPop').innerHTML=docs.filter(d=>d.categoria==='POP').map(card).join('')||'<div class="vazio-doc">Nenhum POP enviado ainda.</div>';
+  }
+  $('#tab-materiais').addEventListener('click',async e=>{
+    const d=e.target.dataset,doc=docs.find(x=>x.id===(d.abrir||d.baixar||d.delDoc));if(!doc)return;
+    // Página HTML: abre dentro do portal, isolada, em vez de baixar.
+    if(d.abrir&&tipoDoc(doc.nome_arquivo)[0]==='html'){
+      const {data,error}=await db.storage.from(BUCKET).download(doc.caminho);if(error){alert('Não foi possível abrir: '+error.message);return}
+      $('#leitorTitulo').textContent=doc.titulo;$('#leitorFrame').srcdoc=await data.text();$('#leitorDialog').showModal();return}
+    if(d.abrir){const w=window.open('','_blank');const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,600);
+      if(error){w?.close();alert('Não foi possível abrir: '+error.message);return}if(w)w.location=data.signedUrl;else location.href=data.signedUrl}
+    if(d.baixar){const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,600,{download:doc.nome_arquivo});
+      if(error){alert('Não foi possível baixar: '+error.message);return}const a=document.createElement('a');a.href=data.signedUrl;a.click()}
+    if(d.delDoc&&await confirmar(`Excluir o material "${doc.titulo}"?`)){
+      const r=await db.storage.from(BUCKET).remove([doc.caminho]);if(r.error){alert('Não foi possível excluir: '+r.error.message);return}
+      const {error}=await db.from('dep_documentos').delete().eq('id',doc.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+      carregarDocs()}
+  });
+  $('#newDoc').onclick=()=>{$('#docForm').reset();$('#docMsg').hidden=true;$('#docDialog').showModal()};
+  $('#docForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#docMsg'),file=f.get('arquivo');msg.hidden=true;
+    if(!file||!file.size){msg.textContent='Escolha um arquivo.';msg.hidden=false;return}
+    if(file.size>25*1024*1024){msg.textContent='O arquivo passa de 25 MB.';msg.hidden=false;return}
+    const limpo=file.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-');
+    // A primeira pasta do caminho é o departamento: é por ela que o banco confere quem pode ler o arquivo.
+    const caminho=`${DEP}/${crypto.randomUUID()}/${limpo}`;
+    $('#docSubmit').disabled=true;$('#docSubmit').textContent='Enviando…';
+    try{
+      const tipo=file.type||(/\.html?$/i.test(file.name)?'text/html':/\.pptx$/i.test(file.name)?'application/vnd.openxmlformats-officedocument.presentationml.presentation':undefined);
+      const up=await db.storage.from(BUCKET).upload(caminho,file,{contentType:tipo});if(up.error)throw up.error;
+      const {error}=await db.from('dep_documentos').insert({departamento:DEP,titulo:String(f.get('titulo')).trim(),categoria:f.get('categoria'),caminho,nome_arquivo:file.name,tamanho:file.size});
+      if(error){await db.storage.from(BUCKET).remove([caminho]);throw error}
+      $('#docDialog').close();toast('Material enviado');await carregarDocs();
+    }catch(err){msg.textContent='Não foi possível enviar: '+(/mime|type/i.test(err.message)?'tipo de arquivo não aceito.':err.message);msg.hidden=false}
+    $('#docSubmit').disabled=false;$('#docSubmit').textContent='Enviar';
+  };
+
+  function renderLinks(){
+    $('#linksLista').innerHTML=links.length?`<div class="tbl-wrap"><table><tbody>${links.map((l,i)=>`<tr><td><a class="link" style="font-size:.92rem" href="${safe(l.url)}" target="_blank" rel="noopener noreferrer">${safe(l.titulo)} ↗</a></td>
+      <td style="text-align:right"><button class="link" data-lup="${l.id}" ${i?'':'disabled'} aria-label="Subir">↑</button><button class="link" data-ldown="${l.id}" ${i<links.length-1?'':'disabled'} aria-label="Descer">↓</button><button class="link" data-ledit="${l.id}">Editar</button><button class="link danger" data-ldel="${l.id}">Excluir</button></td></tr>`).join('')}</tbody></table></div>`
+      :'<p class="msg">Nenhum link ainda. Clique em "+ Novo link".</p>';
+  }
+  $('#linksLista').addEventListener('click',async e=>{
+    const d=e.target.dataset,id=d.lup||d.ldown||d.ledit||d.ldel;if(!id)return;const i=links.findIndex(x=>x.id===id),l=links[i];
+    if(d.ledit){linkEditId=l.id;const f=$('#linkForm');f.titulo.value=l.titulo;f.url.value=l.url;$('#linkTitle').textContent='Editar link';$('#linkMsg').hidden=true;$('#linkDialog').showModal();return}
+    if(d.ldel){if(!await confirmar(`Excluir o link "${l.titulo}"?`))return;const {error}=await db.from('dep_links').delete().eq('id',l.id);if(error){alert('Não foi possível excluir: '+error.message);return}links.splice(i,1);renderLinks();return}
+    const j=d.lup?i-1:i+1;if(!links[j])return;
+    // Renumera a ordem inteira para não depender de posições repetidas.
+    [links[i],links[j]]=[links[j],l];
+    const r=await Promise.all(links.map((x,k)=>db.from('dep_links').update({posicao:k+1}).eq('id',x.id)));
+    if(r.some(x=>x.error)){alert('Não foi possível mudar a ordem.');return carregarAcessos()}
+    links.forEach((x,k)=>x.posicao=k+1);renderLinks();
+  });
+  $('#newLink').onclick=()=>{linkEditId=null;$('#linkForm').reset();$('#linkTitle').textContent='Novo link';$('#linkMsg').hidden=true;$('#linkDialog').showModal()};
+  $('#linkForm').onsubmit=async e=>{
+    e.preventDefault();const f=e.currentTarget,titulo=f.titulo.value.trim(),url=f.url.value.trim(),msg=$('#linkMsg');msg.hidden=true;
+    if(!titulo||!siteOk(url)){msg.textContent='Informe o nome e um link começando com https://';msg.hidden=false;return}
+    const r=linkEditId?await db.from('dep_links').update({titulo,url}).eq('id',linkEditId)
+      :await db.from('dep_links').insert({departamento:DEP,titulo,url,posicao:Math.max(0,...links.map(x=>x.posicao))+1});
+    if(r.error){msg.textContent='Não foi possível salvar: '+r.error.message;msg.hidden=false;return}
+    $('#linkDialog').close();toast('Link salvo');carregarAcessos();
+  };
+
+  // ---------- Visão geral (só a gerência) ----------
+  async function visaoGeral(){
+    $('#geral').innerHTML='<p class="msg" style="padding:14px">Carregando…</p>';
+    try{
+      const [cols,todos]=await Promise.all([tudo('captacao_colunas','id,quadro_id,nome,posicao','posicao'),tudo('captacao_cartoes','quadro_id,coluna_id,modelo,movido_em,arquivado_em','quadro_id')]);
+      const cards=todos.filter(k=>!k.arquivado_em); // arquivados não estão mais no quadro
+      const mod=quadros.find(q=>q.modelo),lista=quadros.filter(q=>!q.modelo&&q.ativo).sort((a,b)=>a.posicao-b.posicao);
+      // As colunas seguem o modelo; colunas que só existem num quadro entram no fim.
+      const nomes=[];const add=n=>{if(!nomes.some(x=>x.toLowerCase()===n.toLowerCase()))nomes.push(n)};
+      cols.filter(c=>c.quadro_id===mod?.id).forEach(c=>add(c.nome));cols.filter(c=>c.quadro_id!==mod?.id).forEach(c=>add(c.nome));
+      const colNome=Object.fromEntries(cols.map(c=>[c.id,c.nome.toLowerCase()]));
+      if(!lista.length){$('#geral').innerHTML='<p class="msg" style="padding:14px">Nenhum quadro de captadora ainda. Crie em <strong>Quadros das captadoras</strong>, na aba Quadro.</p>';return}
+      const conta=(q,n)=>cards.filter(k=>k.quadro_id===q&&!k.modelo&&colNome[k.coluna_id]===n.toLowerCase()).length;
+      // Parado = 7+ dias na mesma coluna, sem contar a última coluna (onde o cartão já terminou), como no quadro.
+      const ultimaDe={};cols.forEach(c=>{const u=ultimaDe[c.quadro_id];if(!u||c.posicao>u.posicao)ultimaDe[c.quadro_id]=c});
+      const parados=q=>cards.filter(k=>k.quadro_id===q&&!k.modelo&&k.coluna_id!==ultimaDe[q]?.id&&diasDesde(k.movido_em)>=7).length;
+      const cel=v=>`<td class="n${v?'':' z'}">${v}</td>`;
+      $('#geral').innerHTML=`<table><thead><tr><th>Captadora</th>${nomes.map(n=>`<th>${safe(n)}</th>`).join('')}<th>Total</th><th title="Parados há 7 dias ou mais na mesma coluna">Parados 7+ dias</th></tr></thead><tbody>
+        ${lista.map(q=>{const t=cards.filter(k=>k.quadro_id===q.id&&!k.modelo).length;return `<tr><td><button class="link" data-q="${q.id}" style="padding-left:0">${safe(q.nome)}</button>${q.email?'':' <small class="muted">(sem login)</small>'}</td>${nomes.map(n=>cel(conta(q.id,n))).join('')}${cel(t)}${cel(parados(q.id))}</tr>`}).join('')}</tbody>
+        <tfoot><tr><td>Total</td>${nomes.map(n=>cel(lista.reduce((s,q)=>s+conta(q.id,n),0))).join('')}${cel(lista.reduce((s,q)=>s+cards.filter(k=>k.quadro_id===q.id&&!k.modelo).length,0))}${cel(lista.reduce((s,q)=>s+parados(q.id),0))}</tr></tfoot></table>`;
+    }catch(err){$('#geral').innerHTML=`<p class="msg error" style="padding:14px">Não foi possível carregar: ${safe(err.message)}</p>`}
+  }
+  $('#geral').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;quadroId=b.dataset.q;try{localStorage.setItem('captacao.quadro',quadroId)}catch{};mostrar={};abrirAba('quadro');pintarTitulo();carregar()});
+
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+  cd.addEventListener('close',()=>{aberto=null});
+  db.auth.onAuthStateChange(()=>setTimeout(()=>refreshSession().catch(console.error),0));
+</script>
+</body>
+</html>
