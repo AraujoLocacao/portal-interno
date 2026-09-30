@@ -107,6 +107,7 @@
     @media(max-width:900px){.filters{grid-template-columns:1fr 1fr;position:static}.filters .mes-nav{grid-column:1/-1}.calcs{grid-template-columns:1fr}.preview dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:700px){.quadros{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
     @media(max-width:560px){.tile strong{font-size:1.4rem}.tiles{grid-template-columns:1fr 1fr}.grid2,.grid3{grid-template-columns:1fr}.res{grid-template-columns:1fr}}
+      .obs{display:inline-block;font-size:.7rem;font-weight:700;color:#65727d;background:#eef1f3;border-radius:5px;padding:0 6px;cursor:help;white-space:nowrap;vertical-align:1px} /* observação da locação: texto completo ao passar o mouse e em "Editar" */
   </style>
 </head>
 <body>
@@ -467,7 +468,7 @@
         <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${err?.some(e=>e.startsWith('REF'))?` <span class="tag bad">${safe(err.find(e=>e.startsWith('REF')))}</span>`:''}</td>
         <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td>
         <td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
-        <td class="nome">${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}${etapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${etapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(etapas[l.id].coluna)}</a>`:''}</td>
+        <td class="nome">${safe(l.proponente)}${l.observacao?` <span class="obs" title="${safe(l.observacao).replace(/"/g,'&quot;')}">📝 Obs.</span>`:''}${etapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${etapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(etapas[l.id].coluna)}</a>`:''}</td>
         <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
         <td class="num"><strong>${num(c.vgl)}</strong></td><td class="num">${pctTxt(l.percentual)}</td>
         <td class="num">${num(c.tx)}</td><td class="num">${num(c.base)}</td><td class="num">${num(c.corretora)}</td><td class="num">${num(c.stefani)}</td><td class="num">${num(c.du)}</td><td class="num">${l.captacao_pos?num(c.capImob):'<span class="muted">–</span>'}</td>

@@ -204,6 +204,7 @@
       #printArea .slide{break-after:page;page-break-after:always}
       *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
     }
+      .obs{display:inline-block;font-size:.7rem;font-weight:700;color:#65727d;background:#eef1f3;border-radius:5px;padding:0 6px;cursor:help;white-space:nowrap;vertical-align:1px} /* observação da locação: texto completo ao passar o mouse e em "Editar" */
   </style>
 </head>
 <body>
@@ -1176,7 +1177,7 @@
       ${list.map(l=>{const e=erros(l);return `<tr${e.length?' class="erro"':''}><td>${br(l.data).slice(0,5)}</td>
         <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${e.filter(x=>x.startsWith('REF')).map(x=>` <span class="tag bad">${safe(x)}</span>`).join('')}</td>
         <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td><td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
-        <td>${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}</td>
+        <td>${safe(l.proponente)}${l.observacao?` <span class="obs" title="${safe(l.observacao).replace(/"/g,'&quot;')}">📝 Obs.</span>`:''}</td>
         <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
         <td class="num"><strong>${brl(l.vgl)}</strong></td><td class="num">${String(Number(l.percentual)).replace('.',',')}%</td>
         <td style="white-space:nowrap">${l.captadora?safe(l.captadora)+' ':''}<span class="tag pos">${l.captacao_pos?'PÓS':'NOVA'}</span></td></tr>`}).join('')}</tbody>

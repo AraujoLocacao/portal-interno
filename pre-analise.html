@@ -104,6 +104,7 @@
     @media(max-width:1100px){.filters{grid-template-columns:repeat(3,minmax(0,1fr));position:static}.filters .search{grid-column:1/-1}}
     @media(max-width:820px){.charts{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}}
     @media(max-width:560px){.filters{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.tile strong{font-size:1.6rem}}
+      .obs{display:inline-block;font-size:.7rem;font-weight:700;color:#65727d;background:#eef1f3;border-radius:5px;padding:0 6px;cursor:help;white-space:nowrap;vertical-align:1px} /* observação da locação: texto completo ao passar o mouse e em "Editar" */
   </style>
 </head>
 <body>
@@ -884,7 +885,7 @@
       html+=ls.map(l=>{const err=porId[l.id],rep=err?.find(e=>e.startsWith('REF'));return `<tr${err?' class="erro"':''}>
         <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${rep?` <span class="tag bad">${rep}</span>`:''}</td>
         <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td><td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
-        <td>${safe(l.proponente)}${l.observacao?`<br><small class="muted">${safe(l.observacao)}</small>`:''}${locEtapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${locEtapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(locEtapas[l.id].coluna)}</a>`:''}</td>
+        <td>${safe(l.proponente)}${l.observacao?` <span class="obs" title="${safe(l.observacao).replace(/"/g,'&quot;')}">📝 Obs.</span>`:''}${locEtapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${locEtapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(locEtapas[l.id].coluna)}</a>`:''}</td>
         <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
         <td class="num"><strong>${locNum(l.vgl)}</strong></td><td class="num">${(+l.percentual).toLocaleString('pt-BR',{maximumFractionDigits:2})}%</td>
         <td class="row-actions"><button class="link" data-loc-edit="${l.id}">Editar</button><button class="link danger" data-loc-del="${l.id}">Excluir</button></td></tr>`}).join('');
