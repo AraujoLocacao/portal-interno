@@ -241,7 +241,7 @@
     <div class="grid3">
       <div class="field"><label for="lVgl">VGL (valor do aluguel, R$)</label><input id="lVgl" name="vgl" inputmode="decimal" placeholder="0,00" required style="text-align:right"></div>
       <div class="field"><label for="lPct">% da taxa de locação</label><input id="lPct" name="percentual" inputmode="decimal" list="pctOpcoes" placeholder="60" required style="text-align:right"><datalist id="pctOpcoes"><option value="30"><option value="50"><option value="60"><option value="100"></datalist></div>
-      <div class="field"><label for="lCap">Nome da captadora</label><input id="lCap" name="captadora" maxlength="40" list="capOpcoes" placeholder="Opcional" style="text-transform:uppercase"><datalist id="capOpcoes"></datalist></div>
+      <div class="field"><label for="lCap">Nome da captadora</label><input id="lCap" name="captadora" maxlength="40" list="capOpcoes" placeholder="Obrigatório" required style="text-transform:uppercase"><datalist id="capOpcoes"></datalist></div>
     </div>
     <div class="field"><label>Tipo de captação</label><div class="seg"><label><input type="radio" name="tipo_cap" value="nova" checked>Captação nova (Age. novo 8%)</label><label><input type="radio" name="tipo_cap" value="pos">Cap. imobiliária – pós (5%)</label></div></div>
     <div class="preview"><h3>Cálculo automático</h3><dl id="lPrev"></dl></div>
@@ -289,7 +289,8 @@
   const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
   // Fórmulas da planilha "RANKING 2026".
   const REGRA={base:.90,corretora:.25,stefani:.10,du:.01,capImob:.05,ageNovo:.08,ajuda:.10};
-  const CAPTADORAS=['RUBIA','SONORA','NAVEGANTES'];
+  // Sugestões do campo "captadora" (as captadoras da área de Captação + Navegantes, como na planilha). Dá para digitar outro nome.
+  const CAPTADORAS=['RUBIA','SONORA','ANA','ANA PAULA','NAVEGANTES'];
   let etapas={},locs=[],bonus=[],corretoras=[],unidades=[],garantias=[],booted=false,senhas=[],docs=[],senhaEditId=null,locEditId=null,mesSel=null;
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
@@ -570,6 +571,7 @@
     if(!reg.unidade)return erro('Escolha a cidade.',f.unidade);
     if(!reg.proponente)return erro('Informe o proponente.',f.proponente);
     if(!reg.corretora)return erro('Escolha a corretora.',f.corretora);
+    if(!reg.captadora)return erro('Informe quem foi a captadora.',f.captadora);
     if(!isFinite(vgl)||vgl<=0)return erro('Informe o VGL (valor do aluguel), por exemplo 2.500,00.',f.vgl);
     if(!isFinite(pct)||pct<=0||pct>200)return erro('Informe o percentual da taxa de locação, por exemplo 60.',f.percentual);
     $('#locSubmit').disabled=true;

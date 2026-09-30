@@ -272,6 +272,7 @@
       <div class="field"><label>Contrato assinado?</label><div class="seg"><label><input type="radio" name="assinado" value="sim">Sim</label><label><input type="radio" name="assinado" value="nao" checked>Não</label></div></div>
       <div class="field"><label for="locVgl">VGL (valor do aluguel, R$)</label><input id="locVgl" name="vgl" inputmode="decimal" placeholder="0,00" required style="text-align:right"></div>
       <div class="field"><label for="locPct">% da taxa de locação</label><input id="locPct" name="percentual" inputmode="decimal" list="locPctOpcoes" placeholder="60" required style="text-align:right"><datalist id="locPctOpcoes"><option value="30"><option value="50"><option value="60"><option value="100"></datalist></div>
+      <div class="field"><label for="locCap">Captadora</label><input id="locCap" name="captadora" maxlength="40" list="locCapOpcoes" placeholder="Obrigatório" required style="text-transform:uppercase"><datalist id="locCapOpcoes"></datalist></div>
     </div>
     <div class="field"><label for="locObs">Observação</label><textarea id="locObs" name="observacao" rows="2" maxlength="500"></textarea></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="locSalvar">Salvar</button></div>
@@ -812,7 +813,9 @@
   // A mesma tabela "locacoes" do departamento Locação (locacao.html). A pré-análise preenche parte dela:
   // aqui aparecem só as colunas até "%". Taxa de locação e comissões não são mostradas nesta página.
   const LOC_MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-  const LOC_CAMPOS='id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,observacao,ordem';
+  const LOC_CAMPOS='id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,captadora,observacao,ordem';
+  // Captadora é obrigatória. Só o nome: o tipo de captação (nova/pós) e as comissões ficam na Locação.
+  const LOC_CAPTADORAS=['RUBIA','SONORA','ANA','ANA PAULA','NAVEGANTES'];
   let locs=[],locEtapas={},locUnidades=[],locMes=null,locEditId=null;
   const locNum=v=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const locBrl=v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -913,8 +916,9 @@
     $('#locUnidade').innerHTML=locOpcoes(locUnidades,l?.unidade,'Selecione…');
     $('#locCorretora').innerHTML=locOpcoes(corretoras,l?.corretora,'Selecione…');
     $('#locGarantia').innerHTML=locOpcoes(garantias,l?.garantia,'Não informada');
+    $('#locCapOpcoes').innerHTML=[...new Set([...LOC_CAPTADORAS,...locs.map(x=>String(x.captadora||'').trim().toUpperCase()).filter(Boolean)])].map(c=>`<option value="${safe(c)}">`).join('');
     if(l){f.data.value=l.data;f.referencia.value=l.referencia;f.proponente.value=l.proponente;f.vgl.value=locNum(l.vgl);f.percentual.value=String(+l.percentual).replace('.',',');
-      f.assinado.value=l.assinado?'sim':'nao';f.observacao.value=l.observacao||'';if(!l.garantia)f.garantia.value=''}
+      f.assinado.value=l.assinado?'sim':'nao';f.observacao.value=l.observacao||'';f.captadora.value=l.captadora||'';if(!l.garantia)f.garantia.value=''}
     else{const hoje=iso(new Date());f.data.value=hoje.startsWith(locMes)?hoje:locMes+'-01';if(locUnidades.some(u=>u.nome==='ITAJAÍ'))f.unidade.value='ITAJAÍ';f.percentual.value='60'}
     locDupCheck();locDialog.showModal();(l?$('#locVgl'):$('#locRef')).focus();
   }
@@ -932,12 +936,13 @@
     const vgl=locLer(f.vgl.value),pct=locLer(f.percentual.value);
     // Só os campos da pré-análise: captadora e tipo de captação continuam como a Locação deixou.
     const reg={data:f.data.value,referencia:locRef(f.referencia.value),unidade:f.unidade.value,corretora:f.corretora.value,assinado:f.assinado.value==='sim',
-      proponente:f.proponente.value.trim().toUpperCase(),garantia:f.garantia.value||null,vgl,percentual:pct,observacao:f.observacao.value.trim()||null};
+      proponente:f.proponente.value.trim().toUpperCase(),garantia:f.garantia.value||null,vgl,percentual:pct,captadora:f.captadora.value.trim().toUpperCase()||null,observacao:f.observacao.value.trim()||null};
     if(!reg.data)return erro('Informe a data.',f.data);
     if(!reg.referencia)return erro('Informe a REF do imóvel.',f.referencia);
     if(!reg.proponente)return erro('Informe o proponente.',f.proponente);
     if(!reg.unidade)return erro('Escolha a cidade.',f.unidade);
     if(!reg.corretora)return erro('Escolha a corretora.',f.corretora);
+    if(!reg.captadora)return erro('Informe quem foi a captadora.',f.captadora);
     if(!isFinite(vgl)||vgl<=0)return erro('Informe o VGL (valor do aluguel), por exemplo 2.500,00.',f.vgl);
     if(!isFinite(pct)||pct<=0||pct>200)return erro('Informe o percentual da taxa de locação, por exemplo 60.',f.percentual);
     $('#locSalvar').disabled=true;let r;

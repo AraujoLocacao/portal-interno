@@ -194,3 +194,93 @@ $$;
 drop trigger if exists locacoes_exclui_cartao on public.locacoes;
 create trigger locacoes_exclui_cartao before delete on public.locacoes
   for each row execute function public.quadro_exclui_cartao_da_locacao();
+
+-- Observação da locação (planilha) => descrição do cartão do quadro.
+
+-- Partes do modelo de descrição (o mesmo do Trello).
+create or replace function public.quadro_desc_cabecalho(p_vgl numeric, p_garantia text)
+returns text language sql immutable as $$
+  select 'Aluguel: R$ ' || translate(to_char(p_vgl, 'FM999,999,990.00'), ',.', '.,') || E'\nEntrada:\nVencimento:\n\nGarantia: ' || coalesce(p_garantia, '');
+$$;
+
+create or replace function public.quadro_desc_rodape(p_corretora text, p_captadora text, p_data date)
+returns text language sql immutable as $$
+  select E'**LIXO:**\n**SEGURO INCENDIO**\n**CHAVES:**\n**SINDICO:**\n**UC:**\n**ÁGUA:**\n**VISTORIA:**\n\nMORADORES:\n\n_CORRETORA: ' || coalesce(p_corretora, '') ||
+         E'_\nCAPTADORA: ' || coalesce(p_captadora, '') || E'\n\n**FECHADO DIA: ' || to_char(p_data, 'DD/MM/YYYY') || E'**\n\n_**INFORMAÇÕES KENLO IMOB]**_';
+$$;
+
+-- Locação nova => cartão na coluna de entrada. Com observação, ela entra no lugar do cabeçalho vazio do modelo.
+create or replace function public.quadro_cartao_da_locacao()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_cartao uuid;
+  v_coluna uuid;
+  v_topo text;
+begin
+  select id into v_cartao from public.quadro_cartoes
+   where locacao_id is null and upper(referencia) = upper(new.referencia) and criado_em > now() - interval '120 days'
+   order by criado_em desc limit 1;
+  if v_cartao is not null then
+    update public.quadro_cartoes set locacao_id = new.id, atualizado_em = now() where id = v_cartao;
+    return new;
+  end if;
+  select id into v_coluna from public.quadro_colunas order by entrada desc, posicao limit 1;
+  if v_coluna is null then
+    return new;
+  end if;
+  v_topo := case when coalesce(trim(new.observacao), '') <> '' then trim(new.observacao) || E'\n' else public.quadro_desc_cabecalho(new.vgl, new.garantia) end;
+  insert into public.quadro_cartoes (coluna_id, posicao, titulo, referencia, descricao, locacao_id, criado_por)
+  values (v_coluna,
+          coalesce((select min(posicao) from public.quadro_cartoes where coluna_id = v_coluna), 65536) - 1024,
+          upper(new.referencia) || ' - ' || new.proponente || ' - ',
+          upper(new.referencia),
+          v_topo || E'\n' || public.quadro_desc_rodape(new.corretora, new.captadora, new.data),
+          new.id, coalesce(auth.jwt() ->> 'email', new.criado_por))
+  returning id into v_cartao;
+  insert into public.quadro_historico (cartao_id, tipo, para_coluna, texto, autor)
+  values (v_cartao, 'criado', (select nome from public.quadro_colunas where id = v_coluna), 'Criado a partir da planilha de locações', coalesce(auth.jwt() ->> 'email', new.criado_por));
+  return new;
+end;
+$$;
+
+-- Observação alterada na planilha => atualiza a descrição do cartão criado por ela (os do Trello não mudam).
+-- Troca o texto antigo pelo novo; se não achar, troca o cabeçalho vazio do modelo; senão, põe a observação no topo.
+create or replace function public.quadro_obs_para_cartao()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_old text := coalesce(trim(old.observacao), '');
+  v_new text := coalesce(trim(new.observacao), '');
+  v_cab text := public.quadro_desc_cabecalho(old.vgl, old.garantia);
+  c record;
+  v_desc text;
+begin
+  for c in select id, descricao from public.quadro_cartoes where locacao_id = new.id and trello_id is null loop
+    if v_old <> '' and position(v_old in c.descricao) > 0 then
+      v_desc := replace(c.descricao, v_old, v_new);
+    elsif v_new <> '' and position(v_cab in c.descricao) > 0 then
+      v_desc := replace(c.descricao, v_cab, v_new || E'\n');
+    elsif v_new <> '' then
+      v_desc := v_new || E'\n\n' || c.descricao;
+    else
+      continue;
+    end if;
+    update public.quadro_cartoes set descricao = v_desc, atualizado_em = now() where id = c.id;
+    insert into public.quadro_historico (cartao_id, tipo, texto, autor)
+    values (c.id, 'editado', 'atualizou a descrição com a observação da planilha', coalesce(auth.jwt() ->> 'email', 'planilha'));
+  end loop;
+  return new;
+end;
+$$;
+
+drop trigger if exists locacoes_obs_cartao on public.locacoes;
+create trigger locacoes_obs_cartao after update of observacao on public.locacoes
+  for each row when (old.observacao is distinct from new.observacao)
+  execute function public.quadro_obs_para_cartao();
