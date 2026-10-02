@@ -98,6 +98,23 @@
     .atv-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;font-size:.78rem;color:var(--muted);line-height:1.25}.atv-nums span{display:grid;gap:2px}
     .atv-nums strong{color:var(--ink);font-size:1.35rem;line-height:1.1}.atv-nums .late strong{color:var(--red)}
     .atv-card .row-actions{text-align:left;margin-left:-4px;margin-top:auto}
+    /* RH: aniversários */
+    .aniv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:12px 0 28px}
+    .aniv{padding:16px 18px;display:flex;gap:14px;align-items:center;min-width:0}.aniv>div{min-width:0}
+    .aniv-dia{width:54px;height:58px;border-radius:12px;display:grid;place-content:center;text-align:center;flex:none;background:#eef2f4;color:var(--navy);line-height:1.05}
+    .aniv-dia strong{font-size:1.45rem}.aniv-dia small{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+    .aniv.vida .aniv-dia{background:#e8f0fa;color:#004AAD}.aniv.empresa .aniv-dia{background:#e3f1ea;color:var(--green)}
+    .aniv.hoje{border-color:#7FA3D0;box-shadow:0 0 0 2px #7FA3D0,var(--shadow)}
+    .aniv h3{margin:0;font-size:1.02rem;overflow-wrap:anywhere}.aniv p{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+    .aniv .quando{font-weight:750;color:var(--ink)}.aniv.hoje .quando{color:#004AAD}
+    .chip.vida{background:#e8f0fa;color:#004AAD}.chip.empresa{background:#e3f1ea;color:var(--green)}
+    .cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:12px 0 28px}
+    .cal{padding:14px 16px}.cal h3{margin:0 0 8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+    .cal.atual{border-color:#7FA3D0}.cal.atual h3{color:#004AAD}
+    .cal ul{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:.86rem}.cal li{display:flex;gap:8px;align-items:baseline}
+    .cal li b{min-width:22px;text-align:right;color:var(--muted);font-weight:700}.cal li.passou{opacity:.55}
+    .cal .vazio{color:#8a969e;font-size:.84rem}
+    tr.inativo td{opacity:.55}
     /* Escolha do departamento */
     .dep-area{margin:0 0 26px}.dep-area h2{font-size:1.15rem;margin-bottom:12px}
     .dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
@@ -172,6 +189,23 @@
     </details>
     <p class="atual" id="rescisaoAtual" hidden></p>
     <div class="card ferramenta"><p class="empty" id="rescisaoMsg">Carregando a calculadora…</p><iframe id="rescisaoFrame" title="Calculadora de rescisão" hidden sandbox="allow-scripts allow-modals allow-popups allow-popups-to-escape-sandbox allow-downloads"></iframe></div>
+  </section>
+
+  <section id="tab-rh" data-tab hidden>
+    <div class="top">
+      <div><h2>RH</h2><p>Aniversários de vida e de empresa da equipe. Os avisos dos próximos dias também aparecem na página inicial do portal, para todos (só o nome e o dia, sem o ano de nascimento).</p></div>
+      <div class="bar-actions"><button class="primary" id="newColab">+ Novo colaborador</button></div>
+    </div>
+    <div class="tiles" id="rhTiles"></div>
+    <h2 style="font-size:1.1rem">Avisos dos próximos 30 dias</h2>
+    <div class="aniv-grid" id="rhAvisos"></div>
+    <h2 style="font-size:1.1rem">Calendário do ano</h2>
+    <div class="cal-grid" id="rhCalendario"></div>
+    <div class="card table-card">
+      <div class="top" style="margin-bottom:0"><div><h2 style="font-size:1.1rem">Colaboradores</h2></div>
+        <div class="bar-actions"><input class="search-input" id="rhBusca" type="search" placeholder="Buscar colaborador" aria-label="Buscar colaborador"><label class="check" style="padding-bottom:0"><input type="checkbox" id="rhInativos"> Mostrar inativos</label></div></div>
+      <div class="table-wrap"><table id="rhTable"></table></div>
+    </div>
   </section>
 
   <section id="tab-adm" data-tab hidden>
@@ -269,6 +303,25 @@
   </form>
 </dialog>
 
+<dialog id="colabDialog">
+  <div class="dialog-head"><h2 id="colabTitle">Novo colaborador</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="colabForm" novalidate>
+    <div class="row2">
+      <div class="field"><label for="cNome">Nome (como aparece no aviso)</label><input id="cNome" name="nome" maxlength="80" required placeholder="Ex.: Maria Clara"></div>
+      <div class="field"><label for="cFuncao">Função</label><input id="cFuncao" name="funcao" maxlength="80" placeholder="Opcional"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><span class="lbl">Aniversário (dia e mês)</span><div class="row2" style="gap:8px"><select id="cDia" name="dia" aria-label="Dia do aniversário"></select><select id="cMes" name="mes" aria-label="Mês do aniversário"></select></div></div>
+      <div class="field"><label for="cAdmissao">Data de entrada na empresa</label><input id="cAdmissao" name="admissao" type="date"></div>
+    </div>
+    <label class="check" style="padding-bottom:0"><input type="checkbox" name="ativo" id="cAtivo" checked> Ativo (aparece nos avisos)</label>
+    <div class="field"><label for="cObs">Observação</label><textarea id="cObs" name="observacao" rows="2" maxlength="500"></textarea></div>
+    <p class="msg" id="colabInfo" hidden></p>
+    <div class="actions"><button type="button" class="danger-btn" id="colabDel" hidden>Excluir</button><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="colabSubmit">Salvar</button></div>
+    <p class="msg error" id="colabMsg" hidden></p>
+  </form>
+</dialog>
+
 <dialog id="docDialog">
   <div class="dialog-head"><h2>Enviar documento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
   <form id="docForm">
@@ -314,7 +367,8 @@
     {slug:'pos-locacao',nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
       recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
       atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
-    {slug:'financeiro-rh',limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',
+    // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
+    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh'],
       atividades:['Colaboradores (admissão/demissão/folha)','Contas a pagar da empresa','Suporte direto à equipe financeira']},
     {slug:'supervisao',limpo:true,nome:'Supervisão',area:'Liderança',papel:'Administrativo',ref:'Referência',
       atividades:['Resposta a notificações direcionadas à imobiliária','Monitoramento da demanda do administrativo','Reuniões semanais']},
@@ -351,7 +405,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',energia:'Energia',atividades:'Atividades',senhas:'Senhas',pop:'POP e documentos'};
+    const nomes={rh:'RH',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',energia:'Energia',atividades:'Atividades',senhas:'Senhas',pop:'POP e documentos'};
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
     $('#previewNote').innerHTML=DEP.limpo
@@ -377,7 +431,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),DEP.energia?loadEnergia():null,ABAS.includes('rescisao')?loadRescisao():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,DEP.energia?loadEnergia():null,ABAS.includes('rescisao')?loadRescisao():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // A gerência vê todos os departamentos: um seletor no topo troca de um para outro.
@@ -679,6 +733,106 @@
     $('#notaSubmit').disabled=true;const {error}=await db.rpc('pos_energia_anotar',{p_cartao:notaCartao,p_texto:texto});$('#notaSubmit').disabled=false;
     if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
     $('#notaDialog').close();toast('Anotação salva');await loadEnergia();
+  };
+
+  // ---------- RH (só Gestão Financeira / RH) ----------
+  // Tabela rh_colaboradores (supabase/rh.sql). O aniversário de vida tem só dia e mês; o de empresa vem da data de entrada.
+  // A página inicial do portal mostra os mesmos avisos pela função aniversarios_portal (mesma regra: hoje até 30 dias).
+  const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const SEMANA=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+  let colabs=[],colabEditId=null;
+  const hojeD=()=>{const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate())};
+  // Próxima vez que o dia/mês acontece a partir de hoje (hoje inclusive). 29/02 vira 28/02 nos anos que não são bissextos.
+  function proxima(dia,mes,base=hojeD()){
+    for(let a=base.getFullYear();;a++){const d=new Date(a,mes-1,Math.min(dia,new Date(a,mes,0).getDate()));if(d>=base)return d}
+  }
+  const ymd=s=>s.split('-').map(Number);
+  // Todos os aniversários (vida e empresa) a partir de hoje, até "dias" à frente.
+  function eventos(dias){
+    const h=hojeD(),lim=new Date(h.getFullYear(),h.getMonth(),h.getDate()+dias),out=[];
+    for(const c of colabs.filter(c=>c.ativo)){
+      if(c.nascimento_dia)out.push({c,tipo:'vida',dia:proxima(c.nascimento_dia,c.nascimento_mes)});
+      if(c.admissao){const [a,m,d]=ymd(c.admissao),dt=proxima(d,m);const anos=dt.getFullYear()-a;if(anos>=1)out.push({c,tipo:'empresa',dia:dt,anos})}
+    }
+    return out.filter(e=>e.dia<=lim).sort((x,y)=>x.dia-y.dia||(x.tipo<y.tipo?1:-1)||x.c.nome.localeCompare(y.c.nome));
+  }
+  const faltam=d=>Math.round((d-hojeD())/864e5);
+  const quandoTxt=d=>{const n=faltam(d);return n===0?'Hoje!':n===1?'Amanhã':`Em ${n} dias`};
+  const anosTxt=n=>`${n} ${n===1?'ano':'anos'} de casa`;
+  const tempoCasa=adm=>{const [a,m,d]=ymd(adm),h=hojeD();let anos=h.getFullYear()-a;if(h<new Date(h.getFullYear(),m-1,d))anos--;
+    if(anos>=1)return anosTxt(anos);const meses=(h.getFullYear()-a)*12+h.getMonth()-(m-1)-(h.getDate()<d?1:0);return meses<=0?'entrou há pouco':`${meses} ${meses===1?'mês':'meses'} de casa`};
+  async function loadRh(){
+    $('#rhTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
+    const {data,error}=await db.from('rh_colaboradores').select('id,nome,funcao,nascimento_dia,nascimento_mes,admissao,ativo,observacao,atualizado_em,atualizado_por').order('nome');
+    if(error){$('#rhTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;$('#rhAvisos').innerHTML='';return}
+    colabs=data;renderRh();
+  }
+  function renderRh(){
+    const prox=eventos(30),hj=prox.filter(e=>faltam(e.dia)===0),ativos=colabs.filter(c=>c.ativo);
+    const semData=ativos.filter(c=>!c.nascimento_dia||!c.admissao).length;
+    $('#rhTiles').innerHTML=`<div class="card tile ${hj.length?'warn':''}"><span>Hoje</span><strong>${hj.length}</strong><small>${hj.length?[...new Set(hj.map(e=>e.c.nome))].map(safe).join(', '):'nenhum aniversário'}</small></div>
+      <div class="card tile"><span>Próximos 30 dias</span><strong>${prox.length}</strong><small>vida e empresa</small></div>
+      <div class="card tile"><span>Colaboradores ativos</span><strong>${ativos.length}</strong><small>&nbsp;</small></div>
+      <div class="card tile ${semData?'warn':''}"><span>Sem alguma data</span><strong>${semData}</strong><small>falta aniversário ou entrada</small></div>`;
+    $('#rhAvisos').innerHTML=prox.map(e=>`<article class="card aniv ${e.tipo}${faltam(e.dia)===0?' hoje':''}">
+      <div class="aniv-dia"><strong>${e.dia.getDate()}</strong><small>${MESES[e.dia.getMonth()].slice(0,3)}</small></div>
+      <div><span class="chip ${e.tipo}">${e.tipo==='vida'?'Aniversário':'Aniversário de empresa'}</span><h3>${safe(e.c.nome)}</h3>
+      <p><span class="quando">${quandoTxt(e.dia)}</span> · ${SEMANA[e.dia.getDay()]}${e.tipo==='empresa'?` · ${anosTxt(e.anos)}`:''}</p></div></article>`).join('')
+      ||'<div class="empty-card">Nenhum aniversário nos próximos 30 dias.</div>';
+    // Calendário do ano: todos os aniversários por mês (de vida e de empresa).
+    const h=hojeD(),porMes=MESES.map(()=>[]);
+    for(const c of colabs.filter(c=>c.ativo)){
+      if(c.nascimento_dia)porMes[c.nascimento_mes-1].push({d:c.nascimento_dia,m:c.nascimento_mes,nome:c.nome,tipo:'vida'});
+      if(c.admissao){const [,m,d]=ymd(c.admissao);porMes[m-1].push({d,m,nome:c.nome,tipo:'empresa'})}
+    }
+    $('#rhCalendario').innerHTML=porMes.map((l,i)=>{l.sort((a,b)=>a.d-b.d||(a.tipo===b.tipo?a.nome.localeCompare(b.nome):a.tipo<b.tipo?1:-1));
+      return `<section class="card cal${i===h.getMonth()?' atual':''}"><h3>${MESES[i]}</h3>${l.length?`<ul>${l.map(x=>{const passou=x.m-1<h.getMonth()||(x.m-1===h.getMonth()&&x.d<h.getDate());
+        return `<li${passou?' class="passou"':''}><b>${pad(x.d)}</b><span>${safe(x.nome)}</span><span class="chip ${x.tipo}">${x.tipo==='vida'?'vida':'empresa'}</span></li>`}).join('')}</ul>`:'<p class="vazio">Nenhum aniversário</p>'}</section>`}).join('');
+    // Tabela de colaboradores
+    const q=$('#rhBusca').value.trim().toLowerCase(),inat=$('#rhInativos').checked;
+    const list=colabs.filter(c=>(inat||c.ativo)&&(!q||`${c.nome} ${c.funcao||''} ${c.observacao||''}`.toLowerCase().includes(q)));
+    if(!list.length){$('#rhTable').innerHTML=`<tbody><tr><td class="empty">${colabs.length?'Nenhum colaborador encontrado.':'Nenhum colaborador cadastrado ainda. Clique em "+ Novo colaborador".'}</td></tr></tbody>`;return}
+    $('#rhTable').innerHTML=`<thead><tr><th>Nome</th><th>Aniversário</th><th>Na empresa desde</th><th>Próximos</th><th>Observação</th><th></th></tr></thead><tbody>${list.map(c=>{
+      const pv=c.nascimento_dia&&proxima(c.nascimento_dia,c.nascimento_mes),pe=c.admissao&&proxima(ymd(c.admissao)[2],ymd(c.admissao)[1]);
+      return `<tr${c.ativo?'':' class="inativo"'}><td><strong>${safe(c.nome)}</strong>${c.ativo?'':' <span class="chip">inativo</span>'}${c.funcao?`<br><small class="muted">${safe(c.funcao)}</small>`:''}</td>
+      <td style="white-space:nowrap">${c.nascimento_dia?`${pad(c.nascimento_dia)}/${pad(c.nascimento_mes)}`:'<span class="muted">–</span>'}</td>
+      <td style="white-space:nowrap">${c.admissao?`${br(c.admissao)}<br><small class="muted">${tempoCasa(c.admissao)}</small>`:'<span class="muted">–</span>'}</td>
+      <td style="white-space:nowrap"><small>${pv?`<span class="chip vida">vida</span> ${quandoTxt(pv).toLowerCase()}`:''}${pv&&pe?'<br>':''}${pe?`<span class="chip empresa">empresa</span> ${quandoTxt(pe).toLowerCase()}`:''}${!pv&&!pe?'<span class="muted">–</span>':''}</small></td>
+      <td>${safe(c.observacao||'')}</td>
+      <td class="row-actions"><button class="link" data-edit-colab="${c.id}">Editar</button></td></tr>`}).join('')}</tbody>`;
+  }
+  $('#rhBusca').addEventListener('input',renderRh);$('#rhInativos').addEventListener('change',renderRh);
+  $('#rhTable').onclick=e=>{const c=colabs.find(x=>x.id===e.target.dataset.editColab);if(c)openColab(c)};
+  const colabDialog=$('#colabDialog');
+  $('#cDia').innerHTML='<option value="">Dia</option>'+Array.from({length:31},(_,i)=>`<option value="${i+1}">${pad(i+1)}</option>`).join('');
+  $('#cMes').innerHTML='<option value="">Mês</option>'+MESES.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+  function openColab(c){
+    colabEditId=c?.id||null;const f=$('#colabForm');f.reset();$('#colabMsg').hidden=true;
+    $('#colabTitle').textContent=c?'Editar colaborador':'Novo colaborador';$('#colabDel').hidden=!c;
+    if(c){f.nome.value=c.nome;f.funcao.value=c.funcao||'';f.dia.value=c.nascimento_dia||'';f.mes.value=c.nascimento_mes||'';f.admissao.value=c.admissao||'';f.ativo.checked=c.ativo;f.observacao.value=c.observacao||'';
+      const por=(c.atualizado_por||'').split('@')[0];$('#colabInfo').textContent=`Última alteração em ${br(iso(new Date(c.atualizado_em)))}${por?' por '+por:''}. Quem saiu da empresa: desmarque "Ativo" em vez de excluir.`;$('#colabInfo').hidden=false}
+    else $('#colabInfo').hidden=true;
+    colabDialog.showModal();f.nome.focus();
+  }
+  $('#newColab').onclick=()=>openColab(null);
+  $('#colabForm').onsubmit=async e=>{
+    e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#colabMsg'),erro=t=>{msg.textContent=t;msg.hidden=false};msg.hidden=true;
+    const dia=Number(f.get('dia'))||null,mes=Number(f.get('mes'))||null;
+    const row={nome:String(f.get('nome')).trim(),funcao:String(f.get('funcao')).trim()||null,nascimento_dia:dia,nascimento_mes:mes,admissao:f.get('admissao')||null,ativo:f.get('ativo')==='on',observacao:String(f.get('observacao')).trim()||null};
+    if(!row.nome)return erro('Informe o nome.');
+    if(!dia!==!mes)return erro('Preencha o dia e o mês do aniversário (ou deixe os dois em branco).');
+    if(dia&&dia>[31,29,31,30,31,30,31,31,30,31,30,31][mes-1])return erro(`${MESES[mes-1]} não tem dia ${dia}.`);
+    if(row.admissao&&row.admissao>hoje())return erro('A data de entrada não pode ser no futuro.');
+    $('#colabSubmit').disabled=true;
+    const {error}=await(colabEditId?db.from('rh_colaboradores').update(row).eq('id',colabEditId):db.from('rh_colaboradores').insert(row));
+    $('#colabSubmit').disabled=false;
+    if(error)return erro('Não foi possível salvar: '+error.message);
+    colabDialog.close();toast('Colaborador salvo');await loadRh();
+  };
+  $('#colabDel').onclick=async()=>{
+    const c=colabs.find(x=>x.id===colabEditId);if(!c||!confirm(`Excluir ${c.nome} da lista? Para quem saiu da empresa, o melhor é desmarcar "Ativo".`))return;
+    const {error}=await db.from('rh_colaboradores').delete().eq('id',c.id);if(error){alert('Não foi possível excluir: '+error.message);return}
+    colabDialog.close();toast('Colaborador excluído');await loadRh();
   };
 
   // ---------- Exportar ----------
