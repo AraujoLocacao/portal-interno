@@ -261,6 +261,10 @@
     .m-plan-box{border:1px solid #cfe3da;background:#f2f8f5;border-radius:10px;padding:8px 12px;font-size:.82rem;margin-top:4px}.m-plan-box dl{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0 0}.m-plan-box dt{color:var(--muted)}.m-plan-box dd{margin:0;font-weight:700}
     .m-prev{background:#f6f8f9;border:1px solid var(--line);border-radius:12px;padding:8px 14px}.m-prev h3{margin:0 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
     .m-prev dl{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:4px 18px}.m-prev dl div{display:flex;justify-content:space-between;gap:6px;font-size:.8rem;white-space:nowrap}.m-prev dt{color:var(--muted)}.m-prev dd{margin:0;font-weight:750}
+    /* Captação: relatório semanal */
+    .m-rin{height:32px;width:78px;font-size:.86rem;text-align:right}.m-rin::placeholder{color:#8a969e}
+    .m-rel-sem{font-size:.95rem;margin:4px 0 6px}
+    .m-aviso{border:1px solid #f0d9a8;background:#fdf6e7;color:#6b4a12;border-radius:12px;padding:8px 14px;margin-bottom:12px;font-size:.82rem}
     /* cartões de abertura e encerramento */
     .m-title{position:absolute;inset:0;z-index:15;background:linear-gradient(135deg,#173552 0%,#1f4262 60%,#24705a 140%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 110px}
     .m-title .lab{font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9fd3bf}
@@ -449,6 +453,8 @@
     ['atendimento','Atendimento · Acesso restrito','Atendimento','Área do atendimento: leads do dia por corretor e unidade, senhas dos sistemas e POP.',['Leads de Itajaí e Navegantes com relatório do dia','Gráficos e resumo por corretor','Senhas dos sistemas (criptografadas) e POP'],'Abrir atendimento →',false],
     ['locacao','Operação · Acesso restrito','Locação','Área da locação: contratos do mês com os cálculos da planilha, ranking, calculadoras, senhas dos sistemas e POP.',['Locações por semana com taxa, base e comissões automáticas','Ranking por corretora, garantias e captadoras','Calculadoras de aluguel proporcional e ALPOP'],'Abrir locação →',true],
     ['quadro','Locação e Pré-análise · Acesso restrito','Quadro de contratos','A esteira dos contratos de locação, no formato do Trello, compartilhada entre a Locação e a Pré-análise.',['Cada locação lançada na planilha vira um cartão','Arrastar entre as etapas, etiquetas e comentários','Histórico completo, inclusive o que veio do Trello'],'Abrir quadro →',false],
+    ['repasses','Financeiro · Acesso restrito','Proprietário · Contas a Pagar','Área de contas a pagar aos proprietários: calculadora de rescisão, senhas dos sistemas e POP.',['Calculadora de rescisão, com aluguel antecipado','Leitura do contrato e das cobranças em PDF','Senhas dos sistemas (criptografadas) e POP'],'Abrir contas a pagar →',true],
+    ['captacao','Captação de imóveis · Acesso restrito','Captação','Área das captadoras: quadro de captação de cada uma, relatório semanal, materiais e senhas.',['Um quadro privado por captadora','Relatório semanal com os totais calculados','Materiais, acessos da equipe e senhas pessoais'],'Abrir captação →',false],
   ];
   function zerarSenhas(){if($('#mPw1')){$('#mPw1').textContent='••••••••';$('#mMostrar').textContent='Mostrar'}}
 
@@ -493,7 +499,8 @@
     $('#aRes').innerHTML=res([['Administração mensal',adm],['Comissão do 1º aluguel',prim],['Total de administração no ano',ano],['Total que o locador recebe no ano',al*12-ano,true]]);
   }
   // Quadro de contratos: colunas e cartões de exemplo (nomes de colunas e cores de etiquetas iguais aos do quadro).
-  const COR_ETQ={URGENTE:['#c9372c','#fff'],'CAUÇÃO PENDENTE':['#6e5dc6','#fff'],'SOLICITADO VISTORIA':['#94c748','#37471f'],'VISTORIA AGENDADA':['#94c748','#37471f'],'CERTIDÃO PENDENTE':['#c9372c','#fff'],'MINUTA ENVIADA P/ SEGURO':['#5b7f24','#fff'],'COM PRAZO':['#f5cd47','#533f04']};
+  const COR_ETQ={URGENTE:['#c9372c','#fff'],'CAUÇÃO PENDENTE':['#6e5dc6','#fff'],'SOLICITADO VISTORIA':['#94c748','#37471f'],'VISTORIA AGENDADA':['#94c748','#37471f'],'CERTIDÃO PENDENTE':['#c9372c','#fff'],'MINUTA ENVIADA P/ SEGURO':['#5b7f24','#fff'],'COM PRAZO':['#f5cd47','#533f04'],
+    'NOVA CAPTAÇÃO':['#1f845a','#fff'],'PÓS':['#6e5dc6','#fff'],'ITAJAÍ':['#0c66e4','#fff'],'NAVEGANTES':['#2898bd','#fff']};
   const chipQ=n=>`<span class="m-qchip" style="background:${COR_ETQ[n][0]};color:${COR_ETQ[n][1]}">${n}</span>`;
   const kcard=(id,etqs,titulo,vgl,com,dias)=>`<article class="m-kcard" id="${id}">${etqs.length?`<div class="m-qchips">${etqs.map(chipQ).join('')}</div>`:''}<div class="t">${titulo}</div><div class="meta"><span class="plan">Planilha · ${brl(vgl)}</span>${com?`<span>💬 ${com}</span>`:''}<span class="${dias>=7?'velho':''}">${dias===0?'hoje':dias===1?'há 1 dia':`há ${dias} dias`}</span></div></article>`;
   const COLS_Q=[
@@ -506,6 +513,22 @@
   const quadroHtml=()=>COLS_Q.map(([nome,entrada,cs],i)=>`<section class="m-kcol${entrada?' entrada':''}" id="mCol${i}"><div class="m-kcol-head"><h3>${nome}${entrada?' <small>· entrada</small>':''}</h3><span data-n>${cs.length}</span></div>
     <div class="m-kcol-body" id="mColBody${i}">${cs.map(c=>kcard(...c)).join('')}</div><div class="m-kcol-foot">+ Adicionar cartão</div></section>`).join('');
   const contarColunas=()=>$$('.m-kcol').forEach(c=>$('[data-n]',c).textContent=$$('.m-kcard:not([hidden])',c).length);
+  // Captação: quadro da captadora (colunas iguais às do quadro real; cartões e REFs de exemplo).
+  const ccard=(id,etqs,titulo,com,dias)=>`<article class="m-kcard" id="${id}">${etqs.length?`<div class="m-qchips">${etqs.map(chipQ).join('')}</div>`:''}<div class="t">${titulo}</div><div class="meta">${com?`<span>💬 ${com}</span>`:''}<span class="${dias>=7?'velho':''}">${dias===0?'hoje':dias===1?'há 1 dia':`há ${dias} dias`}</span></div></article>`;
+  const COLS_C=[
+    ['PROSPECÇÃO',[['c1',['NOVA CAPTAÇÃO','ITAJAÍ'],'AP1650 - Rua Exemplo, 100 - Proprietário A',0,1],['c2',[],'Casa - indicação do cliente B',1,3]]],
+    ['ATENDIMENTO / VISITA',[['c3',['NOVA CAPTAÇÃO','NAVEGANTES'],'CA0710 - Rua Exemplo, 45 - Proprietária C',2,2]]],
+    ['EM ANDAMENTO',[['c4',['PÓS','ITAJAÍ'],'AP0920 - Av. Exemplo, 800 - Proprietário D',1,8]]],
+    ['DOCUMENTAÇÃO DO PROPRIETÁRIO',[['c5',['NOVA CAPTAÇÃO','ITAJAÍ'],'SA0330 - Rua Exemplo, 12 - Proprietário E',3,4]]],
+    ['CADASTRAR',[['c6',['NOVA CAPTAÇÃO','NAVEGANTES'],'AP1410 - Rua Exemplo, 300 - Proprietária F',1,1]]],
+    ['CAPTADO',[['c7',['PÓS','ITAJAÍ'],'AP1102 - Rua Exemplo, 77 - Proprietário G',0,0]]],
+  ];
+  const quadroCapHtml=()=>COLS_C.map(([nome,cs],i)=>`<section class="m-kcol" id="mColC${i}" style="width:178px"><div class="m-kcol-head"><h3>${nome}</h3><span data-n>${cs.length}</span></div>
+    <div class="m-kcol-body" id="mColCBody${i}">${cs.map(c=>ccard(...c)).join('')}</div><div class="m-kcol-foot">+ Adicionar</div></section>`).join('');
+  const CAP_NOVO='AP1777 - Rua Exemplo, 250 - Proprietário H';
+  // Relatório: uma linha por cidade; os campos que vêm do quadro aparecem em cinza (placeholder).
+  const relLinha=(cidade,n,auto)=>`<tr><td><strong>${cidade}</strong></td><td><input class="m-in m-rin" id="rP${n}" tabindex="-1" readonly></td><td><input class="m-in m-rin" id="rA${n}" tabindex="-1" readonly></td>
+    ${auto.slice(0,3).map(v=>`<td><input class="m-in m-rin" tabindex="-1" readonly placeholder="${v}"></td>`).join('')}<td class="num"><strong>${auto[3]}</strong></td><td><input class="m-in" style="height:32px;font-size:.8rem" tabindex="-1" readonly placeholder="${auto[4]}"></td></tr>`;
   function somarDlg(){let total=0;$$('#mDlgLeads .m-unit').forEach(u=>{const s=$$('input',u).reduce((a,i)=>a+(parseInt(i.value,10)||0),0);$('[data-sub]',u).textContent=s;total+=s});$('#mDlgTotal').textContent=total}
 
   const GUIAS={
@@ -854,8 +877,144 @@
           <div class="h mov"><div><span class="m-av">PL</span><strong>planilha</strong> criou o cartão em <em>EMISSÃO DE CERTIDÕES</em> <small>· 15/09</small></div></div>`;
         $('#cChips').innerHTML=chipQ('URGENTE')+chipQ('CAUÇÃO PENDENTE');$('#cEtqBox').hidden=true;$('#cEtqVist').textContent='☐ VISTORIA AGENDADA';$('#cComent').value='';
       }
+    },
+
+    'captacao':{
+      nome:'Captação',a:'a',na:'na',da:'da',pagina:'captacao.html',abaInicial:'quadro',abrir:'Abrir captação →',
+      intro:'Neste vídeo você aprende a entrar na Captação pela primeira vez e a usar o seu quadro, o relatório da semana, os materiais e os acessos. Tenha em mãos o <b>e-mail e a senha</b> que a gerência entregou para você.',
+      gateTexto:'Área restrita das captadoras e da gerência. Entre com o seu e-mail e senha.',
+      app:`<div class="m-app" style="padding:12px 28px 0">
+        <div class="m-tabs" id="mTabs" style="border-bottom:1px solid var(--line);margin-bottom:12px"><span data-t="quadro">Quadro</span><span data-t="relatorio">Relatório</span><span data-t="materiais">Materiais</span><span data-t="acessos">Acessos</span><span data-t="minhas">Minhas senhas</span></div>
+
+        <div data-mtab="quadro">
+          <div class="m-top" style="margin-bottom:10px"><div><h2>Captadora Exemplo</h2><p>6 colunas · 8 cartões. Arraste os cartões entre as colunas ou clique para abrir.</p></div>
+            <div class="acts"><div class="m-in" style="width:190px;height:34px;font-size:.84rem"><span class="ph">Buscar REF, nome ou texto</span></div><div class="m-in" style="width:150px;height:34px;font-size:.84rem">Todas as etiquetas</div><span class="m-msg" id="mVerArq">☐ Ver arquivados</span><span class="m-btn pri" id="mNovoCartao">+ Novo cartão</span></div></div>
+          <div class="m-board" id="mBoard" style="padding:0 0 20px;gap:10px"></div>
+        </div>
+
+        <div data-mtab="relatorio">
+          <div class="m-top"><div><h2>Relatório de captação</h2><p>Captadora Exemplo · outubro de 2026. Digite só a prospecção e os atendimentos. Salva sozinho ao sair do campo.</p></div><div class="acts"><div class="m-field"><span class="l">Mês</span><div class="m-in" style="height:34px;width:150px">outubro de 2026</div></div></div></div>
+          <p class="m-aviso">A partir de outubro, <b>novas captações, pós, em andamento e referências</b> vêm do seu quadro: o número em cinza é o do quadro. Se precisar corrigir, digite por cima (fica amarelo).</p>
+          <h3 class="m-rel-sem">Semana de 05/10 a 11/10</h3>
+          <div class="m-card m-table" id="mRelTab"><table><thead><tr><th>Cidade</th><th>Prospecção</th><th>Atendimentos</th><th>Em andamento</th><th>Pós captados</th><th>Novas captações</th><th class="num">Total captado</th><th>Referências</th></tr></thead><tbody>
+            ${relLinha('Itajaí',1,['3','1','1','2','AP1102 / AP1650'])}${relLinha('Navegantes',2,['1','0','1','1','AP1410'])}
+          </tbody></table></div>
+        </div>
+
+        <div data-mtab="materiais">
+          <div class="m-top"><div><h2>Materiais</h2><p>Materiais da captação para todas as captadoras: apresentações, modelos, POP e documentos.</p></div><div class="acts"><span class="m-btn pri">+ Enviar material</span></div></div>
+          <h2 style="font-size:1.05rem">Materiais</h2>
+          <div class="m-docs"><div class="m-card m-doc" id="mMatTrein"><i>PDF</i><div><strong>Treinamento de Captação</strong><small>Documento de exemplo</small><span class="m-link" style="margin-left:-4px">Abrir</span><span class="m-link">Baixar</span></div></div>
+            <div class="m-card m-doc"><i>PDF</i><div><strong>Apresentação para proprietários</strong><small>Documento de exemplo</small></div></div>
+            <div class="m-card m-doc"><i style="background:var(--blue)">DOC</i><div><strong>Modelo de autorização de locação</strong><small>Documento de exemplo</small></div></div></div>
+          <h2 style="font-size:1.05rem">POP</h2>
+          <div class="m-docs"><div class="m-card m-doc"><i>PDF</i><div><strong>POP da captação</strong><small>Documento de exemplo</small></div></div></div>
+        </div>
+
+        <div data-mtab="acessos">
+          <div class="m-top"><div><h2>Acessos</h2><p>Sistemas e links usados na captação. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".</p></div><div class="acts"><span class="m-btn pri">+ Novo acesso</span></div></div>
+          <div class="m-card m-table" style="margin-bottom:12px"><div class="head"><h2>Sistemas</h2></div><table><thead><tr><th>Sistema</th><th>Usuário</th><th>Senha</th></tr></thead><tbody>
+            <tr><td><strong>CRM</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td></tr>
+            <tr><td><strong>Superlógica</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td></tr>
+            <tr id="mEemovel"><td><strong>EEmovel</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td style="white-space:nowrap"><span class="m-pw" id="mPw1">••••••••</span><span class="m-link" id="mMostrar">Mostrar</span><span class="m-link" id="mCopiar">Copiar</span></td></tr>
+            <tr><td><strong>Clicksign</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td></tr>
+          </tbody></table></div>
+          <div class="m-grid2">
+            <div class="m-card m-group" id="mCursos"><h2>Cursos</h2><div class="m-lgrid" style="grid-template-columns:1fr 1fr"><div class="m-ltile"><strong>Treinamento comercial</strong><span>Curso on-line</span></div><div class="m-ltile"><strong>Curso de fotos</strong><span>Curso on-line</span></div></div></div>
+            <div class="m-card m-group" id="mLinks"><h2>Links úteis</h2><div class="m-lgrid" style="grid-template-columns:1fr 1fr"><div class="m-ltile"><strong>Tour virtual de Itajaí</strong><span>Link de exemplo</span></div><div class="m-ltile"><strong>Planilha de vistoria</strong><span>Link de exemplo</span></div></div></div>
+          </div>
+        </div>
+
+        <div data-mtab="minhas">
+          <div class="m-top"><div><h2>Minhas senhas</h2><p id="mMinhasTxt">Suas senhas pessoais, criptografadas. <b>Só você vê</b> esta lista: nem as outras captadoras, nem a gerência.</p></div><div class="acts"><span class="m-btn pri" id="mNovaMinha">+ Nova senha</span></div></div>
+          <div class="m-card m-table"><table><thead><tr><th>Nome</th><th>Usuário</th><th>Senha</th><th>Atualizado</th></tr></thead><tbody>
+            <tr><td><strong>Senha pessoal de exemplo A</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td>01/10/2026</td></tr>
+            <tr><td><strong>Senha pessoal de exemplo B</strong></td><td>usuario.exemplo <span class="m-link">Copiar</span></td><td><span class="m-pw">••••••••</span><span class="m-link">Mostrar</span><span class="m-link">Copiar</span></td><td>01/10/2026</td></tr>
+          </tbody></table></div>
+        </div>
+
+        <div class="m-dlg-back" id="mDlgNovo" hidden><div class="m-dlg" style="width:520px">
+          <div class="m-dlg-head"><h2>Novo cartão</h2><span class="m-x">×</span></div>
+          <div class="m-dlg-body">
+            <div class="m-field"><span class="l">Título</span><input class="m-in" id="nTitulo" tabindex="-1" readonly placeholder="Ex.: AP1650 - Rua tal, 123 - Proprietário"></div>
+            <div class="m-field"><span class="l">Coluna</span><div class="m-in">PROSPECÇÃO</div></div>
+            <div class="m-actions"><span class="m-btn">Cancelar</span><span class="m-btn pri" id="nCriar">Criar</span></div>
+          </div>
+        </div></div>
+
+        <div class="m-dlg-back" id="mDlgCap" hidden><div class="m-dlg" style="width:900px">
+          <div class="m-dlg-head" style="align-items:start"><div><h2 id="cTit"></h2><p class="m-msg" id="cOnde" style="margin:2px 0 0"></p></div><span class="m-x">×</span></div>
+          <div class="m-dlg-body"><div class="m-cgrid">
+            <div style="display:grid;gap:12px;align-content:start;min-width:0">
+              <div class="m-qchips" id="cChipsC" style="min-height:20px"></div>
+              <div><span class="m-lbl">Comentário</span><textarea class="m-in m-coment" id="cComentC" tabindex="-1" readonly placeholder="Escreva um comentário…"></textarea><div style="margin-top:6px"><span class="m-btn pri" id="cComentarC">Comentar</span></div></div>
+              <div><div class="m-row"><span class="m-lbl">Histórico</span><span class="m-msg">☐ Só comentários</span></div><div class="m-hist" id="cHistC"></div></div>
+            </div>
+            <div style="display:grid;gap:12px;align-content:start">
+              <div class="m-field"><span class="l">Coluna</span><div class="m-in" id="cColC" style="font-size:.8rem"></div></div>
+              <div><div class="m-row"><span class="m-lbl">Etiquetas</span><span class="m-link" id="cEtqAbrirC">Escolher</span></div>
+                <div class="m-etq-picker" id="cEtqBoxC" hidden><label id="cEtqNova">☐ NOVA CAPTAÇÃO</label><label>☐ PÓS</label><label id="cEtqItj">☐ ITAJAÍ</label><label>☐ NAVEGANTES</label></div></div>
+              <div class="m-msg"><span class="m-link" id="cArq" style="margin-left:-4px">Arquivar cartão</span><br><span class="m-link" style="color:var(--red);margin-left:-4px">Excluir cartão</span><br><span style="font-size:.76rem">Arquivar ou excluir tira o cartão do quadro, mas a captação já feita continua no relatório.</span></div>
+            </div>
+          </div></div>
+        </div></div>
+      </div>`,
+      passos:[
+        {titulo:'O seu quadro',texto:'Cada captadora tem o <b>seu próprio quadro</b>: só você e a gerência veem. Cada coluna é uma etapa, de <b>PROSPECÇÃO</b> até <b>CAPTADO</b>, e cada cartão é um imóvel.',
+          setup(){tela('app');aba('quadro')},
+          async acts(A){await A.hl('#mBoard','Cada coluna é uma etapa','above');await A.pause(2600);await A.hl('#mColC5','Aqui fica o imóvel captado','above');await A.pause(2600);A.unhl()}},
+        {titulo:'Novo cartão',texto:'Clique em <b>+ Novo cartão</b>. No <b>Título</b>, comece pela <b>REF</b> do imóvel, depois o endereço e o proprietário. Clique em <b>Criar</b>: o cartão entra em PROSPECÇÃO.',
+          setup(){tela('app');aba('quadro')},
+          async acts(A){await A.click('#mNovoCartao');$('#mDlgNovo').hidden=false;await A.pause(500);await A.click('#nTitulo');await A.type('#nTitulo',CAP_NOVO);await A.click('#nCriar');$('#mDlgNovo').hidden=true;
+            $('#mColCBody0').insertAdjacentHTML('afterbegin',ccard('cN',[],CAP_NOVO,0,0));contarColunas();$('#cN').classList.add('new');await A.pause(500);await A.hl('#cN','A REF vem primeiro','below');await A.pause(2400);A.unhl()}},
+        {titulo:'Etiquetas: sempre duas',texto:'Abra o cartão e, em <b>Etiquetas</b>, clique em <b>Escolher</b>. Marque sempre duas: <b>NOVA CAPTAÇÃO</b> ou <b>PÓS</b>, e <b>ITAJAÍ</b> ou <b>NAVEGANTES</b>. O relatório usa essas etiquetas.',
+          setup(){tela('app');aba('quadro');$('#mColCBody0').insertAdjacentHTML('afterbegin',ccard('cN',[],CAP_NOVO,0,0));contarColunas()},
+          async acts(A){await A.click('#cN');abrirCap(CAP_NOVO,'PROSPECÇÃO');await A.pause(600);await A.click('#cEtqAbrirC');$('#cEtqBoxC').hidden=false;await A.pause(400);
+            await A.click('#cEtqNova');$('#cEtqNova').textContent='☑ NOVA CAPTAÇÃO';$('#cChipsC').insertAdjacentHTML('beforeend',chipQ('NOVA CAPTAÇÃO'));
+            await A.click('#cEtqItj');$('#cEtqItj').textContent='☑ ITAJAÍ';$('#cChipsC').insertAdjacentHTML('beforeend',chipQ('ITAJAÍ'));
+            await A.hl('#cChipsC','Tipo e cidade','below');await A.pause(2400);A.unhl()}},
+        {titulo:'Comentar',texto:'Anote cada contato em <b>Comentário</b> e clique em <b>Comentar</b>. Fica no <b>histórico</b> do cartão, com a data, e você não perde nenhum retorno do proprietário.',
+          setup(){tela('app');aba('quadro');abrirCap(CAP_NOVO,'PROSPECÇÃO');$('#cChipsC').innerHTML=chipQ('NOVA CAPTAÇÃO')+chipQ('ITAJAÍ')},
+          async acts(A){await A.click('#cComentC');await A.type('#cComentC','Visita marcada para quinta, 10h.');await A.click('#cComentarC');
+            $('#cHistC').insertAdjacentHTML('afterbegin',`<div class="h com novo"><div><span class="m-av">SN</span><strong>seunome</strong> <small>${hojeBR()} agora</small></div><div class="txt">Visita marcada para quinta, 10h.</div></div>`);$('#cComentC').value='';
+            await A.pause(600);await A.hl('#cHistC','Fica no histórico','above');await A.pause(2400);A.unhl()}},
+        {titulo:'Mudar de etapa',texto:'Para passar o imóvel para a próxima etapa, clique no cartão, segure, arraste até a outra coluna e solte. Faltou documento? O cartão fica em <b>DOCUMENTAÇÃO DO PROPRIETÁRIO</b> até chegar tudo.',
+          setup(){tela('app');aba('quadro')},
+          async acts(A){await A.drag('#c3','#mColCBody2',()=>{$('#mColCBody2').prepend($('#c3'));$('#c3 .meta span:last-child').textContent='hoje';contarColunas()});await A.hl('#c3','Nova etapa','below');await A.pause(2400);A.unhl()}},
+        {titulo:'Captado!',texto:'Fechou a captação? Arraste o cartão para <b>CAPTADO</b> no mesmo dia. Ele entra sozinho no relatório da semana, como nova captação ou pós, com a cidade e a REF. Enquanto está em <b>CADASTRAR</b>, conta como em andamento.',
+          setup(){tela('app');aba('quadro')},
+          async acts(A){await A.drag('#c6','#mColCBody5',()=>{$('#mColCBody5').prepend($('#c6'));$('#c6 .meta span:last-child').textContent='hoje';contarColunas()});toast('Captação registrada no relatório da semana');await A.pause(900);await A.hl('#c6','Entrou no relatório','below');await A.pause(2400);A.unhl()}},
+        {titulo:'Arquivar',texto:'Para deixar o quadro limpo, abra o cartão e clique em <b>Arquivar cartão</b>. Ele sai do quadro, mas a captação continua no relatório. Para ver os arquivados, marque <b>Ver arquivados</b>.',
+          setup(){tela('app');aba('quadro')},
+          async acts(A){await A.click('#c7');abrirCap('AP1102 - Rua Exemplo, 77 - Proprietário G','CAPTADO');$('#cChipsC').innerHTML=chipQ('PÓS')+chipQ('ITAJAÍ');await A.pause(600);
+            await A.hl('#cArq','Sai do quadro, fica no relatório','below');await A.pause(2600);A.unhl();await A.click('#cArq');$('#mDlgCap').hidden=true;$('#c7').hidden=true;contarColunas();
+            await A.pause(500);await A.hl('#mVerArq','Para ver de novo','below');await A.pause(2200);A.unhl()}},
+        {titulo:'Relatório da semana',texto:'Na aba <b>Relatório</b>, digite só a <b>prospecção</b> e os <b>atendimentos</b> de cada semana, em Itajaí e em Navegantes. O resto vem do quadro (número em cinza). Salva sozinho ao sair do campo.',
+          setup(){tela('app');aba('quadro')},
+          async acts(A){await A.click('[data-t="relatorio"]');aba('relatorio');await A.pause(500);await A.click('#rP1');await A.type('#rP1','12');await A.click('#rA1');await A.type('#rA1','3');
+            await A.hl('#mRelTab','Em cinza: vem do quadro','below');await A.pause(2800);A.unhl()}},
+        {titulo:'Materiais',texto:'Em <b>Materiais</b> ficam as apresentações, os modelos e o POP da captação, para todas as captadoras. Clique em <b>Abrir</b> para ler ou em <b>Baixar</b> para guardar.',
+          setup(){tela('app');aba('relatorio')},
+          async acts(A){await A.click('[data-t="materiais"]');aba('materiais');await A.pause(500);await A.hl('#mMatTrein','Abrir ou baixar','below');await A.pause(2600);A.unhl()}},
+        {titulo:'Acessos',texto:'Em <b>Acessos</b> estão os sistemas da equipe, os cursos e os links úteis. O <b>EEmovel</b> é fornecido pela Araujo para a prospecção. A senha só aparece ao clicar em <b>Mostrar</b>; use <b>Copiar</b> para colar no sistema.',
+          setup(){tela('app');aba('materiais')},
+          async acts(A){await A.click('[data-t="acessos"]');aba('acessos');await A.pause(500);await A.hl('#mEemovel','Fornecido pela Araujo','below');await A.pause(2400);A.unhl();
+            await A.click('#mMostrar');$('#mPw1').textContent='Exemplo@2026';$('#mMostrar').textContent='Ocultar';await A.pause(800);await A.hl('#mCopiar','Copiar e colar no sistema','below');await A.pause(2200);A.unhl();
+            await A.hl('#mCursos','Cursos da equipe','above');await A.pause(2200);A.unhl()}},
+        {titulo:'Minhas senhas',texto:'Em <b>Minhas senhas</b> você guarda as suas senhas pessoais, criptografadas. <b>Só você vê</b> esta lista: nem as outras captadoras, nem a gerência. Para guardar uma, clique em <b>+ Nova senha</b>.',
+          setup(){tela('app');aba('acessos')},
+          async acts(A){await A.click('[data-t="minhas"]');aba('minhas');await A.pause(500);await A.hl('#mMinhasTxt','Só você vê','below');await A.pause(2600);await A.hl('#mNovaMinha','Guardar uma senha','below');await A.pause(2200);A.unhl()}},
+      ],
+      zerar(){
+        $('#mDlgNovo').hidden=true;$('#mDlgCap').hidden=true;$('#mBoard').innerHTML=quadroCapHtml();$('#nTitulo').value='';
+        $('#cChipsC').innerHTML='';$('#cEtqBoxC').hidden=true;$('#cEtqNova').textContent='☐ NOVA CAPTAÇÃO';$('#cEtqItj').textContent='☐ ITAJAÍ';$('#cComentC').value='';
+        $('#cHistC').innerHTML=`<div class="h mov"><div><span class="m-av">SN</span><strong>seunome</strong> criou o cartão em <em>PROSPECÇÃO</em> <small>· ${hojeBR()}</small></div></div>`;
+        for(const id of ['#rP1','#rA1','#rP2','#rA2'])$(id).value='';
+      }
     }
   };
+  // Abre o cartão da Captação com o título e a coluna pedidos.
+  function abrirCap(titulo,coluna){$('#cTit').textContent=titulo;$('#cOnde').textContent='na coluna '+coluna;$('#cColC').textContent=coluna;$('#mDlgCap').hidden=false}
   const LISTA_GUIAS=Object.entries(GUIAS).map(([s,g])=>[s,g.nome]);
 
   const slug=new URLSearchParams(location.search).get('d')||'pre-analise';
