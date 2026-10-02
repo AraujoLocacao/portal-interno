@@ -106,7 +106,7 @@
     .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin:12px 0 28px}
     .doc{padding:18px;display:flex;gap:14px;align-items:flex-start;min-width:0}.doc>div{min-width:0}
     .doc-ico{width:44px;height:52px;border-radius:8px;display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#fff;flex:none;background:var(--blue)}
-    .doc-ico.pdf{background:var(--red)}.doc-ico.xls{background:var(--green)}.doc-ico.img{background:var(--amber)}.doc-ico.html{background:var(--navy)}.doc-ico.ppt{background:#c25100}
+    .doc-ico.pdf{background:var(--red)}.doc-ico.xls{background:var(--green)}.doc-ico.img{background:var(--amber)}.doc-ico.html{background:var(--navy)}.doc-ico.ppt{background:#c25100}.doc-ico.vid{background:#6e5dc6}
     .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}
     .vazio-doc{border:1px dashed #bac5cc;border-radius:12px;padding:22px;text-align:center;color:var(--muted);grid-column:1/-1}
     .seg{display:flex;gap:8px;flex-wrap:wrap}.seg label{flex:1;min-width:110px;border:1px solid #cbd5da;border-radius:10px;padding:9px 10px;text-align:center;font-weight:700;font-size:.85rem;cursor:pointer;position:relative}
@@ -314,10 +314,15 @@
     <div class="field"><label for="dTitulo">Título</label><input id="dTitulo" name="titulo" maxlength="120" required placeholder="Ex.: Apresentação para proprietários"></div>
     <div class="field"><span class="lbl">Onde fica</span>
       <div class="seg"><label><input type="radio" name="categoria" value="Outros" checked>Materiais</label><label><input type="radio" name="categoria" value="POP">POP</label></div></div>
-    <div class="field"><label for="dArquivo">Arquivo (PDF, Word, Excel, PowerPoint, imagem ou página HTML, até 25 MB)</label><input id="dArquivo" name="arquivo" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.html,.htm" required></div>
+    <div class="field"><label for="dArquivo">Arquivo (PDF, Word, Excel, PowerPoint, imagem, página HTML ou vídeo MP4, até 50 MB)</label><input id="dArquivo" name="arquivo" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.html,.htm,.mp4" required></div>
     <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="docSubmit">Enviar</button></div>
     <p class="msg error" id="docMsg" hidden></p>
   </form>
+</dialog>
+
+<dialog id="videoDialog" class="leitor">
+  <div class="dialog-head"><h2 id="videoTitulo">Vídeo</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <video id="videoPlayer" controls preload="metadata" playsinline style="width:100%;height:calc(100% - 60px);background:#000;display:block"></video>
 </dialog>
 
 <dialog id="leitorDialog" class="leitor">
@@ -899,7 +904,7 @@
   // ---------- Materiais (documentos do departamento "captacao": dep_documentos + bucket "departamentos") ----------
   const BUCKET='departamentos';
   let docs=[];
-  const tipoDoc=n=>{const x=(n.split('.').pop()||'').toLowerCase();return x==='pdf'?['pdf','PDF']:['html','htm'].includes(x)?['html','PÁGINA']:['doc','docx'].includes(x)?['doc','WORD']:['xls','xlsx'].includes(x)?['xls','EXCEL']:['ppt','pptx'].includes(x)?['ppt','PPT']:['img','IMAGEM']};
+  const tipoDoc=n=>{const x=(n.split('.').pop()||'').toLowerCase();return x==='mp4'?['vid','VÍDEO']:x==='pdf'?['pdf','PDF']:['html','htm'].includes(x)?['html','PÁGINA']:['doc','docx'].includes(x)?['doc','WORD']:['xls','xlsx'].includes(x)?['xls','EXCEL']:['ppt','pptx'].includes(x)?['ppt','PPT']:['img','IMAGEM']};
   const tamanho=b=>b>=1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(b/1024))+' KB';
   async function carregarDocs(){
     const {data,error}=await db.from('dep_documentos').select('id,titulo,categoria,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').eq('departamento',DEP).order('enviado_em',{ascending:false});
@@ -914,6 +919,10 @@
   }
   $('#tab-materiais').addEventListener('click',async e=>{
     const d=e.target.dataset,doc=docs.find(x=>x.id===(d.abrir||d.baixar||d.delDoc));if(!doc)return;
+    // Vídeo: toca dentro do portal (link temporário de 2 horas, só para quem tem acesso).
+    if(d.abrir&&tipoDoc(doc.nome_arquivo)[0]==='vid'){
+      const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,7200);if(error){alert('Não foi possível abrir: '+error.message);return}
+      $('#videoTitulo').textContent=doc.titulo;$('#videoPlayer').src=data.signedUrl;$('#videoDialog').showModal();return}
     // Página HTML: abre dentro do portal, isolada, em vez de baixar.
     if(d.abrir&&tipoDoc(doc.nome_arquivo)[0]==='html'){
       const {data,error}=await db.storage.from(BUCKET).download(doc.caminho);if(error){alert('Não foi possível abrir: '+error.message);return}
@@ -927,11 +936,13 @@
       const {error}=await db.from('dep_documentos').delete().eq('id',doc.id);if(error){alert('Não foi possível excluir: '+error.message);return}
       carregarDocs()}
   });
+  // Fechou o vídeo: para de tocar e descarta o link temporário.
+  $('#videoDialog').addEventListener('close',()=>{const p=$('#videoPlayer');p.pause();p.removeAttribute('src');p.load()});
   $('#newDoc').onclick=()=>{$('#docForm').reset();$('#docMsg').hidden=true;$('#docDialog').showModal()};
   $('#docForm').onsubmit=async e=>{
     e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#docMsg'),file=f.get('arquivo');msg.hidden=true;
     if(!file||!file.size){msg.textContent='Escolha um arquivo.';msg.hidden=false;return}
-    if(file.size>25*1024*1024){msg.textContent='O arquivo passa de 25 MB.';msg.hidden=false;return}
+    if(file.size>50*1024*1024){msg.textContent='O arquivo passa de 50 MB (limite do sistema). Vídeos maiores: coloque no YouTube e cadastre o link em Acessos → Links úteis.';msg.hidden=false;return}
     const limpo=file.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._-]+/g,'-');
     // A primeira pasta do caminho é o departamento: é por ela que o banco confere quem pode ler o arquivo.
     const caminho=`${DEP}/${crypto.randomUUID()}/${limpo}`;

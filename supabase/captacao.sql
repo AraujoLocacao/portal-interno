@@ -544,8 +544,10 @@ revoke execute on function public.pessoal_senha_salvar(uuid, text, text, text, t
 grant execute on function public.pessoal_senha_salvar(uuid, text, text, text, text, text), public.pessoal_senha_revelar(uuid), public.pessoal_senha_excluir(uuid) to authenticated;
 
 -- Materiais da Captação: usam os documentos dos departamentos (dep_documentos + bucket "departamentos", pasta captacao/).
--- Aceita também PowerPoint (apresentações de captação).
-update storage.buckets set allowed_mime_types = array[
+-- Aceita também PowerPoint (apresentações de captação) e vídeo MP4 (ex.: vídeo narrado do cadastro, 02/10/2026).
+-- Limite por arquivo: 50 MB, o máximo do plano gratuito do Supabase.
+update storage.buckets set file_size_limit = 52428800, allowed_mime_types = array[
+  'video/mp4',
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
