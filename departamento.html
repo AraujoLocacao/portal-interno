@@ -414,11 +414,12 @@
     if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('rescisao')?loadRescisao():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
-  // A gerência vê todos os departamentos: um seletor no topo troca de um para outro.
+  // Quem entra em mais de um departamento (gerência e acesso geral, ver supabase/acesso_geral.sql) ganha um seletor no topo.
   async function montarTrocar(){
-    const {data}=await db.rpc('is_gestor');if(data!==true)return;
+    const pode=await Promise.all(DEPS.map(d=>db.rpc('pode_departamento',{p_departamento:d.slug}).then(r=>r.data===true)));
+    const meus=DEPS.filter((d,i)=>pode[i]);if(meus.length<2)return;
     const sel=$('#trocar');
-    sel.innerHTML=AREAS.map(a=>`<optgroup label="${safe(a)}">${DEPS.filter(d=>d.area===a).map(d=>`<option value="${d.slug}"${d===DEP?' selected':''}>${safe(d.nome)}${d.publicado?'':' (prévia)'}</option>`).join('')}</optgroup>`).join('');
+    sel.innerHTML=AREAS.map(a=>{const ds=meus.filter(d=>d.area===a);return ds.length?`<optgroup label="${safe(a)}">${ds.map(d=>`<option value="${d.slug}"${d===DEP?' selected':''}>${safe(d.nome)}${d.publicado?'':' (prévia)'}</option>`).join('')}</optgroup>`:''}).join('');
     sel.hidden=false;sel.onchange=()=>{location.href='?d='+sel.value};
   }
   $('#loginForm').onsubmit=async e=>{
