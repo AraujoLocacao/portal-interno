@@ -234,13 +234,12 @@
 
   <section id="tab-pop" data-tab hidden>
     <div class="top">
-      <div><h2>POP e documentos</h2><p id="popSub">Procedimento operacional padrão do departamento e demais materiais.</p></div>
+      <div><h2 id="popTitulo">POP e documentos</h2><p id="popSub">Procedimento operacional padrão do departamento e demais materiais.</p></div>
       <div class="bar-actions"><button class="primary" id="newDoc">+ Enviar documento</button></div>
     </div>
     <h2 style="font-size:1.1rem">POP</h2>
     <div class="doc-grid" id="docsPop"></div>
-    <h2 style="font-size:1.1rem">Outros documentos</h2>
-    <div class="doc-grid" id="docsOutros"></div>
+    <div id="docsOutros"></div>
   </section>
 </main>
 
@@ -306,6 +305,7 @@
     <div class="field"><label for="dTitulo">Título</label><input id="dTitulo" name="titulo" maxlength="120" required></div>
     <div class="field"><span class="lbl">Onde fica</span>
       <div class="seg"><label><input type="radio" name="categoria" value="POP" checked>POP</label><label><input type="radio" name="categoria" value="Outros">Outros documentos</label></div></div>
+    <div class="field" id="dPastaCampo" hidden><label for="dPasta">Pasta (opcional)</label><input id="dPasta" name="pasta" maxlength="80" list="pastaList" autocomplete="off" placeholder="Ex.: Contratos"><datalist id="pastaList"></datalist></div>
     <div class="field"><label for="dArquivo">Arquivo (PDF, Word, Excel, imagem ou página HTML, até 25 MB)</label><input id="dArquivo" name="arquivo" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.html,.htm" required></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="docSubmit">Enviar</button></div>
     <p class="msg error" id="docMsg" hidden></p>
@@ -343,7 +343,8 @@
     // recebe = atividades que só entram quando outra área envia (ainda sem envio: ficam vazias).
     // energia = atividade que a Locação também envia, pelo botão no cartão do quadro de contratos (ver supabase/pos_locacao_energia_envio.sql).
     // A Pós-locação cadastra à mão o que não veio da Locação. Publicada em 02/10/2026.
-    {slug:'pos-locacao',publicado:true,nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
+    // materiais = a aba "POP e documentos" se chama "Materiais" (copiados da pasta "Pós locação Araujo" do Drive, separados por pasta).
+    {slug:'pos-locacao',publicado:true,materiais:true,nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
       recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
       atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
@@ -384,7 +385,8 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={rh:'RH',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:'POP e documentos'};
+    const nomes={rh:'RH',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
+    if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
     $('#previewNote').innerHTML=DEP.limpo
@@ -820,7 +822,7 @@
 
   // ---------- POP e documentos ----------
   async function loadDocs(){
-    const {data,error}=await db.from('dep_documentos').select('id,titulo,categoria,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').eq('departamento',DEP.slug).order('enviado_em',{ascending:false});
+    const {data,error}=await db.from('dep_documentos').select('id,titulo,categoria,pasta,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').eq('departamento',DEP.slug).order('enviado_em',{ascending:false});
     if(error){$('#docsPop').innerHTML=`<div class="empty-card">Não foi possível carregar: ${safe(error.message)}</div>`;return}
     docs=data;renderDocs();
   }
@@ -832,8 +834,14 @@
       <div class="row-actions"><button class="link" data-abrir="${d.id}">Abrir</button><button class="link" data-baixar="${d.id}">Baixar</button><button class="link danger" data-del-doc="${d.id}">Excluir</button></div></div></article>`};
     const pop=docs.filter(d=>d.categoria==='POP'),outros=docs.filter(d=>d.categoria!=='POP');
     $('#docsPop').innerHTML=pop.map(card).join('')||'<div class="empty-card">Nenhum POP enviado ainda. Clique em "+ Enviar documento".</div>';
-    $('#docsOutros').innerHTML=outros.map(card).join('')||'<div class="empty-card">Nenhum outro documento.</div>';
+    // Fora do POP, um bloco por pasta (em ordem alfabética); o que não tem pasta fica em "Outros documentos", no fim.
+    const pastas=[...new Set(outros.map(d=>d.pasta).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR')),sem=outros.filter(d=>!d.pasta);
+    const bloco=(nome,ds)=>`<h2 style="font-size:1.1rem">${safe(nome)}</h2><div class="doc-grid">${ds.map(card).join('')||'<div class="empty-card">Nenhum outro documento.</div>'}</div>`;
+    const porTitulo=ds=>ds.sort((a,b)=>a.titulo.localeCompare(b.titulo,'pt-BR'));
+    $('#docsOutros').innerHTML=pastas.map(p=>bloco(p,porTitulo(outros.filter(d=>d.pasta===p)))).join('')+(sem.length||!pastas.length?bloco('Outros documentos',sem):'');
+    $('#pastaList').innerHTML=pastas.map(p=>`<option value="${safe(p)}">`).join('');
   }
+  $('#docForm').addEventListener('change',e=>{if(e.target.name==='categoria')$('#dPastaCampo').hidden=e.target.value==='POP'});
   $('#tab-pop').addEventListener('click',async e=>{
     const d=e.target.dataset,doc=docs.find(x=>x.id===(d.abrir||d.baixar||d.delDoc));if(!doc)return;
     // Página HTML (ex.: POP feito como página): abre dentro do portal, isolada, em vez de baixar.
@@ -850,7 +858,7 @@
       docs=docs.filter(x=>x.id!==doc.id);renderDocs()}
   });
   const docDialog=$('#docDialog');
-  $('#newDoc').onclick=()=>{$('#docForm').reset();$('#docMsg').hidden=true;docDialog.showModal()};
+  $('#newDoc').onclick=()=>{$('#docForm').reset();$('#dPastaCampo').hidden=true;$('#docMsg').hidden=true;docDialog.showModal()};
   $('#docForm').onsubmit=async e=>{
     e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#docMsg'),file=f.get('arquivo');msg.hidden=true;
     if(!file||!file.size){msg.textContent='Escolha um arquivo.';msg.hidden=false;return}
@@ -861,7 +869,7 @@
     $('#docSubmit').disabled=true;$('#docSubmit').textContent='Enviando…';
     try{
       const up=await db.storage.from(BUCKET).upload(caminho,file,{contentType:file.type||(/\.html?$/i.test(file.name)?'text/html':undefined)});if(up.error)throw up.error;
-      const {error}=await db.from('dep_documentos').insert({departamento:DEP.slug,titulo:String(f.get('titulo')).trim(),categoria:f.get('categoria'),caminho,nome_arquivo:file.name,tamanho:file.size});
+      const {error}=await db.from('dep_documentos').insert({departamento:DEP.slug,titulo:String(f.get('titulo')).trim(),categoria:f.get('categoria'),pasta:f.get('categoria')==='POP'?null:String(f.get('pasta')||'').trim()||null,caminho,nome_arquivo:file.name,tamanho:file.size});
       if(error){await db.storage.from(BUCKET).remove([caminho]);throw error}
       docDialog.close();toast('Documento enviado');await loadDocs();
     }catch(err){msg.textContent='Não foi possível enviar: '+(/mime|type/i.test(err.message)?'tipo de arquivo não aceito.':err.message);msg.hidden=false}
