@@ -81,6 +81,9 @@
     .rel-unit table{font-size:.9rem;table-layout:fixed;min-width:760px}.rel-unit th:first-child{width:20%}.rel-unit th{background:var(--navy);color:#fff;padding:6px 10px;border:0}
     .rel-unit td{padding:6px 10px;font-weight:650}.rel-unit tr.sub td{background:#eef2f4;font-weight:800;border-top:1px solid var(--line)}
     .rel-unit.geral th{background:#24705a}
+    .rel-unit td.gap{color:var(--red);background:#fdecec;font-weight:800}
+    .rel-unit.wpp table{min-width:560px}.rel-unit.wpp th:first-child{width:16%}.wpp-body{padding:8px 12px}
+    .msg.gap-msg{color:var(--red);margin-top:6px}.msg.ok-msg{color:var(--green);margin-top:6px}
     .rel-unit th.man,.rel-unit td.man{background-clip:padding-box}
     /* Lançar semana */
     .res-table th{padding:6px 6px}.res-table td{padding:5px 6px;border:0}
@@ -288,7 +291,7 @@
 
   <section id="tab-semanal" data-tab hidden>
     <div class="top">
-      <div><h2>Relatório semanal</h2><p>Igual à sua planilha. Leads vêm do atendimento e análises da pré-análise; o resto você lança aqui.</p></div>
+      <div><h2>Relatório semanal</h2><p>Igual à sua planilha. Leads vêm do atendimento e análises da pré-análise; o resto você lança aqui. "Propostas WhatsApp" vêm da leitura de sexta, 18h.</p></div>
       <div class="bar-actions"><button class="secondary" id="exportCsv">Baixar planilha</button><button class="primary" id="newSemana">+ Lançar semana</button></div>
     </div>
 
@@ -419,9 +422,10 @@
   const COR={azul:'#2a78d6',laranja:'#eb6834',agua:'#1baf7a',cinza:'#a3a19a'};
   const SEM='Não informada';
   const MESES=['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
-  const CAMPOS=['leads','lc','env','apr','rec','ana','vis','prop','fech','vgl'];
+  // pw = propostas recebidas no WhatsApp (propostas_whatsapp, lidas toda sexta às 18h), para comparar com as lançadas (prop).
+  const CAMPOS=['leads','lc','env','apr','rec','ana','vis','prop','pw','fech','vgl'];
   const METRICAS=[{k:'leads',nome:'Leads'},{k:'env',nome:'Análises enviadas'},{k:'apr',nome:'Aprovadas'},{k:'vis',nome:'Visitas'},{k:'prop',nome:'Propostas'},{k:'fech',nome:'Fechamentos'},{k:'vgl',nome:'VGL',moeda:true}];
-  let leads=[],analises=[],resultados=[],locacoes=[],corretoras=[],unidades=[],fatos=[],charts={},booted=false,semRel=null,metrica='leads';
+  let leads=[],analises=[],resultados=[],locacoes=[],propWpp=[],leiturasWpp=[],corretoras=[],unidades=[],fatos=[],charts={},booted=false,semRel=null,metrica='leads';
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
   const pad=n=>String(n).padStart(2,'0');
@@ -509,12 +513,14 @@
   async function loadAll(){
     $('#dash').classList.add('loading');
     try{
-      const [c,u,l,a,r,lo]=await Promise.all([
+      const [c,u,l,a,r,lo,pw,lw]=await Promise.all([
         db.from('corretoras').select('nome,ativa').order('nome'),db.from('unidades').select('nome,ativa').order('nome'),
         tudo('leads_diarios','data,ate,unidade,corretora,quantidade,ordem'),tudo('pre_analises','data,corretora,situacao'),
-        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem'),tudo('locacoes','data,unidade,corretora,vgl')]);
-      if(c.error)throw c.error;if(u.error)throw u.error;
-      corretoras=c.data;unidades=u.data;leads=l;analises=a;resultados=r;locacoes=lo.map(x=>({...x,vgl:Number(x.vgl)}));
+        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem'),tudo('locacoes','data,unidade,corretora,vgl'),
+        tudo('propostas_whatsapp','data,hora,corretora,referencia,aluguel,garantia'),
+        db.from('propostas_whatsapp_leituras').select('de,ate,encontradas,novas').order('ate',{ascending:false}).limit(60)]);
+      if(c.error)throw c.error;if(u.error)throw u.error;if(lw.error)throw lw.error;
+      corretoras=c.data;unidades=u.data;leads=l;analises=a;resultados=r;locacoes=lo.map(x=>({...x,vgl:Number(x.vgl)}));propWpp=pw;leiturasWpp=lw.data;
       montarFatos();
       if(!semRel){const ult=[...resultados.map(x=>x.data),...locacoes.map(x=>x.data)].sort().pop();semRel=semanaDe(ult||iso(new Date()))[0]}
       fillFilterOptions();render();renderSemanal();
@@ -526,11 +532,14 @@
   // Cada linha da planilha da Locação conta como 1 fechamento com o seu VGL. Ela entra sem unidade (como as análises),
   // na unidade do corretor naquela semana; a cidade do imóvel só é usada se o corretor não tiver outro dado na semana.
   function montarFatos(){
+    // Propostas do WhatsApp não têm unidade: vão para a do corretor na semana ou, se não houver, para a última unidade dele.
+    const unidadeUsual={};[...leads,...resultados].sort((x,y)=>x.data.localeCompare(y.data)).forEach(x=>unidadeUsual[x.corretora]=x.unidade);
     fatos=[
       ...leads.map(l=>({data:l.data,corretora:l.corretora,unidade:l.unidade,leads:l.quantidade,ordem:100+(l.ordem||0)})),
       ...analises.map(a=>({data:a.data,corretora:a.corretora||SEM,unidade:null,env:1,apr:+(a.situacao==='APROVADO'),rec:+(a.situacao==='RECUSADO'),ana:+(a.situacao==='EM ANÁLISE')})),
       ...resultados.map(r=>({data:r.data,corretora:r.corretora,unidade:r.unidade,lc:r.leads_corretor,vis:r.visitas,prop:r.propostas,ordem:r.ordem})),
-      ...locacoes.map(l=>({data:l.data,corretora:l.corretora,unidade:null,cidade:l.unidade,fech:1,vgl:l.vgl}))
+      ...locacoes.map(l=>({data:l.data,corretora:l.corretora,unidade:null,cidade:l.unidade,fech:1,vgl:l.vgl})),
+      ...propWpp.map(p=>({data:p.data,corretora:p.corretora,unidade:null,cidade:unidadeUsual[p.corretora],pw:1}))
     ];
   }
   const ordemUnidades=()=>[...new Set([...unidades.map(u=>u.nome),...fatos.map(f=>f.unidade).filter(Boolean)])];
@@ -714,8 +723,9 @@
     const us=[...ordemUnidades(),'OUTROS'];
     return [...rows.values()].sort((x,y)=>us.indexOf(x.unidade)-us.indexOf(y.unidade)||x.ordem-y.ordem||x.corretora.localeCompare(y.corretora));
   }
-  const COLS=[['leads','Leads'],['lc','Leads corretor'],['env','Análises'],['apr','Aprovadas'],['vis','Visitas'],['prop','Propostas'],['fech','Fechamentos'],['vgl','VGL']];
-  const celula=(k,v)=>`<td class="num">${k==='vgl'?brl(v):fmtN(v)}</td>`;
+  const COLS=[['leads','Leads'],['lc','Leads corretor'],['env','Análises'],['apr','Aprovadas'],['vis','Visitas'],['prop','Propostas'],['pw','Propostas WhatsApp'],['fech','Fechamentos'],['vgl','VGL']];
+  // Em vermelho quando chegaram mais propostas no WhatsApp do que foram lançadas.
+  const celula=(k,v,l)=>`<td class="num${k==='pw'&&l&&l.pw>l.prop?' gap':''}">${k==='vgl'?brl(v):fmtN(v)}</td>`;
   const semanasComDados=()=>[...new Set(fatos.map(f=>semanaDe(f.data)[0]))].sort();
   // Sem o bloco OUTROS (lançamentos sem unidade), igual ao slide da apresentação.
   const linhasRelatorio=(a,b)=>linhasSemana(a,b).filter(l=>l.unidade!=='OUTROS');
@@ -727,16 +737,40 @@
     $('#relData').value=semRel;$('#relPrev').disabled=!ws.some(w=>w<a);$('#relNext').disabled=!ws.some(w=>w>a);$('#relCopy').disabled=!ls.length;
     $('#relEdit').textContent=lancada?'Editar semana':'Lançar esta semana';
     const head=`<div class="rel-day">${tituloSemana(a,b)}</div>`;
-    if(!ls.length){$('#relBody').innerHTML=head+'<div class="empty-card">Nenhum dado nesta semana.</div>';return}
+    if(!ls.length){$('#relBody').innerHTML=head+'<div class="empty-card">Nenhum dado nesta semana.</div>'+blocoWhatsapp(a,b);return}
     const th=`<thead><tr><th>Corretor</th>${COLS.map(([,n])=>`<th class="num">${n}</th>`).join('')}</tr></thead>`;
     const us=[...new Set(ls.map(l=>l.unidade))];
     const bloco=u=>{const r=ls.filter(l=>l.unidade===u),s=r.reduce(somar,zero());
-      return `<div class="rel-unit"><h3>RESUMO SEMANAL ${safe(u)}</h3><div class="table-wrap" style="margin:0"><table>${th}<tbody>${r.map(l=>`<tr><td>${safe(l.corretora)}</td>${COLS.map(([k])=>celula(k,l[k])).join('')}</tr>`).join('')}
-        <tr class="sub"><td>SUBTOTAL</td>${COLS.map(([k])=>celula(k,s[k])).join('')}</tr></tbody></table></div></div>`};
+      return `<div class="rel-unit"><h3>RESUMO SEMANAL ${safe(u)}</h3><div class="table-wrap" style="margin:0"><table>${th}<tbody>${r.map(l=>`<tr><td>${safe(l.corretora)}</td>${COLS.map(([k])=>celula(k,l[k],l)).join('')}</tr>`).join('')}
+        <tr class="sub"><td>SUBTOTAL</td>${COLS.map(([k])=>celula(k,s[k],s)).join('')}</tr></tbody></table></div></div>`};
     const g=ls.reduce(somar,zero());
     $('#relBody').innerHTML=head+us.map(bloco).join('')+`<div class="rel-unit geral"><h3>RESUMO GERAL</h3><div class="table-wrap" style="margin:0"><table><thead><tr><th></th>${COLS.map(([,n])=>`<th class="num">${n}</th>`).join('')}</tr></thead>
-      <tbody><tr class="sub"><td>RESUMO DA SEMANA</td>${COLS.map(([k])=>celula(k,g[k])).join('')}</tr></tbody></table></div></div>`+
-      (lancada?'':`<p class="msg note" style="margin-top:12px">Visitas e propostas desta semana ainda não foram lançadas. Clique em "Lançar esta semana". Fechamentos e VGL já vêm da planilha da Locação.</p>`);
+      <tbody><tr class="sub"><td>RESUMO DA SEMANA</td>${COLS.map(([k])=>celula(k,g[k],g)).join('')}</tr></tbody></table></div></div>`+
+      (lancada?'':`<p class="msg note" style="margin-top:12px">Visitas e propostas desta semana ainda não foram lançadas. Clique em "Lançar esta semana". Fechamentos e VGL já vêm da planilha da Locação.</p>`)+
+      blocoWhatsapp(a,b);
+  }
+  // Propostas do WhatsApp × lançadas na semana: quem tem proposta sem lançar e a lista das propostas recebidas.
+  function blocoWhatsapp(a,b){
+    const ps=propWpp.filter(p=>p.data>=a&&p.data<=b).sort((x,y)=>(x.data+(x.hora||'')).localeCompare(y.data+(y.hora||''))||x.corretora.localeCompare(y.corretora));
+    const lanc={},wpp={};
+    resultados.filter(r=>r.data>=a&&r.data<=b).forEach(r=>lanc[r.corretora]=(lanc[r.corretora]||0)+r.propostas);
+    ps.forEach(p=>wpp[p.corretora]=(wpp[p.corretora]||0)+1);
+    const nomes=[...new Set([...Object.keys(lanc),...Object.keys(wpp)])].sort();
+    const faltam=nomes.filter(n=>(wpp[n]||0)>(lanc[n]||0)),amais=nomes.filter(n=>(lanc[n]||0)>(wpp[n]||0));
+    // Até quando o WhatsApp já foi lido (fim da última leitura).
+    const ult=leiturasWpp[0]?.ate,fimSemana=new Date(b+'T23:59:59-03:00');
+    const quando=d=>{const x=new Date(d);return `${pad(x.getDate())}/${pad(x.getMonth()+1)} às ${pad(x.getHours())}h${x.getMinutes()?pad(x.getMinutes()):''}`};
+    const leitura=!ult?'O WhatsApp ainda não foi lido. A leitura é feita toda sexta às 18h.'
+      :new Date(ult)>=fimSemana?`WhatsApp lido até ${quando(ult)}.`
+      :new Date(ult)<new Date(a+'T00:00:00-03:00')?'O WhatsApp desta semana ainda não foi lido. A leitura é feita toda sexta às 18h.'
+      :`WhatsApp lido até ${quando(ult)}. O que chegar depois entra na leitura da próxima sexta.`;
+    const resumo=!ps.length&&!faltam.length?'':
+      faltam.length?`<p class="msg gap-msg"><strong>Propostas que chegaram no WhatsApp e não foram lançadas:</strong> ${faltam.map(n=>`${safe(n)} (${wpp[n]} no WhatsApp, ${lanc[n]||0} lançada${(lanc[n]||0)===1?'':'s'})`).join(' · ')}</p>`
+      :'<p class="msg ok-msg">Todas as propostas do WhatsApp desta semana estão lançadas.</p>';
+    const extra=amais.length&&ult?`<p class="msg" style="margin-top:6px">Lançadas a mais do que chegou no WhatsApp (podem ter vindo por outro canal): ${amais.map(n=>`${safe(n)} (${lanc[n]} lançada${lanc[n]===1?'':'s'}, ${wpp[n]||0} no WhatsApp)`).join(' · ')}</p>`:'';
+    const tabela=ps.length?`<div class="table-wrap" style="margin:0"><table><thead><tr><th>Data</th><th>Corretor</th><th>Referência</th><th>Aluguel</th><th>Garantia</th></tr></thead><tbody>${ps.map(p=>
+      `<tr><td>${br(p.data).slice(0,5)}${p.hora?' '+p.hora.slice(0,5):''}</td><td${faltam.includes(p.corretora)?' class="gap"':''}>${safe(p.corretora)}</td><td>${safe(p.referencia)||'–'}</td><td>${safe(p.aluguel)||'–'}</td><td>${safe(p.garantia)||'–'}</td></tr>`).join('')}</tbody></table></div>`:'';
+    return `<div class="rel-unit wpp"><h3>PROPOSTAS NO WHATSAPP (${ps.length})</h3><div class="wpp-body"><p class="msg">${leitura}</p>${resumo}${extra}</div>${tabela}</div>`;
   }
   function passoRel(dir){const [a]=semanaDe(semRel),ws=semanasComDados(),w=dir<0?ws.filter(x=>x<a).pop():ws.find(x=>x>a);if(w){semRel=w;renderRelatorio()}}
   $('#relPrev').onclick=()=>passoRel(-1);$('#relNext').onclick=()=>passoRel(1);
