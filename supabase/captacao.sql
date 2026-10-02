@@ -2,7 +2,8 @@
 -- A gerência (tabela "gestores") vê e cria todos os quadros. Cada captadora só vê o próprio quadro (e-mail do quadro).
 -- Há um quadro "modelo" (modelo = true): colunas e etiquetas dele são copiadas quando a gerência cria um quadro novo.
 -- Os dados de proprietários ficam só aqui no banco, nunca no repositório (que é público).
--- Rodar uma vez em: Supabase > portal-interno > SQL Editor. Depende de avisos.sql (is_gestor) e departamentos.sql (senhas).
+-- Rodar uma vez em: Supabase > portal-interno > SQL Editor. Depende de avisos.sql (is_gestor), departamentos.sql (senhas)
+-- e acesso_geral.sql (tem_acesso_geral: financeiro@ e supervisora@ veem todos os quadros, desde 02/10/2026).
 
 create table if not exists public.captacao_quadros (
   id uuid primary key default gen_random_uuid(),
@@ -27,7 +28,7 @@ as $$
   select public.is_gestor() or exists (
     select 1 from public.captacao_quadros
     where id = p_quadro and not modelo and ativo
-      and lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+      and (public.tem_acesso_geral() or lower(email) = lower(coalesce(auth.jwt() ->> 'email', '')))
   );
 $$;
 
@@ -39,7 +40,7 @@ stable
 security definer
 set search_path = public
 as $$
-  select public.is_gestor() or exists (
+  select public.is_gestor() or public.tem_acesso_geral() or exists (
     select 1 from public.captacao_quadros
     where not modelo and ativo and lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
   );
@@ -57,7 +58,7 @@ stable
 security definer
 set search_path = public
 as $$
-  select public.is_gestor() or exists (
+  select public.is_gestor() or public.tem_acesso_geral() or exists (
     select 1 from public.departamento_acesso
     where departamento = p_departamento
       and lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
