@@ -89,6 +89,7 @@
     .who-chip{background:#eef2f4;border-radius:999px;padding:2px 9px;font-weight:700;color:var(--blue);max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .prazo{font-weight:700;color:var(--muted);white-space:nowrap}.prazo.late{color:var(--red)}.prazo.today{color:var(--amber)}
     .dm.done .tt{text-decoration:line-through;color:var(--muted)}
+    .dm .de-loc{justify-self:start;background:#e8f0fa;color:#004AAD}
     .col-empty{color:#8a969e;font-size:.84rem;text-align:center;padding:14px 6px}
     .col-more{border:0;background:none;color:var(--blue);font-weight:700;font-size:.82rem;padding:4px}
     /* Atividades */
@@ -218,19 +219,6 @@
     <div class="empty-card">Em preparação. Esta aba vai seguir o controle de contratos Alpop que vocês já usam.</div>
   </section>
 
-  <section id="tab-energia" data-tab hidden>
-    <div class="top">
-      <div><h2>Energia</h2><p>Contratos com a chave já entregue que a Locação ainda não marcou com a etiqueta <strong>CELESC - OK</strong> no quadro de contratos. Ficam aqui até a energia ser transferida.</p></div>
-      <div class="bar-actions">
-        <label class="check"><input type="checkbox" id="eResolvidas"> Mostrar também os resolvidos</label>
-      </div>
-    </div>
-    <p class="preview-note" id="eInicio"></p>
-    <div class="tiles" id="eTiles"></div>
-    <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="energiaTable"></table></div></div>
-    <p class="msg">Quem sinaliza é a Locação, pela etiqueta no quadro. "ENERGIA RATEIO" e "NÃO TROCAR TITULARIDADE – MEDIDOR INTERNO" também tiram o contrato da lista. As anotações aparecem no histórico do cartão, para a Locação acompanhar.</p>
-  </section>
-
   <section id="tab-atividades" data-tab hidden>
     <div class="top"><div><h2>Atividades</h2><p>O que este departamento faz, conforme o organograma. Clique para ver as demandas de cada atividade.</p></div></div>
     <div class="atv-grid" id="atvGrid"></div>
@@ -271,16 +259,6 @@
     <p class="msg" id="demandaInfo" hidden></p>
     <div class="actions"><button type="button" class="danger-btn" id="demandaDel" hidden>Excluir</button><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="demandaSubmit">Salvar</button></div>
     <p class="msg error" id="demandaMsg" hidden></p>
-  </form>
-</dialog>
-
-<dialog id="notaDialog">
-  <div class="dialog-head"><h2>Anotar acompanhamento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
-  <form id="notaForm">
-    <p class="msg" id="notaContrato"></p>
-    <div class="field"><label for="nTexto">Anotação</label><textarea id="nTexto" name="texto" rows="3" maxlength="2000" required placeholder="Ex.: liguei para o locatário, vai transferir até sexta"></textarea></div>
-    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="notaSubmit">Salvar</button></div>
-    <p class="msg error" id="notaMsg" hidden></p>
   </form>
 </dialog>
 
@@ -363,8 +341,9 @@
     {slug:'repasses',publicado:true,limpo:true,nome:'Proprietário · Contas a Pagar',area:'Financeiro',papel:'Contas a pagar',ref:'Imóvel (REF) / proprietário',extras:['rescisao','adm'],
       atividades:['Repasse','Extrato','Cálculo de rescisão','IR / DIMOB','Nota fiscal','Recibos']},
     // recebe = atividades que só entram quando outra área envia (ainda sem envio: ficam vazias).
-    // energia = aba Energia, com os contratos que a Locação não marcou como transferidos (ver supabase/pos_locacao_energia.sql).
-    {slug:'pos-locacao',nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
+    // energia = atividade que a Locação também envia, pelo botão no cartão do quadro de contratos (ver supabase/pos_locacao_energia_envio.sql).
+    // A Pós-locação cadastra à mão o que não veio da Locação. Publicada em 02/10/2026.
+    {slug:'pos-locacao',publicado:true,nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
       recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
       atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
@@ -390,7 +369,7 @@
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
 
   const DEP=DEPS.find(d=>d.slug===new URLSearchParams(location.search).get('d'));
-  const abasDoDep=()=>DEP.limpo?[...(DEP.extras||[]),'pop','senhas']:['demandas',...(DEP.extras||[]),...(DEP.energia?['energia']:[]),'atividades','senhas','pop'];
+  const abasDoDep=()=>DEP.limpo?[...(DEP.extras||[]),'pop','senhas']:['demandas',...(DEP.extras||[]),'atividades','senhas','pop'];
 
   // ---------- Sem departamento: lista para escolher ----------
   // Só os publicados aparecem na lista; ?previa mostra todos (a gerência revisando os demais).
@@ -405,7 +384,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={rh:'RH',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',energia:'Energia',atividades:'Atividades',senhas:'Senhas',pop:'POP e documentos'};
+    const nomes={rh:'RH',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:'POP e documentos'};
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
     $('#previewNote').innerHTML=DEP.limpo
@@ -416,11 +395,10 @@
 
   function iniciar(){
   const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-  // Atividades que recebem de outra área ou que têm aba própria (energia) não entram na "Nova demanda".
-  const automatica=a=>(DEP.recebe||[]).includes(a)||a===DEP.energia;
-  const ATIVIDADES=[...DEP.atividades.filter(a=>!automatica(a)),OUTROS];
+  // Atividades que só recebem de outra área não entram na "Nova demanda".
+  const ATIVIDADES=[...DEP.atividades.filter(a=>!(DEP.recebe||[]).includes(a)),OUTROS];
   const ABAS=abasDoDep();
-  let demandas=[],senhas=[],docs=[],energia=[],booted=false,editId=null,senhaEditId=null,verTodas={};
+  let demandas=[],senhas=[],docs=[],booted=false,editId=null,senhaEditId=null,verTodas={};
 
   // ---------- Acesso ----------
   async function refreshSession(){
@@ -431,7 +409,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,DEP.energia?loadEnergia():null,ABAS.includes('rescisao')?loadRescisao():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('rescisao')?loadRescisao():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // A gerência vê todos os departamentos: um seletor no topo troca de um para outro.
@@ -551,7 +529,7 @@
   // ---------- Demandas ----------
   async function loadDemandas(){
     $('#dash').classList.add('loading');
-    const {data,error}=await db.from('dep_demandas').select('id,atividade,titulo,referencia,responsavel,prazo,status,observacao,criado_em,criado_por,atualizado_em,concluido_em').eq('departamento',DEP.slug).order('criado_em',{ascending:false});
+    const {data,error}=await db.from('dep_demandas').select('id,atividade,titulo,referencia,responsavel,prazo,status,observacao,criado_em,criado_por,atualizado_em,concluido_em,cartao_id').eq('departamento',DEP.slug).order('criado_em',{ascending:false});
     $('#dash').classList.remove('loading');
     if(error){$('#subtitle').textContent='Não foi possível carregar: '+error.message;return}
     demandas=data;fillFilters();render();
@@ -603,7 +581,7 @@
   function cartao(d){
     const t=hoje(),cls=atrasada(d)?'late':aberta(d)&&d.prazo===t?'today':'';
     const prazo=d.prazo?`<span class="prazo ${cls}">${cls==='late'?'Atrasada · ':cls==='today'?'Hoje · ':''}${br(d.prazo).slice(0,5)}</span>`:'<span class="prazo">sem prazo</span>';
-    return `<button type="button" class="dm ${aberta(d)?'':'done'}" draggable="true" data-id="${d.id}"><span class="atv">${safe(d.atividade)}</span><span class="tt">${safe(d.titulo)}</span>
+    return `<button type="button" class="dm ${aberta(d)?'':'done'}" draggable="true" data-id="${d.id}"><span class="atv">${safe(d.atividade)}</span>${d.cartao_id?'<span class="chip de-loc" title="Enviada pela Locação pelo quadro de contratos">Enviada pela Locação</span>':''}<span class="tt">${safe(d.titulo)}</span>
       ${d.referencia?`<span class="ref">${safe(d.referencia)}</span>`:''}<span class="ft">${d.responsavel?`<span class="who-chip">${safe(d.responsavel)}</span>`:'<span class="muted">sem responsável</span>'}${prazo}</span></button>`;
   }
   $('#board').addEventListener('click',e=>{
@@ -637,7 +615,7 @@
     f.atividade.innerHTML='<option value="">Selecione…</option>'+atvs.map(a=>`<option>${safe(a)}</option>`).join('');
     $('#demandaTitle').textContent=d?'Editar demanda':'Nova demanda';$('#demandaDel').hidden=!d;
     if(d){f.atividade.value=d.atividade;f.titulo.value=d.titulo;f.referencia.value=d.referencia||'';f.responsavel.value=d.responsavel||'';f.prazo.value=d.prazo||'';f.status.value=d.status;f.observacao.value=d.observacao||'';
-      $('#demandaInfo').textContent=`Criada em ${br(iso(new Date(d.criado_em)))} por ${(d.criado_por||'').split('@')[0]||'–'}`+(d.concluido_em?` · concluída em ${br(iso(new Date(d.concluido_em)))}`:'');$('#demandaInfo').hidden=false}
+      $('#demandaInfo').textContent=`${d.cartao_id?'Enviada pela Locação':'Criada'} em ${br(iso(new Date(d.criado_em)))} por ${(d.criado_por||'').split('@')[0]||'–'}`+(d.cartao_id?' · ao concluir, a Locação vê no histórico do cartão':'')+(d.concluido_em?` · concluída em ${br(iso(new Date(d.concluido_em)))}`:'');$('#demandaInfo').hidden=false}
     else{f.atividade.value=atividade||$('#fAtividade').value||'';$('#demandaInfo').hidden=true}
     demandaDialog.showModal();(d?f.titulo:f.atividade.value?f.titulo:f.atividade).focus();
   }
@@ -665,74 +643,15 @@
     const mes=hoje().slice(0,7);
     $('#atvGrid').innerHTML=atvs.map(a=>{
       if((DEP.recebe||[]).includes(a))return `<article class="card atv-card auto"><h3>${safe(a)}</h3><p class="msg">Só entra aqui o que outra área enviar. Por enquanto fica vazio.</p></article>`;
-      if(a===DEP.energia){const pend=energia.filter(x=>!x.resolvida).length;
-        return `<article class="card atv-card auto"><h3>${safe(a)}</h3><p class="msg">Automático: os contratos que a Locação não marcou com "CELESC - OK" depois da entrega de chaves.</p>
-          <div class="atv-nums"><span class="${pend?'late':''}"><strong>${pend}</strong>para monitorar</span></div><div class="row-actions"><button class="link" data-go-energia>Ver na aba Energia</button></div></article>`}
       const ds=demandas.filter(d=>d.atividade===a),ab=ds.filter(aberta).length,atr=ds.filter(atrasada).length,cm=ds.filter(d=>!aberta(d)&&(d.concluido_em||'').slice(0,7)===mes).length;
-      return `<article class="card atv-card"><h3>${safe(a)}</h3>${a===OUTROS?'<p class="msg" style="margin-top:-4px">Demandas que não se encaixam nas atividades acima.</p>':''}
+      return `<article class="card atv-card"><h3>${safe(a)}</h3>${a===OUTROS?'<p class="msg" style="margin-top:-4px">Demandas que não se encaixam nas atividades acima.</p>':''}${a===DEP.energia?'<p class="msg" style="margin-top:-4px">A Locação envia pelo botão "Enviar à Pós-locação" no cartão do quadro de contratos. O que não vier de lá, cadastre em "+ Nova demanda".</p>':''}
         <div class="atv-nums"><span><strong>${ab}</strong>em aberto</span><span class="${atr?'late':''}"><strong>${atr}</strong>atrasadas</span><span><strong>${cm}</strong>concluídas no mês</span></div>
         <div class="row-actions"><button class="link" data-ver-atv="${safe(a)}">Ver demandas</button><button class="link" data-nova-atv="${safe(a)}">+ Nova demanda</button></div></article>`}).join('');
   }
   $('#atvGrid').onclick=e=>{
-    const {verAtv,novaAtv,goEnergia}=e.target.dataset;
-    if(goEnergia!==undefined)showTab('energia');
+    const {verAtv,novaAtv}=e.target.dataset;
     if(verAtv!==undefined){fillFilters();$('#fAtividade').value=verAtv;showTab('demandas');render()}
     if(novaAtv!==undefined)openDemanda(null,novaAtv);
-  };
-
-  // ---------- Energia (só pós-locação) ----------
-  // Vem do quadro de contratos pela função pos_energia_lista: a pós-locação não acessa o quadro nem a planilha da Locação.
-  const PREFIXO_NOTA='[Pós-locação · energia] ';
-  const diasDesde=t=>Math.max(0,Math.floor((Date.now()-new Date(t))/864e5));
-  // O monitoramento começa no dia em que as equipes passam a usar o sistema (data guardada no banco; vazia = ainda não começou).
-  let energiaInicio=null;
-  async function loadEnergia(){
-    $('#energiaTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
-    const [ini,lista,gestor]=await Promise.all([db.rpc('pos_energia_inicio'),db.rpc('pos_energia_lista',{p_resolvidas:$('#eResolvidas').checked}),db.rpc('is_gestor')]);
-    const error=ini.error||lista.error;
-    if(error){$('#energiaTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
-    energiaInicio=ini.data;
-    $('#eInicio').innerHTML=(energiaInicio?`Monitorando os contratos com chave entregue a partir de <strong>${br(energiaInicio)}</strong>.`:'<strong>O monitoramento ainda não começou.</strong> Ele começa no dia em que as equipes passarem a usar o sistema.')+
-      (gestor.data===true?` <button class="link" id="eDefinir">${energiaInicio?'Alterar data de início':'Definir data de início'}</button>`:'');
-    energia=lista.data.sort((a,b)=>a.resolvida-b.resolvida||new Date(a.entrada_em)-new Date(b.entrada_em));renderEnergia();renderAtividades();
-  }
-  $('#eInicio').addEventListener('click',async e=>{
-    if(e.target.id!=='eDefinir')return;
-    const atual=energiaInicio?br(energiaInicio):br(hoje());
-    const r=prompt('A partir de que dia a pós-locação monitora a energia? (dd/mm/aaaa)\nContratos com chave entregue antes disso não entram.',atual);if(r===null)return;
-    const m=r.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);if(!m){alert('Use o formato dd/mm/aaaa.');return}
-    const {error}=await db.rpc('pos_energia_definir_inicio',{p_inicio:`${m[3]}-${m[2]}-${m[1]}`});if(error){alert('Não foi possível salvar: '+error.message);return}
-    toast('Data de início salva');await loadEnergia();
-  });
-  function renderEnergia(){
-    const pend=energia.filter(x=>!x.resolvida),antigos=pend.filter(x=>diasDesde(x.entrada_em)>30).length,semNota=pend.filter(x=>!x.nota).length;
-    $('#eTiles').innerHTML=`<div class="card tile ${pend.length?'warn':''}"><span>Para monitorar</span><strong>${pend.length}</strong><small>energia sem sinal da Locação</small></div>
-      <div class="card tile ${antigos?'alert':''}"><span>Há mais de 30 dias</span><strong>${antigos}</strong><small>desde a entrega de chaves</small></div>
-      <div class="card tile"><span>Sem anotação</span><strong>${semNota}</strong><small>ninguém acompanhou ainda</small></div>`;
-    if(!energia.length){$('#energiaTable').innerHTML=`<tbody><tr><td class="empty">${energiaInicio?'Nenhum contrato para monitorar.':'A lista começa a ser preenchida quando a data de início for definida.'}</td></tr></tbody>`;return}
-    const chip=n=>`<span class="chip ${/PENDENTE|FALTA TRASNFERIR|FALTA TRANSFERIR/i.test(n)?'warn':/CELESC - OK|RATEIO|NÃO TROCAR/i.test(n)?'ok':''}">${safe(n)}</span>`;
-    $('#energiaTable').innerHTML=`<thead><tr><th>Contrato</th><th>Chave entregue</th><th>Etapa no quadro</th><th>Etiquetas</th><th>Último acompanhamento</th><th></th></tr></thead><tbody>${energia.map(x=>{const d=diasDesde(x.entrada_em);
-      return `<tr${x.resolvida?' style="opacity:.6"':''}><td><strong>${safe(x.titulo)}</strong>${x.resolvida?'<br><span class="chip ok">Resolvida</span>':''}</td>
-      <td style="white-space:nowrap">${br(iso(new Date(x.entrada_em)))}<br><small class="${!x.resolvida&&d>30?'':'muted'}" style="${!x.resolvida&&d>30?'color:var(--red);font-weight:700':''}">há ${d} ${d===1?'dia':'dias'}</small></td>
-      <td><small>${safe(x.coluna)}</small></td>
-      <td><div class="chips">${(x.etiquetas||[]).filter(n=>/CELESC|LUZ|ENERGIA|TITULARIDADE/i.test(n)).map(chip).join('')||'<span class="muted">sem etiqueta de energia</span>'}</div></td>
-      <td class="nota">${x.nota?`${safe(x.nota.replace(PREFIXO_NOTA,''))}<small>${br(iso(new Date(x.nota_em)))} · ${safe((x.nota_por||'').split('@')[0])}</small>`:'<span class="muted">–</span>'}</td>
-      <td class="row-actions">${x.resolvida?'':`<button class="link" data-nota="${x.cartao_id}">Anotar</button><button class="link" data-transf="${x.cartao_id}">Transferida ✓</button>`}</td></tr>`}).join('')}</tbody>`;
-  }
-  $('#eResolvidas').addEventListener('change',loadEnergia);
-  let notaCartao=null;
-  $('#energiaTable').onclick=async e=>{
-    const {nota,transf}=e.target.dataset,x=energia.find(c=>c.cartao_id===(nota||transf));if(!x)return;
-    if(nota){notaCartao=x.cartao_id;$('#notaForm').reset();$('#notaMsg').hidden=true;$('#notaContrato').textContent=x.titulo;$('#notaDialog').showModal();$('#nTexto').focus()}
-    if(transf&&confirm(`Marcar a energia de "${x.titulo}" como transferida? A etiqueta "CELESC - OK" será colocada no cartão do quadro.`)){
-      const {error}=await db.rpc('pos_energia_transferida',{p_cartao:x.cartao_id});if(error){alert('Não foi possível marcar: '+error.message);return}
-      toast('Marcada como transferida');await loadEnergia()}
-  };
-  $('#notaForm').onsubmit=async e=>{
-    e.preventDefault();const texto=$('#nTexto').value.trim(),msg=$('#notaMsg');if(!texto)return;
-    $('#notaSubmit').disabled=true;const {error}=await db.rpc('pos_energia_anotar',{p_cartao:notaCartao,p_texto:texto});$('#notaSubmit').disabled=false;
-    if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
-    $('#notaDialog').close();toast('Anotação salva');await loadEnergia();
   };
 
   // ---------- RH (só Gestão Financeira / RH) ----------

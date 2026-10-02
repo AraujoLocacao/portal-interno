@@ -148,6 +148,10 @@
           <span class="lbl">Planilha de locações</span>
           <div id="cPlan" style="margin-top:6px"></div>
         </div>
+        <div id="cEnergiaBox">
+          <span class="lbl">Energia · Pós-locação</span>
+          <div id="cEnergia" style="margin-top:6px"></div>
+        </div>
         <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
           <a class="link" id="cTrello" target="_blank" rel="noopener noreferrer" hidden>Abrir no Trello ↗</a>
           <span class="msg" id="cAnexos" hidden></span>
@@ -157,6 +161,17 @@
       </div>
     </div>
   </div>
+</dialog>
+
+<dialog id="posDialog">
+  <div class="dialog-head"><h2>Enviar à Pós-locação</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="posForm" class="dialog-body">
+    <p class="msg">A energia deste contrato não foi transferida? O envio vira uma demanda no quadro da Pós-locação, que verifica com o locatário.</p>
+    <p style="margin:0;font-weight:700" id="posContrato"></p>
+    <div class="field"><label for="posObs">Observação para a Pós-locação (opcional)</label><textarea class="edit" id="posObs" maxlength="2000" style="min-height:70px" placeholder="Ex.: locatário disse que transferia na semana da entrega das chaves"></textarea></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button class="primary" id="posEnviar">Enviar</button></div>
+    <p class="msg error" id="posMsg" hidden></p>
+  </form>
 </dialog>
 
 <dialog id="novoDialog">
@@ -349,7 +364,7 @@
     $('#cTrello').hidden=!c.trello_url;if(c.trello_url)$('#cTrello').href=c.trello_url;
     $('#cAnexos').hidden=!c.anexos_trello;$('#cAnexos').textContent=`${c.anexos_trello} ${c.anexos_trello===1?'anexo ficou':'anexos ficaram'} no Trello`;
     $('#cCriado').textContent=`Criado em ${dataBr(c.criado_em)}${c.criado_por?' por '+nome(c.criado_por):''}`;
-    pintarCartao();if(!cd.open)cd.showModal();
+    pintarCartao();if(!cd.open)cd.showModal();carregarEnvios(c);
     $('#cHist').innerHTML='<p class="msg">Carregando histórico…</p>';
     const {data,error}=await db.from('quadro_historico').select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').eq('cartao_id',id).order('criado_em',{ascending:false});
     if(aberto!==c)return;
@@ -411,6 +426,32 @@
     const {error}=await db.from('quadro_cartoes').delete().eq('id',aberto.id);if(error){alert('Não foi possível excluir: '+error.message);return}
     cartoes=cartoes.filter(x=>x.id!==aberto.id);cd.close();render();toast('Cartão excluído');
   };
+  // Energia não transferida: a Locação envia à Pós-locação, que recebe como demanda (ver supabase/pos_locacao_energia_envio.sql).
+  // O cartão mostra os envios e em que situação estão; o envio e a conclusão também ficam no histórico.
+  async function carregarEnvios(c){
+    $('#cEnergiaBox').hidden=c.modelo;if(c.modelo)return;
+    $('#cEnergia').innerHTML='<p class="msg">Carregando…</p>';
+    const {data,error}=await db.rpc('pos_energia_envios',{p_cartao:c.id});
+    if(aberto!==c)return;
+    if(error){$('#cEnergia').innerHTML=`<p class="msg error">Não foi possível carregar: ${safe(error.message)}</p>`;return}
+    const emAberto=data.find(e=>e.status!=='Concluída');
+    $('#cEnergia').innerHTML=data.map(e=>`<p class="msg" style="margin:0 0 4px">Enviado em ${dataBr(e.criado_em)} por ${safe(nome(e.criado_por))} · <strong>${e.status==='Concluída'?`concluído em ${dataBr(e.concluido_em)}`:safe(e.status.toLowerCase())}</strong>${e.responsavel&&e.status!=='Concluída'?` (${safe(e.responsavel)})`:''}</p>`).join('')
+      +(emAberto?'<p class="msg" style="margin:0">Está com a Pós-locação para verificar.</p>'
+        :`<button class="secondary mini" id="cEnviarPos" style="margin-top:2px">Enviar à Pós-locação</button><p class="msg" style="margin:4px 0 0">Use quando a energia não foi transferida.</p>`);
+  }
+  $('#cEnergia').addEventListener('click',e=>{
+    if(e.target.id!=='cEnviarPos')return;
+    $('#posContrato').textContent=aberto.titulo;$('#posObs').value='';$('#posMsg').hidden=true;$('#posDialog').showModal();$('#posObs').focus();
+  });
+  $('#posForm').onsubmit=async e=>{
+    e.preventDefault();const c=aberto;if(!c)return;$('#posEnviar').disabled=true;
+    const {error}=await db.rpc('pos_energia_enviar',{p_cartao:c.id,p_obs:$('#posObs').value.trim()||null});
+    $('#posEnviar').disabled=false;
+    if(error){$('#posMsg').textContent='Não foi possível enviar: '+error.message;$('#posMsg').hidden=false;return}
+    $('#posDialog').close();comentarios[c.id]=(comentarios[c.id]||0)+1;render();toast('Enviado à Pós-locação');
+    if(aberto===c)abrirCartao(c.id);
+  };
+
   // Etiquetas
   $('#cEtqAbrir').onclick=()=>{$('#cEtqBox').hidden=!$('#cEtqBox').hidden;$('#cEtqBusca').value='';pintarEtq();$('#cEtqCor').innerHTML=Object.keys(CORES).filter(k=>k!=='gray').map(k=>`<option value="${k}" style="background:${CORES[k][0]}">${k.replace('_',' ')}</option>`).join('')};
   function pintarEtq(){
