@@ -108,6 +108,7 @@
     .doc-ico{width:44px;height:52px;border-radius:8px;display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#fff;flex:none;background:var(--blue)}
     .doc-ico.pdf{background:var(--red)}.doc-ico.xls{background:var(--green)}.doc-ico.img{background:var(--amber)}.doc-ico.html{background:var(--navy)}.doc-ico.ppt{background:#c25100}.doc-ico.vid{background:#6e5dc6}
     .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}
+    .pasta-bloco h2{font-size:1.1rem;margin:4px 0 0}.pasta-bloco h2 small{font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:.78rem;color:var(--muted);font-weight:600;margin-left:6px}
     .vazio-doc{border:1px dashed #bac5cc;border-radius:12px;padding:22px;text-align:center;color:var(--muted);grid-column:1/-1}
     .seg{display:flex;gap:8px;flex-wrap:wrap}.seg label{flex:1;min-width:110px;border:1px solid #cbd5da;border-radius:10px;padding:9px 10px;text-align:center;font-weight:700;font-size:.85rem;cursor:pointer;position:relative}
     .seg input{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none}.seg label:has(input:checked){background:var(--navy);border-color:var(--navy);color:#fff}
@@ -196,8 +197,8 @@
     <div class="tools"><div class="grow"><h1>Materiais</h1><p class="sub">Materiais da captação para todas as captadoras: apresentações, modelos, POP e documentos. Vídeos e sites ficam em Acessos → Links úteis.</p></div>
       <button class="primary" id="newDoc">+ Enviar material</button></div>
     <div class="wrap">
-      <h2>Materiais</h2><div class="doc-grid" id="docsMat"></div>
-      <h2>POP</h2><div class="doc-grid" id="docsPop"></div>
+      <div id="docsMat"></div>
+      <section class="pasta-bloco"><h2>POP</h2><div class="doc-grid" id="docsPop"></div></section>
     </div>
   </section>
 
@@ -315,9 +316,21 @@
     <div class="field"><label for="dTitulo">Título</label><input id="dTitulo" name="titulo" maxlength="120" required placeholder="Ex.: Apresentação para proprietários"></div>
     <div class="field"><span class="lbl">Onde fica</span>
       <div class="seg"><label><input type="radio" name="categoria" value="Outros" checked>Materiais</label><label><input type="radio" name="categoria" value="POP">POP</label></div></div>
+    <div class="field" id="dPastaCampo"><label for="dPasta">Pasta (assunto)</label><input id="dPasta" name="pasta" maxlength="80" list="pastaList" autocomplete="off" placeholder="Escolha da lista ou digite um assunto novo"><datalist id="pastaList"></datalist></div>
     <div class="field"><label for="dArquivo">Arquivo (PDF, Word, Excel, PowerPoint, imagem, página HTML ou vídeo MP4, até 50 MB)</label><input id="dArquivo" name="arquivo" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.html,.htm,.mp4" required></div>
     <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="docSubmit">Enviar</button></div>
     <p class="msg error" id="docMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="pastaDialog">
+  <div class="dialog-head"><h2>Mudar de pasta</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="pastaForm" class="dialog-body" autocomplete="off">
+    <p class="msg" style="margin:0"><strong id="mpTitulo"></strong></p>
+    <div class="field"><label for="mpPasta">Pasta (assunto)</label><input id="mpPasta" maxlength="80" list="pastaList" placeholder="Escolha da lista ou digite um assunto novo"></div>
+    <p class="msg">Deixe em branco para o material ficar em "Outros materiais".</p>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary">Salvar</button></div>
+    <p class="msg error" id="mpMsg" hidden></p>
   </form>
 </dialog>
 
@@ -907,19 +920,40 @@
   let docs=[];
   const tipoDoc=n=>{const x=(n.split('.').pop()||'').toLowerCase();return x==='mp4'?['vid','VÍDEO']:x==='pdf'?['pdf','PDF']:['html','htm'].includes(x)?['html','PÁGINA']:['doc','docx'].includes(x)?['doc','WORD']:['xls','xlsx'].includes(x)?['xls','EXCEL']:['ppt','pptx'].includes(x)?['ppt','PPT']:['img','IMAGEM']};
   const tamanho=b=>b>=1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(b/1024))+' KB';
+  // Materiais separados por assunto (campo "pasta" de dep_documentos, o mesmo da Pós-locação). Organização da gerência em 02/10/2026;
+  // as pastas abaixo aparecem nesta ordem, as novas em ordem alfabética depois delas, e o que não tem pasta em "Outros materiais", no fim.
+  const ORDEM_PASTAS=['Planos de locação','Apresentação ao proprietário','Autorização e documentos','Cadastro do imóvel','Treinamento'];
+  const pastasDe=()=>{const usadas=[...new Set(docs.filter(d=>d.categoria!=='POP'&&d.pasta).map(d=>d.pasta))];
+    return [...ORDEM_PASTAS.filter(p=>usadas.includes(p)),...usadas.filter(p=>!ORDEM_PASTAS.includes(p)).sort((a,b)=>a.localeCompare(b,'pt-BR'))]};
   async function carregarDocs(){
-    const {data,error}=await db.from('dep_documentos').select('id,titulo,categoria,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').eq('departamento',DEP).order('enviado_em',{ascending:false});
+    const {data,error}=await db.from('dep_documentos').select('id,titulo,categoria,pasta,caminho,nome_arquivo,tamanho,enviado_em,enviado_por').eq('departamento',DEP).order('enviado_em',{ascending:false});
     if(error){$('#docsMat').innerHTML=`<div class="vazio-doc">Não foi possível carregar: ${safe(error.message)}</div>`;return}
     docs=data;
-    // Excluir: a gerência ou quem enviou.
+    // Excluir e mudar de pasta: a gerência ou quem enviou.
     const card=d=>{const [cls,label]=tipoDoc(d.nome_arquivo),pode=gestor||(d.enviado_por||'').toLowerCase()===meuEmail.toLowerCase();return `<article class="card doc"><div class="doc-ico ${cls}">${label}</div><div><h3>${safe(d.titulo)}</h3>
       <small>${safe(d.nome_arquivo)} · ${tamanho(d.tamanho||0)}</small><small>Enviado em ${dataBr(d.enviado_em)} por ${safe(nome(d.enviado_por))}</small>
-      <div class="row" style="margin:8px 0 0 -4px;gap:2px"><button class="link" data-abrir="${d.id}">Abrir</button><button class="link" data-baixar="${d.id}">Baixar</button>${pode?`<button class="link danger" data-del-doc="${d.id}">Excluir</button>`:''}</div></div></article>`};
-    $('#docsMat').innerHTML=docs.filter(d=>d.categoria!=='POP').map(card).join('')||'<div class="vazio-doc">Nenhum material ainda. Clique em "+ Enviar material".</div>';
+      <div class="row" style="margin:8px 0 0 -4px;gap:2px"><button class="link" data-abrir="${d.id}">Abrir</button><button class="link" data-baixar="${d.id}">Baixar</button>${pode&&d.categoria!=='POP'?`<button class="link" data-pasta="${d.id}">Mudar de pasta</button>`:''}${pode?`<button class="link danger" data-del-doc="${d.id}">Excluir</button>`:''}</div></div></article>`};
+    const porTitulo=l=>[...l].sort((a,b)=>a.titulo.localeCompare(b.titulo,'pt-BR'));
+    const mat=docs.filter(d=>d.categoria!=='POP'),sem=mat.filter(d=>!d.pasta);
+    const bloco=(nomeP,l)=>`<section class="pasta-bloco"><h2>${safe(nomeP)} <small>${l.length} ${l.length===1?'item':'itens'}</small></h2><div class="doc-grid">${porTitulo(l).map(card).join('')}</div></section>`;
+    $('#docsMat').innerHTML=mat.length?pastasDe().map(p=>bloco(p,mat.filter(d=>d.pasta===p))).join('')+(sem.length?bloco('Outros materiais',sem):'')
+      :'<div class="vazio-doc">Nenhum material ainda. Clique em "+ Enviar material".</div>';
     $('#docsPop').innerHTML=docs.filter(d=>d.categoria==='POP').map(card).join('')||'<div class="vazio-doc">Nenhum POP enviado ainda.</div>';
+    $('#pastaList').innerHTML=[...new Set([...ORDEM_PASTAS,...pastasDe()])].map(p=>`<option value="${safe(p)}">`).join('');
   }
+  // Mudar de pasta (vazio = "Outros materiais").
+  async function mudarPasta(doc){
+    $('#pastaDialog').dataset.id=doc.id;$('#mpTitulo').textContent=doc.titulo;$('#mpPasta').value=doc.pasta||'';$('#mpMsg').hidden=true;$('#pastaDialog').showModal();$('#mpPasta').focus();
+  }
+  $('#pastaForm').onsubmit=async e=>{
+    e.preventDefault();const p=$('#mpPasta').value.trim()||null;
+    const {error}=await db.from('dep_documentos').update({pasta:p}).eq('id',$('#pastaDialog').dataset.id);
+    if(error){$('#mpMsg').textContent='Não foi possível salvar: '+error.message;$('#mpMsg').hidden=false;return}
+    $('#pastaDialog').close();toast(p?'Movido para '+p:'Movido para Outros materiais');carregarDocs();
+  };
   $('#tab-materiais').addEventListener('click',async e=>{
-    const d=e.target.dataset,doc=docs.find(x=>x.id===(d.abrir||d.baixar||d.delDoc));if(!doc)return;
+    const d=e.target.dataset,doc=docs.find(x=>x.id===(d.abrir||d.baixar||d.delDoc||d.pasta));if(!doc)return;
+    if(d.pasta){mudarPasta(doc);return}
     // Vídeo: toca dentro do portal (link temporário de 2 horas, só para quem tem acesso).
     if(d.abrir&&tipoDoc(doc.nome_arquivo)[0]==='vid'){
       const {data,error}=await db.storage.from(BUCKET).createSignedUrl(doc.caminho,7200);if(error){alert('Não foi possível abrir: '+error.message);return}
@@ -939,7 +973,9 @@
   });
   // Fechou o vídeo: para de tocar e descarta o link temporário.
   $('#videoDialog').addEventListener('close',()=>{const p=$('#videoPlayer');p.pause();p.removeAttribute('src');p.load()});
-  $('#newDoc').onclick=()=>{$('#docForm').reset();$('#docMsg').hidden=true;$('#docDialog').showModal()};
+  $('#newDoc').onclick=()=>{$('#docForm').reset();$('#docMsg').hidden=true;$('#dPastaCampo').hidden=false;$('#docDialog').showModal()};
+  // POP não tem pasta: o campo some quando escolhe POP.
+  $('#docForm').addEventListener('change',e=>{if(e.target.name==='categoria')$('#dPastaCampo').hidden=e.target.value==='POP'});
   $('#docForm').onsubmit=async e=>{
     e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#docMsg'),file=f.get('arquivo');msg.hidden=true;
     if(!file||!file.size){msg.textContent='Escolha um arquivo.';msg.hidden=false;return}
@@ -951,7 +987,7 @@
     try{
       const tipo=file.type||(/\.html?$/i.test(file.name)?'text/html':/\.pptx$/i.test(file.name)?'application/vnd.openxmlformats-officedocument.presentationml.presentation':undefined);
       const up=await db.storage.from(BUCKET).upload(caminho,file,{contentType:tipo});if(up.error)throw up.error;
-      const {error}=await db.from('dep_documentos').insert({departamento:DEP,titulo:String(f.get('titulo')).trim(),categoria:f.get('categoria'),caminho,nome_arquivo:file.name,tamanho:file.size});
+      const {error}=await db.from('dep_documentos').insert({departamento:DEP,titulo:String(f.get('titulo')).trim(),categoria:f.get('categoria'),pasta:f.get('categoria')==='POP'?null:String(f.get('pasta')||'').trim()||null,caminho,nome_arquivo:file.name,tamanho:file.size});
       if(error){await db.storage.from(BUCKET).remove([caminho]);throw error}
       $('#docDialog').close();toast('Material enviado');await carregarDocs();
     }catch(err){msg.textContent='Não foi possível enviar: '+(/mime|type/i.test(err.message)?'tipo de arquivo não aceito.':err.message);msg.hidden=false}
