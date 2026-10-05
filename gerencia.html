@@ -97,6 +97,7 @@
     .res-table tfoot td{font-weight:800;border-top:1px solid var(--line);padding-top:9px;text-align:right}
     .rm{border:0;background:#f3f5f6;border-radius:8px;font-size:1.1rem;color:var(--muted);width:32px;height:34px}.rm:hover{background:#fdece4;color:var(--red)}
     .week-label{font-weight:800;color:var(--navy);align-self:end;padding-bottom:9px}
+    #sInteira{align-self:end;padding-bottom:9px}
     @media(max-width:900px){.filters{grid-template-columns:1fr 1fr;position:static}}
     @media(max-width:820px){.charts{grid-template-columns:1fr}}
     @media(max-width:560px){.tile strong{font-size:1.5rem}.tiles{grid-template-columns:1fr 1fr}}
@@ -395,8 +396,9 @@
   <div class="dialog-head"><h2 id="semTitle">Lançar semana</h2><button class="close" data-close aria-label="Fechar">×</button></div>
   <form id="semForm" novalidate>
     <div style="display:flex;gap:16px;flex-wrap:wrap">
-      <div class="field" style="width:200px"><label for="sData">Um dia da semana</label><input id="sData" type="date" required></div>
-      <div class="week-label" id="sSemana"></div>
+      <div class="field" style="width:180px"><label for="sData">De</label><input id="sData" type="date" required></div>
+      <div class="field" style="width:180px"><label for="sAte">Até</label><input id="sAte" type="date" required></div>
+      <div class="week-label" id="sSemana"></div><button type="button" class="link" id="sInteira" hidden></button>
     </div>
     <p class="msg note" id="semNota" hidden></p>
     <div class="table-wrap" style="margin-top:0">
@@ -448,15 +450,25 @@
   const plural=(n,s,p)=>`${fmtN(n)} ${n===1?s:p}`;
 
   // Semana de segunda a domingo, cortada na virada do mês (como no relatório: 01 a 06/09, 07 a 13/09...).
+  // Se a gerência lançou outras datas (ex.: 28/09 a 04/10, sem cortar no mês), vale o período lançado.
   function semanaDe(d){
+    const r=resultados.find(r=>r.data<=d&&r.ate>=d);if(r)return [r.data,r.ate];
+    return semanaCortada(d);
+  }
+  function semanaCortada(d){
+    const [seg,dom]=semanaInteira(d),x=dia(d);
+    const ini=iso(new Date(x.getFullYear(),x.getMonth(),1,12)),fim=iso(new Date(x.getFullYear(),x.getMonth()+1,0,12));
+    return [seg<ini?ini:seg,dom>fim?fim:dom];
+  }
+  function semanaInteira(d){
     const x=dia(d),seg=new Date(x);seg.setDate(x.getDate()-(x.getDay()+6)%7);
-    const dom=new Date(seg);dom.setDate(seg.getDate()+6);
-    const ini=new Date(x.getFullYear(),x.getMonth(),1,12),fim=new Date(x.getFullYear(),x.getMonth()+1,0,12);
-    return [iso(seg<ini?ini:seg),iso(dom>fim?fim:dom)];
+    const dom=new Date(seg);dom.setDate(seg.getDate()+6);return [iso(seg),iso(dom)];
   }
   const proxDia=d=>{const x=dia(d);x.setDate(x.getDate()+1);return iso(x)};
-  const tituloSemana=(a,b)=>`SEMANA DO DIA ${a.slice(8)} A ${b.slice(8)} DE ${MESES[+b.slice(5,7)-1]} DE ${b.slice(0,4)}`;
-  const rotuloSemana=(a,b)=>`${a.slice(8)}–${b.slice(8)}/${b.slice(5,7)}`;
+  const mesmoMes=(a,b)=>a.slice(0,7)===b.slice(0,7);
+  const tituloSemana=(a,b)=>mesmoMes(a,b)?`SEMANA DO DIA ${a.slice(8)} A ${b.slice(8)} DE ${MESES[+b.slice(5,7)-1]} DE ${b.slice(0,4)}`
+    :`SEMANA DO DIA ${a.slice(8)} DE ${MESES[+a.slice(5,7)-1]} A ${b.slice(8)} DE ${MESES[+b.slice(5,7)-1]} DE ${b.slice(0,4)}`;
+  const rotuloSemana=(a,b)=>mesmoMes(a,b)?`${a.slice(8)}–${b.slice(8)}/${b.slice(5,7)}`:`${a.slice(8)}/${a.slice(5,7)}–${b.slice(8)}/${b.slice(5,7)}`;
 
   // ---------- Acesso ----------
   async function refreshSession(){
@@ -807,8 +819,7 @@
   $('#relData').addEventListener('change',e=>{if(e.target.value){semRel=semanaDe(e.target.value)[0];renderRelatorio()}});
   // Ao escolher datas, começa pela semana inteira que está na tela (de segunda a domingo, sem cortar no mês).
   $('#relModo').addEventListener('change',e=>{
-    if(e.target.value==='datas'){const x=dia(semRel),seg=new Date(x);seg.setDate(x.getDate()-(x.getDay()+6)%7);const dom=new Date(seg);dom.setDate(seg.getDate()+6);
-      $('#relDe').value=iso(seg);$('#relAte').value=iso(dom);modoRel([iso(seg),iso(dom)])}
+    if(e.target.value==='datas'){const [seg,dom]=semanaInteira(semRel);$('#relDe').value=seg;$('#relAte').value=dom;modoRel([seg,dom])}
     else{if(relDatas?.[0])semRel=semanaDe(relDatas[0])[0];modoRel(null)}
     renderRelatorio()});
   ['#relDe','#relAte'].forEach(s=>$(s).addEventListener('change',()=>{modoRel([$('#relDe').value,$('#relAte').value]);renderRelatorio()}));
@@ -820,7 +831,8 @@
   };
 
   function renderLista(){
-    const [de,ate]=periodo(),ws=[...new Set(resultados.map(r=>r.data))].filter(d=>!(de&&d<de)&&!(ate&&d>ate)).sort().reverse();
+    // Entra a semana que tem algum dia no período (ex.: 28/09 a 04/10 aparece em setembro e em outubro).
+    const [de,ate]=periodo(),ws=[...new Set(resultados.filter(r=>!(de&&r.ate<de)&&!(ate&&r.data>ate)).map(r=>r.data))].sort().reverse();
     $('#listCount').textContent=plural(ws.length,'semana','semanas')+(de||ate?' no período':'');
     if(!ws.length){$('#lista').innerHTML='<tbody><tr><td class="empty">Nenhuma semana lançada neste período. Clique em "+ Lançar semana".</td></tr></tbody>';return}
     $('#lista').innerHTML=`<thead><tr><th>Semana</th><th class="num">Corretores</th><th class="num">Leads corretor</th><th class="num">Visitas</th><th class="num">Propostas</th><th></th></tr></thead><tbody>${ws.map(w=>{
@@ -839,7 +851,7 @@
 
   // ---------- Exportar ----------
   $('#exportCsv').onclick=()=>{
-    const [de,ate]=periodo(),ws=semanasComDados().filter(w=>!(de&&w<de)&&!(ate&&w>ate)),esc=v=>`"${String(v??'').replace(/"/g,'""')}"`,num=v=>String(v).replace('.',',');
+    const [de,ate]=periodo(),ws=semanasComDados().filter(w=>!(de&&semanaDe(w)[1]<de)&&!(ate&&w>ate)),esc=v=>`"${String(v??'').replace(/"/g,'""')}"`,num=v=>String(v).replace('.',',');
     const linhas=ws.flatMap(w=>{const [a,b]=semanaDe(w);return linhasSemana(a,b).map(l=>[`${br(a)} a ${br(b)}`,l.unidade,l.corretora,...COLS.map(([k])=>num(l[k]))])});
     const csv=['Semana;Unidade;Corretor;'+COLS.map(([,n])=>n).join(';'),...linhas.map(r=>r.map(esc).join(';'))].join('\r\n');
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`relatorio-semanal-${iso(new Date())}.csv`;a.click();URL.revokeObjectURL(a.href);
@@ -867,44 +879,65 @@
   function preencher(linhas){$('#semLinhas').innerHTML=(linhas.length?linhas:[{}]).map(linhaHtml).join('');somarSemana()}
   const temDigitado=()=>[...document.querySelectorAll('#semLinhas input')].some(i=>i.value!=='');
   // Semana já lançada: abre para editar. Semana nova: traz os corretores que tiveram leads nela (ou os da última semana lançada).
-  function carregarSemana(data,inicial){
-    const [a,b]=semanaDe(data),rs=resultados.filter(r=>r.data===a).sort((x,y)=>x.ordem-y.ordem),nota=$('#semNota');
+  // De e Até: ao escolher o De, o Até vem com o fim da semana (cortada no mês) ou do período já lançado; dá para trocar (até 7 dias).
+  const deAte=(a,b)=>`${br(a).slice(0,5)} a ${br(b)}`;
+  let semOriginalAte=null;
+  function extrasSemana(){
+    const a=$('#sData').value,b=$('#sAte').value,btn=$('#sInteira');
+    const [seg,dom]=a?semanaInteira(a):['',''];
+    btn.hidden=!a||!b||(a===seg&&b===dom)||a<seg||b>dom;
+    btn.textContent=`Usar a semana inteira: ${deAte(seg,dom)}`;btn.dataset.de=seg;btn.dataset.ate=dom;
+    if(semOriginal&&a&&b){const nota=$('#semNota');nota.hidden=false;
+      nota.textContent=a===semOriginal&&b===semOriginalAte?`Você está editando a semana de ${deAte(a,b)}.`
+        :`Ao salvar, os resultados lançados de ${deAte(semOriginal,semOriginalAte)} passam para ${deAte(a,b)}.`}
+  }
+  function carregarSemana(data,inicial,ate){
+    const [a,b0]=semanaDe(data),b=ate||b0,rs=resultados.filter(r=>r.data===a).sort((x,y)=>x.ordem-y.ordem),nota=$('#semNota');
     const avisar=t=>{nota.textContent=t;nota.hidden=false};
-    $('#sSemana').textContent=`Semana de ${br(a).slice(0,5)} a ${br(b)}`;
-    if(!inicial&&a===semCampo)return;
-    if(!inicial&&a===semOriginal){avisar(`Você está editando a semana de ${br(a).slice(0,5)} a ${br(b)}.`)}
+    // Dentro de um período já lançado, o De vai para o início dele; fora disso, fica a data escolhida.
+    const de=rs.length?a:data;
+    $('#sData').value=de;$('#sAte').value=b;$('#sSemana').textContent='';
+    if(!inicial&&de===semCampo){extrasSemana();return}
+    if(!inicial&&a===semOriginal){}
     else if(rs.length){
-      if(!inicial&&temDigitado()&&!confirm(`A semana de ${br(a).slice(0,5)} a ${br(b)} já foi lançada. Abrir para editar? O que você digitou aqui será descartado.`)){$('#sData').value=semCampo;$('#sSemana').textContent=`Semana de ${br(semCampo).slice(0,5)} a ${br(semanaDe(semCampo)[1])}`;return}
-      semOriginal=a;preencher(rs);$('#semTitle').textContent='Editar semana';avisar(`Você está editando a semana de ${br(a).slice(0,5)} a ${br(b)}.`);
+      if(!inicial&&temDigitado()&&!confirm(`A semana de ${deAte(a,b)} já foi lançada. Abrir para editar? O que você digitou aqui será descartado.`)){$('#sData').value=semCampo;$('#sAte').value=semAteCampo;extrasSemana();return}
+      semOriginal=a;semOriginalAte=rs[0].ate;preencher(rs);$('#semTitle').textContent='Editar semana';
     }
-    else if(semOriginal)avisar(`Ao salvar, os resultados de ${br(semOriginal).slice(0,5)} passam para a semana de ${br(a).slice(0,5)} a ${br(b)}.`);
+    else if(semOriginal){}
     else{
       nota.hidden=true;
       if(inicial){
-        const doAtend=[];leads.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{if(!doAtend.some(x=>x.corretora===l.corretora))doAtend.push({unidade:l.unidade,corretora:l.corretora})});
-        const ult=[...new Set(resultados.map(r=>r.data))].filter(d=>d<a).pop();
+        const doAtend=[];leads.filter(l=>l.data>=de&&l.data<=b).forEach(l=>{if(!doAtend.some(x=>x.corretora===l.corretora))doAtend.push({unidade:l.unidade,corretora:l.corretora})});
+        const ult=[...new Set(resultados.map(r=>r.data))].filter(d=>d<de).pop();
         const base=doAtend.length?doAtend:resultados.filter(r=>r.data===ult).sort((x,y)=>x.ordem-y.ordem).map(r=>({unidade:r.unidade,corretora:r.corretora}));
         preencher(base.filter(l=>corretoras.find(c=>c.nome===l.corretora)?.ativa!==false));
         if(doAtend.length)avisar('Os corretores abaixo são os que receberam leads nesta semana, segundo o atendimento.');
       }
     }
-    semCampo=a;
+    semCampo=de;semAteCampo=b;extrasSemana();
   }
+  let semAteCampo=null;
   function openSemana(data){
-    semOriginal=null;semCampo=null;$('#semMsg').hidden=true;$('#semTitle').textContent='Lançar semana';
-    $('#sData').value=data||iso(new Date());carregarSemana($('#sData').value,true);
+    semOriginal=null;semOriginalAte=null;semCampo=null;semAteCampo=null;$('#semMsg').hidden=true;$('#semTitle').textContent='Lançar semana';
+    carregarSemana(data||iso(new Date()),true);
     semDialog.showModal();
     const vazio=[...semDialog.querySelectorAll('#semLinhas input')].find(i=>i.value==='');(vazio||$('#sData')).focus();
   }
   $('#newSemana').onclick=()=>openSemana(null);
   $('#sData').addEventListener('change',e=>{if(e.target.value)carregarSemana(e.target.value)});
+  $('#sAte').addEventListener('change',()=>{semAteCampo=$('#sAte').value;extrasSemana()});
+  $('#sInteira').onclick=e=>{const {de,ate}=e.target.dataset;carregarSemana(de,false,ate);$('#sAte').value=ate;semAteCampo=ate;extrasSemana()};
   $('#semLinhas').addEventListener('input',somarSemana);
   $('#semLinhas').addEventListener('click',e=>{if(e.target.classList.contains('rm')){e.target.closest('tr').remove();if(!$('#semLinhas').children.length)preencher([]);somarSemana()}});
   $('#addLinha').onclick=()=>{$('#semLinhas').insertAdjacentHTML('beforeend',linhaHtml());$('#semLinhas').lastElementChild.querySelector('.c').focus()};
   $('#semForm').onsubmit=async e=>{
     e.preventDefault();const msg=$('#semMsg'),erro=t=>{msg.textContent=t;msg.hidden=false};msg.hidden=true;
-    const data=$('#sData').value;if(!data)return erro('Informe um dia da semana.');
-    const [a,b]=semanaDe(data),linhas=[],vistos=new Set();
+    const a=$('#sData').value,b=$('#sAte').value,linhas=[],vistos=new Set();
+    if(!a||!b)return erro('Informe as datas De e Até.');
+    if(b<a)return erro('A data Até precisa ser depois da data De.');
+    if((dia(b)-dia(a))/864e5>6)return erro('O período pode ter no máximo 7 dias (uma semana).');
+    const outra=resultados.find(r=>r.data!==semOriginal&&r.data<=b&&r.ate>=a);
+    if(outra)return erro(`Já existe um lançamento de ${deAte(outra.data,outra.ate)} nessas datas. Escolha outras datas ou edite esse lançamento.`);
     for(const tr of document.querySelectorAll('#semLinhas tr')){
       const corretora=tr.querySelector('.c').value,unidade=tr.querySelector('.u').value,ins=[...tr.querySelectorAll('input')];
       if(!corretora&&ins.every(i=>i.value===''))continue;
@@ -951,8 +984,9 @@
   const txt=s=>safe(s).replace(/\n/g,'<br>');
   const brl2=v=>Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const iniciais=n=>String(n||'?').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
-  const periodoTxt=(a,b)=>`${a.slice(8)} a ${b.slice(8)} de ${MESES[+b.slice(5,7)-1].toLowerCase()} de ${b.slice(0,4)}`;
-  function numSemana(a){let n=1,d=a.slice(0,8)+'01';while(semanaDe(d)[0]<a){d=proxDia(semanaDe(d)[1]);n++}return n}
+  const periodoTxt=(a,b)=>`${a.slice(8)}${mesmoMes(a,b)?'':' de '+MESES[+a.slice(5,7)-1].toLowerCase()} a ${b.slice(8)} de ${MESES[+b.slice(5,7)-1].toLowerCase()} de ${b.slice(0,4)}`;
+  // Semana lançada que começa no mês anterior (ex.: 28/09 a 04/10) conta como semana desse mês anterior.
+  function numSemana(a){const ini=a.slice(0,8)+'01';let n=0,d=ini;while(d<=a){const [x,y]=semanaDe(d);if(x>=ini)n++;if(x>=a)break;d=proxDia(y)}return Math.max(n,1)}
   // Fechamentos e VGL de cada corretor na semana (a semana começa em "a"), da planilha da Locação.
   function numerosSemana(a){const b=semanaDe(a)[1],by={};locacoes.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{const o=by[l.corretora]??={fech:0,vgl:0};o.fech++;o.vgl+=l.vgl});return by}
   // Pessoa do slide: "e:<id>" = alguém da galeria; "c:<NOME>" = nome dos lançamentos (usa a galeria se estiver ligado a alguém).
@@ -1079,7 +1113,7 @@
     const C=[['leads','LEADS'],['lc','LEADS CORRETOR'],['vis','VISITAS'],['prop','PROPOSTAS'],['fech','FECHAMENTOS'],['vgl','VGL']];
     const val=(k,x)=>k==='vgl'?brl2(x):fmtN(x),cels=o=>C.map(([k],j)=>`<td${j===0?' class="lead"':''}>${val(k,o[k])}</td>`).join('');
     const cols='<colgroup><col style="width:18%"><col style="width:9%"><col style="width:17%"><col style="width:10%"><col style="width:13%"><col style="width:15%"><col style="width:18%"></colgroup>';
-    const per=`<tr class="per"><td colspan="7">SEMANA DO DIA ${a.slice(8)} A ${b.slice(8)} DE ${MESES[+b.slice(5,7)-1]} DE ${b.slice(0,4)}</td></tr>`;
+    const per=`<tr class="per"><td colspan="7">${tituloSemana(a,b)}</td></tr>`;
     const head=`<tr><th>CORRETOR</th>${C.map(c=>`<th>${c[1]}</th>`).join('')}</tr>`;
     const bloco=u=>{const r=ls.filter(l=>l.unidade===u);
       return `<table>${cols}<tr class="tt"><td colspan="7">RESUMO SEMANAL ${safe(u)}</td></tr>${per}${head}${r.map(l=>`<tr><td>${safe(l.corretora)}</td>${cels(l)}</tr>`).join('')}<tr class="sub"><td>SUBTOTAL:</td>${cels(r.reduce(somar,zero()))}</tr></table>`};
@@ -1117,6 +1151,8 @@
   const escalar=(html,w,h)=>{const k=h?Math.min(w/1440,h/810):w/1440;return {k,html:`<div style="width:1440px;height:810px;transform:scale(${k});transform-origin:0 0">${html}</div>`}};
   function renderThumbs(){
     if(!ap)return;const box=$('#apThumbs'),w=Math.max(220,box.clientWidth||400),ss=slides();
+    // O período pode mudar depois de um lançamento (ex.: semana passa a ser 28/09 a 04/10).
+    {const [a,b]=semanaDe(apSemana);$('#apSemanaTxt').textContent=`Semana ${pad(numSemana(a))} · ${periodoTxt(a,b)}`}
     $('#apConta').textContent=`(${ss.length})`;
     box.innerHTML=ss.map(([n,h],i)=>{const e=escalar(h,w);return `<div class="thumb" data-i="${i}" role="button" tabindex="0" aria-label="Apresentar a partir do slide ${i+1}"><small>${i+1}. ${safe(n)}</small><div class="thumb-in" style="height:${Math.round(810*e.k)}px">${e.html}</div></div>`}).join('')||'<p class="msg">Nenhum slide incluído.</p>';
   }
