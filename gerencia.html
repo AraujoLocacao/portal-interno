@@ -1220,19 +1220,19 @@
 
   // ---------- Captação (relatório e quadros das captadoras) ----------
   // As regras e a visão total vêm de captacao-relatorio.js (as mesmas da página da Captação). Carrega ao abrir a área.
-  let capQuadros=null,capRel=[],capAno=null;
+  let capQuadros=null,capRel=[],capAno=null,capPeriodos=[];
   async function abrirCaptacao(tab){
     if(!$('#crMes').value)$('#crMes').value=ymHoje();
     try{
       if(!capQuadros){const {data,error}=await db.from('captacao_quadros').select('id,nome,email,modelo,ativo,posicao').order('posicao');if(error)throw error;capQuadros=data}
       // De outubro/2026 em diante, parte dos números vem dos quadros (CapRel.efetivas). Recarrega sempre que abre a aba.
       if(tab==='cap-relatorio'){const ano=$('#crMes').value.slice(0,4);$('#crBody').innerHTML='<p class="msg">Carregando…</p>';
-        const [r,d]=await Promise.all([CapRel.carregarAno(db,ano),CapRel.ehAuto(`${ano}-12`)?CapRel.carregarQuadros(db):null]);capRel=CapRel.efetivas(r,d,ano);capAno=ano;renderCapRel()}
+        const [r,d,per]=await Promise.all([CapRel.carregarAno(db,ano),CapRel.ehAuto(`${ano}-12`)?CapRel.carregarQuadros(db):null,CapRel.carregarPeriodos(db)]);capRel=CapRel.efetivas(r,d,ano);capPeriodos=per;capAno=ano;renderCapRel()}
       else await renderCapQuadros();
     }catch(err){$(tab==='cap-relatorio'?'#crBody':'#cqBody').innerHTML=`<p class="msg error">Não foi possível carregar: ${safe(err.message)}</p>`}
   }
   const capCaps=()=>capQuadros.filter(q=>!q.modelo&&(q.ativo||capRel.some(r=>r.quadro_id===q.id)));
-  function renderCapRel(){$('#crBody').innerHTML=CapRel.htmlTotal({rel:capRel,caps:capCaps(),ym:$('#crMes').value,cidade:$('#crCidade').value})}
+  function renderCapRel(){$('#crBody').innerHTML=CapRel.htmlTotal({rel:capRel,caps:capCaps(),ym:$('#crMes').value,cidade:$('#crCidade').value,periodos:capPeriodos})}
   $('#crMes').addEventListener('change',()=>{if(!$('#crMes').value)$('#crMes').value=ymHoje();if($('#crMes').value.slice(0,4)===capAno)renderCapRel();else abrirCaptacao('cap-relatorio')});
   $('#crCidade').addEventListener('change',renderCapRel);
   // O nome da captadora no resumo abre o relatório dela na página da Captação.

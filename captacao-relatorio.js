@@ -39,9 +39,12 @@
 
   // Visão total (gerência): números do mês, por captadora, por semana, acumulado do ano e o detalhe com os erros.
   // rel = linhas do ano todo; caps = captadoras [{id,nome}]; cidade = '' para as duas.
-  function htmlTotal({rel,caps,ym,cidade}){
-    const nomeQ=id=>caps.find(q=>q.id===id)?.nome||'?',filtroC=r=>!cidade||r.cidade===cidade;
+  function htmlTotal({rel,caps:todas,ym,cidade,periodos=[]}){
+    const nomeQ=id=>todas.find(q=>q.id===id)?.nome||'?',filtroC=r=>!cidade||r.cidade===cidade;
     const doMes=rel.filter(r=>r.inicio.startsWith(ym)),mes=doMes.filter(filtroC),sems=semanasDoMes(ym),ano=rel.filter(filtroC);
+    // Corretoras que saíram (quadro inativo) só aparecem onde têm números: no mês, ou no ano para o acumulado.
+    const caps=todas.filter(q=>q.ativo!==false||mes.some(r=>r.quadro_id===q.id));
+    const capsAno=todas.filter(q=>q.ativo!==false||ano.some(r=>r.quadro_id===q.id));
     const cel=v=>`<td class="n${v?'':' z'}">${v}</td>`;
     const kpis=`<div class="kpis">${CAMPOS.map(([f,n])=>`<div class="kpi"><small>${n}</small><strong>${soma(mes,f)}</strong></div>`).join('')}<div class="kpi" style="border-color:#bcd9cc"><small>Total captado</small><strong>${soma(mes,'total')}</strong></div></div>`;
     const porCap=`<div><h2 class="cr-h">Resumo do mês por captadora</h2><div class="tbl-wrap"><table><thead><tr><th>Captadora</th>${CAMPOS.map(([,n])=>`<th>${n}</th>`).join('')}<th>Total captado</th></tr></thead><tbody>
@@ -51,15 +54,24 @@
       ${sems.map(s=>{const l=mes.filter(r=>r.inicio===s.inicio);return `<tr><td>${s.nome}</td>${caps.map(q=>cel(soma(l.filter(r=>r.quadro_id===q.id),'total'))).join('')}<td class="n"><strong>${soma(l,'total')}</strong></td>${cel(soma(l,'prospeccao'))}</tr>`}).join('')}</tbody></table></div></div>`;
     const mesesCom=[...new Set(ano.map(r=>+r.inicio.slice(5,7)))].sort((x,y)=>x-y);
     const acum=`<div><h2 class="cr-h">Acumulado de ${ym.slice(0,4)} <small>(total captado por mês)</small></h2><div class="tbl-wrap"><table><thead><tr><th>Captadora</th>${mesesCom.map(k=>`<th>${MESES[k-1]}</th>`).join('')}<th>Novas</th><th>Pós</th><th>Total</th></tr></thead><tbody>
-      ${caps.map(q=>{const l=ano.filter(r=>r.quadro_id===q.id);return `<tr><td>${safe(q.nome)}</td>${mesesCom.map(k=>cel(soma(l.filter(r=>+r.inicio.slice(5,7)===k),'total'))).join('')}${cel(soma(l,'novas_captacoes'))}${cel(soma(l,'pos_captados'))}<td class="n"><strong>${soma(l,'total')}</strong></td></tr>`}).join('')}</tbody>
+      ${capsAno.map(q=>{const l=ano.filter(r=>r.quadro_id===q.id);return `<tr><td>${safe(q.nome)}${q.ativo===false?' <small class="muted">(saiu)</small>':''}</td>${mesesCom.map(k=>cel(soma(l.filter(r=>+r.inicio.slice(5,7)===k),'total'))).join('')}${cel(soma(l,'novas_captacoes'))}${cel(soma(l,'pos_captados'))}<td class="n"><strong>${soma(l,'total')}</strong></td></tr>`}).join('')}</tbody>
       <tfoot><tr><td>Total</td>${mesesCom.map(k=>cel(soma(ano.filter(r=>+r.inicio.slice(5,7)===k),'total'))).join('')}${cel(soma(ano,'novas_captacoes'))}${cel(soma(ano,'pos_captados'))}${cel(soma(ano,'total'))}</tr></tfoot></table></div></div>`;
     const erros=mes.filter(r=>problemas(r,doMes).length).length;
     const detalhe=`<div><h2 class="cr-h">Detalhe das semanas ${erros?`<small style="color:var(--red)">· ${erros} linha${erros===1?'':'s'} com erro em vermelho</small>`:''}</h2><div class="tbl-wrap"><table><thead><tr><th>Semana</th><th>Captadora</th><th>Cidade</th>${CAMPOS.map(([,n])=>`<th>${n}</th>`).join('')}<th>Total</th><th>Referências</th></tr></thead><tbody>
       ${sems.flatMap(s=>mes.filter(r=>r.inicio===s.inicio).sort((x,y)=>nomeQ(x.quadro_id).localeCompare(nomeQ(y.quadro_id))||x.cidade.localeCompare(y.cidade)).map(r=>{const p=problemas(r,doMes);
         const aj=f=>r._ajustado?.includes(f)?` class="n aj" title="Ajustado à mão (o quadro dizia ${safe(r._auto?.[f]??0)})"`:' class="n"';
         return `<tr class="${p.length?'erro':''}"><td>${s.nome}</td><td>${safe(nomeQ(r.quadro_id))}</td><td>${r.cidade}</td>${CAMPOS.map(([f])=>`<td${aj(f)}>${r[f]||0}</td>`).join('')}<td class="n"><strong>${totCap(r)}</strong></td><td style="white-space:normal;min-width:220px">${safe(r.referencias||'')}${r._ajustado?.length?' <small class="muted">(ajustado)</small>':''}${p.length?`<div class="prob">${safe(p.join(' · '))}</div>`:''}</td></tr>`})).join('')||`<tr><td colspan="${CAMPOS.length+5}" class="muted">Nada lançado neste mês.</td></tr>`}</tbody></table></div></div>`;
-    return kpis+porCap+porSem+acum+detalhe;
+    // Resumos prontos da planilha (ex.: 1º semestre, que inclui meses que não existem semana a semana), do ano escolhido.
+    const anoTxt=ym.slice(0,4),pers=[...new Set(periodos.filter(p=>p.periodo.includes(anoTxt)).map(p=>p.periodo))];
+    const resumos=pers.map(per=>{const l=periodos.filter(p=>p.periodo===per).sort((a,b)=>a.posicao-b.posicao),t=x=>(x.novos||0)+(x.pos||0);
+      const c=v=>v==null?'<td class="n z">–</td>':cel(v);
+      return `<div><h2 class="cr-h">Resumo do ${safe(per)} <small>(como está na planilha; inclui meses que não existem semana a semana)</small></h2><div class="tbl-wrap"><table><thead><tr><th>Captadora</th><th>Novos imóveis</th><th>Imóveis da pós</th><th>Total</th></tr></thead><tbody>
+        ${l.map(x=>`<tr><td>${safe(x.captadora)}</td>${c(x.novos)}${c(x.pos)}<td class="n"><strong>${t(x)}</strong></td></tr>`).join('')}</tbody>
+        <tfoot><tr><td>Total</td>${cel(l.reduce((s,x)=>s+(x.novos||0),0))}${cel(l.reduce((s,x)=>s+(x.pos||0),0))}${cel(l.reduce((s,x)=>s+t(x),0))}</tr></tfoot></table></div></div>`}).join('');
+    return kpis+porCap+porSem+acum+resumos+detalhe;
   }
+  // Resumos de período (só a gerência e o acesso geral leem; para as captadoras volta vazio).
+  async function carregarPeriodos(db){const {data,error}=await db.from('captacao_resumo_periodo').select('periodo,captadora,novos,pos,posicao');return error?[]:data}
 
   // Busca as linhas de um ano inteiro (paginado).
   async function carregarAno(db,ano){
@@ -164,5 +176,5 @@
     .cr .cr-h{margin:0 0 8px}.cr h2 small{font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:.8rem;color:var(--muted);font-weight:600}`;
   const st=document.createElement('style');st.textContent=CSS;document.head.append(st);
 
-  window.CapRel={CIDADES,CAMPOS,COLUNAS,AUTO,AUTO_DESDE,ehAuto,semanasDoMes,refsDe,problemas,totCap,soma,htmlTotal,carregarAno,carregarQuadros,autoDoMes,efetivas};
+  window.CapRel={CIDADES,CAMPOS,COLUNAS,AUTO,AUTO_DESDE,ehAuto,semanasDoMes,refsDe,problemas,totCap,soma,htmlTotal,carregarAno,carregarPeriodos,carregarQuadros,autoDoMes,efetivas};
 })();

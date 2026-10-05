@@ -728,7 +728,7 @@
   // As regras (semanas, totais, erros em vermelho) e a visão total ficam em captacao-relatorio.js, usado também no Meu painel.
   // De outubro/2026 em diante, novas, pós, em andamento e referências vêm do quadro (CapRel.efetivas); o que for digitado vale no lugar.
   const {CIDADES,CAMPOS,COLUNAS:REL,AUTO,ehAuto,semanasDoMes,problemas,totCap,soma}=CapRel;
-  let rel=[],relAno=null,dadosQuadro=null,relEf=[];
+  let rel=[],relAno=null,dadosQuadro=null,relEf=[],periodos=[];
   const recalcular=()=>{relEf=CapRel.efetivas(rel,dadosQuadro,relAno)};
   const hojeYm=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}`};
   const nomeQ=id=>quadros.find(q=>q.id===id)?.nome||'?';
@@ -745,7 +745,7 @@
     const ano=$('#rMes').value.slice(0,4);
     if(forcar||relAno!==ano){
       $('#rConteudo').innerHTML='<p class="msg">Carregando…</p>';
-      try{[rel,dadosQuadro]=await Promise.all([CapRel.carregarAno(db,ano),ehAuto(`${ano}-12`)?CapRel.carregarQuadros(db):null]);relAno=ano}
+      try{[rel,dadosQuadro,periodos]=await Promise.all([CapRel.carregarAno(db,ano),ehAuto(`${ano}-12`)?CapRel.carregarQuadros(db):null,gestor?CapRel.carregarPeriodos(db):[]]);relAno=ano}
       catch(err){$('#rConteudo').innerHTML=`<p class="msg error">Não foi possível carregar o relatório: ${safe(err.message)}</p>`;return}
     }
     recalcular();renderRel();
@@ -814,7 +814,7 @@
   });
 
   // Visão total da gerência: números do mês, por captadora, por semana, acumulado do ano e o detalhe com os erros.
-  function renderTotal(ym){$('#rConteudo').innerHTML=CapRel.htmlTotal({rel:relEf,caps:capVisiveis(),ym,cidade:$('#rCidade').value})}
+  function renderTotal(ym){$('#rConteudo').innerHTML=CapRel.htmlTotal({rel:relEf,caps:capVisiveis(),ym,cidade:$('#rCidade').value,periodos})}
   $('#rConteudo').addEventListener('click',e=>{const b=e.target.closest('[data-rq]');if(b){$('#rQuem').value=b.dataset.rq;renderRel()}});
 
   // ---------- Acessos ----------

@@ -355,6 +355,26 @@ create policy "captacao_relatorio: acesso" on public.captacao_relatorio
 revoke all on public.captacao_relatorio from anon;
 grant select, insert, update, delete on public.captacao_relatorio to authenticated;
 
+-- ---------- Resumo de período (ex.: "Resumo do Semestre 01/2026" da planilha) ----------
+-- Totais prontos que não existem semana a semana (o 1º semestre inclui janeiro a março, que a planilha não tem por semana).
+-- Só a gerência e o acesso geral veem: são os números de todas as captadoras.
+create table if not exists public.captacao_resumo_periodo (
+  id uuid primary key default gen_random_uuid(),
+  periodo text not null check (char_length(periodo) between 1 and 60),
+  captadora text not null check (char_length(captadora) between 1 and 80),
+  novos integer check (novos between 0 and 99999),
+  pos integer check (pos between 0 and 99999),
+  posicao integer not null default 0,
+  unique (periodo, captadora)
+);
+
+alter table public.captacao_resumo_periodo enable row level security;
+drop policy if exists "captacao_resumo_periodo: gerência" on public.captacao_resumo_periodo;
+create policy "captacao_resumo_periodo: gerência" on public.captacao_resumo_periodo
+  for select to authenticated using (public.is_gestor() or public.tem_acesso_geral());
+revoke all on public.captacao_resumo_periodo from anon;
+grant select on public.captacao_resumo_periodo to authenticated;
+
 -- ---------- Captações guardadas (o relatório não perde nada quando o cartão sai do quadro) ----------
 -- Decisão da gerência em 29/09/2026: os quadros podem ser esvaziados (cartões arquivados, excluídos ou levados adiante)
 -- sem mudar o relatório. Por isso, quando um cartão chega na coluna de captado, a captação é gravada aqui e fica.
