@@ -105,6 +105,20 @@
     /* ---------- Aba Apresentação ---------- */
     .ap-semana{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px}
     .ap-semana strong{font-size:1.05rem;color:var(--navy)}.ap-status{font-size:.82rem;color:var(--muted)}.ap-status.dirty{color:#9a5b00;font-weight:700}
+    .ap-ia{padding:14px 18px;display:grid;gap:10px;margin-bottom:16px;border:1px solid #b9cde6;background:#f6f9fd}
+    .ap-ia textarea{width:100%;border:1px solid #cbd5da;border-radius:9px;padding:9px 11px;background:#fff;font:inherit;font-size:.92rem;resize:vertical}
+    .ap-ia textarea:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .ia-acoes{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .ap-ia .msg.erro{color:var(--red)}
+    /* Slide livre: texto à esquerda e, se houver, imagem à direita */
+    .s-livre{position:absolute;left:72px;right:72px;top:240px;bottom:70px;display:flex;flex-direction:column;gap:22px}
+    .s-livre.com-img{right:700px}
+    .s-livre-img{position:absolute;right:72px;top:220px;width:580px;bottom:70px;border-radius:24px;overflow:hidden;background:#eef2f7}
+    .s-livre-img img{width:100%;height:100%;object-fit:cover;display:block}
+    .s-livre-sub{font-size:26px;color:#475569;margin:0;line-height:1.3}
+    .s-livre-itens{display:grid;gap:18px}
+    .s-livre-item{background:#f8fafc;border:1px solid #e2e8f0;border-left:6px solid #7FA3D0;border-radius:16px;padding:20px 24px;font-size:24px;font-weight:700;color:#1e293b;line-height:1.3}
+    .s-livre-msg{margin-top:auto;font-style:italic;font-size:30px;color:#334155;text-align:center;line-height:1.3}
     .ap-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,440px);gap:18px;align-items:start;margin-bottom:24px}
     .ap-form{display:grid;gap:12px}
     .ap-sec{padding:14px 16px;display:grid;gap:10px}
@@ -330,6 +344,14 @@
       <div class="rel-nav"><span class="ap-status" id="apStatus"></span><button class="secondary" id="apSugerir">Refazer sugestões</button></div>
     </div>
     <p class="msg" style="margin:10px 0 16px">Sugestões automáticas da semana: <strong>destaque</strong> = quem teve o maior VGL; <strong>primeira locação</strong> = quem fechou pela primeira vez. Você pode trocar tudo.</p>
+
+    <div class="card ap-ia">
+      <label for="iaPedido"><strong>Pedir para a IA</strong> <span class="muted">· escreva o que você quer na apresentação e ela cria os slides</span></label>
+      <textarea id="iaPedido" rows="4" placeholder="Ex.: Destaque da semana em locações é a Fran e a Thayná. Destaque de leads próprios é a Ana e a Maria. A Maria também se destacou pelos comentários positivos no Google e ganhou um mimo."></textarea>
+      <div class="ia-acoes"><label class="inc"><input type="checkbox" id="iaTrocar" checked> Trocar os destaques que já estão na apresentação</label>
+        <button class="primary" id="iaCriar">Criar slides</button></div>
+      <p class="msg" id="iaMsg" hidden></p>
+    </div>
 
     <div class="ap-grid">
       <div class="ap-form" id="apForm"></div>
@@ -979,7 +1001,9 @@
       {t:'Atendimento Ágil',d:'Lead novo precisa de velocidade. Quanto mais rápido o primeiro contato e os retornos, menor a chance de perdermos o cliente no caminho.'},
       {t:'+ Visitas + Chance de conversão',d:'Nosso objetivo é tirar o cliente do WhatsApp e levá-lo para o imóvel. Vamos trabalhar cada atendimento buscando gerar visita.'},
       {t:'Propostas',d:'Visitou e gostou? Vamos estimular a proposta. Não esperar o cliente pedir: conduzir o atendimento para a negociação.'}]},
-    fim:{on:true,titulo:'Excelente trabalho a toda a equipe!',msg:'Vamos com tudo para bater a próxima meta!'}
+    fim:{on:true,titulo:'Excelente trabalho a toda a equipe!',msg:'Vamos com tudo para bater a próxima meta!'},
+    // Slides livres (criados pela IA ou à mão): etiqueta, título, subtítulo, itens (um por linha) e mensagem.
+    extras:[]
   };
   const copia=o=>JSON.parse(JSON.stringify(o));
   // Texto salvo + padrão (para seções que surgirem depois continuarem funcionando com textos antigos).
@@ -1019,7 +1043,7 @@
   async function iniciarApresentacao(){
     const r=await db.from('apresentacoes').select('semana,conteudo,atualizado_em');
     apresentacoes=r.error?[]:r.data;
-    await loadEquipe();
+    await Promise.all([loadEquipe(),loadImagens()]);
     // Padrão: a semana anterior (a reunião de segunda apresenta a semana que acabou).
     if(!apSemana){const x=new Date();x.setDate(x.getDate()-7);apSemana=semanaDe(iso(x))[0]}
     apPronto=true;carregarAp(apSemana);
@@ -1033,7 +1057,7 @@
     else{
       // Semana nova: repete os textos da última apresentação salva (capa, pauta, foco...) e sugere os destaques.
       const ant=apresentacoes.filter(x=>x.semana<a).sort((x,y)=>x.semana.localeCompare(y.semana)).pop();
-      ap=sugerir(a,ant?mesclar(ant.conteudo):null,ate||semanaDe(a)[1]);ap.ate=ate||null;apSalvoEm=null;apSujo=false;
+      ap=sugerir(a,ant?mesclar(ant.conteudo):null,ate||semanaDe(a)[1]);ap.ate=ate||null;ap.extras=[];apSalvoEm=null;apSujo=false;
     }
     renderApForm();renderThumbs();statusAp();
   }
@@ -1081,12 +1105,21 @@
       <div class="ap-row">${campo(`destaques.${i}.titulo`,'Título do slide',d.titulo)}<label style="display:block"><span class="ap-lbl">Pessoa</span><select data-p="destaques.${i}.pessoa">${opcoesPessoa(d.pessoa)}</select></label></div>
       <div class="ap-row">${campo(`destaques.${i}.selo`,'Selo (opcional)',d.selo,{ph:'Ex.: Top Performance'})}<label class="inc" style="align-self:end;padding-bottom:8px"><input type="checkbox" data-p="destaques.${i}.numeros" ${d.numeros?'checked':''}> Mostrar contratos e VGL da semana</label></div>
       ${campo(`destaques.${i}.msg`,'Mensagem',d.msg,{area:true,rows:3})}</div>`).join('');
+    const optsImg=v=>`<option value="">Sem imagem</option>`+[...new Set([...imagens,...(v?[v]:[])])].map(p=>`<option value="${attr(p)}"${p===v?' selected':''}>${safe(imagens.includes(p)?nomeImg(p):'Imagem removida')}</option>`).join('');
+    const extras=(ap.extras||[]).map((x,i,l)=>`<div class="dest"><div class="dest-head"><span>Slide livre ${i+1}</span><span class="row-actions">
+        <button type="button" class="link" data-acao="xsobe" data-i="${i}" ${i?'':'disabled'} aria-label="Subir">↑</button><button type="button" class="link" data-acao="xdesce" data-i="${i}" ${i<l.length-1?'':'disabled'} aria-label="Descer">↓</button><button type="button" class="link danger" data-acao="delExtra" data-i="${i}">Remover</button></span></div>
+      <div class="ap-row">${campo(`extras.${i}.etiqueta`,'Etiqueta (texto pequeno)',x.etiqueta)}${campo(`extras.${i}.titulo`,'Título',x.titulo)}</div>
+      ${campo(`extras.${i}.subtitulo`,'Subtítulo (opcional)',x.subtitulo)}
+      ${campo(`extras.${i}.itens`,'Itens (um por linha, até 4)',x.itens,{area:true,rows:3})}
+      ${campo(`extras.${i}.msg`,'Mensagem (opcional)',x.msg,{area:true,rows:2})}
+      <label style="display:block"><span class="ap-lbl">Imagem</span><select data-p="extras.${i}.imagem">${optsImg(x.imagem)}</select></label></div>`).join('');
     $('#apForm').innerHTML=
       secao('Capa','','capa.on',ap.capa.on,campo('capa.titulo','Título',ap.capa.titulo,{area:true})+campo('capa.sub','Subtítulo',ap.capa.sub,{area:true})+campo('capa.rodape','Rodapé',ap.capa.rodape))+
       secao('Pauta','','pauta.on',ap.pauta.on,ap.pauta.itens.map((it,i)=>`<div class="ap-row">${campo(`pauta.itens.${i}.t`,'Item '+(i+1),it.t)}${campo(`pauta.itens.${i}.d`,'Descrição',it.d)}</div>`).join(''))+
       secao('Resultados da semana','automático','resultados.on',ap.resultados.on,`<p class="auto">Tabela da semana igual à do Relatório semanal (Itajaí, Navegantes e resumo geral), com as mesmas colunas e cores.${lancada?'':' <strong style="color:#9a5b00">Esta semana ainda não tem visitas e propostas lançadas (aba Relatório semanal).</strong>'}</p>`)+
       secao('Funil da semana','opcional, automático','funil.on',ap.funil.on,'<p class="auto">Leads, análises, aprovadas, visitas, propostas e fechamentos da semana, com as porcentagens e o VGL.</p>')+
       `<div class="card ap-sec"><div class="ap-sec-head"><h3>Destaques<small>um slide para cada</small></h3><button type="button" class="link" data-acao="addDest">+ Adicionar destaque</button></div>${dest||'<p class="auto">Nenhum destaque nesta semana. Clique em "+ Adicionar destaque".</p>'}</div>`+
+      `<div class="card ap-sec"><div class="ap-sec-head"><h3>Slides livres<small>criados pela IA ou por você</small></h3><button type="button" class="link" data-acao="addExtra">+ Adicionar slide</button></div>${extras||'<p class="auto">Nenhum slide livre. Use "Pedir para a IA" ou clique em "+ Adicionar slide".</p>'}</div>`+
       secao('Mensagem para a equipe','','time.on',ap.time.on,campo('time.titulo','Título',ap.time.titulo)+campo('time.frase','Frase',ap.time.frase,{area:true,rows:3}))+
       secao('Foco para a próxima semana','','foco.on',ap.foco.on,campo('foco.titulo','Título',ap.foco.titulo,{area:true})+ap.foco.cards.map((c,i)=>`<div class="ap-row">${campo(`foco.cards.${i}.t`,'Card '+(i+1),c.t)}${campo(`foco.cards.${i}.d`,'Texto',c.d,{area:true,rows:3})}</div>`).join(''))+
       secao('Encerramento','','fim.on',ap.fim.on,campo('fim.titulo','Título',ap.fim.titulo)+campo('fim.msg','Mensagem',ap.fim.msg,{area:true}));
@@ -1100,12 +1133,48 @@
     if(acao==='delDest'){if(!confirm('Remover este destaque?'))return;d.splice(n,1)}
     if(acao==='sobe')[d[n-1],d[n]]=[d[n],d[n-1]];
     if(acao==='desce')[d[n+1],d[n]]=[d[n],d[n+1]];
+    const x=ap.extras??=[];
+    if(acao==='addExtra')x.push({etiqueta:'REUNIÃO SEMANAL',titulo:'',subtitulo:'',itens:'',msg:'',imagem:''});
+    if(acao==='delExtra'){if(!confirm('Remover este slide?'))return;x.splice(n,1)}
+    if(acao==='xsobe')[x[n-1],x[n]]=[x[n],x[n-1]];
+    if(acao==='xdesce')[x[n+1],x[n]]=[x[n],x[n+1]];
     marcarSujo();renderApForm();renderThumbs();
   });
   $('#apSugerir').onclick=()=>{
     if(!confirm('Refazer os destaques e o título da mensagem para a equipe a partir dos números da semana? Os outros textos continuam como estão.'))return;
     const s=sugerir(apSemana,ap,apPeriodo()[1]);ap.destaques=s.destaques;ap.time.titulo=s.time.titulo;marcarSujo();renderApForm();renderThumbs();
   };
+  // ---------- Pedir para a IA (função apresentacao-ia no Supabase, que chama o Claude) ----------
+  // Manda o pedido, as pessoas (galeria + nomes dos lançamentos), as imagens e os números do período; recebe os slides prontos.
+  function pessoasIa(){
+    const semFoto=[...new Set([...corretoras.filter(c=>c.ativa).map(c=>c.nome),...resultados.map(r=>r.corretora),...locacoes.map(l=>l.corretora)])].filter(n=>n&&n!==SEM&&!equipe.some(e=>e.corretora===n));
+    return [...equipe.filter(e=>e.ativo).map(e=>({chave:'e:'+e.id,nome:e.nome+(e.corretora?` (${e.corretora})`:''),funcao:e.funcao})),...semFoto.map(n=>({chave:'c:'+n,nome:n,funcao:'Corretora de Imóveis'}))];
+  }
+  const IA_ERROS={
+    sem_chave:'A IA ainda não está ligada: falta colocar a chave da API da Anthropic no Supabase (passo a passo no chat).',
+    chave_invalida:'A chave da API da Anthropic não foi aceita. Confira se ela foi copiada inteira no Supabase.',
+    requisicao:'A IA recusou o pedido. Confira se a conta da API da Anthropic tem crédito.'};
+  $('#iaCriar').onclick=async()=>{
+    const pedido=$('#iaPedido').value.trim(),msg=$('#iaMsg'),aviso=(t,erro)=>{msg.textContent=t;msg.hidden=false;msg.classList.toggle('erro',!!erro)};
+    if(!pedido){aviso('Escreva o que você quer na apresentação.',true);$('#iaPedido').focus();return}
+    const [a,b]=apPeriodo(),btn=$('#iaCriar');
+    const numeros=linhasRelatorio(a,b).map(l=>({corretor:l.corretora,unidade:l.unidade,...Object.fromEntries(COLS.map(([k,n])=>[n,l[k]]))}));
+    btn.disabled=true;btn.textContent='Criando…';aviso('A IA está montando os slides. Leva uns 20 a 40 segundos.');
+    try{
+      const {data,error}=await db.functions.invoke('apresentacao-ia',{body:{pedido,periodo:periodoTxt(a,b),pessoas:pessoasIa(),
+        imagens:imagens.map(p=>({chave:p,descricao:nomeImg(p)})),numeros,destaques_atuais:ap.destaques.map(d=>({titulo:d.titulo,pessoa:pessoa(d.pessoa)?.nome||''}))}});
+      if(error){let e={};try{e=await error.context.json()}catch{}
+        aviso((IA_ERROS[e.erro]||e.erro||'Não foi possível falar com a IA. Tente de novo.')+(e.detalhe?` (${e.detalhe})`:''),true);return}
+      const ss=data.slides||[],ds=ss.filter(s=>s.tipo==='destaque'),xs=ss.filter(s=>s.tipo==='livre');
+      if(ds.length&&$('#iaTrocar').checked)ap.destaques=[];
+      ds.forEach(s=>ap.destaques.push({titulo:s.titulo,selo:s.selo,pessoa:s.pessoa,numeros:!!s.mostrar_numeros,msg:s.mensagem}));
+      xs.forEach(s=>(ap.extras??=[]).push({etiqueta:s.etiqueta,titulo:s.titulo,subtitulo:s.subtitulo,itens:(s.itens||[]).join('\n'),msg:s.mensagem,imagem:s.imagem||''}));
+      marcarSujo();renderApForm();renderThumbs();
+      aviso(`${data.resumo||'Slides criados.'} Confira os slides à direita, ajuste o que quiser e clique em "Salvar textos".`);
+    }catch(err){aviso('Não foi possível falar com a IA: '+err.message,true)}
+    finally{btn.disabled=false;btn.textContent='Criar slides'}
+  };
+
   $('#apSalvar').onclick=async()=>{
     $('#apSalvar').disabled=true;
     const agora=new Date().toISOString(),{data,error}=await db.from('apresentacoes').upsert({semana:apSemana,conteudo:ap,atualizado_em:agora}).select('semana,conteudo,atualizado_em');
@@ -1158,6 +1227,12 @@
         ${d.numeros?`<div class="s-nums"><div class="s-num"><strong>${fmtN(n.fech)}</strong><span>${n.fech===1?'Contrato':'Contratos'}</span></div><div class="s-num vgl"><strong>${brl2(n.vgl)}</strong><span>VGL</span></div></div>`:''}
         ${d.msg?`<div class="s-msg"${d.numeros?'':' style="margin-top:130px"'}>${txt(d.msg)}</div>`:''}</div></div></div>`]);
     });
+    (ap.extras||[]).forEach(x=>{
+      const itens=String(x.itens||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,4),img=x.imagem&&imgUrl[x.imagem];
+      const grade=img?'1fr':`repeat(${Math.min(itens.length,2)||1},1fr)`;
+      out.push([x.titulo||'Slide livre',`<div class="slide">${cab(x.etiqueta||'REUNIÃO SEMANAL',x.titulo||'',{lar:true})}${img?`<div class="s-livre-img"><img src="${attr(img)}" alt=""></div>`:''}
+        <div class="s-livre${img?' com-img':''}">${x.subtitulo?`<p class="s-livre-sub">${txt(x.subtitulo)}</p>`:''}${itens.length?`<div class="s-livre-itens" style="grid-template-columns:${grade}">${itens.map(t=>`<div class="s-livre-item">${txt(t)}</div>`).join('')}</div>`:''}${x.msg?`<div class="s-livre-msg">${txt(x.msg)}</div>`:''}</div></div>`]);
+    });
     if(ap.time.on)out.push(['Mensagem para a equipe',`<div class="slide">${cab('RECONHECIMENTO SEMANAL',ap.time.titulo,{lar:true})}${ap.time.frase?`<div class="s-frase">${txt(ap.time.frase)}</div>`:''}</div>`]);
     if(ap.foco.on){const ic=[['agenda',''],['casa','ve'],['caneta','am']];
       out.push(['Foco da próxima semana',`<div class="slide">${cab('PLANEJAMENTO ESTRATÉGICO',ap.foco.titulo)}<div class="s-cards" style="grid-template-columns:repeat(3,1fr);top:320px">${ap.foco.cards.map((c,i)=>`<div class="s-card">${icone(...ic[i])}<h3>${txt(c.t)}</h3><p>${txt(c.d)}</p></div>`).join('')}</div></div>`])}
@@ -1209,6 +1284,15 @@
   };
 
   // ---------- Galeria da equipe ----------
+  // Imagens para os slides livres: bucket privado "equipe", pasta slides/ (o nome do arquivo ajuda a IA a escolher).
+  let imagens=[],imgUrl={};
+  const nomeImg=p=>p.replace(/^slides\//,'').replace(/\.[a-z]+$/i,'').replace(/[-_]+/g,' ');
+  async function loadImagens(){
+    const {data,error}=await db.storage.from('equipe').list('slides',{limit:500,sortBy:{column:'name',order:'asc'}});
+    if(error)return;
+    imagens=data.filter(f=>f.id&&/\.(jpe?g|png|webp)$/i.test(f.name)).map(f=>'slides/'+f.name);imgUrl={};
+    if(imagens.length){const r=await db.storage.from('equipe').createSignedUrls(imagens,4*3600);if(!r.error)r.data.forEach(x=>{if(x.signedUrl)imgUrl[x.path]=x.signedUrl})}
+  }
   async function loadEquipe(){
     const {data,error}=await db.from('equipe').select('id,nome,funcao,corretora,foto,ativo').order('nome');
     if(error){$('#galeria').innerHTML=`<div class="empty-card" style="border-radius:10px;grid-column:1/-1">Não foi possível carregar a galeria: ${safe(error.message)}</div>`;return}
