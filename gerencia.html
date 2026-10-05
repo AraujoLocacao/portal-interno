@@ -75,6 +75,9 @@
     /* Relatório semanal: mesmo formato da planilha */
     .rel-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.rel-nav input{border:1px solid #cbd5da;border-radius:10px;padding:7px 9px;background:#fff}
     .rel-nav .secondary{padding:7px 11px}
+    .rel-nav select{border:1px solid #cbd5da;border-radius:10px;padding:7px 9px;background:#fff;font:inherit}
+    .rel-semana,.rel-datas{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.rel-semana[hidden],.rel-datas[hidden]{display:none}
+    .rel-datas label{display:flex;gap:6px;align-items:center;font-weight:700;font-size:.9rem}
     .rel-day{background:var(--head);text-align:center;font-weight:800;font-size:.85rem;padding:6px;border-radius:8px 8px 0 0;letter-spacing:.02em}
     .rel-unit{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:12px}
     .rel-unit h3{margin:0;padding:8px 12px;font-size:.95rem;font-weight:800;letter-spacing:.02em}
@@ -296,8 +299,11 @@
     </div>
 
     <div class="card table-card" id="relCard">
-      <div class="chart-head"><div><h2>Resumo da semana</h2><p>Use as setas para trocar a semana.</p></div>
-        <div class="rel-nav"><button class="secondary" id="relPrev" aria-label="Semana anterior">←</button><input type="date" id="relData" aria-label="Um dia da semana"><button class="secondary" id="relNext" aria-label="Próxima semana">→</button><button class="secondary" id="relEdit">Editar semana</button><button class="secondary" id="relCopy">Copiar para WhatsApp</button></div></div>
+      <div class="chart-head"><div><h2 id="relTitulo">Resumo da semana</h2><p id="relDica">Use as setas para trocar a semana ou escolha as datas.</p></div>
+        <div class="rel-nav"><select id="relModo" aria-label="Mostrar"><option value="semana">Uma semana</option><option value="datas">Escolher datas…</option></select>
+          <span class="rel-semana"><button class="secondary" id="relPrev" aria-label="Semana anterior">←</button><input type="date" id="relData" aria-label="Um dia da semana"><button class="secondary" id="relNext" aria-label="Próxima semana">→</button><button class="secondary" id="relEdit">Editar semana</button></span>
+          <span class="rel-datas" hidden><label>De <input type="date" id="relDe"></label><label>Até <input type="date" id="relAte"></label></span>
+          <button class="secondary" id="relCopy">Copiar para WhatsApp</button></div></div>
       <div id="relBody"></div>
     </div>
 
@@ -732,12 +738,35 @@
   function renderSemanal(){
     renderRelatorio();renderLista();
   }
+  // "Escolher datas…": qualquer intervalo (ex.: 28/09 a 04/10), passando da virada do mês.
+  let relDatas=null;
+  const tituloPeriodo=(a,b)=>`DE ${br(a).slice(0,a.slice(0,4)===b.slice(0,4)?5:10)} A ${br(b)}`;
+  function relIntervalo(){
+    if(!relDatas)return semanaDe(semRel);
+    let [a,b]=relDatas;if(a&&b&&a>b)[a,b]=[b,a];
+    return [a||b,b||a];
+  }
+  function modoRel(datas){
+    relDatas=datas;$('#relModo').value=datas?'datas':'semana';
+    $('.rel-semana').hidden=!!datas;$('.rel-datas').hidden=!datas;
+    $('#relTitulo').textContent=datas?'Resumo do período':'Resumo da semana';
+    $('#relDica').textContent=datas?'Escolha as datas De e Até.':'Use as setas para trocar a semana ou escolha as datas.';
+  }
   function renderRelatorio(){
-    const [a,b]=semanaDe(semRel),ls=linhasRelatorio(a,b),ws=semanasComDados(),lancada=resultados.some(r=>r.data===a);
-    $('#relData').value=semRel;$('#relPrev').disabled=!ws.some(w=>w<a);$('#relNext').disabled=!ws.some(w=>w>a);$('#relCopy').disabled=!ls.length;
+    const [a,b]=relIntervalo();
+    if(!a){$('#relCopy').disabled=true;$('#relBody').innerHTML='<div class="empty-card">Escolha as datas De e Até.</div>';return}
+    const ls=linhasRelatorio(a,b),ws=semanasComDados(),lancada=relDatas?resultados.some(r=>r.data>=a&&r.data<=b):resultados.some(r=>r.data===a);
+    if(!relDatas){$('#relData').value=semRel;$('#relPrev').disabled=!ws.some(w=>w<a);$('#relNext').disabled=!ws.some(w=>w>a)}
+    $('#relCopy').disabled=!ls.length;
     $('#relEdit').textContent=lancada?'Editar semana':'Lançar esta semana';
-    const head=`<div class="rel-day">${tituloSemana(a,b)}</div>`;
-    if(!ls.length){$('#relBody').innerHTML=head+'<div class="empty-card">Nenhum dado nesta semana.</div>'+blocoWhatsapp(a,b);return}
+    // Visitas, propostas e leads do corretor são lançados por semana e contam na data de início dela.
+    const semanaTxt=w=>`${br(w).slice(0,5)} a ${br(resultados.find(r=>r.data===w).ate).slice(0,5)}`;
+    const fora=relDatas?[...new Set(resultados.filter(r=>r.ate&&r.data<a&&r.ate>=a).map(r=>r.data))]:[];
+    const inteira=relDatas?[...new Set(resultados.filter(r=>r.ate&&r.data>=a&&r.data<=b&&r.ate>b).map(r=>r.data))]:[];
+    const avisos=[...fora.map(w=>`a semana de ${semanaTxt(w)} começa antes de ${br(a).slice(0,5)} e fica de fora`),...inteira.map(w=>`a semana de ${semanaTxt(w)} entra inteira`)];
+    const head=`<div class="rel-day">${relDatas?'PERÍODO '+tituloPeriodo(a,b):tituloSemana(a,b)}</div>`+
+      (avisos.length?`<p class="msg note" style="margin:8px 0">Visitas, propostas e leads do corretor são lançados por semana: ${avisos.join('; ')}. Leads, análises, propostas do WhatsApp e locações seguem as datas certinho.</p>`:'');
+    if(!ls.length){$('#relBody').innerHTML=head+`<div class="empty-card">Nenhum dado ${relDatas?'neste período':'nesta semana'}.</div>`+blocoWhatsapp(a,b);return}
     const th=`<thead><tr><th>Corretor</th>${COLS.map(([,n])=>`<th class="num">${n}</th>`).join('')}</tr></thead>`;
     const us=[...new Set(ls.map(l=>l.unidade))];
     const bloco=u=>{const r=ls.filter(l=>l.unidade===u),s=r.reduce(somar,zero());
@@ -745,8 +774,9 @@
         <tr class="sub"><td>SUBTOTAL</td>${COLS.map(([k])=>celula(k,s[k],s)).join('')}</tr></tbody></table></div></div>`};
     const g=ls.reduce(somar,zero());
     $('#relBody').innerHTML=head+us.map(bloco).join('')+`<div class="rel-unit geral"><h3>RESUMO GERAL</h3><div class="table-wrap" style="margin:0"><table><thead><tr><th></th>${COLS.map(([,n])=>`<th class="num">${n}</th>`).join('')}</tr></thead>
-      <tbody><tr class="sub"><td>RESUMO DA SEMANA</td>${COLS.map(([k])=>celula(k,g[k],g)).join('')}</tr></tbody></table></div></div>`+
-      (lancada?'':`<p class="msg note" style="margin-top:12px">Visitas e propostas desta semana ainda não foram lançadas. Clique em "Lançar esta semana". Fechamentos e VGL já vêm da planilha da Locação.</p>`)+
+      <tbody><tr class="sub"><td>RESUMO ${relDatas?'DO PERÍODO':'DA SEMANA'}</td>${COLS.map(([k])=>celula(k,g[k],g)).join('')}</tr></tbody></table></div></div>`+
+      (lancada?'':relDatas?`<p class="msg note" style="margin-top:12px">Nenhuma semana com visitas e propostas lançadas começa nessas datas. Fechamentos e VGL já vêm da planilha da Locação.</p>`
+        :`<p class="msg note" style="margin-top:12px">Visitas e propostas desta semana ainda não foram lançadas. Clique em "Lançar esta semana". Fechamentos e VGL já vêm da planilha da Locação.</p>`)+
       blocoWhatsapp(a,b);
   }
   // Propostas do WhatsApp × lançadas na semana: quem tem proposta sem lançar e a lista das propostas recebidas.
@@ -775,11 +805,18 @@
   function passoRel(dir){const [a]=semanaDe(semRel),ws=semanasComDados(),w=dir<0?ws.filter(x=>x<a).pop():ws.find(x=>x>a);if(w){semRel=w;renderRelatorio()}}
   $('#relPrev').onclick=()=>passoRel(-1);$('#relNext').onclick=()=>passoRel(1);
   $('#relData').addEventListener('change',e=>{if(e.target.value){semRel=semanaDe(e.target.value)[0];renderRelatorio()}});
+  // Ao escolher datas, começa pela semana inteira que está na tela (de segunda a domingo, sem cortar no mês).
+  $('#relModo').addEventListener('change',e=>{
+    if(e.target.value==='datas'){const x=dia(semRel),seg=new Date(x);seg.setDate(x.getDate()-(x.getDay()+6)%7);const dom=new Date(seg);dom.setDate(seg.getDate()+6);
+      $('#relDe').value=iso(seg);$('#relAte').value=iso(dom);modoRel([iso(seg),iso(dom)])}
+    else{if(relDatas?.[0])semRel=semanaDe(relDatas[0])[0];modoRel(null)}
+    renderRelatorio()});
+  ['#relDe','#relAte'].forEach(s=>$(s).addEventListener('change',()=>{modoRel([$('#relDe').value,$('#relAte').value]);renderRelatorio()}));
   $('#relEdit').onclick=()=>openSemana(semRel);
   $('#relCopy').onclick=()=>{
-    const [a,b]=semanaDe(semRel),ls=linhasRelatorio(a,b),us=[...new Set(ls.map(l=>l.unidade))];
+    const [a,b]=relIntervalo(),ls=linhasRelatorio(a,b),us=[...new Set(ls.map(l=>l.unidade))];
     const txt=l=>`${fmtN(l.leads)} leads · ${l.lc} leads corretor · ${l.env} análises (${l.apr} aprov.) · ${l.vis} visitas · ${l.prop} propostas · ${l.fech} fechamentos · VGL ${brl(l.vgl)}`;
-    copiar([`*RESUMO SEMANAL – ${tituloSemana(a,b)}*`,...us.flatMap(u=>{const r=ls.filter(l=>l.unidade===u);return ['',`*${u}*`,...r.map(l=>`${l.corretora}: ${txt(l)}`),`_Subtotal: ${txt(r.reduce(somar,zero()))}_`]}),'',`*RESUMO DA SEMANA:* ${txt(ls.reduce(somar,zero()))}`].join('\n'),'Relatório');
+    copiar([relDatas?`*RESUMO DO PERÍODO ${tituloPeriodo(a,b)}*`:`*RESUMO SEMANAL – ${tituloSemana(a,b)}*`,...us.flatMap(u=>{const r=ls.filter(l=>l.unidade===u);return ['',`*${u}*`,...r.map(l=>`${l.corretora}: ${txt(l)}`),`_Subtotal: ${txt(r.reduce(somar,zero()))}_`]}),'',`*RESUMO ${relDatas?'DO PERÍODO':'DA SEMANA'}:* ${txt(ls.reduce(somar,zero()))}`].join('\n'),'Relatório');
   };
 
   function renderLista(){
@@ -793,7 +830,7 @@
   }
   $('#lista').onclick=async e=>{
     const {ver,edit,del}=e.target.dataset;
-    if(ver){semRel=ver;renderRelatorio();$('#relCard').scrollIntoView({behavior:'smooth',block:'start'})}
+    if(ver){semRel=ver;modoRel(null);renderRelatorio();$('#relCard').scrollIntoView({behavior:'smooth',block:'start'})}
     if(edit)openSemana(edit);
     if(del){const [a,b]=semanaDe(del);if(!confirm(`Excluir os resultados da semana de ${br(a).slice(0,5)} a ${br(b)}? Os leads e as análises não são apagados.`))return;
       const {error}=await db.from('resultados_semanais').delete().eq('data',del);if(error){alert('Não foi possível excluir: '+error.message);return}
@@ -884,7 +921,7 @@
     const {error}=await db.rpc('resultados_salvar_semana',{p_data:a,p_ate:b,p_linhas:linhas,p_data_anterior:semOriginal&&semOriginal!==a?semOriginal:null});
     $('#semSubmit').disabled=false;
     if(error)return erro('Não foi possível salvar: '+error.message);
-    semDialog.close();semRel=a;toast('Semana salva');
+    semDialog.close();semRel=a;if(!relDatas||a<relIntervalo()[0]||a>relIntervalo()[1])modoRel(null);toast('Semana salva');
     try{resultados=await tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem');montarFatos();render();renderSemanal();if(apPronto)renderThumbs()}
     catch(err){alert('Salvo, mas não foi possível atualizar a tela: '+err.message)}
   };
