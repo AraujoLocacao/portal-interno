@@ -1112,7 +1112,8 @@
       ${campo(`extras.${i}.subtitulo`,'Subtítulo (opcional)',x.subtitulo)}
       ${campo(`extras.${i}.itens`,'Itens (um por linha, até 4)',x.itens,{area:true,rows:3})}
       ${campo(`extras.${i}.msg`,'Mensagem (opcional)',x.msg,{area:true,rows:2})}
-      <label style="display:block"><span class="ap-lbl">Imagem</span><select data-p="extras.${i}.imagem">${optsImg(x.imagem)}</select></label></div>`).join('');
+      <div class="ap-row"><label style="display:block"><span class="ap-lbl">Posição</span><select data-p="extras.${i}.posicao"><option value="destaques">Depois dos destaques</option><option value="resultados"${x.posicao==='resultados'?' selected':''}>Depois dos resultados</option></select></label>
+      <label style="display:block"><span class="ap-lbl">Imagem</span><select data-p="extras.${i}.imagem">${optsImg(x.imagem)}</select></label></div></div>`).join('');
     $('#apForm').innerHTML=
       secao('Capa','','capa.on',ap.capa.on,campo('capa.titulo','Título',ap.capa.titulo,{area:true})+campo('capa.sub','Subtítulo',ap.capa.sub,{area:true})+campo('capa.rodape','Rodapé',ap.capa.rodape))+
       secao('Pauta','','pauta.on',ap.pauta.on,ap.pauta.itens.map((it,i)=>`<div class="ap-row">${campo(`pauta.itens.${i}.t`,'Item '+(i+1),it.t)}${campo(`pauta.itens.${i}.d`,'Descrição',it.d)}</div>`).join(''))+
@@ -1193,7 +1194,6 @@
   const icone=(n,cls='')=>`<div class="s-ico ${cls}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONES[n]}"/></svg></div>`;
   const logo='<div class="s-logo"><img src="logo-araujo.jpg" alt="Araujo Locação"></div>';
   const cab=(kick,tit,{lar=false,dir=''}={})=>`<div class="s-head"><div><div class="s-kick${lar?' lar':''}">${safe(kick)}</div><h2 class="s-title">${txt(tit)}</h2></div>${dir}</div>`;
-  // Tabela da semana no formato da planilha (só unidades e corretores com leads ou resultados lançados).
   // Tabela do slide no mesmo modelo do Relatório semanal do sistema (mesmas colunas, cores e vermelho nas propostas do WhatsApp).
   function tabelaSlide(a,b){
     const ls=linhasRelatorio(a,b),us=[...new Set(ls.map(l=>l.unidade))];
@@ -1208,6 +1208,13 @@
   function slides(){
     if(!ap)return [];
     const [a,b]=apPeriodo(),per=periodoTxt(a,b),out=[];
+    // Slides livres: os marcados "depois dos resultados" entram após resultados e funil; os outros, após os destaques.
+    const livres=pos=>(ap.extras||[]).filter(x=>(x.posicao==='resultados')===(pos==='resultados')).forEach(x=>{
+      const itens=String(x.itens||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,4),img=x.imagem&&imgUrl[x.imagem];
+      const grade=img?'1fr':`repeat(${Math.min(itens.length,2)||1},1fr)`;
+      out.push([x.titulo||'Slide livre',`<div class="slide">${cab(x.etiqueta||'REUNIÃO SEMANAL',x.titulo||'',{lar:true})}${img?`<div class="s-livre-img"><img src="${attr(img)}" alt=""></div>`:''}
+        <div class="s-livre${img?' com-img':''}">${x.subtitulo?`<p class="s-livre-sub">${txt(x.subtitulo)}</p>`:''}${itens.length?`<div class="s-livre-itens" style="grid-template-columns:${grade}">${itens.map(t=>`<div class="s-livre-item">${txt(t)}</div>`).join('')}</div>`:''}${x.msg?`<div class="s-livre-msg">${txt(x.msg)}</div>`:''}</div></div>`]);
+    });
     if(ap.capa.on)out.push(['Capa',`<div class="slide s-capa">${logo}<div class="s-top">REUNIÃO DE RESULTADOS</div><div class="s-capa-body"><div class="s-pill-row"><span class="s-pill">APRESENTAÇÃO SEMANAL</span><span>Araujo Locação • CRECI 6945J</span></div>
       <h1>${txt(ap.capa.titulo)}</h1><p>${txt(ap.capa.sub)}</p><p class="s-data">Semana de ${per}</p></div><div class="s-foot">${txt(ap.capa.rodape)}</div></div>`]);
     if(ap.pauta.on){const ic=[['trofeu','am'],['grafico',''],['estrela','am'],['alvo','']];
@@ -1219,6 +1226,7 @@
       out.push(['Funil da semana',`<div class="slide">${cab('VISÃO GERAL','Funil da Semana',{dir:`<div class="s-dir">${safe(per)}</div>`})}<div class="s-funil">${E.map(([n,v,s])=>`<div class="s-etapa"><span>${n}</span><strong>${fmtN(v)}</strong><small>${ok(s)||'&nbsp;'}</small></div>`).join('')}</div>
         <div class="s-vgl"><div><span>VGL DA SEMANA</span><strong>${brl2(t.vgl)}</strong></div>${t.fech?`<div><span>MÉDIA POR FECHAMENTO</span><strong>${brl2(t.vgl/t.fech)}</strong></div>`:''}</div></div>`]);
     }
+    livres('resultados');
     const nums=numerosSemana(a,b);
     ap.destaques.forEach(d=>{
       const p=pessoa(d.pessoa)||{nome:'Escolha a pessoa',funcao:'',foto:null,corretora:null},n=(p.corretora&&nums[p.corretora])||{fech:0,vgl:0};
@@ -1227,12 +1235,7 @@
         ${d.numeros?`<div class="s-nums"><div class="s-num"><strong>${fmtN(n.fech)}</strong><span>${n.fech===1?'Contrato':'Contratos'}</span></div><div class="s-num vgl"><strong>${brl2(n.vgl)}</strong><span>VGL</span></div></div>`:''}
         ${d.msg?`<div class="s-msg"${d.numeros?'':' style="margin-top:130px"'}>${txt(d.msg)}</div>`:''}</div></div></div>`]);
     });
-    (ap.extras||[]).forEach(x=>{
-      const itens=String(x.itens||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,4),img=x.imagem&&imgUrl[x.imagem];
-      const grade=img?'1fr':`repeat(${Math.min(itens.length,2)||1},1fr)`;
-      out.push([x.titulo||'Slide livre',`<div class="slide">${cab(x.etiqueta||'REUNIÃO SEMANAL',x.titulo||'',{lar:true})}${img?`<div class="s-livre-img"><img src="${attr(img)}" alt=""></div>`:''}
-        <div class="s-livre${img?' com-img':''}">${x.subtitulo?`<p class="s-livre-sub">${txt(x.subtitulo)}</p>`:''}${itens.length?`<div class="s-livre-itens" style="grid-template-columns:${grade}">${itens.map(t=>`<div class="s-livre-item">${txt(t)}</div>`).join('')}</div>`:''}${x.msg?`<div class="s-livre-msg">${txt(x.msg)}</div>`:''}</div></div>`]);
-    });
+    livres('destaques');
     if(ap.time.on)out.push(['Mensagem para a equipe',`<div class="slide">${cab('RECONHECIMENTO SEMANAL',ap.time.titulo,{lar:true})}${ap.time.frase?`<div class="s-frase">${txt(ap.time.frase)}</div>`:''}</div>`]);
     if(ap.foco.on){const ic=[['agenda',''],['casa','ve'],['caneta','am']];
       out.push(['Foco da próxima semana',`<div class="slide">${cab('PLANEJAMENTO ESTRATÉGICO',ap.foco.titulo)}<div class="s-cards" style="grid-template-columns:repeat(3,1fr);top:320px">${ap.foco.cards.map((c,i)=>`<div class="s-card">${icone(...ic[i])}<h3>${txt(c.t)}</h3><p>${txt(c.d)}</p></div>`).join('')}</div></div>`])}
