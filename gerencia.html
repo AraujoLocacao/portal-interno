@@ -321,7 +321,7 @@
     </div>
 
     <div class="card ap-semana">
-      <div class="rel-nav"><button class="secondary" id="apPrev" aria-label="Semana anterior">←</button><input type="date" id="apData" aria-label="Um dia da semana apresentada"><button class="secondary" id="apNext" aria-label="Próxima semana">→</button>
+      <div class="rel-nav"><button class="secondary" id="apPrev" aria-label="Semana anterior">←</button><span class="rel-datas"><label>De <input type="date" id="apData"></label><label>Até <input type="date" id="apAte"></label></span><button class="secondary" id="apNext" aria-label="Próxima semana">→</button><button type="button" class="link" id="apInteira" hidden></button>
         <strong id="apSemanaTxt"></strong></div>
       <div class="rel-nav"><span class="ap-status" id="apStatus"></span><button class="secondary" id="apSugerir">Refazer sugestões</button></div>
     </div>
@@ -988,7 +988,7 @@
   // Semana lançada que começa no mês anterior (ex.: 28/09 a 04/10) conta como semana desse mês anterior.
   function numSemana(a){const ini=a.slice(0,8)+'01';let n=0,d=ini;while(d<=a){const [x,y]=semanaDe(d);if(x>=ini)n++;if(x>=a)break;d=proxDia(y)}return Math.max(n,1)}
   // Fechamentos e VGL de cada corretor na semana (a semana começa em "a"), da planilha da Locação.
-  function numerosSemana(a){const b=semanaDe(a)[1],by={};locacoes.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{const o=by[l.corretora]??={fech:0,vgl:0};o.fech++;o.vgl+=l.vgl});return by}
+  function numerosSemana(a,b=semanaDe(a)[1]){const by={};locacoes.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{const o=by[l.corretora]??={fech:0,vgl:0};o.fech++;o.vgl+=l.vgl});return by}
   // Pessoa do slide: "e:<id>" = alguém da galeria; "c:<NOME>" = nome dos lançamentos (usa a galeria se estiver ligado a alguém).
   function pessoa(ref){
     if(!ref)return null;
@@ -998,8 +998,8 @@
   }
 
   // Sugestões a partir dos números: destaque = maior VGL da semana; primeira locação = quem fechou pela primeira vez.
-  function sugerir(a,base){
-    const c=copia(base||PADRAO),by=numerosSemana(a),nomes=Object.keys(by),nomeDe=n=>pessoa('c:'+n).nome;
+  function sugerir(a,base,b){
+    const c=copia(base||PADRAO),by=numerosSemana(a,b),nomes=Object.keys(by),nomeDe=n=>pessoa('c:'+n).nome;
     const top=nomes.filter(n=>by[n].vgl>0||by[n].fech>0).sort((x,y)=>by[y].vgl-by[x].vgl||by[y].fech-by[x].fech)[0];
     const temHistorico=locacoes.some(l=>l.data<a),jaFechou=n=>locacoes.some(l=>l.data<a&&l.corretora===n);
     c.destaques=[];
@@ -1021,29 +1021,38 @@
     apPronto=true;carregarAp(apSemana);
     if(r.error)$('#apStatus').textContent='Não foi possível carregar os textos salvos: '+r.error.message;
   }
-  function carregarAp(a){
+  // Período da apresentação: começa em apSemana; o fim é o "Até" escolhido (guardado nos textos, ap.ate) ou o fim da semana.
+  function apPeriodo(){const fim=semanaDe(apSemana)[1],b=ap?.ate;return [apSemana,b&&b>=apSemana?b:fim]}
+  function carregarAp(a,ate){
     apSemana=a;const salvo=apresentacoes.find(x=>x.semana===a);
-    if(salvo){ap=mesclar(salvo.conteudo);apSalvoEm=salvo.atualizado_em}
+    if(salvo){ap=mesclar(salvo.conteudo);apSalvoEm=salvo.atualizado_em;if(ate&&ate!==apPeriodo()[1]){ap.ate=ate;apSujo=true}else apSujo=false}
     else{
       // Semana nova: repete os textos da última apresentação salva (capa, pauta, foco...) e sugere os destaques.
       const ant=apresentacoes.filter(x=>x.semana<a).sort((x,y)=>x.semana.localeCompare(y.semana)).pop();
-      ap=sugerir(a,ant?mesclar(ant.conteudo):null);apSalvoEm=null;
+      ap=sugerir(a,ant?mesclar(ant.conteudo):null,ate||semanaDe(a)[1]);ap.ate=ate||null;apSalvoEm=null;apSujo=false;
     }
-    apSujo=false;renderApForm();renderThumbs();statusAp();
+    renderApForm();renderThumbs();statusAp();
   }
   function statusAp(){const s=$('#apStatus');s.classList.toggle('dirty',apSujo);
     s.textContent=apSujo?'Alterações não salvas':apSalvoEm?`Textos salvos em ${br(iso(new Date(apSalvoEm)))}`:'Sugestão automática (ainda não salva)'}
   const marcarSujo=()=>{apSujo=true;statusAp()};
   addEventListener('beforeunload',e=>{if(apSujo){e.preventDefault();e.returnValue=''}});
 
-  function irSemana(d){
-    const a=semanaDe(d)[0];if(a===apSemana)return;
-    if(apSujo&&!confirm('Os textos desta semana não foram salvos. Trocar de semana mesmo assim?')){$('#apData').value=apSemana;return}
-    carregarAp(a);
+  // Setas: semana anterior/seguinte. "De": a data escolhida (ou o início do período já lançado que a contém). "Até": qualquer data depois do De.
+  function irSemana(d,{exato=false,ate=null}={}){
+    const [a0,b0]=semanaDe(d),a=exato&&!resultados.some(r=>r.data<=d&&r.ate>=d)?d:a0;
+    if(a===apSemana&&!ate)return;
+    if(a!==apSemana&&apSujo&&!confirm('Os textos desta semana não foram salvos. Trocar de semana mesmo assim?')){$('#apData').value=apSemana;$('#apAte').value=apPeriodo()[1];return}
+    if(a===apSemana){ap.ate=ate;marcarSujo();renderApForm();renderThumbs();return}
+    carregarAp(a,ate);
   }
   $('#apPrev').onclick=()=>{const x=dia(apSemana);x.setDate(x.getDate()-1);irSemana(iso(x))};
-  $('#apNext').onclick=()=>irSemana(proxDia(semanaDe(apSemana)[1]));
-  $('#apData').addEventListener('change',e=>{if(e.target.value)irSemana(e.target.value)});
+  $('#apNext').onclick=()=>irSemana(proxDia(apPeriodo()[1]));
+  $('#apData').addEventListener('change',e=>{if(e.target.value)irSemana(e.target.value,{exato:true})});
+  $('#apAte').addEventListener('change',e=>{const b=e.target.value;
+    if(!b||b<apSemana){alert('A data Até precisa ser depois da data De.');e.target.value=apPeriodo()[1];return}
+    irSemana(apSemana,{ate:b})});
+  $('#apInteira').onclick=e=>irSemana(e.target.dataset.de,{exato:true,ate:e.target.dataset.ate});
 
   // ---------- Formulário ----------
   const campo=(p,label,v,{area=false,rows=2,ph=''}={})=>`<label style="display:block"><span class="ap-lbl">${label}</span>${area?`<textarea data-p="${p}" rows="${rows}" placeholder="${attr(ph)}">${safe(v)}</textarea>`:`<input data-p="${p}" value="${attr(v)}" placeholder="${attr(ph)}">`}</label>`;
@@ -1055,9 +1064,14 @@
     if(v&&!ops.some(o=>o[0]===v))ops.unshift([v,pessoa(v)?.nome||'Pessoa removida']);
     return '<option value="">Escolha…</option>'+ops.map(([k,l])=>`<option value="${attr(k)}"${k===v?' selected':''}>${safe(l)}</option>`).join('');
   }
+  function rotuloAp(){
+    const [a,b]=apPeriodo(),[seg,dom]=semanaInteira(a),btn=$('#apInteira');
+    $('#apData').value=a;$('#apAte').value=b;$('#apSemanaTxt').textContent=`Semana ${pad(numSemana(a))} · ${periodoTxt(a,b)}`;
+    btn.hidden=(a===seg&&b===dom)||a<seg||b>dom;btn.textContent=`Usar a semana inteira: ${br(seg).slice(0,5)} a ${br(dom)}`;btn.dataset.de=seg;btn.dataset.ate=dom;
+  }
   function renderApForm(){
-    const [a,b]=semanaDe(apSemana),lancada=resultados.some(r=>r.data===a);
-    $('#apData').value=apSemana;$('#apSemanaTxt').textContent=`Semana ${pad(numSemana(a))} · ${periodoTxt(a,b)}`;
+    const [a,b]=apPeriodo(),lancada=resultados.some(r=>r.data>=a&&r.data<=b);
+    rotuloAp();
     const dest=ap.destaques.map((d,i)=>`<div class="dest"><div class="dest-head"><span>Destaque ${i+1}</span><span class="row-actions">
         <button type="button" class="link" data-acao="sobe" data-i="${i}" ${i?'':'disabled'} aria-label="Subir">↑</button><button type="button" class="link" data-acao="desce" data-i="${i}" ${i<ap.destaques.length-1?'':'disabled'} aria-label="Descer">↓</button><button type="button" class="link danger" data-acao="delDest" data-i="${i}">Remover</button></span></div>
       <div class="ap-row">${campo(`destaques.${i}.titulo`,'Título do slide',d.titulo)}<label style="display:block"><span class="ap-lbl">Pessoa</span><select data-p="destaques.${i}.pessoa">${opcoesPessoa(d.pessoa)}</select></label></div>
@@ -1086,7 +1100,7 @@
   });
   $('#apSugerir').onclick=()=>{
     if(!confirm('Refazer os destaques e o título da mensagem para a equipe a partir dos números da semana? Os outros textos continuam como estão.'))return;
-    const s=sugerir(apSemana,ap);ap.destaques=s.destaques;ap.time.titulo=s.time.titulo;marcarSujo();renderApForm();renderThumbs();
+    const s=sugerir(apSemana,ap,apPeriodo()[1]);ap.destaques=s.destaques;ap.time.titulo=s.time.titulo;marcarSujo();renderApForm();renderThumbs();
   };
   $('#apSalvar').onclick=async()=>{
     $('#apSalvar').disabled=true;
@@ -1122,7 +1136,7 @@
   }
   function slides(){
     if(!ap)return [];
-    const [a,b]=semanaDe(apSemana),per=periodoTxt(a,b),out=[];
+    const [a,b]=apPeriodo(),per=periodoTxt(a,b),out=[];
     if(ap.capa.on)out.push(['Capa',`<div class="slide s-capa">${logo}<div class="s-top">REUNIÃO DE RESULTADOS</div><div class="s-capa-body"><div class="s-pill-row"><span class="s-pill">APRESENTAÇÃO SEMANAL</span><span>Araujo Locação • CRECI 6945J</span></div>
       <h1>${txt(ap.capa.titulo)}</h1><p>${txt(ap.capa.sub)}</p><p class="s-data">Semana de ${per}</p></div><div class="s-foot">${txt(ap.capa.rodape)}</div></div>`]);
     if(ap.pauta.on){const ic=[['trofeu','am'],['grafico',''],['estrela','am'],['alvo','']];
@@ -1134,7 +1148,7 @@
       out.push(['Funil da semana',`<div class="slide">${cab('VISÃO GERAL','Funil da Semana',{dir:`<div class="s-dir">${safe(per)}</div>`})}<div class="s-funil">${E.map(([n,v,s])=>`<div class="s-etapa"><span>${n}</span><strong>${fmtN(v)}</strong><small>${ok(s)||'&nbsp;'}</small></div>`).join('')}</div>
         <div class="s-vgl"><div><span>VGL DA SEMANA</span><strong>${brl2(t.vgl)}</strong></div>${t.fech?`<div><span>MÉDIA POR FECHAMENTO</span><strong>${brl2(t.vgl/t.fech)}</strong></div>`:''}</div></div>`]);
     }
-    const nums=numerosSemana(a);
+    const nums=numerosSemana(a,b);
     ap.destaques.forEach(d=>{
       const p=pessoa(d.pessoa)||{nome:'Escolha a pessoa',funcao:'',foto:null,corretora:null},n=(p.corretora&&nums[p.corretora])||{fech:0,vgl:0};
       out.push([d.titulo||'Destaque',`<div class="slide">${cab('RECONHECIMENTO SEMANAL',d.titulo,{lar:true,dir:d.selo?`<div class="s-selo">${safe(d.selo)}</div>`:''})}
@@ -1152,7 +1166,7 @@
   function renderThumbs(){
     if(!ap)return;const box=$('#apThumbs'),w=Math.max(220,box.clientWidth||400),ss=slides();
     // O período pode mudar depois de um lançamento (ex.: semana passa a ser 28/09 a 04/10).
-    {const [a,b]=semanaDe(apSemana);$('#apSemanaTxt').textContent=`Semana ${pad(numSemana(a))} · ${periodoTxt(a,b)}`}
+    rotuloAp();
     $('#apConta').textContent=`(${ss.length})`;
     box.innerHTML=ss.map(([n,h],i)=>{const e=escalar(h,w);return `<div class="thumb" data-i="${i}" role="button" tabindex="0" aria-label="Apresentar a partir do slide ${i+1}"><small>${i+1}. ${safe(n)}</small><div class="thumb-in" style="height:${Math.round(810*e.k)}px">${e.html}</div></div>`}).join('')||'<p class="msg">Nenhum slide incluído.</p>';
   }
@@ -1187,7 +1201,7 @@
   $('#apPdf').onclick=async()=>{
     const ss=slides();if(!ss.length)return;const pa=$('#printArea');pa.innerHTML=ss.map(s=>s[1]).join('');
     await Promise.all([...pa.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
-    const [a,b]=semanaDe(apSemana),antes=document.title;document.title=`Reunião semanal ${br(a).slice(0,5)} a ${br(b)}`.replace(/\//g,'-');
+    const [a,b]=apPeriodo(),antes=document.title;document.title=`Reunião semanal ${br(a).slice(0,5)} a ${br(b)}`.replace(/\//g,'-');
     toast('Na janela que abrir, escolha "Salvar como PDF"');
     setTimeout(()=>{window.print();document.title=antes;pa.innerHTML=''},400);
   };
