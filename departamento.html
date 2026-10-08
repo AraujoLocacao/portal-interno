@@ -531,6 +531,8 @@
   // Mesmo esquema da calculadora: o gerador fica no bucket privado (ferramentas/financeiro-rh/gerar-documentos.html), porque
   // os modelos de contrato têm RG e CPF do diretor. Nada é gravado: o Word é montado e baixado dentro do iframe.
   // Quando o gerador avisa 'documentos:pronta', a página manda a lista de colaboradores da aba RH, para puxar o nome.
+  // Ao baixar um contrato, o gerador pode pedir 'documentos:rh' (aniversário e "na empresa desde" de quem já está na lista,
+  // ou cadastro de pessoa nova): a página grava em rh_colaboradores com o login dela e responde 'documentos:rh-ok'.
   const docsFrame=()=>$('#documentosFrame');
   async function loadDocumentos(){
     const msg=$('#documentosMsg');msg.hidden=false;msg.textContent='Carregando os modelos…';
@@ -540,12 +542,33 @@
     fr.srcdoc=html.includes('</body>')?html.replace('</body>',AVISA_USO+'</body>'):html+AVISA_USO;fr.hidden=false;msg.hidden=true;
   }
   function enviarColabs(){
-    docsFrame().contentWindow?.postMessage({tipo:'documentos:colaboradores',lista:colabs.filter(c=>c.ativo).map(c=>({nome:c.nome,funcao:c.funcao||''}))},'*');
+    docsFrame().contentWindow?.postMessage({tipo:'documentos:colaboradores',lista:colabs.filter(c=>c.ativo).map(c=>({id:c.id,nome:c.nome,funcao:c.funcao||'',
+      nascimento_dia:c.nascimento_dia,nascimento_mes:c.nascimento_mes,admissao:c.admissao||''}))},'*');
   }
   addEventListener('message',e=>{
     const fr=docsFrame();if(!fr.contentWindow||e.source!==fr.contentWindow)return;
     ultimoUso=Date.now();if(e.data?.tipo==='documentos:pronta')enviarColabs();
+    if(e.data?.tipo==='documentos:rh')gravarRhDoContrato(e.data);
   });
+  async function gravarRhDoContrato(m){
+    const responder=(ok,info)=>docsFrame().contentWindow?.postMessage({tipo:'documentos:rh-ok',ok,info},'*');
+    const d=m.dados||{},row={},dia=d.nascimento_dia,mes=d.nascimento_mes;
+    if(Number.isInteger(dia)&&Number.isInteger(mes)&&mes>=1&&mes<=12&&dia>=1&&dia<=new Date(2024,mes,0).getDate()){row.nascimento_dia=dia;row.nascimento_mes=mes}
+    if(typeof d.admissao==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d.admissao))row.admissao=d.admissao;
+    let q,nome;
+    if(m.id){const c=colabs.find(x=>x.id===m.id);if(!c){responder(false,'a pessoa não está mais na lista');return}
+      if(!Object.keys(row).length){responder(false,'nada para gravar');return}
+      nome=c.nome;q=db.from('rh_colaboradores').update(row).eq('id',c.id);
+    }else{
+      nome=String(d.nome||'').trim().slice(0,80);if(!nome){responder(false,'falta o nome');return}
+      const funcao=String(d.funcao||'').trim().slice(0,80);row.nome=nome;if(funcao)row.funcao=funcao;
+      q=db.from('rh_colaboradores').insert(row);
+    }
+    const {error}=await q;if(error){responder(false,error.message);return}
+    const feito=[row.nascimento_dia&&`aniversário ${pad(row.nascimento_dia)}/${pad(row.nascimento_mes)}`,row.admissao&&`na empresa desde ${br(row.admissao)}`].filter(Boolean).join(' e ');
+    responder(true,m.id?`Aba RH atualizada: ${nome}${feito?', '+feito:''}.`:`${nome} entrou na lista da aba RH${feito?' ('+feito+')':''}.`);
+    toast('Aba RH atualizada');await loadRh();
+  }
   $('#documentosCheia').onclick=()=>{const fr=docsFrame();if(!fr.hidden)fr.requestFullscreen?.()};
 
   // ---------- Abas ----------
