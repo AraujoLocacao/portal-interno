@@ -209,6 +209,14 @@
     </div>
   </section>
 
+  <section id="tab-documentos" data-tab hidden>
+    <div class="top">
+      <div><h2>Gerar documentos</h2><p>Escolha o modelo, preencha os dados e baixe o contrato em Word, para conferir e imprimir para assinar. O que é digitado aqui não fica salvo no portal.</p></div>
+      <div class="bar-actions"><button class="secondary" id="documentosCheia">Tela cheia</button></div>
+    </div>
+    <div class="card ferramenta"><p class="empty" id="documentosMsg">Carregando os modelos…</p><iframe id="documentosFrame" title="Gerar documentos" hidden sandbox="allow-scripts allow-modals allow-downloads"></iframe></div>
+  </section>
+
   <section id="tab-adm" data-tab hidden>
     <div class="top"><div><h2>Administradoras de condomínio</h2><p>Relatório das administradoras de condomínio. É a mesma lista em Locatário · Boletos, Locatário · Renovação e Proprietário · Contas a Pagar: o que um departamento atualiza, os outros veem.</p></div></div>
     <div class="empty-card">Em preparação. Esta aba vai seguir a planilha de administradoras que vocês já usam.</div>
@@ -348,7 +356,8 @@
       recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
       atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
-    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh'],
+    // documentos = gerador de contratos em Word (08/10/2026). Os modelos ficam no bucket privado, em ferramentas/financeiro-rh/.
+    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','documentos'],
       atividades:['Colaboradores (admissão/demissão/folha)','Contas a pagar da empresa','Suporte direto à equipe financeira']},
     {slug:'supervisao',limpo:true,nome:'Supervisão',area:'Liderança',papel:'Administrativo',ref:'Referência',
       atividades:['Resposta a notificações direcionadas à imobiliária','Monitoramento da demanda do administrativo','Reuniões semanais']},
@@ -385,7 +394,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={rh:'RH',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
+    const nomes={rh:'RH',documentos:'Gerar documentos',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
     if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
@@ -411,7 +420,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('rescisao')?loadRescisao():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // Quem entra em mais de um departamento (gerência e acesso geral, ver supabase/acesso_geral.sql) ganha um seletor no topo.
@@ -428,7 +437,7 @@
     if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
     form.reset();
   };
-  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];rescisoes=[];rescAtual=null;pendente=null;alterado=false;$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true};
+  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];rescisoes=[];rescAtual=null;pendente=null;alterado=false;$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true;$('#documentosFrame').srcdoc='';$('#documentosFrame').hidden=true};
   $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
 
   // Esta área tem senhas: sai sozinha depois de 30 minutos sem uso.
@@ -517,6 +526,27 @@
   };
   $('#rescisaoNova').onclick=()=>{if(alterado&&!confirm('O cálculo que está na tela não foi salvo. Começar uma nova rescisão mesmo assim?'))return;carregarCalc(null)};
   $('#rescisaoCheia').onclick=()=>{const fr=frame();if(!fr.hidden)fr.requestFullscreen?.()};
+
+  // ---------- Gerar documentos (só Gestão Financeira / RH) ----------
+  // Mesmo esquema da calculadora: o gerador fica no bucket privado (ferramentas/financeiro-rh/gerar-documentos.html), porque
+  // os modelos de contrato têm RG e CPF do diretor. Nada é gravado: o Word é montado e baixado dentro do iframe.
+  // Quando o gerador avisa 'documentos:pronta', a página manda a lista de colaboradores da aba RH, para puxar o nome.
+  const docsFrame=()=>$('#documentosFrame');
+  async function loadDocumentos(){
+    const msg=$('#documentosMsg');msg.hidden=false;msg.textContent='Carregando os modelos…';
+    const {data,error}=await db.storage.from(BUCKET).download(`ferramentas/${DEP.slug}/gerar-documentos.html`);
+    if(error){msg.textContent='Não foi possível carregar os modelos. Fale com a gerência.';return}
+    const html=await data.text(),fr=docsFrame();
+    fr.srcdoc=html.includes('</body>')?html.replace('</body>',AVISA_USO+'</body>'):html+AVISA_USO;fr.hidden=false;msg.hidden=true;
+  }
+  function enviarColabs(){
+    docsFrame().contentWindow?.postMessage({tipo:'documentos:colaboradores',lista:colabs.filter(c=>c.ativo).map(c=>({nome:c.nome,funcao:c.funcao||''}))},'*');
+  }
+  addEventListener('message',e=>{
+    const fr=docsFrame();if(!fr.contentWindow||e.source!==fr.contentWindow)return;
+    ultimoUso=Date.now();if(e.data?.tipo==='documentos:pronta')enviarColabs();
+  });
+  $('#documentosCheia').onclick=()=>{const fr=docsFrame();if(!fr.hidden)fr.requestFullscreen?.()};
 
   // ---------- Abas ----------
   // As abas trocam por JavaScript (não por link): o navegador bloqueia o "#aba" quando a página é aberta como arquivo/cópia.
@@ -687,7 +717,7 @@
     $('#rhTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
     const {data,error}=await db.from('rh_colaboradores').select('id,nome,funcao,nascimento_dia,nascimento_mes,admissao,ativo,observacao,atualizado_em,atualizado_por').order('nome');
     if(error){$('#rhTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;$('#rhAvisos').innerHTML='';return}
-    colabs=data;renderRh();
+    colabs=data;renderRh();if(ABAS.includes('documentos'))enviarColabs();
   }
   function renderRh(){
     const prox=eventos(30),hj=prox.filter(e=>faltam(e.dia)===0),ativos=colabs.filter(c=>c.ativo);
