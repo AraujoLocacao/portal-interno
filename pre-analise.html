@@ -82,6 +82,7 @@
     .link-tile{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;min-width:0}.link-tile:hover{border-color:#6da7ec}
     .link-tile .go{display:block;text-decoration:none;color:var(--ink)}.link-tile .go strong{font-size:1.02rem}.link-tile a.go strong:after{content:" ↗";color:var(--blue)}
     .link-tile .go span{display:block;color:#52616c;font-size:.86rem;margin-top:2px}.link-tile .go small{display:block;color:var(--muted);font-size:.78rem;margin-top:4px;overflow-wrap:anywhere}
+    .link-tile .tarja{display:inline-block;background:#c62828;color:#fff;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:3px 9px;border-radius:6px;margin-bottom:8px}
     .link-tile .row-actions{text-align:left;margin:8px 0 0 -4px}
     .group-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
     .nota{margin:10px 0 0;background:#fff8ec;border:1px solid #f0dcb8;border-left:4px solid var(--amber);border-radius:10px;padding:10px 14px;color:#5b4520;font-size:.92rem;white-space:pre-line}
@@ -306,6 +307,7 @@
     </div>
     <div class="field"><label for="lUrl">Endereço do site</label><input id="lUrl" name="url" type="url" maxlength="300" placeholder="https://"></div>
     <div class="field"><label for="lDesc">Descrição (opcional)</label><input id="lDesc" name="descricao" maxlength="200"></div>
+    <div class="field"><label for="lTarja">Tarja vermelha (opcional)</label><input id="lTarja" name="tarja" maxlength="60" placeholder="Ex.: Somente imóveis com ADM"></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="linkSubmit">Salvar</button></div>
     <p class="msg error" id="linkMsg" hidden></p>
   </form>
@@ -654,7 +656,7 @@
 
   // ---------- Validações (links) ----------
   async function loadLinks(){
-    const [l,g]=await Promise.all([db.from('pre_analise_links').select('id,grupo,nome,url,descricao,ordem').order('ordem').order('nome'),db.from('pre_analise_link_grupos').select('grupo,nota')]);
+    const [l,g]=await Promise.all([db.from('pre_analise_links').select('id,grupo,nome,url,descricao,tarja,ordem').order('ordem').order('nome'),db.from('pre_analise_link_grupos').select('grupo,nota')]);
     const error=l.error||g.error;
     if(error){$('#linkGroups').innerHTML=`<div class="empty-card">Não foi possível carregar: ${safe(error.message)}</div>`;return}
     links=l.data;notas=Object.fromEntries(g.data.map(x=>[x.grupo,x.nota||'']));renderLinks();
@@ -670,7 +672,7 @@
   // O grupo "Garantias" tem aba própria; os demais grupos ficam em Validações.
   const GARANTIAS='Garantias';
   const host=u=>{try{return new URL(u).host}catch{return u}};
-  const tileLink=l=>`<div class="link-tile">${l.url?`<a class="go" href="${safe(l.url)}" target="_blank" rel="noopener noreferrer"><strong>${safe(l.nome)}</strong>${l.descricao?`<span>${safe(l.descricao)}</span>`:''}<small>${safe(host(l.url))}</small></a>`
+  const tileLink=l=>`<div class="link-tile">${l.tarja?`<div class="tarja">${safe(l.tarja)}</div>`:''}${l.url?`<a class="go" href="${safe(l.url)}" target="_blank" rel="noopener noreferrer"><strong>${safe(l.nome)}</strong>${l.descricao?`<span>${safe(l.descricao)}</span>`:''}<small>${safe(host(l.url))}</small></a>`
       :`<div class="go"><strong>${safe(l.nome)}</strong>${l.descricao?`<span>${safe(l.descricao)}</span>`:''}<small class="muted">Sem endereço ainda: clique em Editar para colocar</small></div>`}
         <div class="row-actions">${senhas.some(s=>mesmoNome(s.sistema,l.nome))?`<button class="link" data-login="${l.id}">Ver login</button>`:''}<button class="link" data-edit-link="${l.id}">Editar</button><button class="link danger" data-del-link="${l.id}">Excluir</button></div></div>`;
   function renderLinks(){
@@ -706,14 +708,14 @@
   function openLink(l,grupo){
     linkEditId=l?.id||null;const f=$('#linkForm');f.reset();$('#linkMsg').hidden=true;
     $('#linkTitle').textContent=(l?l.grupo:grupo)===GARANTIAS?(l?'Editar garantia':'Nova garantia'):(l?'Editar link':'Novo link');
-    if(l){f.grupo.value=l.grupo;f.nome.value=l.nome;f.url.value=l.url||'';f.descricao.value=l.descricao||''}else if(grupo)f.grupo.value=grupo;
+    if(l){f.grupo.value=l.grupo;f.nome.value=l.nome;f.url.value=l.url||'';f.descricao.value=l.descricao||'';f.tarja.value=l.tarja||''}else if(grupo)f.grupo.value=grupo;
     linkDialog.showModal();
   }
   $('#newLink').onclick=()=>openLink(null);
   $('#newGarantia').onclick=()=>openLink(null,GARANTIAS);
   $('#linkForm').onsubmit=async e=>{
     e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#linkMsg');msg.hidden=true;
-    const item={grupo:String(f.get('grupo')).trim(),nome:String(f.get('nome')).trim(),url:String(f.get('url')).trim()||null,descricao:String(f.get('descricao')).trim()||null};
+    const item={grupo:String(f.get('grupo')).trim(),nome:String(f.get('nome')).trim(),url:String(f.get('url')).trim()||null,descricao:String(f.get('descricao')).trim()||null,tarja:String(f.get('tarja')).trim()||null};
     if(item.url&&!/^https?:\/\//i.test(item.url)){msg.textContent='O endereço precisa começar com https://';msg.hidden=false;return}
     // Link novo entra no fim do seu grupo (ou no fim da página, se o grupo for novo).
     if(!linkEditId){const doGrupo=links.filter(l=>l.grupo===item.grupo);item.ordem=Math.max(0,...(doGrupo.length?doGrupo:links).map(l=>l.ordem))+(doGrupo.length?1:10)}

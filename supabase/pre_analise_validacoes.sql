@@ -76,6 +76,11 @@ select * from (values
 ) as v(grupo, nome, url, descricao, ordem)
 where not exists (select 1 from public.pre_analise_links l where l.grupo = 'Garantias');
 
+-- Tarja vermelha opcional no quadro (ex.: garantias que só servem para imóvel administrado).
+alter table public.pre_analise_links add column if not exists tarja text check (char_length(tarja) <= 60);
+update public.pre_analise_links set tarja = 'Somente imóveis com ADM'
+  where grupo = 'Garantias' and nome in ('Lado Bom','CredAluga','Loft','Seu Fiador','Alpop') and tarja is null;
+
 -- Notas por grupo da aba Validações (ex.: orientação embaixo de "Certidões").
 create table if not exists public.pre_analise_link_grupos (
   grupo text primary key check (char_length(grupo) between 1 and 40),
