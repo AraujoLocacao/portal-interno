@@ -469,7 +469,7 @@
   };
 
   // ---------- Novo cartão ----------
-  const MODELO='Aluguel:\nEntrada:\nVencimento:\n\nGarantia:\n**LIXO:**\n**SEGURO INCENDIO**\n**CHAVES:**\n**SINDICO:**\n**UC:**\n**ÁGUA:**\n**VISTORIA:**\n\nMORADORES:\n\n_CORRETORA:_\nCAPTADORA:\n\n**FECHADO DIA:**\n\n_**INFORMAÇÕES KENLO IMOB]**_';
+  const MODELO='Aluguel:\nEntrada:\nVencimento:\n\nGarantia:\n\nMORADORES:\n\n_CORRETORA:_\nCAPTADORA:\n\n**FECHADO DIA:**\n\n_**INFORMAÇÕES CRM**_';
   function abrirNovo(col){
     const ent=col||colunas.find(c=>c.entrada)?.id||colunas[0]?.id;
     $('#nColuna').innerHTML=colunas.map(x=>`<option value="${x.id}"${x.id===ent?' selected':''}>${safe(x.nome)}</option>`).join('');
