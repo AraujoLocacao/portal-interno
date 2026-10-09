@@ -80,8 +80,8 @@
     .pw-field{display:flex;gap:8px}.pw-field input{flex:1}
     .link-group{padding:20px;margin-bottom:18px}.link-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
     .link-tile{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;min-width:0}.link-tile:hover{border-color:#6da7ec}
-    .link-tile a.go{display:block;text-decoration:none;color:var(--ink)}.link-tile a.go strong{font-size:1.02rem}.link-tile a.go strong:after{content:" ↗";color:var(--blue)}
-    .link-tile a.go span{display:block;color:#52616c;font-size:.86rem;margin-top:2px}.link-tile a.go small{display:block;color:var(--muted);font-size:.78rem;margin-top:4px;overflow-wrap:anywhere}
+    .link-tile .go{display:block;text-decoration:none;color:var(--ink)}.link-tile .go strong{font-size:1.02rem}.link-tile a.go strong:after{content:" ↗";color:var(--blue)}
+    .link-tile .go span{display:block;color:#52616c;font-size:.86rem;margin-top:2px}.link-tile .go small{display:block;color:var(--muted);font-size:.78rem;margin-top:4px;overflow-wrap:anywhere}
     .link-tile .row-actions{text-align:left;margin:8px 0 0 -4px}
     .group-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
     .nota{margin:10px 0 0;background:#fff8ec;border:1px solid #f0dcb8;border-left:4px solid var(--amber);border-radius:10px;padding:10px 14px;color:#5b4520;font-size:.92rem;white-space:pre-line}
@@ -133,7 +133,7 @@
 
 <main id="app" hidden>
   <div class="dept"><h1>Pré-análise</h1>
-    <nav class="tabs" aria-label="Seções da pré-análise"><button type="button" class="tab-link" data-go="analises">Análises</button><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="validacoes">Validações</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button><a class="tab-link" href="quadro.html" style="text-decoration:none">Quadro ↗</a></nav></div>
+    <nav class="tabs" aria-label="Seções da pré-análise"><button type="button" class="tab-link" data-go="analises">Análises</button><button type="button" class="tab-link" data-go="locacoes">Locações</button><button type="button" class="tab-link" data-go="validacoes">Validações</button><button type="button" class="tab-link" data-go="garantias">Garantias</button><button type="button" class="tab-link" data-go="senhas">Senhas</button><button type="button" class="tab-link" data-go="pop">POP e documentos</button><a class="tab-link" href="quadro.html" style="text-decoration:none">Quadro ↗</a></nav></div>
 
   <section id="tab-analises" data-tab>
   <div class="top">
@@ -218,6 +218,14 @@
     <div id="linkGroups"></div>
   </section>
 
+  <section id="tab-garantias" data-tab hidden>
+    <div class="top">
+      <div><h2>Garantias</h2><p>Sites das garantias usadas na análise. Cada quadro abre numa nova aba.</p></div>
+      <div class="bar-actions"><button class="primary" id="newGarantia">+ Nova garantia</button></div>
+    </div>
+    <div class="card link-group"><div class="link-grid" id="garantiasGrid" style="margin-top:0"></div></div>
+  </section>
+
   <section id="tab-senhas" data-tab hidden>
     <div class="top">
       <div><h2>Senhas</h2><p>Acessos aos sistemas usados pela pré-análise. As senhas ficam criptografadas e só aparecem ao clicar em "Mostrar".</p></div>
@@ -296,7 +304,7 @@
       <div class="field"><label for="lGrupo">Grupo</label><input id="lGrupo" name="grupo" maxlength="40" list="lGrupos" placeholder="Ex.: Certidões" required><datalist id="lGrupos"></datalist></div>
       <div class="field"><label for="lNome">Nome</label><input id="lNome" name="nome" maxlength="80" placeholder="Ex.: Estadual SC" required></div>
     </div>
-    <div class="field"><label for="lUrl">Endereço do site</label><input id="lUrl" name="url" type="url" maxlength="300" placeholder="https://" required></div>
+    <div class="field"><label for="lUrl">Endereço do site</label><input id="lUrl" name="url" type="url" maxlength="300" placeholder="https://"></div>
     <div class="field"><label for="lDesc">Descrição (opcional)</label><input id="lDesc" name="descricao" maxlength="200"></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="linkSubmit">Salvar</button></div>
     <p class="msg error" id="linkMsg" hidden></p>
@@ -397,7 +405,7 @@
   // ---------- Abas ----------
   // As abas trocam por JavaScript (não por link), então funcionam em qualquer endereço; o #aba só serve para lembrar a aba ao recarregar.
   function showTab(pedida){
-    const abas=['analises','locacoes','validacoes','senhas','pop'],tab=abas.includes(pedida)?pedida:abas.includes(location.hash.slice(1))?location.hash.slice(1):'analises';
+    const abas=['analises','locacoes','validacoes','garantias','senhas','pop'],tab=abas.includes(pedida)?pedida:abas.includes(location.hash.slice(1))?location.hash.slice(1):'analises';
     if(pedida)try{history.replaceState(null,'','#'+tab)}catch{}
     document.querySelectorAll('[data-tab]').forEach(s=>s.hidden=s.id!=='tab-'+tab);
     document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
@@ -658,19 +666,25 @@
     return q.length<=2?new RegExp(`(^|[^a-z])${q}([^a-z]|$)`).test(hay):hay.includes(q);
   }
   $('#vBusca').addEventListener('input',()=>renderLinks());
-  const mesmoNome=(a,b)=>a.trim().toLowerCase()===b.trim().toLowerCase();
+  const mesmoNome=(a,b)=>semAcento(a.trim())===semAcento(b.trim());
+  // O grupo "Garantias" tem aba própria; os demais grupos ficam em Validações.
+  const GARANTIAS='Garantias';
+  const host=u=>{try{return new URL(u).host}catch{return u}};
+  const tileLink=l=>`<div class="link-tile">${l.url?`<a class="go" href="${safe(l.url)}" target="_blank" rel="noopener noreferrer"><strong>${safe(l.nome)}</strong>${l.descricao?`<span>${safe(l.descricao)}</span>`:''}<small>${safe(host(l.url))}</small></a>`
+      :`<div class="go"><strong>${safe(l.nome)}</strong>${l.descricao?`<span>${safe(l.descricao)}</span>`:''}<small class="muted">Sem endereço ainda: clique em Editar para colocar</small></div>`}
+        <div class="row-actions">${senhas.some(s=>mesmoNome(s.sistema,l.nome))?`<button class="link" data-login="${l.id}">Ver login</button>`:''}<button class="link" data-edit-link="${l.id}">Editar</button><button class="link danger" data-del-link="${l.id}">Excluir</button></div></div>`;
   function renderLinks(){
     const grupos=[...new Set(links.map(l=>l.grupo))];
     $('#lGrupos').innerHTML=grupos.map(g=>`<option value="${safe(g)}">`).join('');
-    if(!links.length){$('#linkGroups').innerHTML='<div class="empty-card">Nenhum link cadastrado. Clique em "+ Novo link".</div>';return}
-    const host=u=>{try{return new URL(u).host}catch{return u}};
+    const garantias=links.filter(l=>l.grupo===GARANTIAS);
+    $('#garantiasGrid').innerHTML=garantias.length?garantias.map(tileLink).join(''):'<p class="muted">Nenhuma garantia cadastrada. Clique em "+ Nova garantia".</p>';
+    const validacoes=links.filter(l=>l.grupo!==GARANTIAS);
+    if(!validacoes.length){$('#linkGroups').innerHTML='<div class="empty-card">Nenhum link cadastrado. Clique em "+ Novo link".</div>';return}
     const q=semAcento($('#vBusca').value.trim()).replace(/[^a-z0-9 ]/g,'');
-    const visiveis=q?links.filter(l=>casaBusca(l,q)):links;
+    const visiveis=q?validacoes.filter(l=>casaBusca(l,q)):validacoes;
     if(!visiveis.length){$('#linkGroups').innerHTML='<div class="empty-card">Nenhum link encontrado.</div>';return}
     $('#linkGroups').innerHTML=grupos.filter(g=>visiveis.some(l=>l.grupo===g)).map(g=>`<div class="card link-group"><div class="group-head"><h2>${safe(g)}</h2><button class="link" data-nota="${safe(g)}">${notas[g]?'Editar nota':'+ Nota'}</button></div>
-      ${notas[g]?`<p class="nota">${safe(notas[g])}</p>`:''}<div class="link-grid">${visiveis.filter(l=>l.grupo===g).map(l=>`
-      <div class="link-tile"><a class="go" href="${safe(l.url)}" target="_blank" rel="noopener noreferrer"><strong>${safe(l.nome)}</strong>${l.descricao?`<span>${safe(l.descricao)}</span>`:''}<small>${safe(host(l.url))}</small></a>
-        <div class="row-actions">${senhas.some(s=>mesmoNome(s.sistema,l.nome))?`<button class="link" data-login="${l.id}">Ver login</button>`:''}<button class="link" data-edit-link="${l.id}">Editar</button><button class="link danger" data-del-link="${l.id}">Excluir</button></div></div>`).join('')}</div></div>`).join('');
+      ${notas[g]?`<p class="nota">${safe(notas[g])}</p>`:''}<div class="link-grid">${visiveis.filter(l=>l.grupo===g).map(tileLink).join('')}</div></div>`).join('');
   }
   const notaDialog=$('#notaDialog');
   $('#notaForm').onsubmit=async e=>{
@@ -679,7 +693,7 @@
     if(error){msg.textContent='Não foi possível salvar: '+error.message;msg.hidden=false;return}
     notas[notaGrupo]=nota;notaDialog.close();renderLinks();
   };
-  $('#linkGroups').onclick=async e=>{
+  $('#linkGroups').onclick=$('#garantiasGrid').onclick=async e=>{
     if(e.target.dataset.nota!==undefined){notaGrupo=e.target.dataset.nota;$('#notaTitle').textContent='Nota – '+notaGrupo;$('#nTexto').value=notas[notaGrupo]||'';$('#notaMsg').hidden=true;notaDialog.showModal();return}
     const d=e.target.dataset,l=links.find(x=>x.id===(d.login||d.editLink||d.delLink));if(!l)return;
     if(d.login){showTab('senhas');$('#sBusca').value=l.nome;renderSenhas()}
@@ -689,16 +703,18 @@
       links=links.filter(x=>x.id!==l.id);renderLinks()}
   };
   const linkDialog=$('#linkDialog');
-  function openLink(l){
-    linkEditId=l?.id||null;const f=$('#linkForm');f.reset();$('#linkMsg').hidden=true;$('#linkTitle').textContent=l?'Editar link':'Novo link';
-    if(l){f.grupo.value=l.grupo;f.nome.value=l.nome;f.url.value=l.url;f.descricao.value=l.descricao||''}
+  function openLink(l,grupo){
+    linkEditId=l?.id||null;const f=$('#linkForm');f.reset();$('#linkMsg').hidden=true;
+    $('#linkTitle').textContent=(l?l.grupo:grupo)===GARANTIAS?(l?'Editar garantia':'Nova garantia'):(l?'Editar link':'Novo link');
+    if(l){f.grupo.value=l.grupo;f.nome.value=l.nome;f.url.value=l.url||'';f.descricao.value=l.descricao||''}else if(grupo)f.grupo.value=grupo;
     linkDialog.showModal();
   }
   $('#newLink').onclick=()=>openLink(null);
+  $('#newGarantia').onclick=()=>openLink(null,GARANTIAS);
   $('#linkForm').onsubmit=async e=>{
     e.preventDefault();const f=new FormData(e.currentTarget),msg=$('#linkMsg');msg.hidden=true;
-    const item={grupo:String(f.get('grupo')).trim(),nome:String(f.get('nome')).trim(),url:String(f.get('url')).trim(),descricao:String(f.get('descricao')).trim()||null};
-    if(!/^https?:\/\//i.test(item.url)){msg.textContent='O endereço precisa começar com https://';msg.hidden=false;return}
+    const item={grupo:String(f.get('grupo')).trim(),nome:String(f.get('nome')).trim(),url:String(f.get('url')).trim()||null,descricao:String(f.get('descricao')).trim()||null};
+    if(item.url&&!/^https?:\/\//i.test(item.url)){msg.textContent='O endereço precisa começar com https://';msg.hidden=false;return}
     // Link novo entra no fim do seu grupo (ou no fim da página, se o grupo for novo).
     if(!linkEditId){const doGrupo=links.filter(l=>l.grupo===item.grupo);item.ordem=Math.max(0,...(doGrupo.length?doGrupo:links).map(l=>l.ordem))+(doGrupo.length?1:10)}
     $('#linkSubmit').disabled=true;

@@ -24,13 +24,7 @@ insert into public.pre_analise_links (grupo, nome, url, descricao, ordem)
 select * from (values
   ('Consultas', 'SPC Serasa', 'https://sistema.spcbrasil.com.br/spc/', 'Consulta de crédito (CPF/CNPJ)', 10),
   ('Certidões', 'Federal Unificada (CJF)', 'https://certidao-unificada.cjf.jus.br/#/solicitacao-certidao', 'Certidão da Justiça Federal de todas as regiões (TRF1 a TRF6) de uma vez', 15),
-  ('Certidões', 'Federal SC', 'https://www2.trf4.jus.br/trf4/processos/certidao/index.php', 'Certidão judicial da Justiça Federal da 4ª Região (TRF4)', 20),
-  ('Certidões', 'Estadual SC', 'https://certeproc2g.tjsc.jus.br/', 'Certidão do Tribunal de Justiça de Santa Catarina (TJSC)', 30),
-  ('Certidões', 'Criminal Estadual – SC (TJSC)', 'https://www.tjsc.jus.br/web/judicial/certidoes', 'Certidão criminal do Tribunal de Justiça de Santa Catarina', 31),
-  ('Certidões', 'Criminal Federal – RJ (TRF2)', 'https://certidoes.trf2.jus.br/certidoes/#/principal/solicitar', 'Certidão criminal da Justiça Federal da 2ª Região (TRF2)', 33),
-  ('Certidões', 'Federal – TRF1', 'https://portal.trf1.jus.br/Servicos/Certidao/', 'Justiça Federal da 1ª Região: DF, GO, TO, MT, BA, PI, MA e Norte', 34),
-  ('Certidões', 'Federal – TRF3 (SP/MS)', 'https://certidao.trf3.jus.br/', 'Justiça Federal da 3ª Região: São Paulo e Mato Grosso do Sul', 35),
-  ('Certidões', 'Federal – TRF6 (MG)', 'https://certidao.trf6.jus.br/', 'Justiça Federal da 6ª Região: Minas Gerais', 36),
+  ('Certidões', 'Estadual SC', 'https://www.tjsc.jus.br/web/judicial/certidoes', 'Certidão do Tribunal de Justiça de Santa Catarina (TJSC)', 30),
   ('Processos', 'Escavador', 'https://www.escavador.com/', 'Consulta de processos', 90)
 ) as v(grupo, nome, url, descricao, ordem)
 where not exists (select 1 from public.pre_analise_links);
@@ -66,6 +60,21 @@ select * from (values
   ('Certidões de outros estados', 'TO – Tocantins (TJTO)', 'https://eproc1.tjto.jus.br/eprocV2_prod_1grau/externo_controlador.php?acao=cj_online', 'Certidão estadual (TJTO)', 66)
 ) as v(grupo, nome, url, descricao, ordem)
 where not exists (select 1 from public.pre_analise_links l where l.grupo = v.grupo);
+
+-- Aba "Garantias" (out/2026): o grupo "Garantias" aparece numa aba própria, fora de Validações.
+-- Endereço opcional, para cadastrar a garantia antes de ter o site (ex.: CDL).
+alter table public.pre_analise_links alter column url drop not null;
+insert into public.pre_analise_links (grupo, nome, url, descricao, ordem)
+select * from (values
+  ('Garantias', 'Lado Bom', 'https://app.ladobom.com/admin/bond-insurances', null, 1),
+  ('Garantias', 'CredAluga', 'https://app.credaluga.com.br/dashboard', null, 2),
+  ('Garantias', 'Loft', 'https://app.loft.com.br/fianca-aluguel/imobiliaria', null, 3),
+  ('Garantias', 'Seu Fiador', 'https://portal.seufiador.com.br/parceiro/simulacao/create', null, 4),
+  ('Garantias', 'Alpop', 'https://alpop.com.br/gerenciamento', null, 5),
+  ('Garantias', 'CDL', null, null, 6),
+  ('Garantias', 'Atlântico', 'https://sistema.atlanticoseguros.com.br/auth/login', null, 7)
+) as v(grupo, nome, url, descricao, ordem)
+where not exists (select 1 from public.pre_analise_links l where l.grupo = 'Garantias');
 
 -- Notas por grupo da aba Validações (ex.: orientação embaixo de "Certidões").
 create table if not exists public.pre_analise_link_grupos (
