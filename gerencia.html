@@ -560,11 +560,11 @@
       const [c,u,l,a,r,lo,pw,lw]=await Promise.all([
         db.from('corretoras').select('nome,ativa').order('nome'),db.from('unidades').select('nome,ativa').order('nome'),
         tudo('leads_diarios','data,ate,unidade,corretora,quantidade,ordem'),tudo('pre_analises','data,corretora,situacao'),
-        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem'),tudo('locacoes','data,unidade,corretora,vgl'),
+        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem'),tudo('locacoes','data,data_original,unidade,corretora,vgl'),
         tudo('propostas_whatsapp','data,hora,corretora,referencia,aluguel,garantia'),
         db.from('propostas_whatsapp_leituras').select('de,ate,encontradas,novas').order('ate',{ascending:false}).limit(60)]);
       if(c.error)throw c.error;if(u.error)throw u.error;if(lw.error)throw lw.error;
-      corretoras=c.data;unidades=u.data;leads=l;analises=a;resultados=r;locacoes=lo.map(x=>({...x,vgl:Number(x.vgl)}));propWpp=pw;leiturasWpp=lw.data;
+      corretoras=c.data;unidades=u.data;leads=l;analises=a;resultados=r;locacoes=lo.map(x=>({...x,data:x.data_original||x.data,vgl:Number(x.vgl)}));// contrato não assinado que passou de mês no fechamento do dia 10 continua contando na semana em que foi lançadopropWpp=pw;leiturasWpp=lw.data;
       montarFatos();
       if(!semRel){const ult=[...resultados.map(x=>x.data),...locacoes.map(x=>x.data)].sort().pop();semRel=semanaDe(ult||iso(new Date()))[0]}
       fillFilterOptions();render();renderSemanal();

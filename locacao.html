@@ -79,7 +79,10 @@
     #planilha tr.erro td:first-child{box-shadow:inset 4px 0 0 var(--red)}
     .tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:.72rem;font-weight:800;letter-spacing:.02em;white-space:nowrap}
     .tag.sim{background:#e3f1ec;color:#1d604d}.tag.nao{background:#fdf1dc;color:#8a5a12}.tag.bad{background:var(--red);color:#fff}
-    .tag.pos{background:#e8eef5;color:var(--blue)}
+    .tag.pos{background:#e8eef5;color:var(--blue)}.tag.veio{background:#e8eef5;color:var(--blue);cursor:help}
+    /* Contrato ainda não assinado: aparece na planilha, mas fica fora dos totais, das comissões e do ranking. */
+    #planilha tr.pend td{color:#8a959e}#planilha tr.pend td strong{color:#65727d}
+    .fech{border:1px solid #c9d8ea;background:#f1f6fb;color:#22405c;border-radius:14px;padding:12px 18px;margin-bottom:18px;font-size:.92rem}.fech strong{color:var(--navy)}
     .alerta{border:1px solid #efc4c4;background:#fdecec;color:#6e2323;border-radius:14px;padding:14px 18px;margin-bottom:18px}
     .alerta strong{color:var(--red)}.alerta ul{margin:6px 0 0;padding-left:20px}.alerta li{margin:2px 0}
     .quadros{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:18px;margin-bottom:18px}
@@ -157,16 +160,17 @@
 
   <div id="dash">
     <div class="alerta" id="alerta" hidden></div>
+    <div class="fech" id="fechamento" hidden></div>
     <div class="tiles" id="tiles"></div>
 
     <div class="card table-card">
       <div class="list-head"><h2>Planilha do mês</h2><span class="muted" id="listCount"></span></div>
       <div class="table-wrap"><table id="planilha"></table></div>
-      <p class="regras">Como é calculado (igual à planilha): Tx de loc. = VGL × %. Base de cálculo = Tx de loc. × 90%. Corretora = base × 25%. Stefani = base × 10%. Du = base × 1%. Captação: vale só um dos dois, conforme o tipo escolhido na locação — captação nova: Age. novo = Tx de loc. × 8%; cap. imobiliária (pós): Cap. imob. = Tx de loc. × 5%. As semanas vão de segunda a domingo e param na virada do mês.</p>
+      <p class="regras">Como é calculado (igual à planilha): Tx de loc. = VGL × %. Base de cálculo = Tx de loc. × 90%. Corretora = base × 25%. Stefani = base × 10%. Du = base × 1%. Captação: vale só um dos dois, conforme o tipo escolhido na locação — captação nova: Age. novo = Tx de loc. × 8%; cap. imobiliária (pós): Cap. imob. = Tx de loc. × 5%. As semanas vão de segunda a domingo e param na virada do mês. Os totais, as comissões e o ranking contam só os contratos assinados (as linhas em cinza ainda não foram assinadas). Todo dia 10 fecha-se o mês anterior: o contrato que não foi assinado passa sozinho para o dia 01 do mês seguinte.</p>
     </div>
 
     <div class="quadros">
-      <div class="card table-card"><h2>Ranking por corretora</h2><p class="msg">Ajuda de custo = VGL × 10%. A bonificação é digitada aqui e fica salva para o mês.</p><div class="table-wrap"><table id="ranking"></table></div></div>
+      <div class="card table-card"><h2>Ranking por corretora</h2><p class="msg">Só contratos assinados. Ajuda de custo = VGL × 10%. A bonificação é digitada aqui e fica salva para o mês.</p><div class="table-wrap"><table id="ranking"></table></div></div>
       <div class="card table-card"><h2>Garantias</h2><div class="table-wrap"><table id="garantiasQ"></table></div></div>
       <div class="card table-card"><h2>Captadoras</h2><div class="table-wrap"><table id="captadorasQ"></table></div></div>
     </div>
@@ -318,6 +322,13 @@
   }
   const CAMPOS=['vgl','tx','base','corretora','stefani','du','capImob','ageNovo'];
   function somar(list){const t=Object.fromEntries(CAMPOS.map(k=>[k,0]));list.forEach(l=>{const c=calc(l);CAMPOS.forEach(k=>t[k]+=c[k])});return t}
+  // Fechamento: no dia 10 fecha-se o mês anterior e só contam os assinados. O banco (supabase/locacao_fechamento.sql)
+  // move sozinho, no dia 10, o contrato não assinado para o dia 01 do mês seguinte e guarda a data original.
+  const assinados=list=>list.filter(l=>l.assinado);
+  const proxMes=ym=>{const [y,m]=ym.split('-').map(Number);return m===12?`${y+1}-01`:`${y}-${pad(m+1)}`};
+  const diaFechamento=ym=>proxMes(ym)+'-10';
+  const veioDe=l=>l.data_original&&l.data_original.slice(0,7)!==l.data.slice(0,7)?l.data_original:null;
+  const plural=(n,um,varios)=>`${n} ${n===1?um:varios}`;
 
   // Semanas de segunda a domingo, cortadas na virada do mês (01 a 06/09, 07 a 13/09...), como no relatório semanal.
   function semanasDoMes(ym){
@@ -379,7 +390,7 @@
   async function loadLocs(){
     const all=[];
     for(let from=0;;from+=1000){
-      const {data,error}=await db.from('locacoes').select('id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,captadora,captacao_pos,observacao,ordem,criado_em').order('data').order('ordem').order('criado_em').range(from,from+999);
+      const {data,error}=await db.from('locacoes').select('id,data,data_original,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,captadora,captacao_pos,observacao,ordem,criado_em').order('data').order('ordem').order('criado_em').range(from,from+999);
       if(error)throw error;all.push(...data);if(data.length<1000)break;
     }
     const b=await db.from('locacao_bonificacoes').select('mes,corretora,valor');if(b.error)throw b.error;
@@ -433,18 +444,29 @@
 
   // ---------- Painel ----------
   function render(){
-    const list=filtered(),todos=doMes(),t=somar(list);
+    const list=filtered(),todos=doMes(),ass=assinados(list),pend=list.filter(l=>!l.assinado),t=somar(ass);
     const partes=[$('#fCorretor').value||'Todas as corretoras',$('#fUnidade').value||'todas as cidades'];
     $('#subtitle').textContent=`${nomeMes(mesSel).replace(/^./,c=>c.toUpperCase())} · ${partes.join(' · ')}`;
-    const ass=list.filter(l=>l.assinado).length;
     $('#tiles').innerHTML=[
-      ['Locações',list.length,list.length===1?'contrato':'contratos'],
-      ['VGL',brl(t.vgl),'soma dos aluguéis'],
+      ['Assinados',`${ass.length} de ${list.length}`,list.length?'contratos que contam no mês':'nenhum contrato'],
+      ['VGL',brl(t.vgl),'só contratos assinados'],
       ['Taxa de locação',brl(t.tx),'VGL × %'],
       ['Base de cálculo',brl(t.base),'taxa × 90%'],
-      ['Assinados',`${ass} de ${list.length}`,list.length-ass?`${list.length-ass} ainda sem assinatura`:'todos assinados']
+      ['A assinar',pend.length,pend.length?`${brl(somar(pend).vgl)} de VGL fora dos totais`:'nenhum pendente']
     ].map(([a,b,c])=>`<div class="card tile"><span>${a}</span><strong>${b}</strong><small>${c}</small></div>`).join('');
-    renderAlerta();renderPlanilha(list);renderRanking(todos);renderGarantias(todos);renderCaptadoras(todos);
+    renderAlerta();renderFechamento();renderPlanilha(list);renderRanking(assinados(todos));renderGarantias(todos);renderCaptadoras(todos);
+  }
+
+  function renderFechamento(){
+    const prox=nomeMes(proxMes(mesSel)).split(' de ')[0],dia=br(diaFechamento(mesSel)).slice(0,5),fechado=iso(new Date())>=diaFechamento(mesSel);
+    const pend=doMes().filter(l=>!l.assinado),movidas=locs.filter(l=>l.data_original?.startsWith(mesSel)&&!l.data.startsWith(mesSel));
+    const refs=ls=>ls.map(l=>safe(l.referencia)).join(', ');
+    let txt=fechado?`<strong>Mês fechado em ${dia}.</strong> Os totais e o ranking contam só os contratos assinados.`
+      :`<strong>Fechamento de ${nomeMes(mesSel).split(' de ')[0]} no dia ${dia}.</strong> Os totais e o ranking contam só os contratos assinados.`;
+    if(movidas.length)txt+=` No fechamento, ${plural(movidas.length,'contrato não assinado passou','contratos não assinados passaram')} para o mês seguinte: ${refs(movidas)}.`;
+    if(pend.length)txt+=fechado?` ${plural(pend.length,'contrato sem assinatura foi lançado','contratos sem assinatura foram lançados')} depois do fechamento (${refs(pend)}): ${pend.length===1?'fica':'ficam'} fora dos totais e ${pend.length===1?'passa':'passam'} para o mês aberto no próximo dia 10.`
+      :` ${plural(pend.length,'contrato ainda não foi assinado','contratos ainda não foram assinados')} (${refs(pend)}): se não ${pend.length===1?'for assinado':'forem assinados'} até o dia ${br(diaFechamento(mesSel).replace(/10$/,'09')).slice(0,5)}, ${pend.length===1?'passa':'passam'} sozinho${pend.length===1?'':'s'} para ${prox}.`;
+    $('#fechamento').innerHTML=txt;$('#fechamento').hidden=!doMes().length&&!movidas.length;
   }
 
   function renderAlerta(){
@@ -456,6 +478,7 @@
   }
 
   const cols=`<thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th><th class="num">Tx de loc.</th><th class="num">Base de cálculo</th><th class="num">Corretora<small>25%</small></th><th class="num">Stefani<small>10%</small></th><th class="num">Du<small>1%</small></th><th class="num">Cap. imob.<small>5%</small></th><th>Nome cap.</th><th class="num">Age. novo<small>8%</small></th><th></th></tr></thead>`;
+  const contagem=ls=>{const a=assinados(ls).length,p=ls.length-a;return plural(a,'assinada','assinadas')+(p?` (${p} a assinar, fora do total)`:'')};
   const linhaValores=t=>CAMPOS.map((k,i)=>`<td class="num">${num(t[k])}</td>${i===0?'<td></td>':''}${k==='capImob'?'<td></td>':''}`).join('');
   function renderPlanilha(list){
     const {porId}=errosDoMes(),sems=semanasDoMes(mesSel);
@@ -465,10 +488,10 @@
     sems.forEach(s=>{
       const ls=list.filter(l=>l.data>=s.de&&l.data<=s.ate);if(!ls.length)return;
       html+=`<tr class="semana"><td colspan="17">SEMANA ${pad(s.n)}<span>${br(s.de).slice(0,5)} a ${br(s.ate).slice(0,5)}</span></td></tr>`;
-      html+=ls.map(l=>{const c=calc(l),err=porId[l.id];return `<tr${err?' class="erro"':''}>
+      html+=ls.map(l=>{const c=calc(l),err=porId[l.id],cls=[err&&'erro',!l.assinado&&'pend'].filter(Boolean).join(' '),veio=veioDe(l);return `<tr${cls?` class="${cls}"`:''}>
         <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${err?.some(e=>e.startsWith('REF'))?` <span class="tag bad">${safe(err.find(e=>e.startsWith('REF')))}</span>`:''}</td>
         <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td>
-        <td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
+        <td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span>${veio?`<br><span class="tag veio" title="Lançado em ${br(veio)}. Não estava assinado no fechamento e passou para este mês.">veio de ${MESES[+veio.slice(5,7)-1]}</span>`:''}</td>
         <td class="nome">${safe(l.proponente)}${l.observacao?` <span class="obs" title="${safe(l.observacao).replace(/"/g,'&quot;')}">📝 Obs.</span>`:''}${etapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${etapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(etapas[l.id].coluna)}</a>`:''}</td>
         <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
         <td class="num"><strong>${num(c.vgl)}</strong></td><td class="num">${pctTxt(l.percentual)}</td>
@@ -476,9 +499,9 @@
         <td style="white-space:nowrap">${l.captadora?safe(capNome(l.captadora))+' ':''}<span class="tag pos">${l.captacao_pos?'PÓS':'NOVA'}</span></td>
         <td class="num">${l.captacao_pos?'<span class="muted">–</span>':num(c.ageNovo)}</td>
         <td class="row-actions"><button class="link" data-edit="${l.id}">Editar</button><button class="link danger" data-del="${l.id}">Excluir</button></td></tr>`}).join('');
-      html+=`<tr class="sub"><td colspan="6">Total da semana ${pad(s.n)} · ${ls.length} ${ls.length===1?'locação':'locações'}</td>${linhaValores(somar(ls))}<td></td></tr>`;
+      html+=`<tr class="sub"><td colspan="6">Total da semana ${pad(s.n)} · ${contagem(ls)}</td>${linhaValores(somar(assinados(ls)))}<td></td></tr>`;
     });
-    html+=`<tr class="total"><td colspan="6">TOTAL MENSAL · ${list.length} ${list.length===1?'locação':'locações'}</td>${linhaValores(somar(list))}<td></td></tr>`;
+    html+=`<tr class="total"><td colspan="6">TOTAL MENSAL · ${contagem(list)}</td>${linhaValores(somar(assinados(list)))}<td></td></tr>`;
     $('#planilha').innerHTML=cols+'<tbody>'+html+'</tbody>';
   }
   $('#planilha').onclick=async e=>{
@@ -587,8 +610,8 @@
   // ---------- Exportar ----------
   $('#exportCsv').onclick=()=>{
     const sems=semanasDoMes(mesSel),sem=d=>sems.find(s=>d>=s.de&&d<=s.ate)?.n||'',esc=v=>`"${String(v??'').replace(/"/g,'""')}"`,n=v=>num(v).replace(/\./g,'');
-    const head=['Semana','Data','REF','Cidade','Corretora','Ass.','Proponente','Garantia','VGL','%','Tx de loc','Base de calculo','Corretora 25%','Stefani 10%','Du 1%','Cap imob 5%','Nome cap','Tipo captacao','Age novo 8%','Observacao'];
-    const rows=filtered().map(l=>{const c=calc(l);return [sem(l.data),br(l.data),l.referencia,l.unidade,l.corretora,l.assinado?'SIM':'NÃO',l.proponente,l.garantia||'NÃO INFORMADA',n(c.vgl),String(+l.percentual).replace('.',','),n(c.tx),n(c.base),n(c.corretora),n(c.stefani),n(c.du),n(c.capImob),l.captadora||'',l.captacao_pos?'PÓS':'NOVA',n(c.ageNovo),l.observacao||'']});
+    const head=['Semana','Data','REF','Cidade','Corretora','Ass.','Proponente','Garantia','VGL','%','Tx de loc','Base de calculo','Corretora 25%','Stefani 10%','Du 1%','Cap imob 5%','Nome cap','Tipo captacao','Age novo 8%','Observacao','Lancada em (veio do mes anterior)'];
+    const rows=filtered().map(l=>{const c=calc(l);return [sem(l.data),br(l.data),l.referencia,l.unidade,l.corretora,l.assinado?'SIM':'NÃO',l.proponente,l.garantia||'NÃO INFORMADA',n(c.vgl),String(+l.percentual).replace('.',','),n(c.tx),n(c.base),n(c.corretora),n(c.stefani),n(c.du),n(c.capImob),l.captadora||'',l.captacao_pos?'PÓS':'NOVA',n(c.ageNovo),l.observacao||'',veioDe(l)?br(veioDe(l)):'']});
     const csv=[head,...rows].map(r=>r.map(esc).join(';')).join('\r\n');
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`locacoes-${mesSel}.csv`;a.click();URL.revokeObjectURL(a.href);
   };
