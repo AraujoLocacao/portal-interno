@@ -304,7 +304,7 @@
   const ajudaCusto=vgl=>tabelaMes(vgl).ajuda;
   // Sugestões do campo "captadora" (as captadoras da área de Captação + Navegantes, como na planilha). Dá para digitar outro nome.
   const CAPTADORAS=['RUBIA','SONORA','ANA','ANA PAULA','NAVEGANTES'];
-  let etapas={},locs=[],bonus=[],corretoras=[],unidades=[],garantias=[],booted=false,senhas=[],docs=[],senhaEditId=null,locEditId=null,mesSel=null;
+  let enviadosRh={},etapas={},locs=[],bonus=[],corretoras=[],unidades=[],garantias=[],booted=false,senhas=[],docs=[],senhaEditId=null,locEditId=null,mesSel=null;
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
   // Confirmação desenhada na própria página: alguns navegadores (como o do painel do app) bloqueiam a janela confirm() do sistema.
@@ -407,6 +407,8 @@
     // Etapa de cada locação no quadro de contratos (quadro.html). Se o quadro não carregar, a planilha funciona igual.
     try{const [k,c]=await Promise.all([db.from('quadro_cartoes').select('id,locacao_id,coluna_id').not('locacao_id','is',null),db.from('quadro_colunas').select('id,nome')]);
       const nomes=Object.fromEntries((c.data||[]).map(x=>[x.id,x.nome]));etapas=Object.fromEntries((k.data||[]).map(x=>[x.locacao_id,{cartao:x.id,coluna:nomes[x.coluna_id]}]))}catch{etapas={}}
+    // Rankings já enviados ao RH no fechamento do dia 10 (tabela locacao_fechamentos).
+    try{const {data}=await db.from('locacao_fechamentos').select('mes,fechado_em');enviadosRh=Object.fromEntries((data||[]).map(x=>[x.mes.slice(0,7),x.fechado_em]))}catch{enviadosRh={}}
     fillMeses();fillFilterOptions();render();
   }
 
@@ -472,6 +474,8 @@
     const refs=ls=>ls.map(l=>safe(l.referencia)).join(', ');
     let txt=fechado?`<strong>Mês fechado em ${dia}.</strong> Os totais e o ranking contam só os contratos assinados.`
       :`<strong>Fechamento de ${nomeMes(mesSel).split(' de ')[0]} no dia ${dia}.</strong> Os totais e o ranking contam só os contratos assinados.`;
+    txt+=enviadosRh[mesSel]?` O ranking foi enviado ao RH em ${new Date(enviadosRh[mesSel]).toLocaleDateString('pt-BR')} (Gestão Financeira / RH → "Fechamento da Locação").`
+      :fechado?'':` No dia ${dia}, o ranking vai sozinho para o RH.`;
     if(movidas.length)txt+=` No fechamento, ${plural(movidas.length,'contrato não assinado passou','contratos não assinados passaram')} para o mês seguinte: ${refs(movidas)}.`;
     if(pend.length)txt+=fechado?` ${plural(pend.length,'contrato sem assinatura foi lançado','contratos sem assinatura foram lançados')} depois do fechamento (${refs(pend)}): ${pend.length===1?'fica':'ficam'} fora dos totais e ${pend.length===1?'passa':'passam'} para o mês aberto no próximo dia 10.`
       :` ${plural(pend.length,'contrato ainda não foi assinado','contratos ainda não foram assinados')} (${refs(pend)}): se não ${pend.length===1?'for assinado':'forem assinados'} até o dia ${br(diaFechamento(mesSel).replace(/10$/,'09')).slice(0,5)}, ${pend.length===1?'passa':'passam'} sozinho${pend.length===1?'':'s'} para ${prox}.`;

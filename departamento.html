@@ -42,6 +42,12 @@
     .gate{max-width:420px;margin:60px auto;padding:28px}.gate h1{font-size:1.6rem;margin-bottom:6px}.gate p{color:var(--muted);margin:0 0 18px}.gate form{display:grid;gap:14px}
     .msg{margin:0;font-size:.85rem;color:var(--muted)}.msg.error{color:var(--red)}
     .empty{padding:30px;text-align:center;color:var(--muted)}
+    /* Fechamento da Locação (ranking que chega ao RH no dia 10) */
+    td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    #fechTable tr.total td{background:#eef2f4;font-weight:800}
+    .fech-sel{border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;font-weight:700;min-width:190px}
+    .tag-mao{display:inline-block;border-radius:6px;padding:0 6px;font-size:.7rem;font-weight:800;background:#e8eef5;color:var(--blue);margin-left:4px;cursor:help}
+    @media print{header.bar,.dept,.tabs,#tab-fechamento .bar-actions,#tab-fechamento .no-print{display:none!important}body{background:#fff}.card{box-shadow:none}}
     dialog{border:0;border-radius:18px;padding:0;box-shadow:0 28px 90px rgba(10,30,45,.3);width:min(600px,calc(100% - 32px));overflow-x:hidden}dialog::backdrop{background:rgba(10,30,45,.62);backdrop-filter:blur(3px)}
     .dialog-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}.close{border:0;background:#eef2f4;width:34px;height:34px;border-radius:50%;font-size:1.2rem}
     dialog form{padding:20px 22px 22px;display:grid;gap:14px}
@@ -209,6 +215,16 @@
     </div>
   </section>
 
+  <section id="tab-fechamento" data-tab hidden>
+    <div class="top">
+      <div><h2>Fechamento da Locação</h2><p id="fechSub">Ranking das corretoras do mês fechado, enviado sozinho pela Locação todo dia 10. Conta só os contratos assinados e fica como estava no dia do fechamento.</p></div>
+      <div class="bar-actions"><select class="fech-sel" id="fechMes" aria-label="Mês do fechamento"></select><button class="secondary" id="fechCsv">Baixar planilha</button><button class="secondary" id="fechPrint">Imprimir / PDF</button></div>
+    </div>
+    <div class="tiles" id="fechTiles"></div>
+    <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="fechTable"></table></div>
+      <p class="msg no-print" style="margin-top:12px">Ajuda de custo: 10% do VGL do mês, limitada a R$ 2.000; a partir de R$ 40.000, R$ 5.000. Bonificação: R$ 500 a partir de R$ 20.000 e R$ 1.000 a partir de R$ 30.000 (sem bonificação a partir de R$ 40.000). "à mão" = valor digitado pela Locação no lugar da tabela.</p></div>
+  </section>
+
   <section id="tab-documentos" data-tab hidden>
     <div class="top">
       <div><h2>Gerar documentos</h2><p>Escolha o modelo, preencha os dados e baixe o contrato em Word, para conferir e imprimir para assinar. O que é digitado aqui não fica salvo no portal.</p></div>
@@ -357,7 +373,7 @@
       atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
     // documentos = gerador de contratos em Word (08/10/2026). Os modelos ficam no bucket privado, em ferramentas/financeiro-rh/.
-    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','documentos'],
+    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','fechamento','documentos'],
       atividades:['Colaboradores (admissão/demissão/folha)','Contas a pagar da empresa','Suporte direto à equipe financeira']},
     {slug:'supervisao',limpo:true,nome:'Supervisão',area:'Liderança',papel:'Administrativo',ref:'Referência',
       atividades:['Resposta a notificações direcionadas à imobiliária','Monitoramento da demanda do administrativo','Reuniões semanais']},
@@ -394,7 +410,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={rh:'RH',documentos:'Gerar documentos',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
+    const nomes={rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
     if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
@@ -420,7 +436,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // Quem entra em mais de um departamento (gerência e acesso geral, ver supabase/acesso_geral.sql) ganha um seletor no topo.
@@ -736,6 +752,44 @@
   const anosTxt=n=>`${n} ${n===1?'ano':'anos'} de casa`;
   const tempoCasa=adm=>{const [a,m,d]=ymd(adm),h=hojeD();let anos=h.getFullYear()-a;if(h<new Date(h.getFullYear(),m-1,d))anos--;
     if(anos>=1)return anosTxt(anos);const meses=(h.getFullYear()-a)*12+h.getMonth()-(m-1)-(h.getDate()<d?1:0);return meses<=0?'entrou há pouco':`${meses} ${meses===1?'mês':'meses'} de casa`};
+  // ---------- Fechamento da Locação ----------
+  // Ranking do mês fechado, gravado pelo banco todo dia 10 (supabase/locacao_fechamento.sql, tabela locacao_fechamentos).
+  let fechamentos=[];
+  const brl=v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const num2=v=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const nomeMesF=m=>{const [y,mm]=m.split('-');return `${MESES[+mm-1].replace(/^./,c=>c.toUpperCase())} de ${y}`};
+  async function loadFechamentos(){
+    $('#fechTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
+    const {data,error}=await db.from('locacao_fechamentos').select('mes,fechado_em,ranking,total_vgl,total_ajuda,total_bonificacao').order('mes',{ascending:false});
+    if(error){$('#fechTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
+    fechamentos=data;
+    $('#fechMes').innerHTML=data.map(f=>`<option value="${f.mes}">${nomeMesF(f.mes)}</option>`).join('');
+    $('#fechMes').hidden=!data.length;renderFechamento();
+  }
+  function renderFechamento(){
+    const f=fechamentos.find(x=>x.mes===$('#fechMes').value);
+    if(!f){$('#fechTiles').innerHTML='';$('#fechTable').innerHTML='<tbody><tr><td class="empty">Nenhum fechamento ainda. O ranking chega sozinho todo dia 10.</td></tr></tbody>';return}
+    const r=f.ranking||[],dia=new Date(f.fechado_em).toLocaleDateString('pt-BR');
+    $('#fechSub').textContent=`Ranking das corretoras de ${nomeMesF(f.mes).toLowerCase()}, enviado pela Locação em ${dia}. Conta só os contratos assinados e fica como estava no dia do fechamento.`;
+    $('#fechTiles').innerHTML=`<div class="card tile"><span>VGL do mês</span><strong>${brl(f.total_vgl)}</strong><small>${r.reduce((a,x)=>a+x.locacoes,0)} contratos assinados</small></div>
+      <div class="card tile"><span>Ajuda de custo</span><strong>${brl(f.total_ajuda)}</strong><small>soma das corretoras</small></div>
+      <div class="card tile"><span>Bonificação</span><strong>${brl(f.total_bonificacao)}</strong><small>soma das corretoras</small></div>
+      <div class="card tile"><span>Total a pagar</span><strong>${brl(+f.total_ajuda+ +f.total_bonificacao)}</strong><small>ajuda de custo + bonificação</small></div>`;
+    $('#fechTable').innerHTML=`<thead><tr><th>Corretora</th><th class="num">Locações</th><th class="num">VGL</th><th class="num">Ajuda de custo</th><th class="num">Bonificação</th><th class="num">Total</th></tr></thead><tbody>${r.map((x,i)=>`<tr>
+      <td><strong>${i+1}º</strong> ${safe(x.corretora)}</td><td class="num">${x.locacoes}</td><td class="num">${num2(x.vgl)}</td><td class="num">${num2(x.ajuda)}</td>
+      <td class="num">${num2(x.bonificacao)}${x.bonificacao_digitada?'<span class="tag-mao" title="Valor digitado pela Locação no lugar da tabela">à mão</span>':''}</td><td class="num"><strong>${num2(+x.ajuda+ +x.bonificacao)}</strong></td></tr>`).join('')}
+      <tr class="total"><td>Total</td><td class="num">${r.reduce((a,x)=>a+x.locacoes,0)}</td><td class="num">${num2(f.total_vgl)}</td><td class="num">${num2(f.total_ajuda)}</td><td class="num">${num2(f.total_bonificacao)}</td><td class="num">${num2(+f.total_ajuda+ +f.total_bonificacao)}</td></tr></tbody>`;
+  }
+  $('#fechMes').addEventListener('change',renderFechamento);
+  $('#fechPrint').onclick=()=>print();
+  $('#fechCsv').onclick=()=>{
+    const f=fechamentos.find(x=>x.mes===$('#fechMes').value);if(!f)return;
+    const esc=v=>`"${String(v??'').replace(/"/g,'""')}"`,n=v=>num2(v).replace(/\./g,'');
+    const linhas=[['Posicao','Corretora','Locacoes','VGL','Ajuda de custo','Bonificacao','Total'],...(f.ranking||[]).map((x,i)=>[i+1,x.corretora,x.locacoes,n(x.vgl),n(x.ajuda),n(x.bonificacao)+(x.bonificacao_digitada?' (a mao)':''),n(+x.ajuda+ +x.bonificacao)]),
+      ['','Total',(f.ranking||[]).reduce((a,x)=>a+x.locacoes,0),n(f.total_vgl),n(f.total_ajuda),n(f.total_bonificacao),n(+f.total_ajuda+ +f.total_bonificacao)]];
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+linhas.map(l=>l.map(esc).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download=`fechamento-locacao-${f.mes.slice(0,7)}.csv`;a.click();URL.revokeObjectURL(a.href);
+  };
+
   async function loadRh(){
     $('#rhTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
     const {data,error}=await db.from('rh_colaboradores').select('id,nome,funcao,nascimento_dia,nascimento_mes,admissao,ativo,observacao,atualizado_em,atualizado_por').order('nome');
