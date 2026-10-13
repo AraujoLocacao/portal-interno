@@ -460,7 +460,7 @@
     $('#subtitle').textContent=`${nomeMes(mesSel).replace(/^./,c=>c.toUpperCase())} · ${partes.join(' · ')}`;
     $('#tiles').innerHTML=[
       ['Assinados',`${ass.length} de ${list.length}`,list.length?'contratos que contam no mês':'nenhum contrato'],
-      ['VGL',brl(t.vgl),'só contratos assinados'],
+      ['VGL',brl(somar(list).vgl),`${brl(t.vgl)} assinado`],
       ['Taxa de locação',brl(t.tx),'VGL × %'],
       ['Base de cálculo',brl(t.base),'taxa × 90%'],
       ['A assinar',pend.length,pend.length?`${brl(somar(pend).vgl)} de VGL fora dos totais`:'nenhum pendente']
