@@ -68,7 +68,9 @@
     .plan-box{border:1px solid #cfe3da;background:#f2f8f5;border-radius:10px;padding:10px 12px;font-size:.86rem}
     .plan-box dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:6px 0 0}.plan-box dt{color:var(--muted)}.plan-box dd{margin:0;font-weight:700}
     .etq-picker{border:1px solid var(--line);border-radius:10px;padding:8px;display:grid;gap:4px;max-height:280px;overflow-y:auto}
-    .etq-picker label{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.82rem}
+    .etq-picker label{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.82rem;flex:1;min-width:0}
+    .etq-row{display:flex;align-items:center;gap:6px}
+    .etq-del{border:0;background:none;color:var(--muted);font-size:1rem;line-height:1;padding:2px 6px;border-radius:6px;flex:none}.etq-del:hover{background:#fdecec;color:var(--red)}
     .hist{display:grid;gap:10px}
     .hist .h{font-size:.84rem;display:grid;gap:3px}.hist .h small{color:var(--muted)}
     .hist .h.com .txt{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -456,8 +458,24 @@
   $('#cEtqAbrir').onclick=()=>{$('#cEtqBox').hidden=!$('#cEtqBox').hidden;$('#cEtqBusca').value='';pintarEtq();$('#cEtqCor').innerHTML=Object.keys(CORES).filter(k=>k!=='gray').map(k=>`<option value="${k}" style="background:${CORES[k][0]}">${k.replace('_',' ')}</option>`).join('')};
   function pintarEtq(){
     const q=$('#cEtqBusca').value.trim().toUpperCase();
-    $('#cEtqLista').innerHTML=etiquetas.filter(e=>!q||e.nome.toUpperCase().includes(q)).map(e=>`<label><input type="checkbox" value="${e.id}"${aberto.etiquetas.includes(e.id)?' checked':''}>${chip(e)}</label>`).join('')||'<p class="msg">Nenhuma etiqueta.</p>';
+    $('#cEtqLista').innerHTML=etiquetas.filter(e=>!q||e.nome.toUpperCase().includes(q)).map(e=>`<div class="etq-row"><label><input type="checkbox" value="${e.id}"${aberto.etiquetas.includes(e.id)?' checked':''}>${chip(e)}</label><button type="button" class="etq-del" data-del-etq="${e.id}" title="Excluir etiqueta" aria-label="Excluir a etiqueta ${safe(e.nome)}">×</button></div>`).join('')||'<p class="msg">Nenhuma etiqueta.</p>';
   }
+  // Excluir etiqueta: tira dos cartões que a usam e depois apaga da lista.
+  $('#cEtqLista').addEventListener('click',async e=>{
+    const id=e.target.closest('[data-del-etq]')?.dataset.delEtq;if(!id)return;e.preventDefault();
+    const et=etq(id);if(!et)return;
+    const usam=cartoes.filter(c=>c.etiquetas.includes(id));
+    if(!await confirmar(`Excluir a etiqueta "${et.nome}"?${usam.length?` Ela sai de ${usam.length} ${usam.length===1?'cartão':'cartões'}.`:' Nenhum cartão usa esta etiqueta.'}`))return;
+    for(const c of usam){
+      const nova=c.etiquetas.filter(x=>x!==id),{error}=await db.from('quadro_cartoes').update({etiquetas:nova}).eq('id',c.id);
+      if(error){alert('Não foi possível tirar a etiqueta do cartão "'+c.titulo+'": '+error.message);return}
+      c.etiquetas=nova;
+    }
+    const {error}=await db.from('quadro_etiquetas').delete().eq('id',id);
+    if(error){alert('Não foi possível excluir a etiqueta: '+error.message);return}
+    etiquetas=etiquetas.filter(x=>x.id!==id);if($('#fEtiqueta').value===id)$('#fEtiqueta').value='';
+    preencherFiltros();pintarCartao();pintarEtq();render();toast('Etiqueta excluída');
+  });
   $('#cEtqBusca').addEventListener('input',pintarEtq);
   $('#cEtqLista').addEventListener('change',e=>{const id=e.target.value,set=new Set(aberto.etiquetas);e.target.checked?set.add(id):set.delete(id);salvarCartao({etiquetas:[...set]}).then(pintarCartao)});
   $('#cEtqCriar').onclick=async()=>{
