@@ -88,6 +88,7 @@
     .quadros{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:18px;margin-bottom:18px}
     .quadros .table-card{margin:0;min-width:0}
     .bar-cell{display:flex;align-items:center;gap:8px;justify-content:flex-end}.bar-cell i{display:block;height:8px;border-radius:4px;background:#2a78d6;opacity:.75}
+    .bonus.auto::placeholder{color:var(--ink);opacity:.6}
     .bonus{width:110px;border:1px solid #cbd5da;border-radius:8px;padding:5px 8px;text-align:right;font-variant-numeric:tabular-nums;background:#fff}
     .regras{margin:10px 0 0;font-size:.8rem;color:var(--muted)}
     /* Formulário da locação */
@@ -170,7 +171,7 @@
     </div>
 
     <div class="quadros">
-      <div class="card table-card"><h2>Ranking por corretora</h2><p class="msg">Só contratos assinados. Ajuda de custo = VGL × 10%. A bonificação é digitada aqui e fica salva para o mês.</p><div class="table-wrap"><table id="ranking"></table></div></div>
+      <div class="card table-card"><h2>Ranking por corretora</h2><p class="msg">Só contratos assinados. Pelo VGL da corretora no mês: até R$ 19.999, ajuda de custo de 10% (no máximo R$ 2.000); de R$ 20.000, + R$ 500 de bonificação; de R$ 30.000, + R$ 1.000; a partir de R$ 40.000, ajuda de custo de R$ 5.000, sem bonificação. A bonificação em cinza vem da tabela; para mudar, digite outro valor (fica salvo para o mês).</p><div class="table-wrap"><table id="ranking"></table></div></div>
       <div class="card table-card"><h2>Garantias</h2><div class="table-wrap"><table id="garantiasQ"></table></div></div>
       <div class="card table-card"><h2>Captadoras</h2><div class="table-wrap"><table id="captadorasQ"></table></div></div>
     </div>
@@ -292,7 +293,15 @@
   const BUCKET='locacao';
   const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
   // Fórmulas da planilha "RANKING 2026".
-  const REGRA={base:.90,corretora:.25,stefani:.10,du:.01,capImob:.05,ageNovo:.08,ajuda:.10};
+  const REGRA={base:.90,corretora:.25,stefani:.10,du:.01,capImob:.05,ageNovo:.08,ajuda:.10,ajudaMax:2000};
+  // Ajuda de custo e bonificação da corretora no mês, pelo VGL produzido (só assinados):
+  // até 19.999: 10% (no máximo R$ 2.000), sem bonificação; 20.000 a 29.999: + R$ 500; 30.000 a 39.999: + R$ 1.000;
+  // a partir de 40.000: ajuda de custo de R$ 5.000 e sem bonificação.
+  function tabelaMes(vgl){
+    if(vgl>=40000)return {ajuda:5000,bonus:0,faixa:'40 MIL'};
+    return {ajuda:Math.min(vgl*REGRA.ajuda,REGRA.ajudaMax),bonus:vgl>=30000?1000:vgl>=20000?500:0,faixa:vgl*REGRA.ajuda>REGRA.ajudaMax?'LIMITE':''};
+  }
+  const ajudaCusto=vgl=>tabelaMes(vgl).ajuda;
   // Sugestões do campo "captadora" (as captadoras da área de Captação + Navegantes, como na planilha). Dá para digitar outro nome.
   const CAPTADORAS=['RUBIA','SONORA','ANA','ANA PAULA','NAVEGANTES'];
   let etapas={},locs=[],bonus=[],corretoras=[],unidades=[],garantias=[],booted=false,senhas=[],docs=[],senhaEditId=null,locEditId=null,mesSel=null;
@@ -519,14 +528,17 @@
     bonus.filter(b=>b.mes===mes).forEach(b=>by[b.corretora]??={n:0,vgl:0});
     const names=Object.keys(by).sort((a,b)=>by[b].vgl-by[a].vgl||a.localeCompare(b)),max=Math.max(1,...names.map(n=>by[n].vgl));
     if(!names.length){$('#ranking').innerHTML='<tbody><tr><td class="empty">Sem locações no mês.</td></tr></tbody>';return}
-    const bon=n=>bonus.find(b=>b.mes===mes&&b.corretora===n)?.valor;
-    const tb=names.reduce((a,n)=>a+(+bon(n)||0),0),tv=names.reduce((a,n)=>a+by[n].vgl,0),tn=names.reduce((a,n)=>a+by[n].n,0);
-    $('#ranking').innerHTML=`<thead><tr><th>Corretora</th><th class="num">Locações</th><th class="num">VGL</th><th class="num">Ajuda de custo</th><th class="num">Bonificação</th></tr></thead><tbody>${names.map((n,i)=>`<tr>
+    // Bonificação: a da tabela, a não ser que tenha sido digitada outra no mês (apagar o campo volta para a tabela).
+    const digitada=n=>bonus.find(b=>b.mes===mes&&b.corretora===n)?.valor,bon=n=>digitada(n)!=null?+digitada(n):tabelaMes(by[n].vgl).bonus;
+    const tb=names.reduce((a,n)=>a+bon(n),0),tv=names.reduce((a,n)=>a+by[n].vgl,0),tn=names.reduce((a,n)=>a+by[n].n,0),ta=names.reduce((a,n)=>a+ajudaCusto(by[n].vgl),0);
+    const dicaAjuda=v=>v>=40000?'A partir de R$ 40.000 de VGL: ajuda de custo de R$ 5.000, sem bonificação.':v*REGRA.ajuda>REGRA.ajudaMax?`10% daria ${num(v*REGRA.ajuda)}: limitada a ${num(REGRA.ajudaMax)}.`:'';
+    const dicaBonus=n=>{const t=tabelaMes(by[n].vgl).bonus;return digitada(n)!=null?`Digitada à mão. Pela tabela seria ${num(t)}. Apague o campo para voltar à tabela.`:'Pela tabela. Para mudar, digite outro valor.'};
+    $('#ranking').innerHTML=`<thead><tr><th>Corretora</th><th class="num">Locações</th><th class="num">VGL</th><th class="num">Ajuda de custo</th><th class="num">Bonificação</th></tr></thead><tbody>${names.map((n,i)=>{const t=tabelaMes(by[n].vgl);return `<tr>
       <td><strong>${i+1}º</strong> ${safe(n)}</td><td class="num">${by[n].n}</td>
       <td class="num"><div class="bar-cell"><i style="width:${Math.round(by[n].vgl/max*70)}px"></i>${num(by[n].vgl)}</div></td>
-      <td class="num">${num(by[n].vgl*REGRA.ajuda)}</td>
-      <td class="num"><input class="bonus" data-bonus="${safe(n)}" inputmode="decimal" aria-label="Bonificação de ${safe(n)}" value="${bon(n)!=null?num(bon(n)):''}" placeholder="–"></td></tr>`).join('')}
-      <tr class="sub" style="background:#eef2f4;font-weight:800"><td><strong>Total</strong></td><td class="num"><strong>${tn}</strong></td><td class="num"><strong>${num(tv)}</strong></td><td class="num"><strong>${num(tv*REGRA.ajuda)}</strong></td><td class="num"><strong>${num(tb)}</strong></td></tr></tbody>`;
+      <td class="num"${t.faixa?` title="${dicaAjuda(by[n].vgl)}"`:''}>${num(t.ajuda)}${t.faixa?` <span class="tag pos">${t.faixa}</span>`:''}</td>
+      <td class="num"><input class="bonus${digitada(n)!=null?'':' auto'}" data-bonus="${safe(n)}" inputmode="decimal" aria-label="Bonificação de ${safe(n)}" title="${dicaBonus(n)}" value="${digitada(n)!=null?num(digitada(n)):''}" placeholder="${t.bonus?num(t.bonus):'–'}"></td></tr>`}).join('')}
+      <tr class="sub" style="background:#eef2f4;font-weight:800"><td><strong>Total</strong></td><td class="num"><strong>${tn}</strong></td><td class="num"><strong>${num(tv)}</strong></td><td class="num"><strong>${num(ta)}</strong></td><td class="num"><strong>${num(tb)}</strong></td></tr></tbody>`;
   }
   $('#ranking').addEventListener('change',async e=>{
     const n=e.target.dataset.bonus;if(!n)return;
@@ -535,7 +547,7 @@
     const r=txt?await db.from('locacao_bonificacoes').upsert({mes,corretora:n,valor:v}):await db.from('locacao_bonificacoes').delete().eq('mes',mes).eq('corretora',n);
     if(r.error){alert('Não foi possível salvar a bonificação: '+r.error.message);return}
     bonus=bonus.filter(b=>!(b.mes===mes&&b.corretora===n));if(txt)bonus.push({mes,corretora:n,valor:v});
-    toast('Bonificação salva');renderRanking(doMes());
+    toast(txt?'Bonificação salva':'Bonificação de volta à tabela');renderRanking(assinados(doMes()));
   });
 
   function renderGarantias(list){
@@ -576,7 +588,7 @@
   $('#newLoc').onclick=()=>openLoc(null);
   function previewLoc(){
     const f=$('#locForm'),pos=f.tipo_cap.value==='pos',c=calc({vgl:lerNumero(f.vgl.value)||0,percentual:lerNumero(f.percentual.value)||0,captacao_pos:pos});
-    $('#lPrev').innerHTML=[['Tx de loc.',c.tx],['Base de cálculo',c.base],['Corretora 25%',c.corretora],['Stefani 10%',c.stefani],['Du 1%',c.du],pos?['Cap. imob. (pós) 5%',c.capImob]:['Age. novo 8%',c.ageNovo],['Ajuda de custo 10%',c.vgl*REGRA.ajuda]].map(([a,v])=>`<div><dt>${a}</dt><dd>${brl(v)}</dd></div>`).join('');
+    $('#lPrev').innerHTML=[['Tx de loc.',c.tx],['Base de cálculo',c.base],['Corretora 25%',c.corretora],['Stefani 10%',c.stefani],['Du 1%',c.du],pos?['Cap. imob. (pós) 5%',c.capImob]:['Age. novo 8%',c.ageNovo],['Ajuda de custo 10% (até R$ 2.000 no mês)',ajudaCusto(c.vgl)]].map(([a,v])=>`<div><dt>${a}</dt><dd>${brl(v)}</dd></div>`).join('');
     // Aviso de REF repetida no mesmo mês (deixa salvar, mas avisa).
     const ref=refNorm(f.referencia.value),ym=(f.data.value||'').slice(0,7);
     const dup=ref&&ym?locs.filter(l=>l.id!==locEditId&&refNorm(l.referencia)===ref&&l.data.startsWith(ym)):[];
