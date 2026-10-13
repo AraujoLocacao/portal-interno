@@ -167,7 +167,7 @@
     <div class="card table-card">
       <div class="list-head"><h2>Planilha do mês</h2><span class="muted" id="listCount"></span></div>
       <div class="table-wrap"><table id="planilha"></table></div>
-      <p class="regras">Como é calculado (igual à planilha): Tx de loc. = VGL × %. Base de cálculo = Tx de loc. × 90%. Corretora = base × 25%. Stefani = base × 10%. Du = base × 1%. Captação: vale só um dos dois, conforme o tipo escolhido na locação — captação nova: Age. novo = Tx de loc. × 8%; cap. imobiliária (pós): Cap. imob. = Tx de loc. × 5%. As semanas vão de segunda a domingo e param na virada do mês. Os totais, as comissões e o ranking contam só os contratos assinados (as linhas em cinza ainda não foram assinadas). Todo dia 10 fecha-se o mês anterior: o contrato que não foi assinado passa sozinho para o dia 01 do mês seguinte.</p>
+      <p class="regras">Como é calculado (igual à planilha): Tx de loc. = VGL × %. Base de cálculo = Tx de loc. × 90%. Corretora = base × 25%. Stefani = base × 10%. Du = base × 1%. Captação: vale só um dos dois, conforme o tipo escolhido na locação — captação nova: Age. novo = Tx de loc. × 8%; cap. imobiliária (pós): Cap. imob. = Tx de loc. × 5%. As semanas vão de segunda a domingo e param na virada do mês. O total da semana e o total mensal somam todos os contratos. A linha "Total assinado" e o ranking contam só os contratos assinados (as linhas em cinza ainda não foram assinadas). Todo dia 10 fecha-se o mês anterior: o contrato que não foi assinado passa sozinho para o dia 01 do mês seguinte.</p>
     </div>
 
     <div class="quadros">
@@ -472,8 +472,8 @@
     const prox=nomeMes(proxMes(mesSel)).split(' de ')[0],dia=br(diaFechamento(mesSel)).slice(0,5),fechado=iso(new Date())>=diaFechamento(mesSel);
     const pend=doMes().filter(l=>!l.assinado),movidas=locs.filter(l=>l.data_original?.startsWith(mesSel)&&!l.data.startsWith(mesSel));
     const refs=ls=>ls.map(l=>safe(l.referencia)).join(', ');
-    let txt=fechado?`<strong>Mês fechado em ${dia}.</strong> Os totais e o ranking contam só os contratos assinados.`
-      :`<strong>Fechamento de ${nomeMes(mesSel).split(' de ')[0]} no dia ${dia}.</strong> Os totais e o ranking contam só os contratos assinados.`;
+    let txt=fechado?`<strong>Mês fechado em ${dia}.</strong> O total assinado e o ranking contam só os contratos assinados.`
+      :`<strong>Fechamento de ${nomeMes(mesSel).split(' de ')[0]} no dia ${dia}.</strong> O total assinado e o ranking contam só os contratos assinados.`;
     txt+=enviadosRh[mesSel]?` O ranking foi enviado ao RH em ${new Date(enviadosRh[mesSel]).toLocaleDateString('pt-BR')} (Gestão Financeira / RH → "Fechamento da Locação").`
       :fechado?'':` No dia ${dia}, o ranking vai sozinho para o RH.`;
     if(movidas.length)txt+=` No fechamento, ${plural(movidas.length,'contrato não assinado passou','contratos não assinados passaram')} para o mês seguinte: ${refs(movidas)}.`;
@@ -491,7 +491,6 @@
   }
 
   const cols=`<thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th><th class="num">Tx de loc.</th><th class="num">Base de cálculo</th><th class="num">Corretora<small>25%</small></th><th class="num">Stefani<small>10%</small></th><th class="num">Du<small>1%</small></th><th class="num">Cap. imob.<small>5%</small></th><th>Nome cap.</th><th class="num">Age. novo<small>8%</small></th><th></th></tr></thead>`;
-  const contagem=ls=>{const a=assinados(ls).length,p=ls.length-a;return plural(a,'assinada','assinadas')+(p?` (${p} a assinar, fora do total)`:'')};
   const linhaValores=t=>CAMPOS.map((k,i)=>`<td class="num">${num(t[k])}</td>${i===0?'<td></td>':''}${k==='capImob'?'<td></td>':''}`).join('');
   function renderPlanilha(list){
     const {porId}=errosDoMes(),sems=semanasDoMes(mesSel);
@@ -512,9 +511,11 @@
         <td style="white-space:nowrap">${l.captadora?safe(capNome(l.captadora))+' ':''}<span class="tag pos">${l.captacao_pos?'PÓS':'NOVA'}</span></td>
         <td class="num">${l.captacao_pos?'<span class="muted">–</span>':num(c.ageNovo)}</td>
         <td class="row-actions"><button class="link" data-edit="${l.id}">Editar</button><button class="link danger" data-del="${l.id}">Excluir</button></td></tr>`}).join('');
-      html+=`<tr class="sub"><td colspan="6">Total da semana ${pad(s.n)} · ${contagem(ls)}</td>${linhaValores(somar(assinados(ls)))}<td></td></tr>`;
+      // Total da semana como era antes: soma todos os contratos da semana, assinados ou não.
+      html+=`<tr class="sub"><td colspan="6">Total da semana ${pad(s.n)} · ${plural(ls.length,'locação','locações')}${ls.length-assinados(ls).length?` (${assinados(ls).length} ${assinados(ls).length===1?'assinada':'assinadas'})`:''}</td>${linhaValores(somar(ls))}<td></td></tr>`;
     });
-    html+=`<tr class="total"><td colspan="6">TOTAL MENSAL · ${contagem(list)}</td>${linhaValores(somar(assinados(list)))}<td></td></tr>`;
+    html+=`<tr class="total"><td colspan="6">TOTAL MENSAL · ${plural(list.length,'locação','locações')}</td>${linhaValores(somar(list))}<td></td></tr>`;
+    html+=`<tr class="sub"><td colspan="6">TOTAL ASSINADO · ${plural(assinados(list).length,'locação','locações')} · é o que conta no fechamento do dia 10</td>${linhaValores(somar(assinados(list)))}<td></td></tr>`;
     $('#planilha').innerHTML=cols+'<tbody>'+html+'</tbody>';
   }
   $('#planilha').onclick=async e=>{
