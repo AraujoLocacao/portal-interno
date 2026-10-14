@@ -160,7 +160,7 @@
     <div class="charts">
       <div class="card chart-card" id="relCard">
         <div class="chart-head"><div><h2 id="relTitulo">Relatório do dia</h2><p id="relAjuda">Igual à planilha diária. Use as setas para trocar o dia.</p></div>
-          <div class="rel-nav"><button class="secondary" id="relPrev" aria-label="Dia anterior com lançamento">←</button><input type="date" id="relData" aria-label="Dia do relatório"><button class="secondary" id="relNext" aria-label="Próximo dia com lançamento">→</button><button class="secondary" id="relCopy">Copiar para WhatsApp</button></div></div>
+          <div class="rel-nav"><div class="seg-mini" id="relModo" role="group" aria-label="Relatório por dia ou por semana"><button type="button" data-rel="dia">Dia</button><button type="button" data-rel="semana">Semana</button></div><button class="secondary" id="relPrev" aria-label="Dia anterior com lançamento">←</button><input type="date" id="relData" aria-label="Dia do relatório"><button class="secondary" id="relNext" aria-label="Próximo dia com lançamento">→</button><button class="secondary" id="relCopy">Copiar para WhatsApp</button></div></div>
         <div id="relBody"></div>
       </div>
       <div class="card chart-card">
@@ -402,17 +402,19 @@
   ['#fUnidade','#fCorretor','#fDe','#fAte'].forEach(s=>$(s).addEventListener('input',render));
   $('#fModo').onclick=e=>{const b=e.target.closest('[data-modo]');if(!b)return;
     if(b.dataset.modo==='datas'&&!$('#fDe').value){const [de,ate]=periodo();$('#fDe').value=de;$('#fAte').value=ate}
-    modo=b.dataset.modo;render()};
+    modo=b.dataset.modo;if(modo==='dia'||modo==='semana')relModo=modo;render()};
   $('#perPrev').onclick=()=>mover(-1);$('#perNext').onclick=()=>mover(1);
   $('#perHoje').onclick=()=>{ref=new Date();ref.setHours(12,0,0,0);render()};
   $('#perDia').addEventListener('change',e=>{if(e.target.value){ref=new Date(e.target.value+'T12:00');render()}});
-  $('#clearFilters').onclick=()=>{$('#fUnidade').value='';$('#fCorretor').value='';modo='mes';ref=new Date();ref.setHours(12,0,0,0);diaRel=leads[0]?.data||iso(new Date());render()};
+  $('#clearFilters').onclick=()=>{$('#fUnidade').value='';$('#fCorretor').value='';modo='mes';relModo='dia';ref=new Date();ref.setHours(12,0,0,0);diaRel=leads[0]?.data||iso(new Date());render()};
 
   // ---------- Painel ----------
   function render(){
     atualizarPeriodo();
     // No filtro Dia, o relatório do dia acompanha o dia escolhido.
     if(modo==='dia')diaRel=iso(ref);
+    // No filtro Semana, o relatório da semana mostra a mesma semana do filtro.
+    if(modo==='semana'&&relModo==='semana')diaRel=iso(segunda(ref));
     const list=filtered(),[de,ate]=periodo(),us=unidadesVisiveis();
     const partes=[$('#fCorretor').value||'Todos os corretores',$('#fUnidade').value?titulo($('#fUnidade').value):'todas as unidades'];
     $('#subtitle').textContent=`${partes.join(' · ')} · ${de||ate?`${br(de)||'início'} a ${br(ate)||'hoje'}`:'todo o período'}`;
@@ -508,20 +510,23 @@
   };
 
   // ---------- Relatório do dia ----------
-  // No filtro Semana, o relatório vira "Relatório da semana": soma cada corretor de segunda a domingo.
+  // Botões Dia | Semana do próprio relatório. Semana soma cada corretor de segunda a domingo (semana do dia escolhido).
+  let relModo='dia';
+  const semanaRel=()=>{const s=segunda(new Date(diaRel+'T12:00')),f=new Date(s);f.setDate(s.getDate()+6);return [iso(s),iso(f)]};
   function dadosRel(){
-    if(modo!=='semana')return {titulo:tituloPeriodo(diaRel),linhas:leads.filter(l=>l.data===diaRel)};
-    const [de,ate]=periodo(),by=new Map();
+    if(relModo!=='semana')return {titulo:tituloPeriodo(diaRel),linhas:leads.filter(l=>l.data===diaRel)};
+    const [de,ate]=semanaRel(),by=new Map();
     leads.filter(l=>l.data>=de&&l.data<=ate&&!(l.ate&&l.ate>ate)).forEach(l=>{const k=l.unidade+'|'+l.corretora,o=by.get(k);if(o)o.quantidade+=l.quantidade;else by.set(k,{unidade:l.unidade,corretora:l.corretora,quantidade:l.quantidade})});
     return {titulo:`SEMANA DE ${br(de).slice(0,5)} A ${br(ate)}`,linhas:[...by.values()].sort((a,b)=>a.corretora.localeCompare(b.corretora))};
   }
   function renderRelatorio(){
-    const semana=modo==='semana';
+    const semana=relModo==='semana';
+    document.querySelectorAll('#relModo button').forEach(b=>{const on=b.dataset.rel===relModo;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
     $('#relTitulo').textContent=semana?'Relatório da semana':'Relatório do dia';
     $('#relAjuda').textContent=semana?'Soma de segunda a domingo. Use as setas para trocar a semana.':'Igual à planilha diária. Use as setas para trocar o dia.';
-    $('#relData').hidden=semana;$('#relData').value=diaRel;
+    $('#relData').value=diaRel;
     const {titulo:tit,linhas:doDia}=dadosRel(),datas=[...new Set(leads.map(l=>l.data))].sort();
-    if(semana){$('#relPrev').disabled=false;$('#relNext').disabled=false}
+    if(semana){const [de,ate]=semanaRel();$('#relPrev').disabled=!datas.some(d=>d<de);$('#relNext').disabled=!datas.some(d=>d>ate)}
     else{$('#relPrev').disabled=!datas.some(d=>d<diaRel);$('#relNext').disabled=!datas.some(d=>d>diaRel)}
     $('#relCopy').disabled=!doDia.length;
     if(!doDia.length){$('#relBody').innerHTML=`<div class="rel-day">${tit}</div><div class="empty-card" style="border-radius:0 0 10px 10px">Nenhum lead lançado ${semana?'nesta semana':'neste dia'}.</div>`;return}
@@ -534,8 +539,10 @@
   // No filtro Dia, trocar o dia do relatório troca o filtro também.
   function irRel(d){if(modo==='dia'){ref=new Date(d+'T12:00');render()}else{diaRel=d;renderRelatorio()}}
   function passoRel(dir){const datas=[...new Set(leads.map(l=>l.data))].sort();const d=dir<0?datas.filter(x=>x<diaRel).pop():datas.find(x=>x>diaRel);if(d)irRel(d)}
-  // No filtro Semana, as setas do relatório andam uma semana (junto com o filtro).
-  $('#relPrev').onclick=()=>modo==='semana'?mover(-1):passoRel(-1);$('#relNext').onclick=()=>modo==='semana'?mover(1):passoRel(1);
+  // Na Semana, as setas andam uma semana inteira.
+  function semanaPasso(dir){const d=new Date(diaRel+'T12:00');d.setDate(d.getDate()+7*dir);diaRel=iso(segunda(d));renderRelatorio()}
+  $('#relPrev').onclick=()=>relModo==='semana'?semanaPasso(-1):passoRel(-1);$('#relNext').onclick=()=>relModo==='semana'?semanaPasso(1):passoRel(1);
+  $('#relModo').onclick=e=>{const b=e.target.closest('[data-rel]');if(!b)return;relModo=b.dataset.rel;renderRelatorio()};
   $('#relData').addEventListener('change',e=>{if(e.target.value)irRel(e.target.value)});
   $('#relCopy').onclick=()=>{
     const {titulo:tit,linhas:doDia}=dadosRel(),us=ordemUnidades().filter(u=>doDia.some(l=>l.unidade===u));
