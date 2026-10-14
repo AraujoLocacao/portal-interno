@@ -159,7 +159,7 @@
 
     <div class="charts">
       <div class="card chart-card" id="relCard">
-        <div class="chart-head"><div><h2>Relatório do dia</h2><p>Igual à planilha diária. Use as setas para trocar o dia.</p></div>
+        <div class="chart-head"><div><h2 id="relTitulo">Relatório do dia</h2><p id="relAjuda">Igual à planilha diária. Use as setas para trocar o dia.</p></div>
           <div class="rel-nav"><button class="secondary" id="relPrev" aria-label="Dia anterior com lançamento">←</button><input type="date" id="relData" aria-label="Dia do relatório"><button class="secondary" id="relNext" aria-label="Próximo dia com lançamento">→</button><button class="secondary" id="relCopy">Copiar para WhatsApp</button></div></div>
         <div id="relBody"></div>
       </div>
@@ -508,13 +508,25 @@
   };
 
   // ---------- Relatório do dia ----------
+  // No filtro Semana, o relatório vira "Relatório da semana": soma cada corretor de segunda a domingo.
+  function dadosRel(){
+    if(modo!=='semana')return {titulo:tituloPeriodo(diaRel),linhas:leads.filter(l=>l.data===diaRel)};
+    const [de,ate]=periodo(),by=new Map();
+    leads.filter(l=>l.data>=de&&l.data<=ate&&!(l.ate&&l.ate>ate)).forEach(l=>{const k=l.unidade+'|'+l.corretora,o=by.get(k);if(o)o.quantidade+=l.quantidade;else by.set(k,{unidade:l.unidade,corretora:l.corretora,quantidade:l.quantidade})});
+    return {titulo:`SEMANA DE ${br(de).slice(0,5)} A ${br(ate)}`,linhas:[...by.values()].sort((a,b)=>a.corretora.localeCompare(b.corretora))};
+  }
   function renderRelatorio(){
-    $('#relData').value=diaRel;
-    const doDia=leads.filter(l=>l.data===diaRel),datas=[...new Set(leads.map(l=>l.data))].sort();
-    $('#relPrev').disabled=!datas.some(d=>d<diaRel);$('#relNext').disabled=!datas.some(d=>d>diaRel);$('#relCopy').disabled=!doDia.length;
-    if(!doDia.length){$('#relBody').innerHTML=`<div class="rel-day">${tituloPeriodo(diaRel)}</div><div class="empty-card" style="border-radius:0 0 10px 10px">Nenhum lead lançado neste dia.</div>`;return}
+    const semana=modo==='semana';
+    $('#relTitulo').textContent=semana?'Relatório da semana':'Relatório do dia';
+    $('#relAjuda').textContent=semana?'Soma de segunda a domingo. Use as setas para trocar a semana.':'Igual à planilha diária. Use as setas para trocar o dia.';
+    $('#relData').hidden=semana;$('#relData').value=diaRel;
+    const {titulo:tit,linhas:doDia}=dadosRel(),datas=[...new Set(leads.map(l=>l.data))].sort();
+    if(semana){$('#relPrev').disabled=false;$('#relNext').disabled=false}
+    else{$('#relPrev').disabled=!datas.some(d=>d<diaRel);$('#relNext').disabled=!datas.some(d=>d>diaRel)}
+    $('#relCopy').disabled=!doDia.length;
+    if(!doDia.length){$('#relBody').innerHTML=`<div class="rel-day">${tit}</div><div class="empty-card" style="border-radius:0 0 10px 10px">Nenhum lead lançado ${semana?'nesta semana':'neste dia'}.</div>`;return}
     const us=ordemUnidades().filter(u=>doDia.some(l=>l.unidade===u));
-    $('#relBody').innerHTML=`<div class="rel-day">${tituloPeriodo(diaRel)}</div><div class="rel-grid" style="margin-top:12px">${us.map(u=>{const ls=doDia.filter(l=>l.unidade===u);
+    $('#relBody').innerHTML=`<div class="rel-day">${tit}</div><div class="rel-grid" style="margin-top:12px">${us.map(u=>{const ls=doDia.filter(l=>l.unidade===u);
       return `<div class="rel-unit"><h3><i class="dot" style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${corUnidade(u)}"></i>LEADS ${safe(u)}</h3><table><thead><tr><th>Corretor</th><th class="num">Leads</th></tr></thead>
         <tbody>${ls.map(l=>`<tr><td>${safe(l.corretora)}</td><td class="num">${l.quantidade}</td></tr>`).join('')}<tr class="sub"><td>SUBTOTAL</td><td class="num">${soma(ls)}</td></tr></tbody></table></div>`}).join('')}</div>
       <div class="rel-total"><span>TOTAL</span><strong>${soma(doDia)}</strong></div>`;
@@ -522,11 +534,12 @@
   // No filtro Dia, trocar o dia do relatório troca o filtro também.
   function irRel(d){if(modo==='dia'){ref=new Date(d+'T12:00');render()}else{diaRel=d;renderRelatorio()}}
   function passoRel(dir){const datas=[...new Set(leads.map(l=>l.data))].sort();const d=dir<0?datas.filter(x=>x<diaRel).pop():datas.find(x=>x>diaRel);if(d)irRel(d)}
-  $('#relPrev').onclick=()=>passoRel(-1);$('#relNext').onclick=()=>passoRel(1);
+  // No filtro Semana, as setas do relatório andam uma semana (junto com o filtro).
+  $('#relPrev').onclick=()=>modo==='semana'?mover(-1):passoRel(-1);$('#relNext').onclick=()=>modo==='semana'?mover(1):passoRel(1);
   $('#relData').addEventListener('change',e=>{if(e.target.value)irRel(e.target.value)});
   $('#relCopy').onclick=()=>{
-    const doDia=leads.filter(l=>l.data===diaRel),us=ordemUnidades().filter(u=>doDia.some(l=>l.unidade===u));
-    const txt=[`*LEADS – ${tituloPeriodo(diaRel)}*`,...us.flatMap(u=>{const ls=doDia.filter(l=>l.unidade===u);return ['',`*${u}*`,...ls.map(l=>`${l.corretora}: ${l.quantidade}`),`Subtotal: ${soma(ls)}`]}),'',`*TOTAL: ${soma(doDia)}*`].join('\n');
+    const {titulo:tit,linhas:doDia}=dadosRel(),us=ordemUnidades().filter(u=>doDia.some(l=>l.unidade===u));
+    const txt=[`*LEADS – ${tit}*`,...us.flatMap(u=>{const ls=doDia.filter(l=>l.unidade===u);return ['',`*${u}*`,...ls.map(l=>`${l.corretora}: ${l.quantidade}`),`Subtotal: ${soma(ls)}`]}),'',`*TOTAL: ${soma(doDia)}*`].join('\n');
     copiar(txt,'Relatório');
   };
 
