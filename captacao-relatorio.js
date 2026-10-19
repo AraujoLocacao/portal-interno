@@ -84,7 +84,7 @@
   // ---------- Números que vêm do quadro (de outubro/2026 em diante; setembro ficou digitado) ----------
   // Decisão da gerência em 29/09/2026. Regras:
   // - captado = cartão que chegou na coluna de captado (CAPTADO). A captação fica gravada em captacao_captados (gatilho no banco)
-  //   e NÃO some quando o cartão é arquivado, excluído ou levado para uma coluna depois dela; só sai se voltar para antes (engano);
+  //   e NÃO some quando o cartão é arquivado ou levado para uma coluna depois dela; sai se voltar para antes ou for excluído (engano);
   // - nova ou pós = etiqueta do cartão (sem etiqueta conta como nova, com aviso); cidade = etiqueta ITAJAÍ/NAVEGANTES (sem etiqueta = Itajaí, com aviso);
   // - em andamento = cartões entre a primeira coluna e a de captado no fim da semana (arquivados não contam depois de arquivados);
   // - referências = a REF do começo do título de cada cartão captado.

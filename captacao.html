@@ -250,7 +250,7 @@
           <span class="msg" id="cCriado"></span>
           <button class="link" id="cArquivar">Arquivar cartão</button>
           <button class="link danger" id="cExcluir">Excluir cartão</button>
-          <span class="msg" style="font-size:.76rem">Arquivar ou excluir tira o cartão do quadro, mas a captação já feita continua no relatório.</span>
+          <span class="msg" style="font-size:.76rem">Arquivar tira o cartão do quadro, mas a captação já feita continua no relatório. Excluir apaga também a captação.</span>
         </div>
       </div>
     </div>
@@ -617,7 +617,7 @@
     if(arquivar)cd.close();else abrirCartao(c.id);
   };
   $('#cExcluir').onclick=async()=>{
-    if(!await confirmar(`Excluir o cartão "${aberto.titulo}"? O cartão e os comentários serão apagados. Se ele já foi captado, a captação continua no relatório. Para só tirar do quadro, prefira "Arquivar".`))return;
+    if(!await confirmar(`Excluir o cartão "${aberto.titulo}"? O cartão e os comentários serão apagados. Se ele já foi captado, a captação também sai do relatório. Para só tirar do quadro, prefira "Arquivar".`))return;
     const {error}=await db.from('captacao_cartoes').delete().eq('id',aberto.id);if(error){alert('Não foi possível excluir: '+error.message);return}
     cartoes=cartoes.filter(x=>x.id!==aberto.id);cd.close();render();toast('Cartão excluído');
   };

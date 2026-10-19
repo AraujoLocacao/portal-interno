@@ -376,9 +376,10 @@ revoke all on public.captacao_resumo_periodo from anon;
 grant select on public.captacao_resumo_periodo to authenticated;
 
 -- ---------- Captações guardadas (o relatório não perde nada quando o cartão sai do quadro) ----------
--- Decisão da gerência em 29/09/2026: os quadros podem ser esvaziados (cartões arquivados, excluídos ou levados adiante)
+-- Decisão da gerência em 29/09/2026: os quadros podem ser esvaziados (cartões arquivados ou levados adiante)
 -- sem mudar o relatório. Por isso, quando um cartão chega na coluna de captado, a captação é gravada aqui e fica.
--- Só sai se o cartão VOLTAR para uma coluna antes da de captado (foi engano).
+-- Sai se o cartão VOLTAR para uma coluna antes da de captado ou for EXCLUÍDO (foi engano). Em 19/10/2026 a gerência
+-- pediu que cartão excluído saia do relatório (antes ficava: on delete set null); para limpar o quadro, arquive.
 alter table public.captacao_colunas add column if not exists captado boolean not null default false;
 update public.captacao_colunas set captado = true where upper(nome) = 'CAPTADO' and not captado;
 alter table public.captacao_cartoes add column if not exists arquivado_em timestamptz;
@@ -386,7 +387,7 @@ alter table public.captacao_cartoes add column if not exists arquivado_em timest
 create table if not exists public.captacao_captados (
   id uuid primary key default gen_random_uuid(),
   quadro_id uuid not null references public.captacao_quadros (id) on delete cascade,
-  cartao_id uuid unique references public.captacao_cartoes (id) on delete set null,
+  cartao_id uuid unique references public.captacao_cartoes (id) on delete cascade,
   referencia text,
   titulo text not null,
   cidade text not null check (cidade in ('Itajaí', 'Navegantes')),
@@ -398,6 +399,11 @@ create table if not exists public.captacao_captados (
 );
 
 create index if not exists captacao_captados_quadro_idx on public.captacao_captados (quadro_id, captado_em);
+-- Bancos criados antes de 19/10/2026 tinham "on delete set null": troca para cascade e tira as captações de cartões já excluídos.
+alter table public.captacao_captados drop constraint if exists captacao_captados_cartao_id_fkey;
+alter table public.captacao_captados add constraint captacao_captados_cartao_id_fkey
+  foreign key (cartao_id) references public.captacao_cartoes (id) on delete cascade;
+delete from public.captacao_captados where cartao_id is null;
 
 alter table public.captacao_captados enable row level security;
 drop policy if exists "captacao_captados: leitura" on public.captacao_captados;
