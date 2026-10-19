@@ -6,6 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Meu painel | Araujo Locação</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400..800&display=swap">
   <style>
     :root{--navy:#173552;--blue:#294b68;--green:#24705a;--cream:#f5f5f0;--white:#fff;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10);--head:#c9d8ea}
     *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
@@ -220,6 +221,62 @@
     .s-vgl{position:absolute;left:72px;right:72px;top:500px;display:flex;justify-content:center;gap:18px}
     .s-vgl div{background:#e8f7ee;border-radius:16px;padding:20px 40px;text-align:center}.s-vgl span{font-weight:700;color:#166534;font-size:16px}.s-vgl strong{display:block;font-size:40px;color:#16a34a;margin-top:4px}
 
+    /* ---------- Apresentação do mês (modelo do balanço de setembro/2026: DM Sans e as cores da Araujo) ---------- */
+    .slide.mm{font-family:'DM Sans',Arial,Helvetica,sans-serif;background:#F6F8FB;color:#16243A;padding:60px 72px 96px;display:flex;flex-direction:column;gap:28px}
+    .slide.mm.alt{background:#E9EFF7}.slide.mm.azul{background:#7FA3D0}
+    .mm p,.mm h1,.mm h2,.mm h3{margin:0;font-family:inherit}
+    .mm-kick{font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#004AAD}
+    .mm .mm-h{font-size:54px;font-weight:800;line-height:1.1;color:#16243A;margin-top:10px}
+    .mm-foot{position:absolute;left:72px;right:72px;bottom:40px;font-size:16px;color:#5B6B80}
+    .mm-g2,.mm-g3{display:grid;gap:24px}.mm-g2{grid-template-columns:1fr 1fr}.mm-g3{grid-template-columns:1fr 1fr 1fr}
+    .mm-card{background:#fff;border-radius:16px;padding:26px 30px;display:flex;flex-direction:column;gap:8px}
+    .mm-card.top{border-top:6px solid #004AAD;box-shadow:0 6px 18px rgba(22,36,58,.06)}.mm-card.fosco{background:#E9EFF7}
+    .mm-big{font-size:90px;font-weight:800;line-height:1;color:#004AAD}
+    .mm-n{font-size:54px;font-weight:800;line-height:1.1;color:#004AAD}.mm-n.esc{color:#16243A}
+    .mm-n2{font-size:33px;font-weight:800;line-height:1.2;color:#004AAD}.mm-n2.esc{color:#16243A}
+    .mm-t{font-size:24px;line-height:1.4;color:#44546A}.mm-t b{color:#16243A}
+    .mm-s{font-size:18px;line-height:1.35;color:#44546A}
+    .mm-band{display:flex;gap:22px;align-items:center;background:#16243A;color:#F6F8FB;border-radius:16px;padding:22px 30px;font-size:24px;line-height:1.4}
+    .mm-band .mm-n{color:#7FA3D0}.mm-band b{color:#fff}
+    .mm-pill{font-size:18px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:7px 16px;border-radius:999px;background:#004AAD;color:#F6F8FB;align-self:flex-start;white-space:nowrap}
+    .mm-pill.claro{background:#7FA3D0;color:#16243A}.mm-pill.esc{background:#16243A}
+    .mm-ico{width:40px;height:40px;flex:none;fill:currentColor}
+    .mm-faixa{flex-direction:row;align-items:center;gap:18px;padding:20px 24px}
+    .mm-row{display:flex;gap:44px;align-items:center}
+    .mm-bars{width:760px;display:flex;flex-direction:column;gap:14px;flex:none}.mm-bars.sm{gap:10px}
+    .mm-bar-row{display:flex;align-items:center;gap:18px;font-size:21px}
+    .mm-bar-row b{width:150px;font-weight:700;flex:none}.mm-bar-row span{font-weight:700;color:#004AAD}
+    .mm-bar{height:36px;background:#7FA3D0;border-radius:6px;flex:none}.mm-bars.sm .mm-bar{height:30px}
+    .mm-call{flex:1;background:#fff;border-radius:16px;border-left:6px solid #004AAD;padding:28px 32px;display:flex;flex-direction:column;gap:10px}
+    .mm-tab{width:100%;border-collapse:collapse;font-size:24px;border-radius:16px;overflow:hidden}
+    .mm-tab th{background:#7FA3D0;color:#16243A;font-weight:800;text-align:right;padding:14px 22px}
+    .mm-tab td{background:#fff;text-align:right;padding:12px 22px;border-bottom:1px solid #EEF2F7;font-variant-numeric:tabular-nums}
+    .mm-tab tr:nth-child(odd) td{background:#F8FAFD}.mm-tab th:first-child,.mm-tab td:first-child{text-align:left}
+    .mm-etapa{display:flex;align-items:center;gap:30px}
+    .mm-etapa div{display:flex;align-items:baseline;gap:14px;padding:12px 30px;border-radius:12px;flex:none}
+    .mm-etapa strong{font-size:33px;font-weight:800}.mm-etapa em{font-style:normal;font-size:24px}
+    .mm-etapa p{font-size:24px;color:#44546A}.mm-etapa p b{color:#004AAD}
+    .mm-dest{flex-direction:row;align-items:center;gap:28px;padding:22px}
+    .mm-foto{width:200px;height:268px;border-radius:12px;overflow:hidden;background:#dbe4ef;display:grid;place-items:center;font-size:64px;font-weight:800;color:#7a8ca3;flex:none}
+    .mm-foto img{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block}
+    .mm-chart{width:800px;flex:none}
+    .mm-cols{display:flex;gap:16px;align-items:flex-end;border-bottom:2px solid #C3CEDC;height:330px}
+    .mm-cols>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+    .mm-cols p{font-size:21px;font-weight:700;color:#44546A}.mm-cols p.cur{color:#004AAD;font-weight:800}
+    .mm-cols>div>div{width:64px;background:#7FA3D0;border-radius:6px 6px 0 0}.mm-cols>div>div.cur{background:#004AAD}
+    .mm-meses{display:flex;gap:16px;margin-top:8px}.mm-meses p{flex:1;text-align:center;font-size:18px;color:#44546A}.mm-meses p.cur{color:#004AAD;font-weight:700}
+    .mm-giga{font-size:300px;font-weight:800;line-height:.85;letter-spacing:-9px;color:#16243A}
+    .mm-prio{flex-direction:row;align-items:center;gap:30px;border-left:9px solid #004AAD;padding:22px 34px}
+    .mm.capa,.mm.azul{justify-content:space-between}
+    .mm-capa-faixa{position:absolute;left:1044px;top:0;width:396px;height:810px;background:#7FA3D0;display:flex;flex-direction:column;justify-content:center;padding-left:48px}
+    .mm-capa-faixa p:first-child{font-size:90px;font-weight:800;line-height:1}.mm-capa-faixa p:last-child{font-size:54px;line-height:1.2}
+    .mm-capa-logo{width:300px;background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 6px 18px rgba(22,36,58,.08)}.mm-capa-logo img{width:100%;display:block}
+    .mm .mm-capa-h{font-size:90px;font-weight:800;line-height:1.05;color:#16243A}
+    .mm.regra{padding-left:168px;justify-content:center;gap:36px}
+    .mm-regra-faixa{position:absolute;left:0;top:0;width:72px;height:810px;background:#004AAD}
+    .mm .mm-regra-h{font-size:72px;font-weight:800;line-height:1.1;color:#16243A}
+    .mm.fim{justify-content:center;align-items:center;gap:36px;text-align:center}
+
     #printArea{display:none}
     @media print{
       @page{size:1440px 810px;margin:0}
@@ -260,7 +317,7 @@
     <nav class="areas" aria-label="Áreas do painel"><button type="button" class="area-link" data-area="captacao">Captação</button><button type="button" class="area-link" data-area="locacao">Locação</button></nav></div>
   <nav class="tabs subtabs" aria-label="Seções da área">
     <button type="button" class="tab-link" data-go="cap-relatorio" data-area="captacao">Relatório</button><button type="button" class="tab-link" data-go="cap-quadros" data-area="captacao">Quadros</button>
-    <button type="button" class="tab-link" data-go="painel" data-area="locacao">Painel</button><button type="button" class="tab-link" data-go="semanal" data-area="locacao">Relatório semanal</button><button type="button" class="tab-link" data-go="apresentacao" data-area="locacao">Apresentação</button><button type="button" class="tab-link" data-go="contratos" data-area="locacao">Contratos do mês</button></nav>
+    <button type="button" class="tab-link" data-go="painel" data-area="locacao">Painel</button><button type="button" class="tab-link" data-go="semanal" data-area="locacao">Relatório semanal</button><button type="button" class="tab-link" data-go="apresentacao" data-area="locacao">Apresentação</button><button type="button" class="tab-link" data-go="mensal" data-area="locacao">Apresentação do mês</button><button type="button" class="tab-link" data-go="contratos" data-area="locacao">Contratos do mês</button></nav>
 
   <div class="card filters" role="search">
     <div class="field"><label for="fPeriodo">Período</label><select id="fPeriodo"><option value="mes">Este mês</option><option value="mespassado">Mês passado</option><option value="90">Últimos 90 dias</option><option value="ano">Este ano</option><option value="tudo">Tudo</option><option value="custom">Escolher datas…</option></select>
@@ -361,6 +418,22 @@
     <div class="card table-card">
       <div class="list-head"><div><h2>Galeria da equipe</h2><p class="msg" style="margin-top:4px">Fotos, nomes e funções usados nas apresentações. Ficam guardados só para você.</p></div><button class="primary" id="newPessoa">+ Adicionar pessoa</button></div>
       <div class="gal" id="galeria"></div>
+    </div>
+  </section>
+
+  <section id="tab-mensal" data-tab hidden>
+    <div class="top">
+      <div><h2>Apresentação do mês</h2><p>Balanço do mês para a reunião. Os números saem dos lançamentos; os textos você ajusta aqui e clica em "Salvar textos". Um mês novo começa com os textos do último mês salvo.</p></div>
+      <div class="bar-actions"><button class="secondary" id="amSalvar">Salvar textos</button><button class="secondary" id="amPdf">Baixar PDF</button><button class="primary" id="amApresentar">▶ Apresentar</button></div>
+    </div>
+    <div class="card ap-semana">
+      <div class="rel-nav"><button class="secondary" id="amPrev" aria-label="Mês anterior">←</button><input type="month" id="amMes" aria-label="Mês"><button class="secondary" id="amNext" aria-label="Próximo mês">→</button><strong id="amTxt"></strong></div>
+      <div class="rel-nav"><span class="ap-status" id="amStatus"></span></div>
+    </div>
+    <p class="msg" style="margin:10px 0 16px">Escreva <strong>{mes}</strong> e <strong>{proximo}</strong> nos textos para aparecer o nome do mês (ex.: "Balanço de {mes}"). Destaques automáticos: maior VGL do mês e maior contrato; as fotos vêm da galeria da aba Apresentação.</p>
+    <div class="ap-grid">
+      <div class="ap-form" id="amForm"></div>
+      <div class="card ap-preview"><h3>Slides <small class="muted" id="amConta"></small></h3><p class="msg" style="margin:-6px 0 10px">Clique num slide para apresentar a partir dele.</p><div id="amThumbs"></div></div>
     </div>
   </section>
 
@@ -514,12 +587,12 @@
     if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
     form.reset();
   };
-  const sair=async()=>{if(apSujo&&!confirm('Os textos da apresentação não foram salvos. Sair mesmo assim?'))return;await db.auth.signOut();booted=false;leads=[];analises=[];resultados=[];locacoes=[];fatos=[];equipe=[];fotos={};apresentacoes=[];apPronto=false;apSujo=false;contratos=null;capQuadros=null;capRel=[];capAno=null};
+  const sair=async()=>{if((apSujo||amSujo)&&!confirm('Os textos da apresentação não foram salvos. Sair mesmo assim?'))return;await db.auth.signOut();booted=false;leads=[];analises=[];resultados=[];locacoes=[];fatos=[];equipe=[];fotos={};apresentacoes=[];apPronto=false;apSujo=false;mensais=[];am=null;amMes=null;amPronto=false;amSujo=false;amDados=false;contratos=null;capQuadros=null;capRel=[];capAno=null};
   $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
 
   // ---------- Abas ----------
   // Duas áreas: Captação (relatório e quadros das captadoras) e Locação (painel, relatório semanal, apresentação e contratos).
-  const AREAS={captacao:['cap-relatorio','cap-quadros'],locacao:['painel','semanal','apresentacao','contratos']};
+  const AREAS={captacao:['cap-relatorio','cap-quadros'],locacao:['painel','semanal','apresentacao','mensal','contratos']};
   const ABAS=Object.values(AREAS).flat();
   const areaDe=tab=>Object.keys(AREAS).find(a=>AREAS[a].includes(tab));
   const ultimaDaArea={};
@@ -535,6 +608,7 @@
     // Os filtros (período, unidade, corretor) valem só para o painel e o relatório semanal.
     $('.filters').hidden=!['painel','semanal'].includes(tab);
     if(tab==='apresentacao'&&apPronto)renderThumbs();
+    if(tab==='mensal')abrirMensal();
     if(tab==='contratos')abrirContratos();
     if(area==='captacao')abrirCaptacao(tab);
   }
@@ -559,8 +633,8 @@
     try{
       const [c,u,l,a,r,lo,pw,lw]=await Promise.all([
         db.from('corretoras').select('nome,ativa').order('nome'),db.from('unidades').select('nome,ativa').order('nome'),
-        tudo('leads_diarios','data,ate,unidade,corretora,quantidade,ordem'),tudo('pre_analises','data,corretora,situacao'),
-        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem'),tudo('locacoes','data,unidade,corretora,vgl'),
+        tudo('leads_diarios','data,ate,unidade,corretora,quantidade,ordem'),tudo('pre_analises','data,corretora,situacao,garantias'),
+        tudo('resultados_semanais','id,data,ate,unidade,corretora,leads_corretor,visitas,propostas,ordem'),tudo('locacoes','data,data_original,unidade,corretora,vgl'),
         tudo('propostas_whatsapp','data,hora,corretora,referencia,aluguel,garantia'),
         db.from('propostas_whatsapp_leituras').select('de,ate,encontradas,novas').order('ate',{ascending:false}).limit(60)]);
       if(c.error)throw c.error;if(u.error)throw u.error;if(lw.error)throw lw.error;
@@ -570,6 +644,7 @@
       if(!semRel){const ult=[...resultados.map(x=>x.data),...locacoes.map(x=>x.data)].sort().pop();semRel=semanaDe(ult||iso(new Date()))[0]}
       fillFilterOptions();render();renderSemanal();
       await iniciarApresentacao();
+      amDados=true;if(!$('#tab-mensal').hidden)abrirMensal();
     }catch(err){$('#subtitle').textContent='Não foi possível carregar os dados: '+err.message}
     $('#dash').classList.remove('loading');
   }
@@ -1065,7 +1140,7 @@
   function statusAp(){const s=$('#apStatus');s.classList.toggle('dirty',apSujo);
     s.textContent=apSujo?'Alterações não salvas':apSalvoEm?`Textos salvos em ${br(iso(new Date(apSalvoEm)))}`:'Sugestão automática (ainda não salva)'}
   const marcarSujo=()=>{apSujo=true;statusAp()};
-  addEventListener('beforeunload',e=>{if(apSujo){e.preventDefault();e.returnValue=''}});
+  addEventListener('beforeunload',e=>{if(apSujo||amSujo){e.preventDefault();e.returnValue=''}});
 
   // Setas: semana anterior/seguinte. "De": a data escolhida (ou o início do período já lançado que a contém). "Até": qualquer data depois do De.
   function irSemana(d,{exato=false,ate=null}={}){
@@ -1253,11 +1328,12 @@
   }
   $('#apThumbs').addEventListener('click',e=>{const t=e.target.closest('.thumb');if(t)apresentar(+t.dataset.i)});
   $('#apThumbs').addEventListener('keydown',e=>{const t=e.target.closest('.thumb');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();apresentar(+t.dataset.i)}});
-  addEventListener('resize',()=>{clearTimeout(tThumbs);tThumbs=setTimeout(()=>{if(apPronto&&!$('#tab-apresentacao').hidden)renderThumbs();if(!$('#show').hidden)mostrar()},200)});
+  addEventListener('resize',()=>{clearTimeout(tThumbs);tThumbs=setTimeout(()=>{if(apPronto&&!$('#tab-apresentacao').hidden)renderThumbs();if(amPronto&&!$('#tab-mensal').hidden)renderAmThumbs();if(!$('#show').hidden)mostrar()},200)});
 
   // ---------- Apresentar (tela cheia) ----------
-  function apresentar(i=0){
-    showSlides=slides();if(!showSlides.length)return;showIdx=Math.min(i,showSlides.length-1);
+  // fonte = a função que monta os slides (a semanal, slides; a do mês, mSlides).
+  function apresentar(i=0,fonte=slides){
+    showSlides=fonte();if(!showSlides.length)return;showIdx=Math.min(i,showSlides.length-1);
     $('#show').hidden=false;mostrar();document.documentElement.requestFullscreen?.().catch(()=>{});
   }
   function mostrar(){
@@ -1279,13 +1355,15 @@
   document.addEventListener('fullscreenchange',()=>{if($('#show').hidden)return;if(!document.fullscreenElement)fecharShow();else setTimeout(mostrar,50)});
 
   // ---------- PDF (pela impressão do navegador: "Salvar como PDF") ----------
-  $('#apPdf').onclick=async()=>{
-    const ss=slides();if(!ss.length)return;const pa=$('#printArea');pa.innerHTML=ss.map(s=>s[1]).join('');
+  async function imprimir(ss,nome){
+    if(!ss.length)return;const pa=$('#printArea');pa.innerHTML=ss.map(s=>s[1]).join('');
     await Promise.all([...pa.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
-    const [a,b]=apPeriodo(),antes=document.title;document.title=`Reunião semanal ${br(a).slice(0,5)} a ${br(b)}`.replace(/\//g,'-');
+    await document.fonts?.ready;
+    const antes=document.title;document.title=nome.replace(/\//g,'-');
     toast('Na janela que abrir, escolha "Salvar como PDF"');
     setTimeout(()=>{window.print();document.title=antes;pa.innerHTML=''},400);
-  };
+  }
+  $('#apPdf').onclick=()=>{const [a,b]=apPeriodo();imprimir(slides(),`Reunião semanal ${br(a).slice(0,5)} a ${br(b)}`)};
 
   // ---------- Galeria da equipe ----------
   // Imagens para os slides livres: bucket privado "equipe", pasta slides/ (o nome do arquivo ajuda a IA a escolher).
@@ -1312,7 +1390,7 @@
       <div class="row-actions"><button class="link" data-edit-p="${e.id}">Editar</button><button class="link danger" data-del-p="${e.id}">Excluir</button></div></div></div>`).join('')
       ||'<div class="empty-card" style="border-radius:10px;grid-column:1/-1">Ninguém na galeria ainda. Clique em "+ Adicionar pessoa".</div>';
   }
-  const atualizarAp=()=>{if(apPronto){renderApForm();renderThumbs()}};
+  const atualizarAp=()=>{if(apPronto){renderApForm();renderThumbs()}if(amPronto){renderAmForm();renderAmThumbs()}};
   const pesDialog=$('#pesDialog');let pesEdit=null,pesFoto=null;
   const prevFoto=url=>{$('#pesPrev').innerHTML=url?`<img src="${attr(url)}" alt="">`:'Sem foto'};
   function openPessoa(p){
@@ -1355,6 +1433,256 @@
       erro('Não foi possível salvar: '+(/duplicate|unique/i.test(err.message)?'esse nome dos lançamentos já está ligado a outra pessoa da galeria.':err.message));
     }
     $('#pesSubmit').disabled=false;
+  };
+
+  // ---------- Apresentação do mês ----------
+  // Balanço mensal no modelo da reunião de setembro/2026. Os números saem dos lançamentos (Atendimento, Pré-análise,
+  // Relatório semanal, WhatsApp e planilha da Locação); os textos ficam em apresentacoes_mensais, um registro por mês.
+  // Mês novo repete os textos do último mês salvo. Nos textos, {mes}, {proximo} e {ano} viram o nome do mês.
+  const PADRAO_MES={
+    capa:{on:true,etiqueta:'Reunião de resultados · mensal',titulo:'Balanço de {mes}',sub:'Como foi o mês da Locação e onde vamos melhorar em {proximo}.'},
+    numeros:{on:true},
+    destaques:{on:true,faixa:'',d:[{titulo:'Destaque do mês',pessoa:'',tipo:'vgl'},{titulo:'Maior contrato',pessoa:'',tipo:'contrato'}]},
+    corretoras:{on:true,soComLocacao:true},
+    funil:{on:true,metaVisitas:'10'},
+    analise:{on:true,meta:'13'},
+    recusas:{on:true,dica:'Antes de enviar: conferir CPF, renda e documentos com o cliente.',porque:'Por que tanta recusa? O bolso do brasileiro está apertado:',
+      cards:[{n:'84 milhões',t:'de inadimplentes, recorde: metade dos adultos com o nome sujo'},{n:'13,75% ao ano',t:'de Selic: juros altos encarecem o crédito e apertam o orçamento'},{n:'29,6%',t:'das famílias com contas em atraso; 81,7% têm dívidas'}],
+      fonte:'Serasa, Mapa da Inadimplência (ago/2026) · Banco Central, Copom (16/09/2026) · CNC, pesquisa Peic (set/2026)'},
+    aprovados:{on:true,acao:'Toda semana: lista dos aprovados sem contrato, e cada corretora retoma o contato com os seus clientes.'},
+    queda:{on:true,titulo:''},
+    oportunidade:{on:true,titulo:'Análise é oportunidade: explore mais',cards:[
+      {t:'Aprovou?',d:'O cliente está pronto para alugar. Mostre mais imóveis na faixa aprovada e marque a visita na hora.'},
+      {t:'Duas garantias?',d:'{duas} dos {aprovadas} aprovados tinham 2 ou mais opções. Use como argumento: o cliente escolhe a que cabe no bolso.'},
+      {t:'Recusou?',d:'Não é o fim. Ofereça caução, se for possível, um imóvel de valor menor ou compor renda com outra pessoa.'}],
+      msg:'Cada análise é um cliente que já levantou a mão. Não deixe a análise parada: ligue no mesmo dia do resultado.'},
+    crm:{on:true,titulo:'Corretora tem que usar o CRM',msg:'O que não está no CRM, a gente não enxerga: sem visitas e propostas registradas, não sabemos onde o cliente desiste.'},
+    regra:{on:true,etiqueta:'Nova regra · a partir de hoje',titulo:'Proposta só vai para o locador depois de lançada no CRM.',texto:'O lançamento da proposta passa a ser obrigatório para o envio ao locador. É assim que garantimos que toda proposta fica registrada.'},
+    prioridades:{on:true,titulo:'Prioridades para {proximo}',itens:[
+      {t:'Retomar os aprovados sem contrato',d:'Importantíssimo. Lista toda semana; cada corretora liga para os seus.'},
+      {t:'Lançar visitas e propostas toda semana',d:'Tudo no CRM. O que não está registrado, não aparece no resultado.'},
+      {t:'Proposta lançada antes de ir ao locador',d:'Regra nova: sem lançamento, não há envio.'}]},
+    comparativo:{on:true},
+    seguinte:{on:true},
+    fim:{on:true,titulo:'Vamos com tudo em {proximo}!',msg:'Obrigada, equipe.'}
+  };
+  let mensais=[],am=null,amMes=null,amSalvoEm=null,amSujo=false,amPronto=false,amDados=false,tAm=null;
+  const mesclarMes=c=>{c=copia(c||{});const o=copia(PADRAO_MES);for(const k in c)o[k]=c[k]&&typeof c[k]==='object'&&!Array.isArray(c[k])&&o[k]&&typeof o[k]==='object'?{...o[k],...c[k]}:c[k];return o};
+  const ymMais=(ym,n)=>iso(new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1,12)).slice(0,7);
+  const fimMes=ym=>iso(new Date(+ym.slice(0,4),+ym.slice(5,7),0,12));
+  const nomeMes=ym=>MESES[+ym.slice(5,7)-1].toLowerCase();
+  const Mes=ym=>titulo(nomeMes(ym));
+  const somaDias=(d,n)=>{const x=dia(d);x.setDate(x.getDate()+n);return iso(x)};
+  const num=(v,d)=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)&&n>0?n:d};
+  const tk=s=>String(s??'').replace(/\{mes\}/g,Mes(amMes)).replace(/\{proximo\}/g,nomeMes(ymMais(amMes,1))).replace(/\{ano\}/g,amMes.slice(0,4));
+  const totPer=(a,b)=>fatos.filter(x=>x.data>=a&&x.data<=b).reduce(somar,zero());
+  function porCorretora(a,b){const by={};fatos.filter(x=>x.data>=a&&x.data<=b&&x.corretora&&x.corretora!==SEM).forEach(x=>somar(by[x.corretora]??=zero(),x));return by}
+  const mmIco=(n,cor='#004AAD')=>`<svg class="mm-ico" viewBox="0 0 24 24" style="color:${cor}" aria-hidden="true"><path d="${ICONES[n]}"/></svg>`;
+  const mmHead=(kick,tit)=>`<div><p class="mm-kick">${safe(kick)}</p><h2 class="mm-h">${txt(tit)}</h2></div>`;
+  const mmFoot=t=>t?`<p class="mm-foot">${safe(t)}</p>`:'';
+  const mmBars=(rows,cls='')=>{const mx=Math.max(...rows.map(r=>r[1]),1);
+    return `<div class="mm-bars ${cls}">${rows.map(([n,v])=>`<div class="mm-bar-row"><b>${safe(n)}</b><div class="mm-bar" style="width:${Math.max(6,Math.round(v/mx*480))}px"></div><span>${Math.round(v)}%</span></div>`).join('')}</div>`};
+  const variacao=(v1,v2,menorMelhor=false,abs=false)=>{
+    if(!v1&&!abs)return ['–',''];const d=abs?v2-v1:Math.round((v2/v1-1)*100);if(!d)return ['igual',''];
+    const bom=menorMelhor?d<0:d>0;
+    return [menorMelhor?(bom?'melhorou':'piorou'):`${d>0?'subiu':'caiu'} ${Math.abs(d)}${abs?'':'%'}`,bom?'#004AAD':'#B4441F']};
+  // Locações do mês por corretora; "maior" = o maior contrato de cada uma.
+  function locMes(a,b){const by={};locacoes.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{const o=by[l.corretora]??={n:0,vgl:0,maior:0};o.n++;o.vgl+=l.vgl;o.maior=Math.max(o.maior,l.vgl)});return by}
+
+  function mSlides(){
+    if(!am)return [];
+    const M=amMes,N=ymMais(M,1),[a,b]=[M+'-01',fimMes(M)],hoje=iso(new Date()),t=totPer(a,b),by=porCorretora(a,b),out=[];
+    const linhas=Object.entries(by).filter(([,o])=>o.leads||o.env||o.fech).filter(([,o])=>!am.corretoras.soComLocacao||o.fech).sort((x,y)=>y[1].vgl-x[1].vgl||y[1].fech-x[1].fech);
+    const ticket=t.fech?t.vgl/t.fech:0;let ponto=0;const P=()=>`Ponto ${++ponto}`;
+    const S=(nome,cls,html)=>out.push([nome,`<div class="slide mm ${cls}">${html}</div>`]);
+
+    if(am.capa.on)S('Capa','capa',`<div class="mm-capa-faixa"><p>${MESES[+M.slice(5,7)-1].slice(0,3)}</p><p>${M.slice(0,4)}</p></div>
+      <div class="mm-capa-logo"><img src="logo-araujo.jpg" alt="Araujo Locação"></div>
+      <div style="width:900px;display:flex;flex-direction:column;gap:22px"><p class="mm-kick" style="font-size:24px">${safe(tk(am.capa.etiqueta))}</p><h1 class="mm-capa-h">${txt(tk(am.capa.titulo))}</h1><p class="mm-t" style="font-size:33px">${txt(tk(am.capa.sub))}</p></div>
+      <p class="mm-t" style="width:900px">Araujo Locação · ${periodoTxt(a,b)}</p>`);
+
+    if(am.numeros.on)S('Números do mês','',mmHead(`${Mes(M)} em números`,'O mês da Locação')+
+      `<div class="mm-g3">${[[fmtN(t.fech),t.fech===1?'locação fechada':'locações fechadas','mm-big'],[brl(t.vgl),'de VGL (soma dos aluguéis)','mm-n'],[brl(Math.round(ticket)),'aluguel médio por contrato','mm-n']].map(([n,l,c])=>`<div class="mm-card top"><p class="${c}">${n}</p><p class="mm-t">${l}</p></div>`).join('')}</div>
+      <div class="mm-g3">${[[fmtN(t.leads),'leads no atendimento'],[fmtN(t.env),'pré-análises enviadas'],[fmtN(t.apr),'análises aprovadas']].map(([n,l])=>`<div class="mm-card fosco"><p class="mm-n esc">${n}</p><p class="mm-t">${l}</p></div>`).join('')}</div>`+
+      mmFoot('Fontes: planilha da Locação (RANKING 2026), Atendimento e Pré-análise · portal interno'));
+
+    // Destaques: pessoa escolhida ou automática (maior VGL do mês; maior contrato, de preferência de outra corretora).
+    const lm=locMes(a,b),nomesL=Object.keys(lm);
+    if(am.destaques.on&&nomesL.length){
+      const top=[...nomesL].sort((x,y)=>lm[y].vgl-lm[x].vgl)[0],porMaior=[...nomesL].sort((x,y)=>lm[y].maior-lm[x].maior),maior=porMaior.find(n=>n!==top)&&porMaior[0]===top?porMaior.find(n=>n!==top):porMaior[0];
+      const card=(d,i)=>{const p=pessoa(d.pessoa||('c:'+(d.tipo==='contrato'?maior:top)))||{nome:'—',funcao:'',foto:null,corretora:null},o=lm[p.corretora]||{n:0,vgl:0,maior:0};
+        const nums=d.tipo==='contrato'?`<p class="mm-n2">${brl(o.maior)}</p><p class="mm-s">de aluguel em um só contrato</p>`:`<p class="mm-n2">${plural(o.n,'contrato','contratos')}</p><p class="mm-n2">${brl(o.vgl)}</p>`;
+        return `<div class="mm-card mm-dest"><div class="mm-foto">${p.foto?`<img src="${attr(p.foto)}" alt="">`:safe(iniciais(p.nome))}</div><div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+          <p class="mm-pill${i?' claro':''}">${safe(tk(d.titulo))}</p><p class="mm-n esc">${safe(p.nome)}</p><p class="mm-s">${safe([p.funcao,'Araujo Locação'].filter(Boolean).join(' • '))}</p>${nums}</div></div>`};
+      // Melhor semana do mês (pelo VGL) e a faixa da direita (texto livre ou automático).
+      const sem={};locacoes.filter(l=>l.data>=a&&l.data<=b).forEach(l=>{const k=semanaDe(l.data)[0],o=sem[k]??={n:0,vgl:0};o.n++;o.vgl+=l.vgl});
+      const ms=Object.keys(sem).sort((x,y)=>sem[y].vgl-sem[x].vgl)[0],fecharam=nomesL.filter(n=>lm[n].n),mn=Math.min(...fecharam.map(n=>lm[n].n));
+      const auto=fecharam.length===1?`${titulo(fecharam[0])} fechou ${plural(mn,'locação','locações')} no mês.`:`${fecharam.length} corretoras fecharam ${mn} ${mn===1?'locação':'locações'} ou mais.`;
+      S('Destaques do mês','alt',mmHead('Reconhecimento',`Destaques de ${nomeMes(M)}`)+`<div class="mm-g2">${am.destaques.d.map(card).join('')}</div>
+        <div class="mm-g2">${ms&&Object.keys(sem).length>1?`<div class="mm-card mm-faixa">${mmIco('grafico')}<p class="mm-t"><b>Semana de ${br(ms).slice(0,5)}:</b> a melhor do mês, com ${plural(sem[ms].n,'contrato','contratos')} e ${brl(sem[ms].vgl)}.</p></div>`:''}
+        <div class="mm-card mm-faixa">${mmIco('estrela')}<p class="mm-t">${txt(am.destaques.faixa?.trim()?tk(am.destaques.faixa):auto)}</p></div></div>`);
+    }
+
+    if(am.corretoras.on&&linhas.length)S('Por corretora','',mmHead('Resultado individual',`${Mes(M)} por corretora`)+
+      `<table class="mm-tab"><tr><th>Corretora</th><th>Leads</th><th>Análises</th><th>Recusadas</th><th>Locações</th><th>VGL</th></tr>${linhas.map(([n,o])=>`<tr><td>${safe(n)}</td><td>${fmtN(o.leads)}</td><td>${fmtN(o.env)}</td><td>${pct(o.rec,o.env)}</td><td>${fmtN(o.fech)}</td><td>${brl(o.vgl)}</td></tr>`).join('')}</table>`+
+      mmFoot('Leads: Atendimento · Análises e recusadas: Pré-análise · Locações e VGL: planilha da Locação'));
+
+    if(am.funil.on){const meta=num(am.funil.metaVisitas,10),mv=Math.round(t.leads*meta/100/10)*10,porSem=Math.round(mv/(linhas.length||1)/((+b.slice(8))/7));
+      const et=[[t.leads,'leads','#D3E0F0','#16243A',820,'Topo do funil'],[t.env,'análises','#ACC4E2','#16243A',640,`<b>${pct(t.env,t.leads)}</b> dos leads viram análise`],
+        [t.apr,'aprovadas','#7FA3D0','#16243A',490,`<b>${pct(t.apr,t.env)}</b> das análises são aprovadas`],
+        [t.fech,t.fech===1?'locação':'locações','#004AAD','#F6F8FB',340,t.fech?`só <b>1 em cada ${Math.round(t.apr/t.fech)||1}</b> aprovados virou contrato`:'nenhum contrato no mês']];
+      S('Funil','',mmHead('Onde melhorar',`O funil de ${nomeMes(M)}`)+`<div style="display:flex;flex-direction:column;gap:12px">${et.map(([v,n,bg,c,w,s])=>`<div class="mm-etapa"><div style="width:${w}px;background:${bg};color:${c}"><strong>${fmtN(v)}</strong><em>${n}</em></div><p>${s}</p></div>`).join('')}</div>
+        <div class="mm-band"><div style="text-align:center;flex:none"><p class="mm-n">${fmtN(mv)}</p><p class="mm-s" style="color:#F6F8FB;font-weight:700">visitas/mês</p></div><p>é a meta: <b>${String(meta).replace('.',',')}% dos leads</b>, referência de mercado. São cerca de ${porSem} por corretora por semana. Em ${nomeMes(M)}, lançamos <b>${fmtN(t.vis)} (${pct(t.vis,t.leads)})</b>.</p></div>`+
+        mmFoot('Portal: Atendimento, Pré-análise e Locação · Referência de visitas: Leal Mídia, abaixo de 10% de leads em visita indica problema'));
+    }
+
+    if(am.analise.on&&t.leads){const meta=num(am.analise.meta,13),rows=linhas.filter(([,o])=>o.leads).map(([n,o])=>[n,o.env/o.leads*100]).sort((x,y)=>y[1]-x[1]);
+      const extra=Math.round(t.leads*meta/100-t.env),locX=t.env?Math.round(extra*t.fech/t.env):0,m=String(meta).replace('.',',');
+      const call=extra>0?`<p class="mm-t">Se todas chegarem a <b>${m}%</b>:</p><p class="mm-n2">+${fmtN(extra)} análises</p>${locX>0?`<p class="mm-n2">≈ +${plural(locX,'locação','locações')}</p><p class="mm-t">cerca de ${brlCurto(Math.max(1000,Math.round(locX*ticket/1000)*1000))} a mais de VGL no mês</p>`:''}`
+        :`<p class="mm-n2">Meta de ${m}% batida</p><p class="mm-t">A equipe passou da meta de leads que viram análise.</p>`;
+      S('Leads que viram análise','',mmHead(`${P()} · Leads que viram análise`,`Só ${pct(t.env,t.leads)} dos leads chegam à análise`)+`<div class="mm-row">${mmBars(rows)}<div class="mm-call">${call}</div></div>`+
+        mmFoot('Pré-análises enviadas ÷ leads recebidos no Atendimento, por corretora'));
+    }
+
+    if(am.recusas.on&&t.env){const rows=linhas.filter(([,o])=>o.env).map(([n,o])=>[n,o.rec/o.env*100]).sort((x,y)=>y[1]-x[1]),cards=(am.recusas.cards||[]).filter(c=>c.n?.trim()||c.t?.trim());
+      S('Análises recusadas','',mmHead(`${P()} · Análises recusadas`,t.rec?`1 em cada ${Math.round(t.env/t.rec)} análises foi recusada`:'Nenhuma análise recusada')+
+        `<div class="mm-row">${mmBars(rows,'sm')}<div class="mm-call"><p class="mm-n2">${fmtN(t.rec)} de ${fmtN(t.env)}</p><p class="mm-s">análises recusadas no mês</p>${am.recusas.dica?`<p class="mm-s" style="color:#16243A;font-size:21px">${txt(tk(am.recusas.dica))}</p>`:''}</div></div>`+
+        (cards.length?`<div style="display:flex;flex-direction:column;gap:12px">${am.recusas.porque?`<p class="mm-t" style="font-weight:700;color:#16243A">${txt(tk(am.recusas.porque))}</p>`:''}<div class="mm-g3" style="grid-template-columns:repeat(${cards.length},1fr)">${cards.map(c=>`<div class="mm-card fosco" style="padding:18px 24px;gap:2px"><p class="mm-n2">${safe(c.n)}</p><p class="mm-s">${safe(c.t)}</p></div>`).join('')}</div></div>`:'')+
+        mmFoot(tk(am.recusas.fonte)));
+    }
+
+    if(am.aprovados.on&&t.apr){const sc=Math.max(0,t.apr-t.fech);
+      S('Aprovados sem contrato','azul',`<div style="display:flex;flex-direction:column;gap:18px"><p class="mm-pill esc">${P()} · Importantíssimo</p><h2 class="mm-h" style="margin:0">Aprovado que não vira contrato</h2></div>
+        <div class="mm-row" style="align-items:flex-end"><p class="mm-giga">${fmtN(sc)}</p><div style="flex:1;display:flex;flex-direction:column;gap:18px"><p class="mm-n2 esc" style="line-height:1.25">clientes aprovados em ${nomeMes(M)} ainda não alugaram com a gente.</p><p class="mm-t" style="color:#16243A">Foram ${fmtN(t.apr)} aprovados e ${plural(t.fech,'contrato','contratos')}${t.fech?`: só 1 em cada ${Math.round(t.apr/t.fech)||1}`:''}.</p></div></div>
+        ${am.aprovados.acao?`<div class="mm-card mm-faixa" style="background:#F6F8FB">${mmIco('agenda')}<p class="mm-t" style="color:#16243A">${txt(tk(am.aprovados.acao))}</p></div>`:''}`);
+    }
+
+    if(am.queda.on){const meses=[...Array(9)].map((_,i)=>ymMais(M,i-8)),cont=ym=>analises.filter(x=>x.data.startsWith(ym)).length,vals=meses.map(cont),mx=Math.max(...vals,1),cur=vals[8],ini=vals[0],ant=cont(ymMais(M,-12));
+      const tit=am.queda.titulo?.trim()?tk(am.queda.titulo):cur<ini*.8?`As análises caíram desde ${nomeMes(meses[0])}`:cur>ini*1.2?`As análises cresceram desde ${nomeMes(meses[0])}`:'Volume de análises por mês';
+      const vr=ant?Math.round((cur/ant-1)*100):0,ano=+M.slice(0,4);
+      S('Análises por mês','',mmHead(`${P()} · Volume de análises`,tit)+`<div class="mm-row" style="align-items:flex-end"><div class="mm-chart"><div class="mm-cols">${vals.map((v,i)=>`<div><p${i===8?' class="cur"':''}>${fmtN(v)}</p><div style="height:${Math.max(4,Math.round(v/mx*270))}px"${i===8?' class="cur"':''}></div></div>`).join('')}</div>
+        <div class="mm-meses">${meses.map((m,i)=>`<p${i===8?' class="cur"':''}>${titulo(MESES[+m.slice(5,7)-1].slice(0,3).toLowerCase())}</p>`).join('')}</div></div>
+        ${ant?`<div class="mm-call"><p class="mm-s">${Mes(M)} de ${ano-1}</p><p class="mm-n2 esc">${plural(ant,'análise','análises')}</p><p class="mm-s">${Mes(M)} de ${ano}</p><p class="mm-n2">${fmtN(cur)} (${vr>0?'+':vr<0?'−':''}${Math.abs(vr)}%)</p></div>`:''}</div>`+
+        mmFoot('Pré-análises enviadas por mês · Pré-análise do portal'));
+    }
+
+    if(am.oportunidade.on){const duas=analises.filter(x=>x.data>=a&&x.data<=b&&x.situacao==='APROVADO'&&(x.garantias||[]).length>=2).length,rep=s=>tk(s).replace(/\{duas\}/g,fmtN(duas)).replace(/\{aprovadas\}/g,fmtN(t.apr)),ic=['agenda','casa','alvo'];
+      S('Análise é oportunidade','alt',mmHead('Atitude',rep(am.oportunidade.titulo))+`<div class="mm-g3">${(am.oportunidade.cards||[]).map((c,i)=>`<div class="mm-card top"${i===2?' style="border-top-color:#7FA3D0"':''}>${mmIco(ic[i]||'estrela')}<h3 class="mm-n2 esc">${safe(rep(c.t))}</h3><p class="mm-t" style="font-size:21px">${txt(rep(c.d))}</p></div>`).join('')}</div>
+        ${am.oportunidade.msg?`<div class="mm-band">${mmIco('estrela','#7FA3D0')}<p>${txt(rep(am.oportunidade.msg))}</p></div>`:''}`+mmFoot(`Garantias aprovadas: Pré-análise do portal, ${nomeMes(M)} de ${M.slice(0,4)}`));
+    }
+
+    if(am.crm.on){const pw=propWpp.filter(p=>p.data>=a&&p.data<=b).map(p=>p.data).sort(),[seg]=semanaInteira(hoje),a2=somaDias(seg,-14),b2=somaDias(seg,-1);
+      const rec=resultados.filter(r=>r.data>=a2&&r.data<=b2).reduce((s,r)=>s+(r.visitas||0)+(r.propostas||0),0);
+      const cards=[[fmtN(t.vis),`visitas lançadas em ${nomeMes(M)}, para ${plural(t.fech,'locação','locações')}.`],
+        pw.length?[`${fmtN(t.prop)} × ${fmtN(pw.length)}`,`${plural(t.prop,'proposta lançada','propostas lançadas')} no mês; só no WhatsApp, ${pw.length} entre ${br(pw[0]).slice(0,5)} e ${br(pw.at(-1)).slice(0,5)}.`]:[fmtN(t.prop),'propostas lançadas no mês.'],
+        [fmtN(rec),`visitas e propostas lançadas de ${br(a2).slice(0,5)} a ${br(b2).slice(0,5)}.`]];
+      S('CRM','alt',mmHead(`${P()} · Registro do atendimento`,tk(am.crm.titulo))+`<div class="mm-g3">${cards.map(([n,l])=>`<div class="mm-card" style="gap:12px"><p class="mm-n">${n}</p><p class="mm-t">${l}</p></div>`).join('')}</div>
+        ${am.crm.msg?`<div class="mm-band">${mmIco('alvo','#7FA3D0')}<p>${txt(tk(am.crm.msg))}</p></div>`:''}`);
+    }
+
+    if(am.regra.on&&am.regra.titulo?.trim())S('Regra nova','regra',`<div class="mm-regra-faixa"></div><p class="mm-pill">${safe(tk(am.regra.etiqueta))}</p><h2 class="mm-regra-h">${txt(tk(am.regra.titulo))}</h2>${am.regra.texto?`<p class="mm-t" style="font-size:33px;width:1050px">${txt(tk(am.regra.texto))}</p>`:''}`);
+
+    if(am.prioridades.on){const it=(am.prioridades.itens||[]).filter(x=>x.t?.trim());
+      if(it.length)S('Prioridades','alt',mmHead('Plano de ação',tk(am.prioridades.titulo))+`<div style="display:flex;flex-direction:column;gap:18px">${it.map((x,i)=>`<div class="mm-card mm-prio"${i?' style="border-left-color:#7FA3D0"':''}><p class="mm-n" style="width:60px;flex:none">${i+1}</p><div style="display:flex;flex-direction:column;gap:6px"><h3 class="mm-n2 esc">${safe(tk(x.t))}</h3>${x.d?`<p class="mm-t">${txt(tk(x.d))}</p>`:''}</div></div>`).join('')}</div>`)}
+
+    // Comparativo e mês seguinte: só quando o mês seguinte já começou. Mesmo período nos dois meses (dia 1 até hoje).
+    const fimN=fimMes(N),ateN=hoje<fimN?hoje:fimN;
+    if(am.comparativo.on&&hoje>=N+'-01'){const D=Math.min(+ateN.slice(8),+b.slice(8)),dd=pad(D),x1=totPer(a,`${M}-${dd}`),x2=totPer(`${N}-01`,`${N}-${dd}`);
+      const ld=leads.filter(l=>l.data>=N+'-01'&&l.data<=ateN),ldFim=ld.map(l=>(l.ate||l.data)>fimN?fimN:(l.ate||l.data)).sort().pop(),lpd1=t.leads/(+b.slice(8)),lpd2=ldFim?ld.reduce((s,l)=>s+(l.quantidade||0),0)/(+ldFim.slice(8)):0;
+      const w1=propWpp.filter(p=>p.data>=a&&p.data<=b).map(p=>p.data).sort(),w2=propWpp.filter(p=>p.data>=N+'-01'&&p.data<=ateN).map(p=>p.data).sort();
+      const wpd1=w1.length?w1.length/(+b.slice(8)-+w1[0].slice(8)+1):0,wpd2=w2.length?w2.length/(+w2.at(-1).slice(8)):0;
+      const r1=x1.env?x1.rec/x1.env:0,r2=x2.env?x2.rec/x2.env:0,dec=v=>v.toFixed(1).replace('.',',');
+      const rows=[['Locações lançadas',fmtN(x1.fech),fmtN(x2.fech),variacao(x1.fech,x2.fech,false,true)],['VGL',brl(x1.vgl),brl(x2.vgl),variacao(x1.vgl,x2.vgl)],
+        ['Pré-análises enviadas',fmtN(x1.env),fmtN(x2.env),variacao(x1.env,x2.env)],['Análises recusadas',pct(x1.rec,x1.env),pct(x2.rec,x2.env),x1.env&&x2.env?variacao(Math.round(r1*100),Math.round(r2*100),true,true):['–','']],
+        ...(lpd1&&lpd2?[['Leads por dia',fmtN(Math.round(lpd1)),fmtN(Math.round(lpd2)),variacao(lpd1,lpd2)]]:[]),
+        ...(wpd1&&wpd2?[['Propostas no WhatsApp por dia',dec(wpd1),dec(wpd2),variacao(wpd1,wpd2)]]:[])];
+      const mov=locacoes.filter(l=>l.data>=N+'-01'&&l.data<=`${N}-${dd}`&&l.data_original&&l.data_original.startsWith(M)).length;
+      const nota=[lpd1&&lpd2?`Leads: média de ${nomeMes(M)} × 01 a ${br(ldFim).slice(0,5)}`:'',wpd1&&wpd2?`WhatsApp: ${br(w1[0]).slice(0,5)} a ${br(b).slice(0,5)} × 01 a ${br(w2.at(-1)).slice(0,5)}`:'',mov?`${Mes(N)} inclui ${plural(mov,'contrato vindo','contratos vindos')} de ${nomeMes(M)}`:''].filter(Boolean).join(' · ');
+      S('Comparativo','',mmHead(`Comparativo · dia 1 a ${D} de cada mês`,`${Mes(M)} × ${nomeMes(N)}`)+`<table class="mm-tab"><tr><th style="width:40%">Indicador</th><th>${Mes(M)}</th><th>${Mes(N)}</th><th>Variação</th></tr>${rows.map(([n,v1,v2,[vt,cor]])=>`<tr><td>${n}</td><td>${v1}</td><td>${v2}</td><td style="font-weight:700;color:${cor||'#44546A'}">${vt}</td></tr>`).join('')}</table>`+mmFoot(nota));
+    }
+    if(am.seguinte.on&&hoje>=N+'-01'){const ln=locMes(`${N}-01`,ateN),nm=Object.keys(ln).sort((x,y)=>ln[y].n-ln[x].n||ln[y].vgl-ln[x].vgl),tn=nm.reduce((s,n)=>s+ln[n].n,0),tv=nm.reduce((s,n)=>s+ln[n].vgl,0);
+      if(tn){const restam=+fimN.slice(8)-+ateN.slice(8),fc=tn>t.fech?0:t.fech-tn+1,fv=tv>t.vgl?0:t.vgl-tv,falta=[fc?`<b>${plural(fc,'contrato','contratos')}</b>`:'',fv?`<b>${brl(fv)}</b>`:''].filter(Boolean).join(' e ');
+        const msg=!falta?`Já passamos ${nomeMes(M)}! Agora é buscar mais.`:restam>0?`Para passar ${nomeMes(M)}, faltam ${falta} em ${plural(restam,'dia','dias')}. Dá para fazer!`:`${Mes(N)} fechou abaixo de ${nomeMes(M)}: faltaram ${falta}.`;
+        const cs=nm.slice(0,5);
+        S(`${Mes(N)} até agora`,'alt',mmHead(`${Mes(N)} até agora · 01 a ${br(ateN).slice(0,5)}`,`${plural(tn,'contrato','contratos')} e ${brl(tv)}`)+
+          `<div class="mm-g3" style="grid-template-columns:repeat(${cs.length},1fr)">${cs.map(n=>`<div class="mm-card"><p class="mm-t" style="font-weight:800;color:#16243A">${safe(n)}</p><p class="mm-n">${fmtN(ln[n].n)}</p><p class="mm-t">${brl(ln[n].vgl)}</p></div>`).join('')}</div>
+          <div class="mm-band">${mmIco('trofeu','#7FA3D0')}<p>${msg}</p></div>`+
+          mmFoot(`Contratos lançados na planilha da Locação até ${br(ateN).slice(0,5)} · ${nomeMes(M)} fechou com ${plural(t.fech,'contrato','contratos')} e ${brl(t.vgl)}`));
+      }
+    }
+
+    if(am.fim.on)S('Encerramento','azul fim',`<div class="mm-capa-logo" style="width:390px"><img src="logo-araujo.jpg" alt="Araujo Locação"></div><h1 class="mm-capa-h">${txt(tk(am.fim.titulo))}</h1>${am.fim.msg?`<p class="mm-t" style="font-size:33px;color:#16243A">${txt(tk(am.fim.msg))}</p>`:''}`);
+    return out;
+  }
+
+  // ---------- Formulário e navegação ----------
+  async function abrirMensal(){
+    if(!amDados)return;
+    if(amPronto){renderAmThumbs();return}
+    const r=await db.from('apresentacoes_mensais').select('mes,conteudo,atualizado_em');
+    mensais=r.error?[]:r.data;amPronto=true;
+    // Padrão: o mês passado (o balanço é do mês que acabou).
+    carregarMes(ymMais(iso(new Date()).slice(0,7),-1));
+    if(r.error)$('#amStatus').textContent='Não foi possível carregar os textos salvos: '+r.error.message;
+  }
+  function carregarMes(ym){
+    amMes=ym;$('#amMes').value=ym;const salvo=mensais.find(x=>x.mes===ym+'-01');
+    if(salvo){am=mesclarMes(salvo.conteudo);amSalvoEm=salvo.atualizado_em}
+    else{const ant=mensais.filter(x=>x.mes<ym+'-01').sort((x,y)=>x.mes.localeCompare(y.mes)).pop();
+      am=mesclarMes(ant?.conteudo);am.destaques.d.forEach(d=>d.pessoa='');am.destaques.faixa='';am.queda.titulo='';amSalvoEm=null}
+    amSujo=false;renderAmForm();renderAmThumbs();statusAm();
+  }
+  function statusAm(){const s=$('#amStatus');s.classList.toggle('dirty',amSujo);
+    s.textContent=amSujo?'Alterações não salvas':amSalvoEm?`Textos salvos em ${br(iso(new Date(amSalvoEm)))}`:'Textos do último mês salvo (ainda não salvos para este mês)'}
+  const irMes=ym=>{if(!ym||ym===amMes)return;
+    if(amSujo&&!confirm('Os textos deste mês não foram salvos. Trocar de mês mesmo assim?')){$('#amMes').value=amMes;return}
+    carregarMes(ym)};
+  $('#amPrev').onclick=()=>irMes(ymMais(amMes,-1));$('#amNext').onclick=()=>irMes(ymMais(amMes,1));
+  $('#amMes').addEventListener('change',e=>irMes(e.target.value));
+  function renderAmForm(){
+    if(!am)return;const f=campo;
+    const pessoaSel=(i,d)=>`<label style="display:block"><span class="ap-lbl">Pessoa</span><select data-p="destaques.d.${i}.pessoa">${opcoesPessoa(d.pessoa).replace('Escolha…','Automático (pelos números)')}</select></label>`;
+    const tipoSel=(i,d)=>`<label style="display:block"><span class="ap-lbl">Números</span><select data-p="destaques.d.${i}.tipo"><option value="vgl">Contratos e VGL do mês</option><option value="contrato"${d.tipo==='contrato'?' selected':''}>Maior contrato</option></select></label>`;
+    $('#amForm').innerHTML=
+      secao('Capa','','capa.on',am.capa.on,f('capa.etiqueta','Etiqueta',am.capa.etiqueta)+f('capa.titulo','Título',am.capa.titulo)+f('capa.sub','Subtítulo',am.capa.sub,{area:true}))+
+      secao('Números do mês','automático','numeros.on',am.numeros.on,'<p class="auto">Locações, VGL, aluguel médio, leads, análises e aprovadas do mês.</p>')+
+      secao('Destaques','fotos da galeria','destaques.on',am.destaques.on,am.destaques.d.map((d,i)=>`<div class="dest"><div class="dest-head"><span>Destaque ${i+1}</span></div><div class="ap-row">${f(`destaques.d.${i}.titulo`,'Selo',d.titulo)}${pessoaSel(i,d)}</div>${tipoSel(i,d)}</div>`).join('')+
+        f('destaques.faixa','Faixa de baixo (em branco = automático)',am.destaques.faixa||'',{ph:'Ex.: 5 corretoras fecharam 3 locações ou mais.'})+'<p class="auto">A outra faixa mostra a melhor semana do mês.</p>')+
+      secao('Por corretora','automático','corretoras.on',am.corretoras.on,`<label class="inc"><input type="checkbox" data-p="corretoras.soComLocacao" ${am.corretoras.soComLocacao?'checked':''}> Mostrar só quem fechou locação no mês</label>`)+
+      secao('Funil','automático','funil.on',am.funil.on,f('funil.metaVisitas','Meta de visitas (% dos leads)',am.funil.metaVisitas))+
+      secao('Leads que viram análise','automático','analise.on',am.analise.on,f('analise.meta','Meta (% dos leads que viram análise)',am.analise.meta))+
+      secao('Análises recusadas','atualize a economia todo mês','recusas.on',am.recusas.on,f('recusas.dica','Dica',am.recusas.dica,{area:true})+f('recusas.porque','Frase antes dos números',am.recusas.porque)+
+        (am.recusas.cards||[]).map((c,i)=>`<div class="ap-row">${f(`recusas.cards.${i}.n`,'Número '+(i+1),c.n)}${f(`recusas.cards.${i}.t`,'Texto',c.t,{area:true})}</div>`).join('')+f('recusas.fonte','Fontes (rodapé)',am.recusas.fonte,{area:true}))+
+      secao('Aprovados sem contrato','automático','aprovados.on',am.aprovados.on,f('aprovados.acao','O que fazer',am.aprovados.acao,{area:true}))+
+      secao('Análises por mês','automático','queda.on',am.queda.on,f('queda.titulo','Título (em branco = automático)',am.queda.titulo||''))+
+      secao('Análise é oportunidade','','oportunidade.on',am.oportunidade.on,f('oportunidade.titulo','Título',am.oportunidade.titulo)+
+        (am.oportunidade.cards||[]).map((c,i)=>`<div class="ap-row">${f(`oportunidade.cards.${i}.t`,'Card '+(i+1),c.t)}${f(`oportunidade.cards.${i}.d`,'Texto',c.d,{area:true,rows:3})}</div>`).join('')+
+        f('oportunidade.msg','Mensagem',am.oportunidade.msg,{area:true})+'<p class="auto">{duas} e {aprovadas} viram os números do mês (aprovados com 2 ou mais garantias e total de aprovados).</p>')+
+      secao('Uso do CRM','números automáticos','crm.on',am.crm.on,f('crm.titulo','Título',am.crm.titulo)+f('crm.msg','Mensagem',am.crm.msg,{area:true}))+
+      secao('Regra nova','','regra.on',am.regra.on,f('regra.etiqueta','Etiqueta',am.regra.etiqueta)+f('regra.titulo','Regra',am.regra.titulo,{area:true})+f('regra.texto','Explicação',am.regra.texto,{area:true}))+
+      secao('Prioridades','','prioridades.on',am.prioridades.on,f('prioridades.titulo','Título',am.prioridades.titulo)+
+        (am.prioridades.itens||[]).map((x,i)=>`<div class="ap-row">${f(`prioridades.itens.${i}.t`,'Prioridade '+(i+1),x.t)}${f(`prioridades.itens.${i}.d`,'Texto',x.d,{area:true})}</div>`).join(''))+
+      secao('Comparativo com o mês seguinte','automático','comparativo.on',am.comparativo.on,'<p class="auto">Mesmo período nos dois meses (dia 1 até hoje). Aparece quando o mês seguinte já começou.</p>')+
+      secao('Mês seguinte até agora','automático','seguinte.on',am.seguinte.on,'<p class="auto">Contratos de cada corretora no mês seguinte e quanto falta para passar este mês.</p>')+
+      secao('Encerramento','','fim.on',am.fim.on,f('fim.titulo','Título',am.fim.titulo)+f('fim.msg','Mensagem',am.fim.msg));
+  }
+  $('#amForm').addEventListener('input',e=>{const p=e.target.dataset.p;if(!p||!am)return;
+    setP(am,p,e.target.type==='checkbox'?e.target.checked:e.target.value);amSujo=true;statusAm();clearTimeout(tAm);tAm=setTimeout(renderAmThumbs,250)});
+  function renderAmThumbs(){
+    if(!am)return;const box=$('#amThumbs'),w=Math.max(220,box.clientWidth||400),ss=mSlides();
+    $('#amTxt').textContent=`${Mes(amMes)} de ${amMes.slice(0,4)}`;$('#amConta').textContent=`(${ss.length})`;
+    box.innerHTML=ss.map(([n,h],i)=>{const e=escalar(h,w);return `<div class="thumb" data-i="${i}" role="button" tabindex="0" aria-label="Apresentar a partir do slide ${i+1}"><small>${i+1}. ${safe(n)}</small><div class="thumb-in" style="height:${Math.round(810*e.k)}px">${e.html}</div></div>`}).join('')||'<p class="msg">Nenhum slide incluído.</p>';
+  }
+  $('#amThumbs').addEventListener('click',e=>{const t=e.target.closest('.thumb');if(t)apresentar(+t.dataset.i,mSlides)});
+  $('#amThumbs').addEventListener('keydown',e=>{const t=e.target.closest('.thumb');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();apresentar(+t.dataset.i,mSlides)}});
+  $('#amApresentar').onclick=()=>apresentar(0,mSlides);
+  $('#amPdf').onclick=()=>{if(am)imprimir(mSlides(),`Balanço de ${nomeMes(amMes)} ${amMes.slice(0,4)}`)};
+  $('#amSalvar').onclick=async()=>{
+    if(!am)return;$('#amSalvar').disabled=true;
+    const agora=new Date().toISOString(),mes=amMes+'-01',{data,error}=await db.from('apresentacoes_mensais').upsert({mes,conteudo:am,atualizado_em:agora}).select('mes,conteudo,atualizado_em');
+    $('#amSalvar').disabled=false;
+    if(error){alert('Não foi possível salvar: '+error.message);return}
+    mensais=mensais.filter(x=>x.mes!==mes).concat(data?.[0]||{mes,conteudo:copia(am),atualizado_em:agora});amSalvoEm=agora;amSujo=false;statusAm();toast('Textos salvos');
   };
 
   // ---------- Locação · Contratos do mês ----------
