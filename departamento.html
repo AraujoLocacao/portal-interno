@@ -233,6 +233,14 @@
     <div class="card ferramenta"><p class="empty" id="documentosMsg">Carregando os modelos…</p><iframe id="documentosFrame" title="Gerar documentos" hidden sandbox="allow-scripts allow-modals allow-downloads"></iframe></div>
   </section>
 
+  <section id="tab-parceria" data-tab hidden>
+    <div class="top">
+      <div><h2>Calculadora de parceria</h2><p>Quanto fica para o corretor parceiro, para a Araujo e para a corretora numa locação feita em parceria. O que é digitado aqui não fica salvo no portal.</p></div>
+      <div class="bar-actions"><button class="secondary" id="parceriaCheia">Tela cheia</button></div>
+    </div>
+    <div class="card ferramenta"><p class="empty" id="parceriaMsg">Carregando a calculadora…</p><iframe id="parceriaFrame" title="Calculadora de parceria" hidden sandbox="allow-scripts"></iframe></div>
+  </section>
+
   <section id="tab-adm" data-tab hidden>
     <div class="top"><div><h2>Administradoras de condomínio</h2><p>Relatório das administradoras de condomínio. É a mesma lista em Locatário · Boletos, Locatário · Renovação e Proprietário · Contas a Pagar: o que um departamento atualiza, os outros veem.</p></div></div>
     <div class="empty-card">Em preparação. Esta aba vai seguir a planilha de administradoras que vocês já usam.</div>
@@ -351,7 +359,9 @@
       atividades:['Cadastro do imóvel no Superlógica','Agendamento de visita de corretoras']},
     {slug:'captacao',nome:'Corretoras de captação',area:'Captação de imóveis',papel:'Campo',ref:'Imóvel / proprietário',limpo:true,
       atividades:['Captação de imóveis','Documentos de proprietários','Chaveiro']},
-    {slug:'corretoras-locacao',nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,
+    // parceria = calculadora de parceria na locação (26/10/2026). Fica no bucket privado, em ferramentas/corretoras-locacao/,
+    // porque mostra a comissão da corretora e é só para a equipe.
+    {slug:'corretoras-locacao',publicado:true,nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,extras:['parceria'],
       atividades:['Responsável pela locação dos imóveis']},
     // extras = abas próprias da área. "adm" (administradoras de condomínio) é a mesma lista em Boletos, Renovação e Contas a Pagar.
     {slug:'boletos',limpo:true,nome:'Locatário · Boletos',area:'Financeiro',papel:'Boletos',ref:'Contrato / locatário',extras:['adm','alpop'],
@@ -410,7 +420,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
+    const nomes={rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
     if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
@@ -436,7 +446,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,ABAS.includes('parceria')?loadParceria():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // Quem entra em mais de um departamento (gerência e acesso geral, ver supabase/acesso_geral.sql) ganha um seletor no topo.
@@ -453,7 +463,7 @@
     if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
     form.reset();
   };
-  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];rescisoes=[];rescAtual=null;pendente=null;alterado=false;anexosSalvos=[];pastaAtual=null;$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true;$('#documentosFrame').srcdoc='';$('#documentosFrame').hidden=true};
+  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];rescisoes=[];rescAtual=null;pendente=null;alterado=false;anexosSalvos=[];pastaAtual=null;$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true;$('#documentosFrame').srcdoc='';$('#documentosFrame').hidden=true;$('#parceriaFrame').srcdoc='';$('#parceriaFrame').hidden=true};
   $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
 
   // Esta área tem senhas: sai sozinha depois de 30 minutos sem uso.
@@ -614,6 +624,18 @@
     toast('Aba RH atualizada');await loadRh();
   }
   $('#documentosCheia').onclick=()=>{const fr=docsFrame();if(!fr.hidden)fr.requestFullscreen?.()};
+
+  // ---------- Calculadora de parceria (Corretoras de locação) ----------
+  // Mesmo esquema: fica no bucket privado (ferramentas/corretoras-locacao/calculadora-parceria.html). Nada é gravado.
+  async function loadParceria(){
+    const msg=$('#parceriaMsg');msg.hidden=false;msg.textContent='Carregando a calculadora…';
+    const {data,error}=await db.storage.from(BUCKET).download(`ferramentas/${DEP.slug}/calculadora-parceria.html`);
+    if(error){msg.textContent='Não foi possível carregar a calculadora. Fale com a gerência.';return}
+    const html=await data.text(),fr=$('#parceriaFrame');
+    fr.srcdoc=html.includes('</body>')?html.replace('</body>',AVISA_USO+'</body>'):html+AVISA_USO;fr.hidden=false;msg.hidden=true;
+  }
+  addEventListener('message',e=>{const fr=$('#parceriaFrame');if(fr.contentWindow&&e.source===fr.contentWindow)ultimoUso=Date.now()});
+  $('#parceriaCheia').onclick=()=>{const fr=$('#parceriaFrame');if(!fr.hidden)fr.requestFullscreen?.()};
 
   // ---------- Abas ----------
   // As abas trocam por JavaScript (não por link): o navegador bloqueia o "#aba" quando a página é aberta como arquivo/cópia.
