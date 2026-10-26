@@ -360,8 +360,8 @@
     {slug:'captacao',nome:'Corretoras de captação',area:'Captação de imóveis',papel:'Campo',ref:'Imóvel / proprietário',limpo:true,
       atividades:['Captação de imóveis','Documentos de proprietários','Chaveiro']},
     // parceria = calculadora de parceria na locação (26/10/2026). Fica no bucket privado, em ferramentas/corretoras-locacao/,
-    // porque mostra a comissão da corretora e é só para a equipe.
-    {slug:'corretoras-locacao',publicado:true,nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,extras:['parceria'],
+    // Ainda prévia: as corretoras não têm login. Por enquanto a calculadora fica aberta no portal, em parceria.html.
+    {slug:'corretoras-locacao',nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,extras:['parceria'],
       atividades:['Responsável pela locação dos imóveis']},
     // extras = abas próprias da área. "adm" (administradoras de condomínio) é a mesma lista em Boletos, Renovação e Contas a Pagar.
     {slug:'boletos',limpo:true,nome:'Locatário · Boletos',area:'Financeiro',papel:'Boletos',ref:'Contrato / locatário',extras:['adm','alpop'],

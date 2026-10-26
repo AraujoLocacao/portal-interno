@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+<title>Calculadora de parceria | Araujo Locação</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap">
+<style>
+/* Layout: uma coluna de entrada + resultado ao lado (empilha no celular); a taxa vira uma barra dividida em fatias */
+:root{
+  --bg:#F4F7FB; --card:#FFFFFF; --fg:#1B2533; --muted:#556172; --line:#DCE4EE;
+  --accent:#004AAD; --accent-soft:#7FA3D0; --cut:#C9D3E0; --partner:#B45309; --chip:#EAF0F7;
+  --font:'DM Sans', 'Segoe UI', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121821; --card:#1A2230; --fg:#E8EDF4; --muted:#A3AEBD; --line:#2C3747;
+  --accent:#7FA3D0; --accent-soft:#3F6597; --cut:#3A4555; --partner:#F0A35E; --chip:#222C3B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121821; --card:#1A2230; --fg:#E8EDF4; --muted:#A3AEBD; --line:#2C3747;
+  --accent:#7FA3D0; --accent-soft:#3F6597; --cut:#3A4555; --partner:#F0A35E; --chip:#222C3B; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:32px 48px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;line-height:1.1;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:66ch;font-size:17px}
+.intro{gap:14px;padding-bottom:8px}
+.pontos{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.pontos{grid-template-columns:minmax(0,1fr)}}
+.pontos li{display:flex;flex-direction:column;gap:4px;padding-top:12px;border-top:3px solid var(--accent-soft)}
+.pontos b{font-size:17px}
+.pontos span{color:var(--muted);font-size:15px}
+.voltar{margin:0;font-size:14px;font-weight:700}.voltar a{color:var(--accent);text-decoration:none}.voltar a:hover{text-decoration:underline}
+.titulo{font-size:24px;font-weight:800;margin:8px 0 0}
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;min-width:0}
+label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15px}
+.hint{font-weight:400;color:var(--muted);font-size:13px}
+.field{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
+.field span{padding:0 12px;color:var(--muted);font-weight:700}
+.field input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);font:inherit;font-size:20px;font-weight:700;padding:12px 12px 12px 0;font-variant-numeric:tabular-nums}
+.field input:focus{outline:none}
+.field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent)}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pills button{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--line);background:var(--chip);color:var(--fg);border-radius:999px;padding:6px 14px;cursor:pointer}
+.pills button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--card)}
+.pills button:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
+.big{display:flex;flex-direction:column;gap:2px}
+.big .k{font-size:14px;color:var(--muted);font-weight:500}
+.big .v{font-size:clamp(30px,6vw,44px);font-weight:800;line-height:1.1;color:var(--accent);font-variant-numeric:tabular-nums}
+.bar{display:flex;height:44px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.bar div{flex-basis:0;min-width:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;transition:flex-grow .25s}
+.s-cut{background:var(--cut);color:var(--fg)}
+.s-par{background:var(--partner);color:var(--card)}
+.s-ara{background:var(--accent);color:var(--card)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+thead th{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+tr.hl td{font-weight:800;color:var(--accent)}
+td .sub{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.note{background:var(--chip);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--fg)}
+.note b{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.bar div{transition:none}}
+</style>
+
+<div class="wrap">
+  <p class="voltar"><a href="index.html">← Portal interno</a></p>
+  <header class="intro">
+    <p class="eyebrow">Araujo Locação · Parcerias</p>
+    <h1>Uma imobiliária que acredita em parcerias</h1>
+    <p class="lead">Na Araujo Locação, parceria faz parte do jeito de trabalhar. Quando a nossa carteira de imóveis encontra os clientes de um parceiro, ou o contrário, o cliente acha o imóvel certo mais rápido, o proprietário aluga antes e todos saem ganhando.</p>
+    <p class="lead">Por isso a nossa regra é simples e aberta: a taxa de locação, menos 10%, é dividida meio a meio entre o corretor parceiro e a Araujo.</p>
+    <ul class="pontos">
+      <li><b>Divisão clara</b><span>Metade para o parceiro, metade para a Araujo, sem letra miúda.</span></li>
+      <li><b>Você sabe antes</b><span>Simule abaixo quanto cada um recebe antes de fechar o negócio.</span></li>
+      <li><b>Mais imóveis, mais negócios</b><span>A nossa carteira em Itajaí e Navegantes à disposição dos seus clientes.</span></li>
+    </ul>
+  </header>
+
+  <h2 class="titulo">Calculadora de parceria</h2>
+
+  <div class="grid">
+    <form class="card" id="form" autocomplete="off">
+      <label for="aluguel">Valor do aluguel (VGL)
+        <span class="field"><span>R$</span><input id="aluguel" inputmode="decimal" value="2.000"></span>
+      </label>
+      <label for="taxa">Taxa de locação (% do aluguel)
+        <span class="field"><input id="taxa" inputmode="decimal" value="60" style="padding-left:12px"><span>%</span></span>
+        <span class="pills" role="group" aria-label="Taxas mais usadas">
+          <button type="button" data-taxa="50">50%</button>
+          <button type="button" data-taxa="60">60%</button>
+          <button type="button" data-taxa="100">100%</button>
+        </span>
+      </label>
+      <label for="comissao">Comissão da corretora
+        <span class="hint">% sobre a parte da Araujo</span>
+        <span class="field"><input id="comissao" inputmode="decimal" value="25" style="padding-left:12px"><span>%</span></span>
+      </label>
+      <p class="note" style="margin:0">A <b>captação não muda</b>: a parceria vale só para a locação.</p>
+    </form>
+
+    <section class="card" aria-live="polite">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+        <div class="big"><span class="k">Sua comissão com parceria</span><span class="v" id="vCom">R$ 0,00</span></div>
+        <div class="big"><span class="k">Corretor parceiro recebe</span><span class="v" id="vPar" style="color:var(--partner)">R$ 0,00</span></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="bar" id="bar" role="img" aria-label="Divisão da taxa de locação">
+          <div class="s-cut" id="bCut">10%</div>
+          <div class="s-par" id="bPar">Parceiro</div>
+          <div class="s-ara" id="bAra">Araujo</div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--cut)"></i>10% descontados</span>
+          <span><i style="background:var(--partner)"></i>Corretor parceiro (50%)</span>
+          <span><i style="background:var(--accent)"></i>Araujo (50%)</span>
+        </div>
+      </div>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Passo a passo</th><th>Sem parceria</th><th>Com parceria</th></tr></thead>
+          <tbody>
+            <tr><td>Aluguel (VGL)</td><td id="t1a"></td><td id="t1b"></td></tr>
+            <tr><td>Taxa de locação<span class="sub" id="tTaxa"></span></td><td id="t2a"></td><td id="t2b"></td></tr>
+            <tr><td>Taxa menos 10%</td><td id="t3a"></td><td id="t3b"></td></tr>
+            <tr><td>Corretor parceiro<span class="sub">50% do valor acima</span></td><td>—</td><td id="t4b"></td></tr>
+            <tr><td>Parte da Araujo</td><td id="t5a"></td><td id="t5b"></td></tr>
+            <tr class="hl"><td>Comissão da corretora<span class="sub" id="tCom"></span></td><td id="t6a"></td><td id="t6b"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="hint" style="margin:0">Valores de exemplo. O cálculo final de cada contrato é feito pela Locação.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const brl = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const pct = v => v.toLocaleString('pt-BR',{maximumFractionDigits:2}) + '%';
+  function num(s){
+    s = String(s||'').replace(/[^\d,.-]/g,'');
+    if (s.includes(',')) s = s.replace(/\./g,'').replace(',','.');
+    else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g,'');
+    const n = parseFloat(s); return isFinite(n) && n > 0 ? n : 0;
+  }
+  function calc(){
+    const vgl = num($('aluguel').value), tx = num($('taxa').value), com = num($('comissao').value);
+    const taxa = vgl * tx / 100, base = taxa * 0.9, parceiro = base / 2, araujo = base - parceiro;
+    $('vCom').textContent = brl(araujo * com / 100);
+    $('vPar').textContent = brl(parceiro);
+    $('t1a').textContent = $('t1b').textContent = brl(vgl);
+    $('t2a').textContent = $('t2b').textContent = brl(taxa);
+    $('t3a').textContent = $('t3b').textContent = brl(base);
+    $('t4b').textContent = brl(parceiro);
+    $('t5a').textContent = brl(base); $('t5b').textContent = brl(araujo);
+    $('t6a').textContent = brl(base * com / 100); $('t6b').textContent = brl(araujo * com / 100);
+    $('tTaxa').textContent = pct(tx) + ' do aluguel';
+    $('tCom').textContent = pct(com) + ' da parte da Araujo';
+    const on = taxa > 0;
+    $('bCut').style.flexGrow = on ? 10 : 1; $('bPar').style.flexGrow = on ? 45 : 1; $('bAra').style.flexGrow = on ? 45 : 1;
+    $('bCut').textContent = on ? brl(taxa * 0.1) : '10%';
+    $('bPar').textContent = on ? brl(parceiro) : 'Parceiro';
+    $('bAra').textContent = on ? brl(araujo) : 'Araujo';
+    document.querySelectorAll('[data-taxa]').forEach(b => b.setAttribute('aria-pressed', String(num(b.dataset.taxa) === tx)));
+  }
+  document.querySelectorAll('[data-taxa]').forEach(b => b.addEventListener('click', () => { $('taxa').value = b.dataset.taxa; calc(); }));
+  ['aluguel','taxa','comissao'].forEach(id => $(id).addEventListener('input', calc));
+  $('form').addEventListener('submit', e => e.preventDefault());
+  calc();
+})();
+</script>
+
+</body>
+</html>
