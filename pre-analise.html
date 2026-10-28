@@ -97,6 +97,7 @@
     #locTabela tr.erro td{background:#fdecec}#locTabela tr.erro td:first-child{box-shadow:inset 4px 0 0 var(--red)}
     .tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:.72rem;font-weight:800;letter-spacing:.02em;white-space:nowrap}
     .tag.sim{background:#e3f1ec;color:#1d604d}.tag.nao{background:#fdf1dc;color:#8a5a12}.tag.bad{background:var(--red);color:#fff}
+    .tag.nova{background:#e6eef8;color:#004AAD}.tag.pos{background:#fde9d7;color:#a24f0c}
     .alerta{border:1px solid #efc4c4;background:#fdecec;color:#6e2323;border-radius:14px;padding:14px 18px;margin-bottom:18px}
     .alerta strong{color:var(--red)}.alerta ul{margin:6px 0 0;padding-left:20px}.alerta li{margin:2px 0}
     a.etapa{display:inline-block;margin-top:2px;font-size:.72rem;font-weight:700;color:var(--blue);text-decoration:none;background:#eef2f6;border-radius:5px;padding:0 6px}a.etapa:hover{background:#dde6ef}
@@ -282,6 +283,7 @@
       <div class="field"><label for="locVgl">VGL (valor do aluguel, R$)</label><input id="locVgl" name="vgl" inputmode="decimal" placeholder="0,00" required style="text-align:right"></div>
       <div class="field"><label for="locPct">% da taxa de locação</label><input id="locPct" name="percentual" inputmode="decimal" list="locPctOpcoes" placeholder="60" required style="text-align:right"><datalist id="locPctOpcoes"><option value="30"><option value="50"><option value="60"><option value="100"></datalist></div>
       <div class="field"><label for="locCap">Captadora</label><input id="locCap" name="captadora" maxlength="40" list="locCapOpcoes" placeholder="Obrigatório" required style="text-transform:uppercase"><datalist id="locCapOpcoes"></datalist></div>
+      <div class="field"><label>Tipo de captação</label><div class="seg"><label><input type="radio" name="tipo_cap" value="nova">Nova</label><label><input type="radio" name="tipo_cap" value="pos">Pós</label></div></div>
     </div>
     <div class="field"><label for="locObs">Observação</label><textarea id="locObs" name="observacao" rows="2" maxlength="500"></textarea></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="locSalvar">Salvar</button></div>
@@ -831,8 +833,8 @@
   // A mesma tabela "locacoes" do departamento Locação (locacao.html). A pré-análise preenche parte dela:
   // aqui aparecem só as colunas até "%". Taxa de locação e comissões não são mostradas nesta página.
   const LOC_MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-  const LOC_CAMPOS='id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,captadora,observacao,ordem';
-  // Captadora é obrigatória. Só o nome: o tipo de captação (nova/pós) e as comissões ficam na Locação.
+  const LOC_CAMPOS='id,data,referencia,unidade,corretora,assinado,proponente,garantia,vgl,percentual,captadora,captacao_pos,observacao,ordem';
+  // Captadora e tipo de captação (nova/pós) são obrigatórios. As comissões ficam só na Locação.
   const LOC_CAPTADORAS=['RUBIA','SONORA','ANA','ANA PAULA','NAVEGANTES'];
   let locs=[],locEtapas={},locUnidades=[],locMes=null,locEditId=null;
   const locNum=v=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -902,18 +904,19 @@
     const soma=ls=>ls.reduce((a,l)=>a+(+l.vgl||0),0);let html='';
     locSemanas(locMes).forEach(s=>{
       const ls=list.filter(l=>l.data>=s.de&&l.data<=s.ate);if(!ls.length)return;
-      html+=`<tr class="semana"><td colspan="9">SEMANA ${pad(s.n)}<span>${br(s.de).slice(0,5)} a ${br(s.ate).slice(0,5)}</span></td></tr>`;
+      html+=`<tr class="semana"><td colspan="10">SEMANA ${pad(s.n)}<span>${br(s.de).slice(0,5)} a ${br(s.ate).slice(0,5)}</span></td></tr>`;
       html+=ls.map(l=>{const err=porId[l.id],rep=err?.find(e=>e.startsWith('REF'));return `<tr${err?' class="erro"':''}>
         <td style="white-space:nowrap"><strong>${safe(l.referencia)}</strong>${rep?` <span class="tag bad">${rep}</span>`:''}</td>
         <td>${safe(l.unidade)}</td><td>${safe(l.corretora)}</td><td><span class="tag ${l.assinado?'sim':'nao'}">${l.assinado?'SIM':'NÃO'}</span></td>
         <td>${safe(l.proponente)}${l.observacao?` <span class="obs" title="${safe(l.observacao).replace(/"/g,'&quot;')}">📝 Obs.</span>`:''}${locEtapas[l.id]?`<br><a class="etapa" href="quadro.html?c=${locEtapas[l.id].cartao}" title="Abrir no quadro de contratos">▸ ${safe(locEtapas[l.id].coluna)}</a>`:''}</td>
         <td>${l.garantia?safe(l.garantia):'<span class="tag bad">NÃO INFORMADA</span>'}</td>
+        <td style="white-space:nowrap">${l.captadora?safe(l.captadora)+' ':''}<span class="tag ${l.captacao_pos?'pos':'nova'}">${l.captacao_pos?'PÓS':'NOVA'}</span></td>
         <td class="num"><strong>${locNum(l.vgl)}</strong></td><td class="num">${(+l.percentual).toLocaleString('pt-BR',{maximumFractionDigits:2})}%</td>
         <td class="row-actions"><button class="link" data-loc-edit="${l.id}">Editar</button><button class="link danger" data-loc-del="${l.id}">Excluir</button></td></tr>`}).join('');
-      html+=`<tr class="sub"><td colspan="6">Total da semana ${pad(s.n)} · ${ls.length} ${ls.length===1?'locação':'locações'}</td><td class="num">${locNum(soma(ls))}</td><td colspan="2"></td></tr>`;
+      html+=`<tr class="sub"><td colspan="7">Total da semana ${pad(s.n)} · ${ls.length} ${ls.length===1?'locação':'locações'}</td><td class="num">${locNum(soma(ls))}</td><td colspan="2"></td></tr>`;
     });
-    html+=`<tr class="total"><td colspan="6">TOTAL MENSAL · ${list.length} ${list.length===1?'locação':'locações'}</td><td class="num">${locNum(soma(list))}</td><td colspan="2"></td></tr>`;
-    $('#locTabela').innerHTML=`<thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th class="num">VGL</th><th class="num">%</th><th></th></tr></thead><tbody>${html}</tbody>`;
+    html+=`<tr class="total"><td colspan="7">TOTAL MENSAL · ${list.length} ${list.length===1?'locação':'locações'}</td><td class="num">${locNum(soma(list))}</td><td colspan="2"></td></tr>`;
+    $('#locTabela').innerHTML=`<thead><tr><th>REF</th><th>Cidade</th><th>Corretora</th><th>Ass.</th><th>Proponente</th><th>Garantia</th><th>Captação</th><th class="num">VGL</th><th class="num">%</th><th></th></tr></thead><tbody>${html}</tbody>`;
   }
   $('#locTabela').onclick=async e=>{
     const {locEdit,locDel}=e.target.dataset;
@@ -936,7 +939,7 @@
     $('#locGarantia').innerHTML=locOpcoes(garantias,l?.garantia,'Não informada');
     $('#locCapOpcoes').innerHTML=[...new Set([...LOC_CAPTADORAS,...locs.map(x=>String(x.captadora||'').trim().toUpperCase()).filter(Boolean)])].map(c=>`<option value="${safe(c)}">`).join('');
     if(l){f.data.value=l.data;f.referencia.value=l.referencia;f.proponente.value=l.proponente;f.vgl.value=locNum(l.vgl);f.percentual.value=String(+l.percentual).replace('.',',');
-      f.assinado.value=l.assinado?'sim':'nao';f.observacao.value=l.observacao||'';f.captadora.value=l.captadora||'';if(!l.garantia)f.garantia.value=''}
+      f.assinado.value=l.assinado?'sim':'nao';f.observacao.value=l.observacao||'';f.captadora.value=l.captadora||'';f.tipo_cap.value=l.captacao_pos?'pos':'nova';if(!l.garantia)f.garantia.value=''}
     else{const hoje=iso(new Date());f.data.value=hoje.startsWith(locMes)?hoje:locMes+'-01';if(locUnidades.some(u=>u.nome==='ITAJAÍ'))f.unidade.value='ITAJAÍ';f.percentual.value='60'}
     locDupCheck();locDialog.showModal();(l?$('#locVgl'):$('#locRef')).focus();
   }
@@ -952,15 +955,16 @@
   $('#locForm').onsubmit=async e=>{
     e.preventDefault();const f=e.currentTarget,msg=$('#locMsg'),erro=(t,campo)=>{msg.textContent=t;msg.hidden=false;campo?.focus()};msg.hidden=true;
     const vgl=locLer(f.vgl.value),pct=locLer(f.percentual.value);
-    // Só os campos da pré-análise: captadora e tipo de captação continuam como a Locação deixou.
+    // Só os campos da pré-análise: taxa e comissões continuam como a Locação deixou.
     const reg={data:f.data.value,referencia:locRef(f.referencia.value),unidade:f.unidade.value,corretora:f.corretora.value,assinado:f.assinado.value==='sim',
-      proponente:f.proponente.value.trim().toUpperCase(),garantia:f.garantia.value||null,vgl,percentual:pct,captadora:f.captadora.value.trim().toUpperCase()||null,observacao:f.observacao.value.trim()||null};
+      proponente:f.proponente.value.trim().toUpperCase(),garantia:f.garantia.value||null,vgl,percentual:pct,captadora:f.captadora.value.trim().toUpperCase()||null,captacao_pos:f.tipo_cap.value==='pos',observacao:f.observacao.value.trim()||null};
     if(!reg.data)return erro('Informe a data.',f.data);
     if(!reg.referencia)return erro('Informe a REF do imóvel.',f.referencia);
     if(!reg.proponente)return erro('Informe o proponente.',f.proponente);
     if(!reg.unidade)return erro('Escolha a cidade.',f.unidade);
     if(!reg.corretora)return erro('Escolha a corretora.',f.corretora);
     if(!reg.captadora)return erro('Informe quem foi a captadora.',f.captadora);
+    if(!f.tipo_cap.value)return erro('Marque se a captação é nova ou pós.',f.tipo_cap[0]);
     if(!isFinite(vgl)||vgl<=0)return erro('Informe o VGL (valor do aluguel), por exemplo 2.500,00.',f.vgl);
     if(!isFinite(pct)||pct<=0||pct>200)return erro('Informe o percentual da taxa de locação, por exemplo 60.',f.percentual);
     $('#locSalvar').disabled=true;let r;
