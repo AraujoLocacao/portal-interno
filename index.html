@@ -62,6 +62,7 @@
       <button class="nav-link" data-open="regras"><svg viewBox="0 0 24 24"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg>Regras de convivência</button>
       <button class="nav-link" data-open="esperamos"><svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/></svg>O que esperamos de você</button>
       <button class="nav-link" data-open="historia"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16V8l6-4 6 4v8M9 16v-5h6v5"/></svg>Nossa história</button>
+      <button class="nav-link" data-open="saude"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Saúde mental · Guia da Alma</button>
     </nav>
     <div class="nav-group" role="group" aria-labelledby="navFerramentas">
       <p class="nav-title" id="navFerramentas">Ferramentas</p>
@@ -86,6 +87,7 @@
         <article class="resource green"><span class="resource-label">Ambiente de trabalho</span><h3>Regras de Convivência</h3><p>Orientações para mantermos um espaço organizado, respeitoso e agradável para todos.</p><ul><li>Cozinha e áreas comuns</li><li>Recepção e banheiros</li><li>Regras administrativas</li></ul><button class="open" data-open="regras">Consultar regras →</button></article>
         <article class="resource"><span class="resource-label">Cultura</span><h3>O que esperamos de você</h3><p>Os valores e comportamentos que orientam nossa forma de trabalhar e crescer juntos.</p><ul><li>Lealdade, proatividade e excelência</li><li>Coração ensinável e comprometimento</li><li>Postura, organização e comunicação</li></ul><button class="open" data-open="esperamos">Conhecer expectativas →</button></article>
         <article class="resource green"><span class="resource-label">Quem somos</span><h3>Nossa História</h3><p>Conheça a trajetória da Araujo Locação e das lideranças que ajudam a construir essa história.</p><ul><li>Jonathan Araujo</li><li>Stefani</li><li>Chauanda</li></ul><button class="open" data-open="historia">Conhecer histórias →</button></article>
+        <article class="resource"><span class="resource-label">Bem-estar · Guia da Alma</span><h3>Saúde mental em dia</h3><p>Material do encontro com o Guia da Alma: sinais de atenção na rotina, as terapias disponíveis e como agendar a sua sessão.</p><ul><li>9 formas de se cuidar: psicologia, meditação, yoga, reiki e mais</li><li>Como escolher a especialidade ideal</li><li>Passo a passo para agendar na plataforma</li></ul><div style="margin-top:auto;display:flex;flex-wrap:wrap;gap:8px 24px;align-items:flex-end"><button class="open" data-open="saude">Ver material →</button><a class="open" style="text-decoration:none" href="https://plataforma.guiadaalma.com.br/empresa/araujo-locac/d41d8cd98f00b204e9800998ecf8427e" target="_blank" rel="noopener">Agendar sessão ↗</a></div></article>
       </div>
     </section>
     <!-- Funções: ferramentas de cada departamento. Cada uma pede login e busca os dados no Supabase; nada restrito fica neste arquivo. -->
@@ -144,12 +146,13 @@
     return new TextDecoder('utf-8').decode(bytes);
   }
   function openViewer(kind){
-    const titles={organograma:'Organograma por Função',politica:'Política de Atendimento',regras:'Regras de Convivência',esperamos:'O que esperamos de você',historia:'Nossa História',guia:'Guia da Alma'};
+    const titles={organograma:'Organograma por Função',politica:'Política de Atendimento',regras:'Regras de Convivência',esperamos:'O que esperamos de você',historia:'Nossa História',guia:'Guia da Alma',saude:'Saúde mental em dia · Guia da Alma'};
     const frame=document.querySelector('#viewerFrame');
     document.querySelector('#viewerTitle').textContent=titles[kind]||titles.politica;
     frame.removeAttribute('src');
-    frame.srcdoc='';
+    frame.removeAttribute('srcdoc');
     if(kind==='guia') frame.src=embeddedGuide;
+    else if(kind==='saude') frame.src='guia-saude-mental.html';
     else frame.srcdoc=decodeHtml(embeddedMaterials[kind]||embeddedMaterials.politica);
     viewer.showModal();
   }
