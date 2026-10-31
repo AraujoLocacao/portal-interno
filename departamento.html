@@ -128,6 +128,22 @@
     .dep-card{padding:18px 20px;text-decoration:none;color:inherit;display:grid;gap:6px}.dep-card:hover{border-color:#b6c5cf}
     .dep-card h3{margin:0;font-family:Georgia,serif;font-size:1.2rem}.dep-card p{margin:0;color:var(--muted);font-size:.86rem}
     .dep-card .area{font-size:.72rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+    /* Visitas (Corretoras de locação) */
+    .chip.amber{background:#fdf3e1;color:#8a5a12}
+    .v-filtros{grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr)) auto}
+    .v-ims{display:grid;gap:4px;font-size:.84rem;min-width:220px}.v-ims div{display:flex;gap:6px;align-items:baseline}.v-ims small{color:var(--muted);white-space:nowrap}
+    .v-ims span.e{overflow-wrap:anywhere}
+    dialog.largo{width:min(780px,calc(100% - 32px))}
+    .vf-imoveis{display:grid;gap:10px;margin-bottom:6px}
+    .vf-row{display:grid;grid-template-columns:96px minmax(0,1fr) 150px 106px 34px;gap:8px;align-items:end;background:#f6f8f8;border:1px solid var(--line);border-radius:12px;padding:10px}
+    .vf-row .field label{font-size:.7rem}.vf-row .del{border:0;background:#eef2f4;width:34px;height:38px;border-radius:9px;font-size:1.1rem;color:var(--red)}
+    .v-link{display:flex;gap:8px}.v-link input{flex:1;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#f6f8f8;min-width:0}
+    .v-msg{white-space:pre-wrap;background:#f6f8f8;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.88rem;margin:0}
+    .v-sec{font-size:.76rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:6px 0 -6px}
+    .v-dl{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;font-size:.9rem;margin:0}.v-dl dt{color:var(--muted)}.v-dl dd{margin:0;overflow-wrap:anywhere}
+    .v-est{color:#e0a21b;letter-spacing:1px;white-space:nowrap}
+    #visitaVerBody{padding:20px 22px 22px;display:grid;gap:14px}
+    @media(max-width:700px){.vf-row{grid-template-columns:1fr 1fr}.vf-row .end{grid-column:1/-1;order:-1}.vf-row .del{width:100%}.v-dl{grid-template-columns:1fr}.v-dl dt{margin-top:6px}}
     @media(max-width:1100px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:1fr 1fr 1fr}.filters .field:first-child{grid-column:1/-1}}
     @media(max-width:700px){.tiles{grid-template-columns:1fr 1fr}.tile strong{font-size:1.6rem}.filters{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
     @media(max-width:560px){.board{grid-template-columns:1fr}.search-input{width:100%}}
@@ -183,6 +199,22 @@
       <div class="tiles" id="tiles"></div>
       <div class="board" id="board"></div>
     </div>
+  </section>
+
+  <section id="tab-visitas" data-tab hidden>
+    <div class="top">
+      <div><h2>Visitas</h2><p>Cadastre o cliente, os imóveis e os horários e envie o link de confirmação. O cliente confirma cada imóvel informando telefone e e-mail. 30 minutos depois da visita, ele recebe por e-mail a pergunta "como foi a visita?", e as respostas aparecem aqui.</p></div>
+      <div class="bar-actions"><button class="secondary" id="vCsv">Baixar planilha</button><button class="primary" id="newVisita">+ Nova visita</button></div>
+    </div>
+    <div class="card filters v-filtros" role="search">
+      <div class="field"><label for="vBusca">Buscar</label><input id="vBusca" type="search" placeholder="Cliente, endereço, REF, telefone ou e-mail"></div>
+      <div class="field"><label for="vPeriodo">Período</label><select id="vPeriodo"><option value="proximas">Próximas (de hoje em diante)</option><option value="hoje">Hoje</option><option value="semana">Esta semana</option><option value="mes">Este mês</option><option value="passadas">Últimos 30 dias</option><option value="tudo">Todas</option></select></div>
+      <div class="field"><label for="vCorretora">Corretora</label><select id="vCorretora"></select></div>
+      <div class="field"><label for="vSit">Situação</label><select id="vSit"><option value="">Todas</option><option value="aguardando">Aguardando cliente</option><option value="confirmada">Confirmadas</option><option value="nao">Não vai</option><option value="avaliada">Avaliadas</option><option value="cancelada">Canceladas</option></select></div>
+      <button class="secondary" id="vLimpar">Limpar</button>
+    </div>
+    <div class="tiles" id="vTiles"></div>
+    <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="vTable"></table></div></div>
   </section>
 
   <section id="tab-rescisao" data-tab hidden>
@@ -293,6 +325,38 @@
   </form>
 </dialog>
 
+<dialog id="visitaDialog" class="largo">
+  <div class="dialog-head"><h2 id="visitaTitle">Nova visita</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form id="visitaForm" novalidate>
+    <div class="row2">
+      <div class="field"><label for="vfCorretora">Corretora</label><select id="vfCorretora" name="corretora" required></select></div>
+      <div class="field"><label for="vfTel">Telefone do cliente (opcional)</label><input id="vfTel" name="cliente_telefone" type="tel" maxlength="30" placeholder="(47) 99999-9999"></div>
+    </div>
+    <div class="field"><label for="vfCliente">Nome do cliente</label><input id="vfCliente" name="cliente_nome" maxlength="120" required></div>
+    <div class="field"><span class="lbl">Imóveis e horários</span><div class="vf-imoveis" id="vfImoveis"></div>
+      <div><button type="button" class="secondary" id="vfAdd">+ Adicionar imóvel</button></div></div>
+    <div class="field"><label for="vfObs">Observação interna (o cliente não vê)</label><textarea id="vfObs" name="observacao" rows="2" maxlength="1000"></textarea></div>
+    <p class="msg" id="visitaInfo" hidden></p>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary" id="visitaSubmit">Salvar e gerar link</button></div>
+    <p class="msg error" id="visitaMsg" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="visitaLinkDialog">
+  <div class="dialog-head"><h2>Link da visita</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <form method="dialog">
+    <p class="msg" style="font-size:.92rem;color:var(--ink)">Envie este link para o cliente. Ele abre no celular, confirma cada imóvel e informa telefone e e-mail.</p>
+    <div class="v-link"><input id="vlLink" readonly aria-label="Link da visita"><button type="button" class="secondary" id="vlCopiar">Copiar link</button></div>
+    <div class="field"><span class="lbl">Mensagem pronta</span><p class="v-msg" id="vlMsg"></p></div>
+    <div class="actions"><button type="button" class="secondary" id="vlCopiarMsg">Copiar mensagem</button><button type="button" class="primary" id="vlWa">Enviar no WhatsApp</button></div>
+  </form>
+</dialog>
+
+<dialog id="visitaVerDialog" class="largo">
+  <div class="dialog-head"><h2 id="visitaVerTitle">Visita</h2><button class="close" data-close aria-label="Fechar">×</button></div>
+  <div id="visitaVerBody"></div>
+</dialog>
+
 <dialog id="leitorDialog" class="leitor">
   <div class="dialog-head"><h2 id="leitorTitulo">Documento</h2><button class="close" data-close aria-label="Fechar">×</button></div>
   <iframe id="leitorFrame" title="Documento" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
@@ -361,7 +425,8 @@
       atividades:['Captação de imóveis','Documentos de proprietários','Chaveiro']},
     // parceria = calculadora de parceria na locação (26/10/2026). Fica no bucket privado, em ferramentas/corretoras-locacao/,
     // Ainda prévia: as corretoras não têm login. Por enquanto a calculadora fica aberta no portal, em parceria.html.
-    {slug:'corretoras-locacao',nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,extras:['parceria'],
+    // visitas = link de confirmação de visita e pesquisa depois da visita (30/10/2026, ver supabase/visitas.sql e visita.html).
+    {slug:'corretoras-locacao',nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,extras:['visitas','parceria'],
       atividades:['Responsável pela locação dos imóveis']},
     // extras = abas próprias da área. "adm" (administradoras de condomínio) é a mesma lista em Boletos, Renovação e Contas a Pagar.
     {slug:'boletos',limpo:true,nome:'Locatário · Boletos',area:'Financeiro',papel:'Boletos',ref:'Contrato / locatário',extras:['adm','alpop'],
@@ -420,7 +485,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
+    const nomes={visitas:'Visitas',rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
     if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
@@ -446,7 +511,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,ABAS.includes('parceria')?loadParceria():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,ABAS.includes('parceria')?loadParceria():null,ABAS.includes('visitas')?loadVisitas():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // Quem entra em mais de um departamento (gerência e acesso geral, ver supabase/acesso_geral.sql) ganha um seletor no topo.
@@ -463,7 +528,7 @@
     if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
     form.reset();
   };
-  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];rescisoes=[];rescAtual=null;pendente=null;alterado=false;anexosSalvos=[];pastaAtual=null;$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true;$('#documentosFrame').srcdoc='';$('#documentosFrame').hidden=true;$('#parceriaFrame').srcdoc='';$('#parceriaFrame').hidden=true};
+  const sair=async()=>{await db.auth.signOut();booted=false;demandas=[];senhas=[];docs=[];visitas=[];rescisoes=[];rescAtual=null;pendente=null;alterado=false;anexosSalvos=[];pastaAtual=null;$('#rescisaoFrame').srcdoc='';$('#rescisaoFrame').hidden=true;$('#documentosFrame').srcdoc='';$('#documentosFrame').hidden=true;$('#parceriaFrame').srcdoc='';$('#parceriaFrame').hidden=true};
   $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
 
   // Esta área tem senhas: sai sozinha depois de 30 minutos sem uso.
@@ -636,6 +701,243 @@
   }
   addEventListener('message',e=>{const fr=$('#parceriaFrame');if(fr.contentWindow&&e.source===fr.contentWindow)ultimoUso=Date.now()});
   $('#parceriaCheia').onclick=()=>{const fr=$('#parceriaFrame');if(!fr.hidden)fr.requestFullscreen?.()};
+
+  // ---------- Visitas (Corretoras de locação, 30/10/2026) ----------
+  // A corretora cadastra cliente, imóveis e horários e envia o link visita.html?c=<token>. O cliente confirma cada imóvel
+  // com telefone e e-mail; 30 minutos depois do último imóvel confirmado sai o e-mail da pesquisa (função visitas-avaliacao).
+  // Dados em visitas / visita_imoveis (supabase/visitas.sql). Criar e editar passa por visita_salvar, com os imóveis juntos.
+  const LINK_VISITA=location.protocol.startsWith('http')?new URL('visita.html',location.href).href:'https://portal-interno-rust.vercel.app/visita.html';
+  let visitas=[],corretorasAtivas=[],visitaEditId=null,visitaAberta=null;
+  const fmtV=(d,o)=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',...o}).format(new Date(d));
+  const hm=d=>fmtV(d,{hour:'2-digit',minute:'2-digit'});
+  const quandoV=d=>`${fmtV(d,{weekday:'short'}).replace('.','')} ${fmtV(d,{day:'2-digit',month:'2-digit'})} às ${hm(d)}`;
+  const quandoCurto=d=>`${fmtV(d,{day:'2-digit',month:'2-digit'})} ${hm(d)}`;
+  const ms=d=>new Date(d).getTime();
+  const nomeCor=n=>n?n.charAt(0)+n.slice(1).toLowerCase():'';
+  const primeiroNome=v=>nomeCor((v.conf_nome||v.cliente_nome||'').trim().split(/\s+/)[0]);
+  const confirmadosV=v=>v.imoveis.filter(i=>i.resposta==='confirmo');
+  const fimConfirmados=v=>{const c=confirmadosV(v);return c.length?Math.max(...c.map(i=>ms(i.data_hora))):null};
+  const estrelasV=n=>n?`<span class="v-est" title="${n} de 5">${'★'.repeat(n)}${'☆'.repeat(5-n)}</span>`:'';
+  const media=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
+  const virg=n=>n.toFixed(1).replace('.',',');
+  const INTERESSE={sim:'Quer fazer proposta',talvez:'Talvez',nao:'Sem interesse'};
+  const linkVisita=v=>`${LINK_VISITA}?c=${v.token}`;
+  const foneWa=t=>{let n=(t||'').replace(/\D/g,'');if(n&&n.length<=11)n='55'+n;return n};
+  function msgConvite(v){
+    const lista=v.imoveis.map(i=>`• ${quandoV(i.data_hora)}: ${i.endereco}${i.referencia?` (${i.referencia})`:''}`).join('\n');
+    return `Olá, ${primeiroNome(v)}! Aqui é ${v.corretora?`a ${nomeCor(v.corretora)}, `:''}da Araujo Locação. ${v.imoveis.length>1?'Suas visitas estão agendadas':'Sua visita está agendada'}:\n\n${lista}\n\nPor favor, confirme pelo link:\n${linkVisita(v)}`;
+  }
+  const msgPesquisa=v=>`Olá, ${primeiroNome(v)}! Aqui é ${v.corretora?`a ${nomeCor(v.corretora)}, `:''}da Araujo Locação. Como foi a visita? Conte pra gente em menos de 1 minuto:\n${linkVisita(v)}&avaliar=1`;
+  const abrirWa=(fone,texto)=>window.open(`https://wa.me/${foneWa(fone)}?text=${encodeURIComponent(texto)}`,'_blank','noopener');
+  function situacaoV(v){
+    if(v.cancelada)return ['cancelada','Cancelada',''];
+    if(v.avaliado_em)return ['avaliada','Avaliada','ok'];
+    if(!v.confirmado_em)return ['aguardando','Aguardando cliente','amber'];
+    const c=confirmadosV(v).length;
+    if(!c)return ['nao','Não vai','warn'];
+    return ['confirmada',c<v.imoveis.length?`Confirmou ${c} de ${v.imoveis.length}`:'Confirmada','ok'];
+  }
+  function pesquisaV(v){
+    if(v.avaliado_em){const notas=v.imoveis.filter(i=>i.nota).map(i=>i.nota),m=media(notas);
+      return `Respondida ${quandoCurto(v.avaliado_em)}${m?`<br>Imóvel ${estrelasV(Math.round(m))}`:''}${v.aval_nota_atendimento?`<br>Atendimento ${estrelasV(v.aval_nota_atendimento)}`:''}${v.imoveis.some(i=>i.interesse==='sim')?'<br><span class="chip ok">Quer fazer proposta</span>':''}`}
+    if(v.cancelada)return '<span class="muted">–</span>';
+    const wa=v.aval_whatsapp_em?`<br><small class="muted">WhatsApp enviado ${quandoCurto(v.aval_whatsapp_em)}</small>`:'';
+    const fim=fimConfirmados(v);
+    if(!fim)return `<span class="muted">${v.confirmado_em?'Sem pesquisa':'Depois da confirmação'}</span>${wa}`;
+    if(v.aval_envio_em)return `E-mail enviado ${quandoCurto(v.aval_envio_em)}${wa}`;
+    if(v.aval_envio_erro)return `<span class="chip warn" title="${safe(v.aval_envio_erro)}">Erro no e-mail</span>${wa}`;
+    const sai=fim+30*60000;
+    return (Date.now()<sai?`E-mail sai ${quandoCurto(sai)}`:'E-mail na fila')+wa;
+  }
+  const podePesquisa=v=>!v.cancelada&&!v.avaliado_em&&v.imoveis.some(i=>ms(i.data_hora)<=Date.now());
+
+  async function loadVisitas(){
+    const [v,c]=await Promise.all([
+      db.from('visitas').select('*,visita_imoveis(*)').order('criado_em',{ascending:false}).limit(3000),
+      db.from('corretoras').select('nome,ativa').order('nome')]);
+    if(v.error){$('#vTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(v.error.message)}</td></tr></tbody>`;return}
+    visitas=v.data.map(({visita_imoveis,...x})=>({...x,imoveis:(visita_imoveis||[]).sort((a,b)=>ms(a.data_hora)-ms(b.data_hora)||a.ordem-b.ordem)}));
+    corretorasAtivas=(c.data||[]).filter(x=>x.ativa).map(x=>x.nome);
+    const sel=$('#vCorretora'),atual=sel.value,todas=[...new Set([...corretorasAtivas,...visitas.map(x=>x.corretora).filter(Boolean)])].sort();
+    sel.innerHTML='<option value="">Todas</option>'+todas.map(n=>`<option value="${safe(n)}">${safe(nomeCor(n))}</option>`).join('');sel.value=atual;
+    renderVisitas();
+    if(visitaAberta){const a=visitas.find(x=>x.id===visitaAberta);if(a&&$('#visitaVerDialog').open)verVisita(a)}
+  }
+  function filtradasV(){
+    const q=$('#vBusca').value.trim().toLowerCase(),per=$('#vPeriodo').value,cor=$('#vCorretora').value,sit=$('#vSit').value;
+    const h=new Date();h.setHours(0,0,0,0);const amanha=ms(h)+864e5;
+    const seg=new Date(h);seg.setDate(h.getDate()-((h.getDay()+6)%7));const ini1Mes=new Date(h.getFullYear(),h.getMonth(),1),fimMes=new Date(h.getFullYear(),h.getMonth()+1,1);
+    return visitas.filter(v=>{
+      const ini=v.imoveis.length?ms(v.imoveis[0].data_hora):ms(v.criado_em),fim=v.imoveis.length?ms(v.imoveis[v.imoveis.length-1].data_hora):ini;
+      if(per==='proximas'&&fim<ms(h))return false;
+      if(per==='hoje'&&!(fim>=ms(h)&&ini<amanha))return false;
+      if(per==='semana'&&!(ini>=ms(seg)&&ini<ms(seg)+7*864e5))return false;
+      if(per==='mes'&&!(ini>=ms(ini1Mes)&&ini<ms(fimMes)))return false;
+      if(per==='passadas'&&!(ini<amanha&&ini>=ms(h)-30*864e5))return false;
+      if(cor&&v.corretora!==cor)return false;
+      if(sit&&situacaoV(v)[0]!==sit)return false;
+      if(q&&!`${v.cliente_nome} ${v.conf_nome||''} ${v.cliente_telefone||''} ${v.conf_telefone||''} ${v.conf_email||''} ${v.imoveis.map(i=>i.endereco+' '+(i.referencia||'')).join(' ')}`.toLowerCase().includes(q))return false;
+      return true;
+    }).sort((a,b)=>{const x=a.imoveis[0]?ms(a.imoveis[0].data_hora):0,y=b.imoveis[0]?ms(b.imoveis[0].data_hora):0;return per==='proximas'?x-y:y-x});
+  }
+  function renderVisitas(){
+    const list=filtradasV(),ativas=list.filter(v=>!v.cancelada);
+    const conf=ativas.filter(v=>confirmadosV(v).length).length,agu=ativas.filter(v=>!v.confirmado_em).length,av=ativas.filter(v=>v.avaliado_em);
+    const mi=media(av.flatMap(v=>v.imoveis.filter(i=>i.nota).map(i=>i.nota))),ma=media(av.filter(v=>v.aval_nota_atendimento).map(v=>v.aval_nota_atendimento));
+    const prop=ativas.filter(v=>v.imoveis.some(i=>i.interesse==='sim')).length;
+    $('#vTiles').innerHTML=`<div class="card tile"><span>Visitas</span><strong>${ativas.length}</strong><small>${ativas.reduce((s,v)=>s+v.imoveis.length,0)} imóveis${list.length>ativas.length?` · ${list.length-ativas.length} cancelada(s)`:''}</small></div>
+      <div class="card tile"><span>Confirmadas</span><strong>${conf}</strong><small>${ativas.length?Math.round(conf/ativas.length*100)+'% das visitas':'–'}</small></div>
+      <div class="card tile${agu?' warn':''}"><span>Aguardando cliente</span><strong>${agu}</strong><small>ainda não abriram ou não confirmaram</small></div>
+      <div class="card tile"><span>Avaliações</span><strong>${av.length}</strong><small>${mi?`imóvel ★ ${virg(mi)}`:'sem notas'}${ma?` · atendimento ★ ${virg(ma)}`:''}${prop?` · ${prop} quer(em) proposta`:''}</small></div>`;
+    if(!list.length){$('#vTable').innerHTML=`<tbody><tr><td class="empty">${visitas.length?'Nenhuma visita neste filtro.':'Nenhuma visita cadastrada ainda. Clique em "+ Nova visita".'}</td></tr></tbody>`;return}
+    $('#vTable').innerHTML=`<thead><tr><th>Quando</th><th>Cliente</th><th>Corretora</th><th>Imóveis</th><th>Situação</th><th>Pesquisa</th><th></th></tr></thead><tbody>${list.map(v=>{
+      const [,sit,cls]=situacaoV(v),p=v.imoveis[0];
+      return `<tr${v.cancelada?' class="inativo"':''}>
+      <td style="white-space:nowrap"><strong>${p?quandoV(p.data_hora):'–'}</strong>${v.imoveis.length>1?`<br><small class="muted">${v.imoveis.length} imóveis, até ${hm(v.imoveis[v.imoveis.length-1].data_hora)}</small>`:''}</td>
+      <td><strong>${safe(v.cliente_nome)}</strong>${v.conf_telefone||v.cliente_telefone?`<br><small class="muted">${safe(v.conf_telefone||v.cliente_telefone)}</small>`:''}${v.conf_email?`<br><small class="muted">${safe(v.conf_email)}</small>`:''}</td>
+      <td>${safe(nomeCor(v.corretora))||'<span class="muted">–</span>'}</td>
+      <td><div class="v-ims">${v.imoveis.map(i=>`<div>${i.resposta==='confirmo'?'<span class="chip ok">vai</span>':i.resposta==='nao_vou'?'<span class="chip warn">não vai</span>':'<span class="chip amber">?</span>'}<small>${hm(i.data_hora)}</small><span class="e">${i.referencia?`<b>${safe(i.referencia)}</b> · `:''}${safe(i.endereco)}</span></div>`).join('')}</div></td>
+      <td><span class="chip ${cls}">${sit}</span>${v.confirmado_em&&!v.avaliado_em?`<br><small class="muted">respondeu ${quandoCurto(v.confirmado_em)}</small>`:''}</td>
+      <td style="font-size:.84rem">${pesquisaV(v)}</td>
+      <td class="row-actions"><button class="link" data-v-ver="${v.id}">Ver</button>${v.cancelada?'':`<button class="link" data-v-wa="${v.id}">WhatsApp</button><button class="link" data-v-link="${v.id}">Link</button>${podePesquisa(v)?`<button class="link" data-v-pesq="${v.id}">Pesquisa</button>`:''}`}</td></tr>`}).join('')}</tbody>`;
+  }
+  ['vBusca','vPeriodo','vCorretora','vSit'].forEach(id=>$('#'+id).addEventListener(id==='vBusca'?'input':'change',renderVisitas));
+  $('#vLimpar').onclick=()=>{$('#vBusca').value='';$('#vPeriodo').value='proximas';$('#vCorretora').value='';$('#vSit').value='';renderVisitas()};
+  async function marcarPesquisaWa(v){
+    abrirWa(v.conf_telefone||v.cliente_telefone,msgPesquisa(v));
+    const {error}=await db.from('visitas').update({aval_whatsapp_em:new Date().toISOString()}).eq('id',v.id);
+    if(!error)await loadVisitas();
+  }
+  function acaoVisita(d){
+    const id=d.vVer||d.vWa||d.vLink||d.vPesq||d.vEditar||d.vCancelar||d.vExcluir,v=visitas.find(x=>x.id===id);if(!v)return;
+    if(d.vVer)verVisita(v);
+    if(d.vWa)abrirWa(v.conf_telefone||v.cliente_telefone,msgConvite(v));
+    if(d.vLink)mostrarLink(v);
+    if(d.vPesq)marcarPesquisaWa(v);
+    if(d.vEditar){$('#visitaVerDialog').close();abrirVisita(v)}
+    if(d.vCancelar)cancelarVisita(v);
+    if(d.vExcluir)excluirVisita(v);
+  }
+  $('#vTable').onclick=e=>{const b=e.target.closest('button');if(b)acaoVisita(b.dataset)};
+  $('#visitaVerBody').onclick=e=>{const b=e.target.closest('button');if(b)acaoVisita(b.dataset)};
+
+  // Detalhe: tudo o que o cliente respondeu.
+  function verVisita(v){
+    visitaAberta=v.id;const [,sit,cls]=situacaoV(v);
+    $('#visitaVerTitle').textContent=v.cliente_nome;
+    const tel=v.conf_telefone||v.cliente_telefone;
+    $('#visitaVerBody').innerHTML=`<div><span class="chip ${cls}">${sit}</span>${v.corretora?` <span class="chip">${safe(nomeCor(v.corretora))}</span>`:''}</div>
+      <dl class="v-dl">
+        <dt>Contato do cliente</dt><dd>${v.conf_nome?`${safe(v.conf_nome)}<br>`:''}${tel?`${safe(tel)} <button class="link" data-v-wa="${v.id}">WhatsApp</button><br>`:''}${v.conf_email?safe(v.conf_email):'<span class="muted">o cliente ainda não informou</span>'}</dd>
+        <dt>Respondeu em</dt><dd>${v.confirmado_em?quandoV(v.confirmado_em):'<span class="muted">ainda não respondeu</span>'}</dd>
+        <dt>Pesquisa</dt><dd>${pesquisaV(v)}${v.aval_envio_erro&&!v.aval_envio_em?`<br><small class="muted">${safe(v.aval_envio_erro)}</small>`:''}</dd>
+        ${v.observacao?`<dt>Observação interna</dt><dd>${safe(v.observacao)}</dd>`:''}
+        <dt>Cadastrada</dt><dd>${quandoV(v.criado_em)}${v.criado_por?' por '+quem(v.criado_por):''}</dd>
+      </dl>
+      <p class="v-sec">Imóveis</p>
+      <div class="table-wrap" style="margin-top:0"><table><thead><tr><th>Quando</th><th>Imóvel</th><th>Confirmação</th><th>Avaliação</th></tr></thead><tbody>${v.imoveis.map(i=>`<tr>
+        <td style="white-space:nowrap">${quandoV(i.data_hora)}</td>
+        <td>${i.referencia?`<b>${safe(i.referencia)}</b><br>`:''}${safe(i.endereco)}</td>
+        <td>${i.resposta==='confirmo'?'<span class="chip ok">Vai</span>':i.resposta==='nao_vou'?'<span class="chip warn">Não vai</span>':'<span class="chip amber">Aguardando</span>'}${i.motivo?`<br><small>${safe(i.motivo)}</small>`:''}</td>
+        <td>${i.visitou===false?'<span class="muted">Não visitou</span>':i.visitou?`${estrelasV(i.nota)}${i.interesse?`<br><span class="chip${i.interesse==='sim'?' ok':''}">${INTERESSE[i.interesse]}</span>`:''}${i.comentario?`<br><small>${safe(i.comentario)}</small>`:''}`:'<span class="muted">–</span>'}</td></tr>`).join('')}</tbody></table></div>
+      ${v.avaliado_em?`<p class="v-sec">Atendimento da corretora</p><div>${estrelasV(v.aval_nota_atendimento)||'<span class="muted">sem nota</span>'}${v.aval_comentario?`<p class="nota" style="margin:6px 0 0">${safe(v.aval_comentario)}</p>`:''}</div>`:''}
+      <div class="actions" style="justify-content:flex-start">
+        ${v.cancelada?`<button class="secondary" data-v-cancelar="${v.id}">Reativar visita</button>`:`<button class="secondary" data-v-editar="${v.id}">Editar</button><button class="secondary" data-v-link="${v.id}">Link e mensagem</button>${podePesquisa(v)?`<button class="secondary" data-v-pesq="${v.id}">Pesquisa no WhatsApp</button>`:''}<button class="secondary" data-v-cancelar="${v.id}">Cancelar visita</button>`}
+        <button class="danger-btn" style="margin:0 0 0 auto" data-v-excluir="${v.id}">Excluir</button></div>`;
+    if(!$('#visitaVerDialog').open)$('#visitaVerDialog').showModal();
+  }
+  $('#visitaVerDialog').addEventListener('close',()=>visitaAberta=null);
+  async function cancelarVisita(v){
+    if(!v.cancelada&&!confirm(`Cancelar a visita de ${v.cliente_nome}? O link passa a mostrar "visita cancelada" e a pesquisa não é enviada.`))return;
+    const {error}=await db.from('visitas').update({cancelada:!v.cancelada}).eq('id',v.id);
+    if(error){alert('Não foi possível salvar: '+error.message);return}
+    toast(v.cancelada?'Visita reativada':'Visita cancelada');await loadVisitas();
+  }
+  async function excluirVisita(v){
+    if(!confirm(`Excluir a visita de ${v.cliente_nome}, com as respostas do cliente? Não dá para desfazer. Para manter o histórico, use "Cancelar visita".`))return;
+    const {error}=await db.from('visitas').delete().eq('id',v.id);
+    if(error){alert('Não foi possível excluir: '+error.message);return}
+    $('#visitaVerDialog').close();toast('Visita excluída');await loadVisitas();
+  }
+
+  // Link e mensagem prontos para o WhatsApp.
+  let visitaLink=null;
+  function mostrarLink(v){
+    visitaLink=v;$('#vlLink').value=linkVisita(v);$('#vlMsg').textContent=msgConvite(v);
+    $('#vlWa').textContent=(v.conf_telefone||v.cliente_telefone)?'Enviar no WhatsApp do cliente':'Enviar no WhatsApp';
+    $('#visitaLinkDialog').showModal();
+  }
+  $('#vlCopiar').onclick=()=>copiar($('#vlLink').value,'Link');
+  $('#vlCopiarMsg').onclick=()=>copiar($('#vlMsg').textContent,'Mensagem');
+  $('#vlWa').onclick=()=>{if(visitaLink)abrirWa(visitaLink.conf_telefone||visitaLink.cliente_telefone,msgConvite(visitaLink))};
+
+  // Cadastro / edição. A data e a hora são as do computador (horário de Brasília).
+  const dataLocal=d=>iso(new Date(d)),horaLocal=d=>{const x=new Date(d);return `${pad(x.getHours())}:${pad(x.getMinutes())}`};
+  function linhaImovel(i){
+    const div=document.createElement('div');div.className='vf-row';div.dataset.id=i?.id||'';
+    div.innerHTML=`<div class="field"><label>REF</label><input name="ref" maxlength="40" placeholder="Opcional"></div>
+      <div class="field end"><label>Endereço do imóvel</label><input name="endereco" maxlength="300" placeholder="Rua, número, apto, bairro, cidade"></div>
+      <div class="field"><label>Data</label><input name="data" type="date"></div>
+      <div class="field"><label>Hora</label><input name="hora" type="time" step="300"></div>
+      <button type="button" class="del" title="Tirar este imóvel" aria-label="Tirar este imóvel">×</button>`;
+    const q=n=>div.querySelector(`[name="${n}"]`);
+    if(i){q('ref').value=i.referencia||'';q('endereco').value=i.endereco||'';q('data').value=i.data_hora?dataLocal(i.data_hora):(i.data||'');q('hora').value=i.data_hora?horaLocal(i.data_hora):(i.hora||'')}
+    div.querySelector('.del').onclick=()=>{if($('#vfImoveis').children.length>1)div.remove();else toast('A visita precisa de pelo menos um imóvel')};
+    $('#vfImoveis').append(div);return div;
+  }
+  $('#vfAdd').onclick=()=>{
+    const linhas=[...$('#vfImoveis').children];if(linhas.length>=10){toast('No máximo 10 imóveis por link');return}
+    const ult=linhas[linhas.length-1],d=ult?.querySelector('[name="data"]').value||'',h=ult?.querySelector('[name="hora"]').value||'';
+    // O próximo imóvel já vem com a mesma data e uma hora depois.
+    let hora='';if(h){const [hh,mm]=h.split(':').map(Number);hora=`${pad(Math.min(hh+1,23))}:${pad(mm)}`}
+    linhaImovel({data:d,hora}).querySelector('[name="endereco"]').focus();
+  };
+  function abrirVisita(v){
+    visitaEditId=v?.id||null;const f=$('#visitaForm');f.reset();$('#visitaMsg').hidden=true;$('#vfImoveis').innerHTML='';
+    $('#visitaTitle').textContent=v?'Editar visita':'Nova visita';$('#visitaSubmit').textContent=v?'Salvar':'Salvar e gerar link';
+    const nomes=[...new Set([...corretorasAtivas,...(v?.corretora?[v.corretora]:[])])].sort();
+    let ultima='';try{ultima=localStorage.getItem('visitas:corretora')||''}catch{}
+    $('#vfCorretora').innerHTML='<option value="">Escolha</option>'+nomes.map(n=>`<option value="${safe(n)}">${safe(nomeCor(n))}</option>`).join('');
+    $('#vfCorretora').value=v?(v.corretora||''):(nomes.includes(ultima)?ultima:'');
+    if(v){f.cliente_nome.value=v.cliente_nome;f.cliente_telefone.value=v.cliente_telefone||'';f.observacao.value=v.observacao||'';v.imoveis.forEach(linhaImovel)}
+    else linhaImovel(null);
+    $('#visitaInfo').hidden=!v?.confirmado_em;
+    $('#visitaInfo').textContent='O cliente já respondeu. Se mudar o endereço ou o horário de um imóvel, ele precisa confirmar de novo pelo mesmo link.';
+    $('#visitaDialog').showModal();(v?f.cliente_nome:$('#vfCorretora').value?f.cliente_nome:$('#vfCorretora')).focus();
+  }
+  $('#newVisita').onclick=()=>abrirVisita(null);
+  $('#visitaForm').onsubmit=async e=>{
+    e.preventDefault();const f=e.currentTarget,msg=$('#visitaMsg'),erro=(t,el)=>{msg.textContent=t;msg.hidden=false;el?.focus()};msg.hidden=true;
+    const dados={corretora:f.corretora.value,cliente_nome:f.cliente_nome.value.trim(),cliente_telefone:f.cliente_telefone.value.trim(),observacao:f.observacao.value.trim()};
+    if(!dados.corretora)return erro('Escolha a corretora.',f.corretora);
+    if(!dados.cliente_nome)return erro('Informe o nome do cliente.',f.cliente_nome);
+    if(dados.cliente_telefone&&dados.cliente_telefone.replace(/\D/g,'').length<10)return erro('Telefone do cliente incompleto: coloque o DDD (ou deixe em branco).',f.cliente_telefone);
+    const imoveis=[];
+    for(const row of $('#vfImoveis').children){
+      const q=n=>row.querySelector(`[name="${n}"]`),end=q('endereco').value.trim(),data=q('data').value,hora=q('hora').value;
+      if(!end)return erro('Informe o endereço de todos os imóveis.',q('endereco'));
+      if(!data)return erro('Informe a data de todos os imóveis.',q('data'));
+      if(!hora)return erro('Informe a hora de todos os imóveis.',q('hora'));
+      imoveis.push({id:row.dataset.id||null,referencia:q('ref').value.trim(),endereco:end,data_hora:new Date(`${data}T${hora}`).toISOString()});
+    }
+    const antes=visitas.find(x=>x.id===visitaEditId);
+    const passou=imoveis.filter(i=>ms(i.data_hora)<Date.now()&&!antes?.imoveis.some(a=>a.id===i.id&&ms(a.data_hora)===ms(i.data_hora)));
+    if(passou.length&&!confirm('Tem horário que já passou. Salvar assim mesmo?'))return;
+    $('#visitaSubmit').disabled=true;
+    const {data,error}=await db.rpc('visita_salvar',{p_id:visitaEditId,p_visita:dados,p_imoveis:imoveis});
+    $('#visitaSubmit').disabled=false;
+    if(error)return erro('Não foi possível salvar: '+error.message);
+    try{localStorage.setItem('visitas:corretora',dados.corretora)}catch{}
+    const nova=!visitaEditId;$('#visitaDialog').close();toast(nova?'Visita cadastrada':'Visita salva');await loadVisitas();
+    const v=visitas.find(x=>x.id===data.id);if(v&&nova)mostrarLink(v);
+  };
+  $('#vCsv').onclick=()=>{
+    const esc=x=>`"${String(x??'').replace(/"/g,'""')}"`,linhas=[];
+    for(const v of filtradasV())for(const i of v.imoveis)linhas.push([quandoV(i.data_hora),v.cliente_nome,v.conf_telefone||v.cliente_telefone,v.conf_email,nomeCor(v.corretora),i.referencia,i.endereco,
+      situacaoV(v)[1],i.resposta==='confirmo'?'Vai':i.resposta==='nao_vou'?'Não vai':'Aguardando',i.motivo,i.visitou==null?'':i.visitou?'Sim':'Não',i.nota,INTERESSE[i.interesse]||'',i.comentario,v.aval_nota_atendimento,v.aval_comentario].map(esc).join(';'));
+    const csv=['Quando;Cliente;Telefone;E-mail;Corretora;REF;Endereço;Situação;Confirmação;Motivo;Visitou;Nota do imóvel;Interesse;Comentário;Nota do atendimento;Comentário geral',...linhas].join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`visitas-${hoje()}.csv`;a.click();URL.revokeObjectURL(a.href);
+  };
 
   // ---------- Abas ----------
   // As abas trocam por JavaScript (não por link): o navegador bloqueia o "#aba" quando a página é aberta como arquivo/cópia.

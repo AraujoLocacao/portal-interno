@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Confirmação de visita | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23004AAD'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--azul:#7FA3D0;--forte:#004AAD;--claro:#eef3fa;--fundo:#f4f6f9;--ink:#1d2730;--muted:#66727c;--line:#dde3ea;--verde:#1f7a5a;--vermelho:#b03b3b;--amarelo:#f2b01e}
+    *{box-sizing:border-box} body{margin:0;background:var(--fundo);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.5}
+    button,input,textarea{font:inherit;color:inherit} button{cursor:pointer} [hidden]{display:none!important}
+    header{background:#fff;border-bottom:4px solid var(--azul);padding:14px 16px;text-align:center}
+    header img{height:58px;width:auto}
+    main{max-width:620px;margin:0 auto;padding:22px 16px 60px}
+    h1{font-size:1.45rem;line-height:1.25;margin:0 0 6px;color:var(--forte)}
+    h2{font-size:1.05rem;margin:26px 0 10px}
+    .sub{color:var(--muted);margin:0 0 18px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,74,173,.06)}
+    .quando{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .dia{width:58px;height:62px;border-radius:12px;background:var(--claro);color:var(--forte);display:grid;place-content:center;text-align:center;line-height:1.05;flex:none}
+    .dia strong{font-size:1.5rem}.dia small{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+    .quando b{display:block;font-size:1.05rem}.quando span{color:var(--muted);font-size:.9rem}
+    .end{font-weight:650;overflow-wrap:anywhere}.ref{color:var(--muted);font-size:.85rem}
+    .mapa{display:inline-block;margin-top:4px;color:var(--forte);font-weight:700;font-size:.9rem;text-decoration:none}.mapa:hover{text-decoration:underline}
+    .escolha{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+    .escolha button{flex:1;min-width:130px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:11px 10px;font-weight:700}
+    .escolha button.on.sim{background:var(--verde);border-color:var(--verde);color:#fff}
+    .escolha button.on.nao{background:var(--vermelho);border-color:var(--vermelho);color:#fff}
+    .escolha button.on.neutro{background:var(--forte);border-color:var(--forte);color:#fff}
+    .escolha button:focus-visible,.estrelas button:focus-visible{outline:3px solid #9ec5f4;outline-offset:2px}
+    .field{display:grid;gap:5px;margin-top:12px}.field label,.lbl{font-size:.85rem;font-weight:700;color:#3d4a55}
+    .field input,.field textarea{width:100%;border:1.5px solid #cdd6df;border-radius:11px;padding:11px 12px;background:#fff;min-width:0}
+    .field input:focus,.field textarea:focus{outline:2px solid #9ec5f4;border-color:var(--forte)}
+    .obrig{color:var(--vermelho)}
+    .nota{font-size:.82rem;color:var(--muted);margin:10px 0 0}
+    .enviar{width:100%;border:0;background:var(--forte);color:#fff;border-radius:13px;padding:14px;font-weight:800;font-size:1.05rem;margin-top:18px;box-shadow:0 8px 20px rgba(0,74,173,.25)}
+    .enviar:disabled{opacity:.6;cursor:wait}
+    .erro{color:var(--vermelho);font-weight:650;margin:12px 0 0}
+    .estrelas{display:flex;gap:4px;margin-top:6px}
+    .estrelas button{border:0;background:none;font-size:2.1rem;line-height:1;padding:2px;color:#cfd6de}
+    .estrelas button.on{color:var(--amarelo)}
+    .ok{text-align:center;padding:28px 18px}.ok .ico{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;font-size:2rem;color:#fff;background:var(--verde)}
+    .ok.aviso .ico{background:var(--azul)}
+    .chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:800}
+    .chip.sim{background:#e3f3ec;color:var(--verde)}.chip.nao{background:#fbe9e9;color:var(--vermelho)}
+    .resumo .card{padding:14px 16px}
+    .link{border:0;background:none;color:var(--forte);font-weight:700;padding:6px 0;text-decoration:underline}
+    footer{text-align:center;color:var(--muted);font-size:.8rem;padding:0 16px 30px}
+  </style>
+</head>
+<body>
+<header><img src="logo-araujo.jpg" alt="Araujo Locação"></header>
+<main id="app"><p class="sub" style="text-align:center">Carregando…</p></main>
+<footer>Araujo Locação · Itajaí e Navegantes (SC)</footer>
+<script>
+  // Página do cliente: visita.html?c=<token>. Não tem login: só conversa com o banco pelas funções visita_publica,
+  // visita_confirmar e visita_avaliar (supabase/visitas.sql), que só aceitam o token desta visita.
+  // &avaliar=1 vem no e-mail e no WhatsApp da pesquisa: abre a avaliação assim que o primeiro imóvel passou do horário.
+  const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
+  const params=new URLSearchParams(location.search),TOKEN=params.get('c')||'',PEDIU_AVALIAR=params.has('avaliar');
+  const $=s=>document.querySelector(s),app=$('#app');
+  const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  const TZ='America/Sao_Paulo';
+  const fmt=(d,o)=>new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,...o}).format(new Date(d));
+  const hora=d=>fmt(d,{hour:'2-digit',minute:'2-digit'}).replace(':','h');
+  const semana=d=>fmt(d,{weekday:'long'});
+  const mapa=e=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(e);
+  let V=null,estado={};
+
+  async function rpc(nome,args){
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${nome}`,{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});
+    const j=await r.json().catch(()=>null);
+    if(!r.ok)throw new Error(j?.message||'Não foi possível concluir. Tente de novo.');
+    return j;
+  }
+
+  async function iniciar(){
+    if(!TOKEN){mensagem('Link incompleto','Abra o link exatamente como você recebeu da sua corretora.','aviso');return}
+    try{V=await rpc('visita_publica',{p_token:TOKEN})}catch(e){mensagem('Não foi possível abrir',e.message,'aviso');return}
+    if(!V){mensagem('Link não encontrado','Confira se o link está completo ou fale com a sua corretora.','aviso');return}
+    decidir();
+  }
+
+  // Qual tela mostrar, pelo horário do banco (não pelo relógio do celular).
+  function decidir(modoAlterar){
+    const agora=new Date(V.agora).getTime(),t=i=>new Date(i.data_hora).getTime();
+    const confirmados=V.imoveis.filter(i=>i.resposta==='confirmo');
+    if(V.avaliado_em){mensagem('Obrigado pela sua avaliação!','Recebemos as suas respostas. Elas ajudam a gente a atender cada vez melhor.');return}
+    if(V.cancelada){mensagem('Visita cancelada','Esta visita foi cancelada. Para marcar outro horário, fale com a sua corretora.','aviso');return}
+    if(modoAlterar){telaConfirmar();return}
+    if(V.confirmado_em&&confirmados.length){
+      const todosPassaram=confirmados.every(i=>t(i)<=agora),primeiroPassou=confirmados.some(i=>t(i)<=agora);
+      if(todosPassaram||(PEDIU_AVALIAR&&primeiroPassou)){telaAvaliar(confirmados);return}
+      telaResumo();return;
+    }
+    const todosPassaram=V.imoveis.every(i=>t(i)<=agora),algumPassou=V.imoveis.some(i=>t(i)<=agora);
+    if(todosPassaram||(PEDIU_AVALIAR&&algumPassou)){telaAvaliar(V.imoveis);return}
+    if(V.confirmado_em){telaResumo();return}
+    telaConfirmar();
+  }
+
+  function mensagem(titulo,texto,tipo){
+    app.innerHTML=`<div class="card ok ${tipo||''}"><div class="ico">${tipo==='aviso'?'i':'✓'}</div><h1>${safe(titulo)}</h1><p class="sub" style="margin:0">${safe(texto)}</p></div>`;
+  }
+
+  function blocoImovel(i){
+    const d=new Date(i.data_hora);
+    return `<div class="quando"><div class="dia"><strong>${fmt(d,{day:'2-digit'})}</strong><small>${fmt(d,{month:'short'}).replace('.','')}</small></div>
+      <div><b>${safe(semana(d))}, às ${hora(d)}</b><span>${fmt(d,{day:'2-digit',month:'2-digit',year:'numeric'})}</span></div></div>
+      <div class="end">${safe(i.endereco)}</div>${i.referencia?`<div class="ref">Imóvel ${safe(i.referencia)}</div>`:''}
+      <a class="mapa" href="${mapa(i.endereco)}" target="_blank" rel="noopener">Ver no mapa ↗</a>`;
+  }
+  // "JULIANA" ou "juliana" vira "Juliana".
+  const primeiroNome=()=>{const n=(V.conf_nome||V.cliente||'').trim().split(/\s+/)[0]||'';return n.charAt(0).toUpperCase()+n.slice(1).toLowerCase()};
+  const mascara=el=>el.addEventListener('input',()=>{let n=el.value.replace(/\D/g,'').slice(0,13);
+    if(n.length>11&&n.startsWith('55'))n=n.slice(2);
+    el.value=n.length<=2?n:n.length<=6?`(${n.slice(0,2)}) ${n.slice(2)}`:n.length<=10?`(${n.slice(0,2)}) ${n.slice(2,6)}-${n.slice(6)}`:`(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7,11)}`});
+  const camposContato=()=>`<h2>Seus dados</h2><div class="card">
+      <div class="field" style="margin-top:0"><label for="cNome">Nome completo <span class="obrig">*</span></label><input id="cNome" autocomplete="name" maxlength="120" value="${safe(V.conf_nome||V.cliente||'')}"></div>
+      <div class="field"><label for="cTel">Telefone / WhatsApp <span class="obrig">*</span></label><input id="cTel" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="(47) 99999-9999"></div>
+      <div class="field"><label for="cEmail">E-mail <span class="obrig">*</span></label><input id="cEmail" type="email" inputmode="email" autocomplete="email" maxlength="160" placeholder="seuemail@exemplo.com"></div>
+      <p class="nota">Usamos seus dados só para falar com você sobre esta visita. Depois da visita, enviamos uma pergunta rápida sobre como foi.</p></div>`;
+  function lerContato(){
+    const nome=$('#cNome').value.trim(),tel=$('#cTel').value.trim(),email=$('#cEmail').value.trim(),dig=tel.replace(/\D/g,'');
+    if(!nome)return {erro:'Informe o seu nome.',el:'#cNome'};
+    if(dig.length<10||dig.length>13)return {erro:'Informe o telefone com DDD.',el:'#cTel'};
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return {erro:'Informe um e-mail válido.',el:'#cEmail'};
+    return {nome,tel,email};
+  }
+
+  // ---------- Confirmar ----------
+  function telaConfirmar(){
+    estado={};V.imoveis.forEach(i=>{estado[i.id]={resposta:i.resposta,motivo:i.motivo||''}});
+    const varios=V.imoveis.length>1;
+    app.innerHTML=`<h1>Olá${primeiroNome()?', '+safe(primeiroNome()):''}! Confirme sua visita</h1>
+      <p class="sub">${V.corretora?`Sua corretora é <b>${safe(V.corretora)}</b>. `:''}${varios?'Para cada imóvel, diga se você vai.':'Diga se você vai.'} Depois preencha seus dados e toque em "Enviar confirmação".</p>
+      ${V.imoveis.map(i=>`<div class="card" data-im="${i.id}">${blocoImovel(i)}
+        <div class="escolha"><button type="button" class="sim" data-r="confirmo">✓ Confirmo</button><button type="button" class="nao" data-r="nao_vou">Não poderei ir</button></div>
+        <div class="field" data-motivo hidden><label>Quer sugerir outro dia ou horário? (opcional)</label><textarea rows="2" maxlength="500"></textarea></div></div>`).join('')}
+      ${camposContato()}
+      <p class="erro" id="erro" role="alert" hidden></p><button class="enviar" id="enviar">Enviar confirmação</button>`;
+    mascara($('#cTel'));
+    app.querySelectorAll('[data-im]').forEach(card=>{
+      const id=card.dataset.im,mot=card.querySelector('[data-motivo]'),ta=mot.querySelector('textarea');ta.value=estado[id].motivo;
+      const pintar=()=>{card.querySelectorAll('[data-r]').forEach(b=>b.classList.toggle('on',b.dataset.r===estado[id].resposta));mot.hidden=estado[id].resposta!=='nao_vou'};
+      card.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{estado[id].resposta=b.dataset.r;pintar()});
+      ta.oninput=()=>estado[id].motivo=ta.value;pintar();
+    });
+    $('#enviar').onclick=enviarConfirmacao;
+  }
+  async function enviarConfirmacao(){
+    const erro=$('#erro');erro.hidden=true;
+    const falta=V.imoveis.find(i=>!estado[i.id].resposta);
+    if(falta){erro.textContent=V.imoveis.length>1?'Responda "Confirmo" ou "Não poderei ir" em todos os imóveis.':'Toque em "Confirmo" ou "Não poderei ir".';erro.hidden=false;app.querySelector(`[data-im="${falta.id}"]`).scrollIntoView({behavior:'smooth',block:'center'});return}
+    const c=lerContato();if(c.erro){erro.textContent=c.erro;erro.hidden=false;$(c.el).focus();return}
+    const b=$('#enviar');b.disabled=true;b.textContent='Enviando…';
+    try{
+      V=await rpc('visita_confirmar',{p_token:TOKEN,p_nome:c.nome,p_telefone:c.tel,p_email:c.email,
+        p_respostas:V.imoveis.map(i=>({id:i.id,resposta:estado[i.id].resposta,motivo:estado[i.id].motivo}))});
+      telaResumo(true);scrollTo(0,0);
+    }catch(e){erro.textContent=e.message;erro.hidden=false;b.disabled=false;b.textContent='Enviar confirmação'}
+  }
+
+  // ---------- Resumo (já respondeu) ----------
+  function telaResumo(acabou){
+    const vai=V.imoveis.filter(i=>i.resposta==='confirmo'),agora=new Date(V.agora).getTime();
+    const titulo=vai.length?(acabou?'Visita confirmada!':'Sua visita está confirmada'):'Recebemos a sua resposta';
+    const texto=vai.length?`${V.corretora?`A ${safe(V.corretora)}`:'A sua corretora'} espera você${vai.length>1?' nos horários abaixo':' no horário abaixo'}.`:'Você informou que não poderá ir. A sua corretora vai entrar em contato para combinar outro horário.';
+    const podeAlterar=V.imoveis.some(i=>new Date(i.data_hora).getTime()>agora);
+    app.innerHTML=`<div class="card ok"><div class="ico">✓</div><h1>${titulo}</h1><p class="sub" style="margin:0">${texto}</p></div>
+      <div class="resumo">${V.imoveis.map(i=>`<div class="card">${blocoImovel(i)}<div style="margin-top:10px">${i.resposta==='confirmo'?'<span class="chip sim">Confirmado</span>':'<span class="chip nao">Não vou</span>'}${i.motivo?` <span class="ref">· ${safe(i.motivo)}</span>`:''}</div></div>`).join('')}</div>
+      ${podeAlterar?'<p style="text-align:center"><button class="link" id="alterar">Alterar minha resposta</button></p>':''}`;
+    if(podeAlterar)$('#alterar').onclick=()=>{decidir(true);scrollTo(0,0)};
+  }
+
+  // ---------- Avaliar ----------
+  function estrelas(nome,valor){return `<div class="estrelas" role="radiogroup" aria-label="Nota de 1 a 5" data-estrelas="${nome}">${[1,2,3,4,5].map(n=>`<button type="button" role="radio" aria-label="${n} de 5" data-n="${n}" class="${valor>=n?'on':''}">★</button>`).join('')}</div>`}
+  function telaAvaliar(lista){
+    estado={atendimento:null,imoveis:{}};lista.forEach(i=>estado.imoveis[i.id]={visitou:lista.length===1?true:null,nota:null,interesse:null,comentario:''});
+    const semContato=!V.tem_contato;
+    app.innerHTML=`<h1>Como foi a sua visita${primeiroNome()?', '+safe(primeiroNome()):''}?</h1>
+      <p class="sub">Leva menos de um minuto. A sua opinião vai direto para a equipe da Araujo.</p>
+      ${lista.map(i=>`<div class="card" data-av="${i.id}">${blocoImovel(i)}
+        <div class="field"><span class="lbl">Você fez esta visita?</span><div class="escolha" style="margin-top:4px" data-campo="visitou"><button type="button" class="neutro" data-v="true">Sim</button><button type="button" class="neutro" data-v="false">Não</button></div></div>
+        <div data-sim>
+          <div class="field"><span class="lbl">Que nota você dá para o imóvel?</span>${estrelas('nota',0)}</div>
+          <div class="field"><span class="lbl">Tem interesse em alugar?</span><div class="escolha" style="margin-top:4px" data-campo="interesse"><button type="button" class="sim" data-v="sim">Sim, quero fazer proposta</button><button type="button" class="neutro" data-v="talvez">Talvez</button><button type="button" class="nao" data-v="nao">Não</button></div></div>
+        </div>
+        <div class="field"><label>O que achou? (opcional)</label><textarea rows="2" maxlength="1000" placeholder="Pontos positivos, o que faltou, dúvidas…"></textarea></div></div>`).join('')}
+      <h2>E o atendimento?</h2>
+      <div class="card"><span class="lbl">Que nota você dá para o atendimento${V.corretora?' da '+safe(V.corretora):' da corretora'}?</span>${estrelas('atendimento',0)}
+        <div class="field"><label for="aCom">Quer contar mais alguma coisa? (opcional)</label><textarea id="aCom" rows="3" maxlength="2000"></textarea></div></div>
+      ${semContato?camposContato():''}
+      <p class="erro" id="erro" role="alert" hidden></p><button class="enviar" id="enviar">Enviar avaliação</button>`;
+    if(semContato)mascara($('#cTel'));
+    app.querySelectorAll('[data-av]').forEach(card=>{
+      const s=estado.imoveis[card.dataset.av],sim=card.querySelector('[data-sim]');
+      const pintar=()=>{
+        card.querySelectorAll('[data-campo="visitou"] button').forEach(b=>b.classList.toggle('on',String(s.visitou)===b.dataset.v));
+        card.querySelectorAll('[data-campo="interesse"] button').forEach(b=>b.classList.toggle('on',s.interesse===b.dataset.v));
+        card.querySelectorAll('[data-estrelas] button').forEach(b=>b.classList.toggle('on',(s.nota||0)>=+b.dataset.n));
+        sim.hidden=s.visitou!==true;
+      };
+      card.querySelectorAll('[data-campo="visitou"] button').forEach(b=>b.onclick=()=>{s.visitou=b.dataset.v==='true';pintar()});
+      card.querySelectorAll('[data-campo="interesse"] button').forEach(b=>b.onclick=()=>{s.interesse=b.dataset.v;pintar()});
+      card.querySelectorAll('[data-estrelas] button').forEach(b=>b.onclick=()=>{s.nota=+b.dataset.n;pintar()});
+      card.querySelector('textarea').oninput=e=>s.comentario=e.target.value;pintar();
+    });
+    const at=app.querySelector('[data-estrelas="atendimento"]');
+    at.querySelectorAll('button').forEach(b=>b.onclick=()=>{estado.atendimento=+b.dataset.n;at.querySelectorAll('button').forEach(x=>x.classList.toggle('on',estado.atendimento>=+x.dataset.n))});
+    $('#enviar').onclick=()=>enviarAvaliacao(lista,semContato);
+  }
+  async function enviarAvaliacao(lista,semContato){
+    const erro=$('#erro');erro.hidden=true;
+    const avisar=(t,el)=>{erro.textContent=t;erro.hidden=false;el?.scrollIntoView({behavior:'smooth',block:'center'})};
+    for(const i of lista){const s=estado.imoveis[i.id],card=app.querySelector(`[data-av="${i.id}"]`);
+      if(s.visitou===null)return avisar('Diga se você fez a visita em cada imóvel.',card);
+      if(s.visitou&&!s.nota)return avisar('Dê uma nota de 1 a 5 estrelas para o imóvel.',card);
+      if(s.visitou&&!s.interesse)return avisar('Diga se tem interesse em alugar o imóvel.',card);
+    }
+    const visitouAlgum=lista.some(i=>estado.imoveis[i.id].visitou);
+    if(visitouAlgum&&!estado.atendimento)return avisar('Dê uma nota de 1 a 5 estrelas para o atendimento.',app.querySelector('[data-estrelas="atendimento"]'));
+    let c={};if(semContato){c=lerContato();if(c.erro){avisar(c.erro);$(c.el).focus();return}}
+    const b=$('#enviar');b.disabled=true;b.textContent='Enviando…';
+    try{
+      V=await rpc('visita_avaliar',{p_token:TOKEN,p_avaliacoes:lista.map(i=>({id:i.id,...estado.imoveis[i.id]})),
+        p_nota_atendimento:estado.atendimento,p_comentario:$('#aCom').value,p_nome:c.nome||null,p_telefone:c.tel||null,p_email:c.email||null});
+      decidir();scrollTo(0,0);
+    }catch(e){avisar(e.message);b.disabled=false;b.textContent='Enviar avaliação'}
+  }
+
+  iniciar();
+</script>
+</body>
+</html>
