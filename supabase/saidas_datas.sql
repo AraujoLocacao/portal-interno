@@ -100,3 +100,37 @@ $$;
 drop trigger if exists saidas_cartoes_notifica_captacao on public.saidas_cartoes;
 create trigger saidas_cartoes_notifica_captacao after update of vistoria_data, vistoria_hora, chaves_em on public.saidas_cartoes
   for each row execute function public.saidas_notifica_captacao();
+
+-- Cartões arquivados: só preenche os campos (para o histórico do Meu painel), sem mexer na descrição.
+with t as (select k.id, public.saidas_data_campo(k.descricao, 'vistoria') v, public.saidas_data_campo(k.descricao, 'chaves') c
+             from public.saidas_cartoes k where k.arquivado and k.vistoria_data is null and k.chaves_em is null),
+l as (select id, (public.saidas_ler_data(v)).dia vd, (public.saidas_ler_data(v)).hora vh, (public.saidas_ler_data(c)).dia cd from t)
+update public.saidas_cartoes k set vistoria_data = l.vd, vistoria_hora = l.vh, chaves_em = l.cd
+  from l where l.id = k.id and (l.vd is not null or l.cd is not null);
+
+-- -- Correção do ano das datas sem ano: usa a criação do cartão como referência (a data fica a partir de 60 dias antes dela).
+create or replace function public.saidas_ler_data(p_txt text, p_ref date, out dia date, out hora time)
+language plpgsql immutable as $$
+declare
+  m text[]; d int; mm int; a int; h int; mi int; cand date;
+begin
+  m := regexp_match(coalesce(p_txt, ''),
+         '(?i)(?:^|\D)(\d{1,2})\s*(?:[/\-.]+|\s)\s*(\d{1,2})(?!\d)(?:\s*[/\-.]+\s*(\d{4}|\d{2})(?!\d))?(?:\D{0,6}?(\d{1,2})\s*(?:[:h;]\s*(\d{2})?|hrs?|\s+hrs?))?');
+  if m is null then return; end if;
+  d := m[1]::int; mm := m[2]::int;
+  if mm < 1 or mm > 12 or d < 1 or d > 31 then return; end if;
+  if m[3] is not null then a := m[3]::int; if a < 100 then a := a + 2000; end if;
+  elsif p_ref is not null then
+    a := extract(year from p_ref)::int;
+    if make_date(a, mm, least(d, 28)) < p_ref - 60 then a := a + 1; end if;
+  else
+    a := extract(year from current_date)::int;
+    if make_date(a, mm, least(d, 28)) > current_date + 120 then a := a - 1; end if;
+  end if;
+  begin dia := make_date(a, mm, d); exception when others then dia := null; return; end;
+  if m[4] is not null then
+    h := m[4]::int; mi := coalesce(m[5], '0')::int;
+    if h between 0 and 23 and mi between 0 and 59 then hora := make_time(h, mi, 0); end if;
+  end if;
+end;
+$$;

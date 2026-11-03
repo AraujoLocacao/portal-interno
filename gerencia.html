@@ -314,10 +314,10 @@
 
 <main id="app" hidden>
   <div class="dept"><h1>Meu painel</h1>
-    <nav class="areas" aria-label="Áreas do painel"><button type="button" class="area-link" data-area="captacao">Captação</button><button type="button" class="area-link" data-area="locacao">Locação</button></nav></div>
+    <nav class="areas" aria-label="Áreas do painel"><button type="button" class="area-link" data-area="captacao">Captação</button><button type="button" class="area-link" data-area="locacao">Locação</button><button type="button" class="area-link" data-area="pos">Pós-locação</button></nav></div>
   <nav class="tabs subtabs" aria-label="Seções da área">
     <button type="button" class="tab-link" data-go="cap-relatorio" data-area="captacao">Relatório</button><button type="button" class="tab-link" data-go="cap-quadros" data-area="captacao">Quadros</button>
-    <button type="button" class="tab-link" data-go="painel" data-area="locacao">Painel</button><button type="button" class="tab-link" data-go="semanal" data-area="locacao">Relatório semanal</button><button type="button" class="tab-link" data-go="apresentacao" data-area="locacao">Apresentação</button><button type="button" class="tab-link" data-go="mensal" data-area="locacao">Apresentação do mês</button><button type="button" class="tab-link" data-go="contratos" data-area="locacao">Contratos do mês</button></nav>
+    <button type="button" class="tab-link" data-go="painel" data-area="locacao">Painel</button><button type="button" class="tab-link" data-go="semanal" data-area="locacao">Relatório semanal</button><button type="button" class="tab-link" data-go="apresentacao" data-area="locacao">Apresentação</button><button type="button" class="tab-link" data-go="mensal" data-area="locacao">Apresentação do mês</button><button type="button" class="tab-link" data-go="contratos" data-area="locacao">Contratos do mês</button><button type="button" class="tab-link" data-go="pos-painel" data-area="pos">Painel</button></nav>
 
   <div class="card filters" role="search">
     <div class="field"><label for="fPeriodo">Período</label><select id="fPeriodo"><option value="mes">Este mês</option><option value="mespassado">Mês passado</option><option value="90">Últimos 90 dias</option><option value="ano">Este ano</option><option value="tudo">Tudo</option><option value="custom">Escolher datas…</option></select>
@@ -447,6 +447,17 @@
       <div class="table-wrap"><table id="contratos"></table></div></div>
   </section>
 
+  <section id="tab-pos-painel" data-tab hidden>
+    <div class="top">
+      <div><h2>Pós-locação</h2><p>Saídas e distratos do mês, pelo quadro Saídas e distratos (inclui o histórico que veio do Trello). Vistorias e entregas das chaves contam pela data preenchida no cartão.</p></div>
+      <div class="cap-tools"><div class="field"><label for="psMes">Mês</label><input type="month" id="psMes"></div><a class="secondary" href="saidas.html" style="text-decoration:none">Abrir o quadro ↗</a></div>
+    </div>
+    <div class="tiles" id="psTiles"></div>
+    <div class="charts" style="margin-top:6px">
+      <div class="card chart-card"><div class="chart-head"><div><h2>Últimos 6 meses</h2><p>Avisos de saída, chaves entregues e distratos concluídos.</p></div><div class="legend"><span><i style="background:#7FA3D0"></i>Avisos</span><span><i style="background:#24705a"></i>Chaves</span><span><i style="background:#b97822"></i>Concluídos</span></div></div><div id="psMeses"></div></div>
+      <div class="card chart-card"><div class="chart-head"><div><h2>Cartões por etapa, agora</h2><p>Onde estão os cartões do quadro hoje.</p></div></div><div id="psEtapas"></div></div>
+    </div>
+  </section>
   <section id="tab-cap-relatorio" data-tab hidden>
     <div class="top">
       <div><h2>Relatório de captação</h2><p>O que cada captadora lança na Captação. Os totais são calculados; os erros aparecem em vermelho.</p></div>
@@ -592,7 +603,7 @@
 
   // ---------- Abas ----------
   // Duas áreas: Captação (relatório e quadros das captadoras) e Locação (painel, relatório semanal, apresentação e contratos).
-  const AREAS={captacao:['cap-relatorio','cap-quadros'],locacao:['painel','semanal','apresentacao','mensal','contratos']};
+  const AREAS={captacao:['cap-relatorio','cap-quadros'],locacao:['painel','semanal','apresentacao','mensal','contratos'],pos:['pos-painel']};
   const ABAS=Object.values(AREAS).flat();
   const areaDe=tab=>Object.keys(AREAS).find(a=>AREAS[a].includes(tab));
   const ultimaDaArea={};
@@ -611,6 +622,7 @@
     if(tab==='mensal')abrirMensal();
     if(tab==='contratos')abrirContratos();
     if(area==='captacao')abrirCaptacao(tab);
+    if(tab==='pos-painel')abrirPos();
   }
   addEventListener('hashchange',()=>showTab());
   document.querySelectorAll('.tab-link').forEach(b=>b.onclick=()=>showTab(b.dataset.go));
@@ -1727,6 +1739,27 @@
   // ---------- Captação (relatório e quadros das captadoras) ----------
   // As regras e a visão total vêm de captacao-relatorio.js (as mesmas da página da Captação). Carrega ao abrir a área.
   let capQuadros=null,capRel=[],capAno=null,capPeriodos=[];
+  // ---------- Pós-locação (supabase/saidas_gerencia.sql) ----------
+  async function abrirPos(){
+    if(!$('#psMes').value)$('#psMes').value=ymHoje();
+    $('#psTiles').innerHTML='<p class="msg">Carregando…</p>';
+    const {data,error}=await db.rpc('saidas_painel_gerencia',{p_mes:$('#psMes').value+'-01'});
+    if(error||!data){$('#psTiles').innerHTML=`<p class="msg">Não foi possível carregar: ${error?error.message:'sem permissão'}</p>`;return}
+    const t=(rot,v,sub)=>`<div class="card tile"><span>${rot}</span><strong>${v??'–'}</strong>${sub?`<small>${sub}</small>`:''}</div>`;
+    const atual=$('#psMes').value===ymHoje();
+    $('#psTiles').innerHTML=t('Avisos de saída',data.avisos,'entraram no quadro no mês')
+      +t('Vistorias de saída',data.vistorias_feitas,atual&&data.vistorias_agendadas?`+ ${data.vistorias_agendadas} agendada(s) até o fim do mês`:'realizadas no mês')
+      +t('Chaves entregues',data.chaves,'pela data no cartão')+t('Distratos concluídos',data.concluidos,'pagos e assinados')
+      +t('Do aviso às chaves',data.tempo_medio!=null?`${data.tempo_medio} dias`:'–','em média, nas chaves do mês')
+      +t('Em cobrança',data.em_cobranca,'hoje, inclui acionamentos e acordos')+t('Na Justiça',data.na_justica,'cobrança judicial, hoje');
+    const ms=data.meses||[],mx=Math.max(1,...ms.flatMap(m=>[m.avisos,m.chaves,m.concluidos]));
+    const nomeM=m=>{const [y,mm]=m.split('-');return MESES[+mm-1].slice(0,3)+'/'+y.slice(2)};
+    const barra=(v,cor)=>`<div style="display:flex;align-items:center;gap:6px"><div style="height:10px;border-radius:4px;background:${cor};width:${Math.round(v*100/mx)}%;min-width:${v?3:0}px"></div><small class="muted">${v}</small></div>`;
+    $('#psMeses').innerHTML=ms.map(m=>`<div style="display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)"><strong style="font-size:.85rem">${nomeM(m.mes)}</strong><div style="display:grid;gap:3px">${barra(m.avisos,'#7FA3D0')}${barra(m.chaves,'#24705a')}${barra(m.concluidos,'#b97822')}</div></div>`).join('');
+    const et=(data.etapas||[]),mxe=Math.max(1,...et.map(e=>e.n));
+    $('#psEtapas').innerHTML=et.map(e=>`<div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:center;padding:4px 0;border-top:1px solid var(--line);font-size:.82rem"><span>${e.coluna.charAt(0)+e.coluna.slice(1).toLowerCase()}</span><div style="display:flex;align-items:center;gap:6px"><div style="height:9px;border-radius:4px;background:#7FA3D0;width:${Math.round(e.n*100/mxe)}%;min-width:${e.n?3:0}px"></div><small class="muted">${e.n}</small></div></div>`).join('');
+  }
+  $('#psMes').addEventListener('change',abrirPos);
   async function abrirCaptacao(tab){
     if(!$('#crMes').value)$('#crMes').value=ymHoje();
     try{
