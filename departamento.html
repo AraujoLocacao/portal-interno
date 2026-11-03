@@ -75,6 +75,9 @@
     .nota{font-size:.84rem}.nota small{display:block;color:var(--muted);font-size:.76rem}
     .atv-card.auto{border-style:dashed;box-shadow:none;background:#fbfbf9}
     .ferramenta{overflow:hidden}.ferramenta iframe{display:block;width:100%;height:calc(100vh - 150px);min-height:640px;border:0;background:#fff}.ferramenta iframe:fullscreen{height:100vh}
+    .seguros{padding:14px 20px;margin-bottom:14px}.seguros summary{cursor:pointer;font-weight:800;color:var(--navy)}
+    .seg-item{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:12px 0}.seg-item.feito{opacity:.75}.seg-item .msg{margin:2px 0 0}
+    .seg-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .salvas{padding:14px 20px;margin-bottom:14px}.salvas summary{cursor:pointer;font-weight:800;color:var(--navy)}.salvas tr.aberta{background:#eef6f2}
     .atual{background:#eef6f2;color:#1d4d3f;border:1px solid #cfe3da;border-radius:12px;padding:9px 14px;font-size:.88rem;margin:0 0 14px}
     .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}.doc .row-actions{text-align:left;margin-top:8px;margin-left:-4px}
@@ -222,6 +225,10 @@
       <div><h2>Calculadora de rescisão</h2><p>Conferência e cálculo de distratos, com leitura do contrato e das cobranças em PDF. Para guardar, clique em "Salvar rescisão", no resumo da calculadora. O cálculo fica em "Rescisões salvas" para abrir de novo. Os PDFs e prints anexados não são salvos.</p></div>
       <div class="bar-actions"><button class="secondary" id="rescisaoNova">+ Nova rescisão</button><button class="secondary" id="rescisaoCheia">Tela cheia</button></div>
     </div>
+    <details class="card seguros" id="segurosWrap"><summary id="segurosTitulo">Seguro incêndio a cancelar</summary>
+      <p class="msg" style="margin:8px 0 0">Distratos que entraram em "Saídas para cálculo" no quadro Saídas e distratos. "Abrir e-mail" abre o seu programa de e-mail com a mensagem pronta para a Atlântico Seguros, com cópia para financeiro.locacao@ e financeiro.apagar@. Depois de enviar, clique em "Marcar como enviado".</p>
+      <div id="segurosLista"></div>
+    </details>
     <details class="card salvas" id="salvasWrap"><summary id="salvasTitulo">Rescisões salvas</summary>
       <input class="search-input" id="rBusca" type="search" placeholder="Buscar locatário ou imóvel" aria-label="Buscar rescisão salva" style="margin-top:12px">
       <div class="table-wrap"><table id="salvasTable"></table></div>
@@ -561,7 +568,49 @@
   const quando=ts=>{const d=new Date(ts);return `${br(iso(d))} às ${pad(d.getHours())}:${pad(d.getMinutes())}`};
   const quem=e=>safe((e||'').split('@')[0]);
   const saldoTxt=v=>v==null?'–':`${v<0?'A devolver':'A pagar'} ${Math.abs(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}`;
+  // ---------- Seguro incêndio a cancelar (supabase/saidas_seguro.sql) ----------
+  // Cartão do quadro Saídas e distratos que entra em "SAÍDAS PARA CÁLCULO - FINANCEIRO" vira pedido aqui, junto da calculadora.
+  // O e-mail sai do programa de e-mail de quem clica, para a corretora, com cópia para os dois e-mails do financeiro.
+  const SEG_PARA='atendimento@atlanticoseguros.com.br',SEG_CC='financeiro.locacao@araujolocacao.com.br,financeiro.apagar@araujolocacao.com.br';
+  let seguros=[];
+  function nomesDoTitulo(t){
+    const sem=String(t||'').replace(/^\s*[A-Za-z]{2}\d{3,5}(\/\d+)?\s*[-–:]*\s*/,'');
+    const p=sem.split(/\s*[-–]*\s*\b(?:PROPRIET[AÁ]RI[OA]|PROPRI|PROP)\b\.?\s*:?\s*/i);
+    return {locatario:(p[0]||'').replace(/[-–\s]+$/,'').trim(),locador:(p[1]||'').replace(/^[-–\s]+/,'').trim()};
+  }
+  function emailSeguro(s){
+    const nt=nomesDoTitulo(s.titulo),loc=s.locatario||nt.locatario||'—',dono=s.locador||nt.locador||'—',end=s.endereco||'(endereço não preenchido)';
+    const assunto=`Cancelamento de seguro incêndio – ${s.referencia||''} – ${s.endereco||loc}`.replace(/ – $/,'');
+    const corpo=`Prezados,\n\nSolicitamos o cancelamento do seguro incêndio do imóvel abaixo, em razão da rescisão do contrato de locação.\n\nImóvel (REF): ${s.referencia||'—'}\nEndereço: ${end}\nLocatário: ${loc}\nLocador: ${dono}\n\nPor favor, confirmem o cancelamento respondendo este e-mail.\n\nAtenciosamente,\nFinanceiro – Araujo Locação`;
+    return {assunto,corpo,loc,dono,mailto:`mailto:${SEG_PARA}?cc=${SEG_CC}&subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`};
+  }
+  async function loadSeguros(){
+    const {data,error}=await db.rpc('saidas_seguros_listar');
+    if(error){$('#segurosLista').innerHTML=`<p class="msg">Não foi possível carregar os pedidos: ${safe(error.message)}</p>`;return}
+    seguros=data;pintarSeguros();
+  }
+  function pintarSeguros(){
+    const pend=seguros.filter(s=>s.situacao==='pendente'),feitos=seguros.filter(s=>s.situacao!=='pendente');
+    $('#segurosTitulo').textContent=`Seguro incêndio a cancelar (${pend.length})`;$('#segurosWrap').open=pend.length>0||$('#segurosWrap').open;
+    const linha=s=>{const m=emailSeguro(s);
+      return `<div class="seg-item${s.situacao!=='pendente'?' feito':''}"><div><strong>${safe(s.titulo)}</strong>
+        <p class="msg">Locatário: ${safe(m.loc)} · Locador: ${safe(m.dono)} · Endereço: ${s.endereco?safe(s.endereco):'<span style="color:var(--red);font-weight:700">não preenchido (preencha no cartão)</span>'}</p>
+        <p class="msg">${s.situacao==='pendente'?`Na coluna de cálculo desde ${br(s.criado_em.slice(0,10))}`:s.situacao==='enviado'?`Enviado à corretora em ${br(s.resolvido_em.slice(0,10))} por ${safe(s.resolvido_por)}`:`Não se aplica (marcado por ${safe(s.resolvido_por)})`}</p></div>
+        <div class="seg-acoes">${s.situacao==='pendente'?`<a class="primary" href="${m.mailto}" style="text-decoration:none">Abrir e-mail</a><button class="secondary" data-seg-copiar="${s.id}">Copiar e-mail</button><button class="secondary" data-seg="${s.id}" data-sit="enviado">Marcar como enviado</button><button class="link" data-seg="${s.id}" data-sit="nao_se_aplica">Não se aplica</button>`
+          :`<button class="link" data-seg="${s.id}" data-sit="pendente">Reabrir</button>`}<a class="link" href="saidas.html?c=${s.cartao_id}">Abrir cartão ↗</a></div></div>`};
+    $('#segurosLista').innerHTML=(pend.length?pend.map(linha).join(''):'<p class="msg">Nenhum seguro esperando cancelamento.</p>')+(feitos.length?`<p class="msg" style="margin-top:12px;font-weight:700">Resolvidos nos últimos 30 dias</p>${feitos.map(linha).join('')}`:'');
+  }
+  $('#segurosLista').addEventListener('click',async e=>{
+    const c=e.target.closest('[data-seg-copiar]');
+    if(c){const s=seguros.find(x=>x.id===c.dataset.segCopiar),m=emailSeguro(s);copiar(`Para: ${SEG_PARA}\nCópia: ${SEG_CC.replace(',',', ')}\nAssunto: ${m.assunto}\n\n${m.corpo}`,'E-mail');return}
+    const b=e.target.closest('[data-seg]');if(!b)return;b.disabled=true;
+    const {error}=await db.rpc('saidas_seguro_resolver',{p_id:b.dataset.seg,p_situacao:b.dataset.sit});
+    if(error){alert('Não foi possível salvar: '+error.message);b.disabled=false;return}
+    toast(b.dataset.sit==='enviado'?'Marcado como enviado':b.dataset.sit==='pendente'?'Pedido reaberto':'Marcado como não se aplica');await loadSeguros();
+  });
+
   async function loadRescisao(){
+    loadSeguros();
     const msg=$('#rescisaoMsg');msg.hidden=false;msg.textContent='Carregando a calculadora…';
     const {data,error}=await db.storage.from(BUCKET).download(`ferramentas/${DEP.slug}/calculadora-rescisao.html`);
     if(error){msg.textContent='Não foi possível carregar a calculadora. Fale com a gerência.';return}
