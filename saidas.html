@@ -149,7 +149,7 @@
           <div id="cChecklists" style="display:grid;gap:10px;margin-top:6px"></div>
         </div>
         <div id="cAnexosBox">
-          <span class="lbl">Anexos (ficaram no Trello)</span>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Anexos</span><label class="link" style="cursor:pointer">+ Anexar arquivo<input type="file" id="cAnexar" multiple hidden></label></div>
           <div class="anexos" id="cAnexos" style="margin-top:6px"></div>
         </div>
         <div>
@@ -331,7 +331,7 @@
     return `<article class="kcard" draggable="true" data-id="${c.id}" tabindex="0">
       ${c.etiquetas.length?`<div class="chips">${c.etiquetas.map(etq).filter(Boolean).map(chip).join('')}</div>`:''}
       <div class="t">${safe(c.titulo)}</div>
-      <div class="meta">${pz?`<span class="prazo ${pz.cls}" title="Prazo${c.prazo_ok?' (concluído)':''}">🕑 ${pz.txt}</span>`:''}${it.length?`<span class="chk${feitos===it.length?' ok':''}" title="Checklist">☑ ${feitos}/${it.length}</span>`:''}${n?`<span title="Comentários">💬 ${n}</span>`:''}${na?`<span title="Anexos no Trello">📎 ${na}</span>`:''}
+      <div class="meta">${pz?`<span class="prazo ${pz.cls}" title="Prazo${c.prazo_ok?' (concluído)':''}">🕑 ${pz.txt}</span>`:''}${it.length?`<span class="chk${feitos===it.length?' ok':''}" title="Checklist">☑ ${feitos}/${it.length}</span>`:''}${n?`<span title="Comentários">💬 ${n}</span>`:''}${na?`<span title="Anexos">📎 ${na}</span>`:''}
         <span class="${d>=7?'velho':''}" title="Tempo nesta coluna${d>=7?' (parado há 7 dias ou mais)':''}">${d===0?'hoje':d===1?'há 1 dia':`há ${d} dias`}</span>
         ${c.membros.length?`<span class="mbs">${c.membros.map(m=>`<span class="av sm" title="${safe(m)}">${safe(iniciais(m))}</span>`).join('')}</span>`:''}</div></article>`;
   }
@@ -416,9 +416,44 @@
     $('#cPrazo').value=c.prazo?isoDia(c.prazo):'';$('#cPrazoOk').checked=c.prazo_ok;$('#cPrazoOk').disabled=!c.prazo;
     $('#cMembros').value=c.membros.join(', ');
     pintarChecklists();
-    const an=c.anexos||[];$('#cAnexosBox').hidden=!an.length;
-    $('#cAnexos').innerHTML=an.map(a=>`<a href="${safe(a.url)}" target="_blank" rel="noopener noreferrer">📎 ${safe(a.nome||a.url)}</a>`).join('');
+    pintarAnexos();
   }
+  // Anexos: os copiados do Trello e os enviados aqui ficam no bucket "saidas" (caminho); sem caminho, o arquivo só existe no Trello.
+  function pintarAnexos(){
+    const an=aberto.anexos||[];
+    $('#cAnexos').innerHTML=an.map((a,i)=>`<div class="row" style="gap:6px;flex-wrap:nowrap">${a.caminho?`<button class="link" data-abrir="${i}" style="text-align:left;padding-left:0">📎 ${safe(a.nome||'arquivo')}</button>`
+      :`<a href="${safe(a.url)}" target="_blank" rel="noopener noreferrer">📎 ${safe(a.nome||a.url)}</a><small class="muted">(no Trello)</small>`}
+      <small class="muted" style="white-space:nowrap">${a.data?dataBr(a.data):''}</small><button class="link danger" data-tirar="${i}" aria-label="Excluir anexo">×</button></div>`).join('')||'<p class="msg">Nenhum anexo.</p>';
+  }
+  const nomeArquivo=n=>n.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.\-]+/g,'_').slice(-120);
+  $('#cAnexar').onchange=async e=>{
+    const c=aberto,arqs=[...e.target.files];e.target.value='';if(!arqs.length)return;
+    const novos=[];
+    for(const f of arqs){
+      if(f.size>50*1024*1024){alert(`"${f.name}" tem mais de 50 MB e não pode ser anexado.`);continue}
+      toast('Enviando '+f.name+'…');
+      const caminho=`${c.id}/${Date.now()}-${nomeArquivo(f.name)}`;
+      const {error}=await db.storage.from('saidas').upload(caminho,f,{contentType:f.type||'application/octet-stream'});
+      if(error){alert(`Não foi possível enviar "${f.name}": ${error.message}`);continue}
+      novos.push({nome:f.name,caminho,data:new Date().toISOString(),por:meuEmail});
+    }
+    if(!novos.length||aberto!==c)return;
+    if(await salvarCartao({anexos:[...(c.anexos||[]),...novos]},novos.length===1?'Arquivo anexado':`${novos.length} arquivos anexados`)){
+      pintarAnexos();
+      const {data}=await db.from('saidas_historico').insert({cartao_id:c.id,tipo:'editado',texto:'anexou '+novos.map(n=>n.nome).join(', '),autor:meuEmail}).select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').single();
+      if(data&&aberto===c){hist.unshift(data);pintarHist()}
+    }
+  };
+  $('#cAnexos').addEventListener('click',async e=>{
+    const ab=e.target.closest('[data-abrir]'),ti=e.target.closest('[data-tirar]');
+    if(ab){const a=aberto.anexos[+ab.dataset.abrir],w=window.open('','_blank');
+      const {data,error}=await db.storage.from('saidas').createSignedUrl(a.caminho,300);
+      if(error||!data){w?.close();alert('Não foi possível abrir o arquivo: '+(error?.message||''));return}
+      if(w)w.location=data.signedUrl;else location.href=data.signedUrl;return}
+    if(ti){const i=+ti.dataset.tirar,a=aberto.anexos[i];if(!await confirmar(`Excluir o anexo "${a.nome}"?`))return;
+      if(a.caminho){const {error}=await db.storage.from('saidas').remove([a.caminho]);if(error){alert('Não foi possível excluir: '+error.message);return}}
+      const l=[...aberto.anexos];l.splice(i,1);if(await salvarCartao({anexos:l},'Anexo excluído'))pintarAnexos()}
+  });
   function pintarChecklists(){
     const c=aberto;
     $('#cChecklists').innerHTML=(c.checklists||[]).map((l,i)=>{const it=l.itens||[],f=it.filter(x=>x.feito).length,pc=it.length?Math.round(f*100/it.length):0;
