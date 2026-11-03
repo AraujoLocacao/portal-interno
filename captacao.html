@@ -57,6 +57,9 @@
     .mais{border:0;background:transparent;color:var(--blue);font-weight:700;font-size:.82rem;padding:6px}
     .kcol-foot{padding:0 8px 8px}.kcol-foot button{width:100%;border:0;background:transparent;text-align:left;padding:6px 8px;border-radius:8px;color:var(--muted);font-weight:650;font-size:.85rem}.kcol-foot button:hover{background:#dde3e8;color:var(--ink)}
     .vazio{margin:30px clamp(16px,3vw,32px);padding:24px;max-width:640px}
+    /* Notificações */
+    .sino{position:relative;font-size:1rem;padding:5px 10px}.sino-n{position:absolute;top:-6px;right:-6px;min-width:18px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font-size:.68rem;font-weight:800;line-height:18px;text-align:center}
+    .notif{display:flex;justify-content:space-between;gap:12px;align-items:start;border-top:1px solid var(--line);padding:10px 0}.notif:first-child{border-top:0}.notif.nova strong{color:var(--blue)}.notif .msg{margin:2px 0 0}
     /* Avisos de saída */
     .tabs .badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--red);color:#fff;font-size:.72rem;line-height:1.6;text-align:center}
     .avisos{display:grid;gap:12px;max-width:900px}
@@ -128,7 +131,7 @@
 <body>
 <header class="bar">
   <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Captação</strong></div>
-  <div class="bar-actions" id="barActions" hidden><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
+  <div class="bar-actions" id="barActions" hidden><button class="ghost sino" id="sino" hidden title="Notificações da Pós-locação">🔔<span class="sino-n" id="sinoN" hidden></span></button><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
 </header>
 
 <section class="card gate" id="gate" hidden>
@@ -369,6 +372,11 @@
   </form>
 </dialog>
 
+<dialog id="notifDialog">
+  <div class="dialog-head"><div><h2>Notificações</h2><p class="msg">Datas que a Pós-locação preencheu nos imóveis que você pegou. Últimos 30 dias.</p></div><button class="close" data-close aria-label="Fechar">×</button></div>
+  <div class="dialog-body"><div id="notifLista"></div></div>
+</dialog>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="captacao-relatorio.js"></script>
 <script>
@@ -416,7 +424,7 @@
     if(p.error||p.data!==true){show('denied');return}
     gestor=g.data===true;document.querySelectorAll('[data-gestor]').forEach(el=>el.hidden=!gestor);
     show('app');
-    if(!booted){booted=true;await carregarQuadros();carregarAvisos()}
+    if(!booted){booted=true;await carregarQuadros();carregarAvisos();carregarNotifs()}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   $('#loginForm').onsubmit=async e=>{
@@ -468,6 +476,29 @@
     await carregarAvisos();if(quadroId===meuQuadro()?.id)carregar();
   });
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&booted)carregarAvisos()});
+
+  // ---------- Notificações da Pós-locação (supabase/captacao_notificacoes.sql) ----------
+  // Datas de vistoria de saída e de entrega das chaves preenchidas no cartão de saídas, para a captadora que pegou o aviso.
+  let notifs=[];
+  async function carregarNotifs(){
+    const {data,error}=await db.rpc('captacao_notificacoes_listar');if(error)return;
+    notifs=data;const novas=notifs.filter(n=>n.minha&&!n.lida_em).length;
+    $('#sino').hidden=!notifs.length&&!gestor&&!meuQuadro();$('#sinoN').textContent=novas||'';$('#sinoN').hidden=!novas;
+  }
+  $('#sino').onclick=async()=>{
+    $('#notifLista').innerHTML=notifs.length?notifs.map(n=>`<div class="notif${n.minha&&!n.lida_em?' nova':''}"><div><strong>${n.tipo==='vistoria'?'🗓️':'🔑'} ${safe(n.texto)}</strong>
+      <p class="msg">${safe(n.titulo||'')}${n.minha?'':` · quadro ${safe(n.quadro)}`} · ${dataHora(n.criado_em)}</p></div>${n.minha&&n.cartao_id?`<button class="link" data-notif-cartao="${n.cartao_id}">Abrir cartão</button>`:''}</div>`).join('')
+      :'<p class="msg">Nenhuma notificação nos últimos 30 dias. Quando a Pós-locação preencher a data da vistoria de saída ou da entrega das chaves de um imóvel que você pegou, ela aparece aqui.</p>';
+    $('#notifDialog').showModal();
+    if(notifs.some(n=>n.minha&&!n.lida_em)){await db.rpc('captacao_notificacoes_ler');notifs.forEach(n=>{if(n.minha&&!n.lida_em)n.lida_em=new Date().toISOString()});$('#sinoN').hidden=true}
+  };
+  $('#notifLista').addEventListener('click',async e=>{
+    const b=e.target.closest('[data-notif-cartao]');if(!b)return;$('#notifDialog').close();abrirAba('quadro');
+    const meu=meuQuadro();if(meu&&quadroId!==meu.id){quadroId=meu.id;pintarTitulo();await carregar()}
+    if(!cartoes.some(c=>c.id===b.dataset.notifCartao))await carregar();abrirCartao(b.dataset.notifCartao);
+  });
+  setInterval(()=>{if(booted&&!document.hidden)carregarNotifs()},120000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&booted)carregarNotifs()});
 
   // ---------- Dados ----------
   async function tudo(tabela,campos,ordem,filtro){
