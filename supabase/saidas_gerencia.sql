@@ -3,7 +3,8 @@
 -- Rodar uma vez em: Supabase > portal-interno > SQL Editor. Depende de saidas.sql e saidas_datas.sql.
 
 drop function if exists public.saidas_painel_gerencia(date);
--- p_meses: quantos meses no histórico (o mês escolhido e os anteriores); 0 = desde abril de 2020, quando o quadro começou.
+-- p_meses: quantos meses no histórico (o mês escolhido e os anteriores); 0 = desde janeiro de 2022 (antes disso a data de
+-- entrega das chaves quase nunca estava escrita no cartão; decisão da gerência em 03/11/2026).
 create or replace function public.saidas_painel_gerencia(p_mes date, p_meses int default 12)
 returns jsonb
 language sql
@@ -24,7 +25,7 @@ as $$
      where h.tipo in ('criado', 'movido') and h.para_coluna ilike 'DISTRATOS CONCLU%'
      group by h.cartao_id
   ), meses as (
-    select generate_series(case when coalesce(p_meses, 0) <= 0 then date '2020-04-01' else date_trunc('month', p_mes) - make_interval(months => least(p_meses, 120) - 1) end, date_trunc('month', p_mes), interval '1 month')::date m
+    select generate_series(case when coalesce(p_meses, 0) <= 0 then date '2022-01-01' else date_trunc('month', p_mes) - make_interval(months => least(p_meses, 120) - 1) end, date_trunc('month', p_mes), interval '1 month')::date m
   )
   select case when not public.is_gestor() then null else jsonb_build_object(
     'avisos', (select count(*) from aviso, lim where dia >= ini and dia < fim),
@@ -52,7 +53,7 @@ as $$
                  'concluidos', (select count(*) from concl where extract(year from dia) = y),
                  'tempo_medio', (select round(avg(k.chaves_em - a.dia)) from saidas_cartoes k join aviso a on a.cartao_id = k.id
                                   where extract(year from k.chaves_em) = y and k.chaves_em between a.dia and a.dia + 365)) order by y)
-               from generate_series(2020, extract(year from p_mes)::int) y)
+               from generate_series(2022, extract(year from p_mes)::int) y)
   ) end;
 $$;
 

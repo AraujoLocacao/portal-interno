@@ -449,17 +449,13 @@
 
   <section id="tab-pos-painel" data-tab hidden>
     <div class="top">
-      <div><h2>Pós-locação</h2><p>Saídas e distratos do mês, pelo quadro Saídas e distratos (inclui o histórico que veio do Trello). Vistorias e entregas das chaves contam pela data preenchida no cartão.</p></div>
+      <div><h2>Pós-locação</h2><p>Avisos de saída (dia em que o cartão entrou em "Avisos de saída") e saídas de fato (data da entrega das chaves no cartão), pelo quadro Saídas e distratos. De 2022 em diante.</p></div>
       <div class="cap-tools"><div class="field"><label for="psMes">Mês</label><input type="month" id="psMes"></div><a class="secondary" href="saidas.html" style="text-decoration:none">Abrir o quadro ↗</a></div>
     </div>
     <div class="tiles" id="psTiles"></div>
-    <div class="charts" style="margin-top:6px">
-      <div class="card chart-card"><div class="chart-head"><div><h2>Histórico por mês</h2><p>Avisos de saída, chaves entregues e distratos concluídos.</p></div><select id="psHist" aria-label="Período do histórico" style="border:1px solid #cbd5da;border-radius:8px;padding:5px 8px;background:#fff"><option value="12">12 meses</option><option value="24">24 meses</option><option value="36">36 meses</option><option value="0">Desde 2020</option></select></div><div class="chart-box" id="box-pos" style="height:320px;position:relative"><canvas id="ch-pos" role="img" aria-label="Histórico mensal da Pós-locação"></canvas></div></div>
-      <div class="card chart-card"><div class="chart-head"><div><h2>Cartões por etapa, agora</h2><p>Onde estão os cartões do quadro hoje.</p></div></div><div id="psEtapas"></div></div>
-    </div>
-    <div class="card table-card"><div class="list-head"><h2>Por ano</h2><span class="muted">desde 2020, quando o quadro começou no Trello</span></div>
-      <div class="table-wrap"><table id="psAnos"></table></div>
-      <p class="msg" style="margin-top:10px">Os números antigos dependem de como o Trello era usado na época: vistoria e entrega das chaves só contam quando a data estava escrita no cartão (o campo entrou no modelo em 2021), e a coluna de distratos concluídos quase não foi usada entre 2021 e 2023.</p></div>
+    <div class="card chart-card" style="margin:6px 0 18px"><div class="chart-head"><div><h2>Por mês</h2><p>Avisos de saída e entregas de chaves.</p></div><select id="psHist" aria-label="Período do gráfico" style="border:1px solid #cbd5da;border-radius:8px;padding:5px 8px;background:#fff"><option value="12">12 meses</option><option value="24">24 meses</option><option value="0">Desde 2022</option></select></div><div class="chart-box" id="box-pos" style="height:320px;position:relative"><canvas id="ch-pos" role="img" aria-label="Avisos de saída e entregas de chaves por mês"></canvas></div></div>
+    <div class="card table-card"><div class="list-head"><h2>Avisos de saída por mês</h2></div><div class="table-wrap"><table id="psTabAvisos"></table></div></div>
+    <div class="card table-card" style="margin-top:18px"><div class="list-head"><h2>Entregas de chaves por mês</h2><span class="muted">saídas de fato</span></div><div class="table-wrap"><table id="psTabChaves"></table></div></div>
   </section>
   <section id="tab-cap-relatorio" data-tab hidden>
     <div class="top">
@@ -1746,27 +1742,27 @@
   async function abrirPos(){
     if(!$('#psMes').value)$('#psMes').value=ymHoje();
     $('#psTiles').innerHTML='<p class="msg">Carregando…</p>';
-    const {data,error}=await db.rpc('saidas_painel_gerencia',{p_mes:$('#psMes').value+'-01',p_meses:+$('#psHist').value});
+    const {data,error}=await db.rpc('saidas_painel_gerencia',{p_mes:$('#psMes').value+'-01',p_meses:0});
     if(error||!data){$('#psTiles').innerHTML=`<p class="msg">Não foi possível carregar: ${error?error.message:'sem permissão'}</p>`;return}
+    const todos=data.meses||[],mesSel=$('#psMes').value,anoAnt=todos.find(m=>m.mes===(+mesSel.slice(0,4)-1)+mesSel.slice(4)),atual=mesSel===ymHoje();
     const t=(rot,v,sub)=>`<div class="card tile"><span>${rot}</span><strong>${v??'–'}</strong>${sub?`<small>${sub}</small>`:''}</div>`;
-    const atual=$('#psMes').value===ymHoje();
-    $('#psTiles').innerHTML=t('Avisos de saída',data.avisos,'entraram no quadro no mês')
-      +t('Vistorias de saída',data.vistorias_feitas,atual&&data.vistorias_agendadas?`+ ${data.vistorias_agendadas} agendada(s) até o fim do mês`:'realizadas no mês')
-      +t('Chaves entregues',data.chaves,'pela data no cartão')+t('Distratos concluídos',data.concluidos,'pagos e assinados')
-      +t('Do aviso às chaves',data.tempo_medio!=null?`${data.tempo_medio} dias`:'–','em média, nas chaves do mês')
-      +t('Em cobrança',data.em_cobranca,'hoje, inclui acionamentos e acordos')+t('Na Justiça',data.na_justica,'cobrança judicial, hoje');
-    const ms=data.meses||[],nomeM=m=>{const [y,mm]=m.split('-');return MESES[+mm-1].slice(0,3).toLowerCase()+'/'+y.slice(2)},muitos=ms.length>24;
+    const comp=k=>anoAnt?`no mesmo mês de ${+mesSel.slice(0,4)-1}: ${anoAnt[k]}`:'';
+    $('#psTiles').innerHTML=t('Avisos de saída',data.avisos,(atual?'até hoje · ':'')+comp('avisos'))+t('Entregas de chaves',data.chaves,(atual?'até hoje · ':'')+comp('chaves'));
+    // Gráfico: os últimos N meses até o mês escolhido.
+    const n=+$('#psHist').value,ate=todos.findIndex(m=>m.mes===mesSel),ms=n?todos.slice(Math.max(0,ate-n+1),ate+1):todos.slice(0,ate+1);
+    const nomeM=m=>{const [y,mm]=m.split('-');return MESES[+mm-1].slice(0,3).toLowerCase()+'/'+y.slice(2)},muitos=ms.length>24;
     draw('pos',{type:muitos?'line':'bar',data:{labels:ms.map(m=>nomeM(m.mes)),datasets:[
       {label:'Avisos de saída',data:ms.map(m=>m.avisos),backgroundColor:'#7FA3D0',borderColor:'#7FA3D0',tension:.25,pointRadius:muitos?0:3},
-      {label:'Chaves entregues',data:ms.map(m=>m.chaves),backgroundColor:'#24705a',borderColor:'#24705a',tension:.25,pointRadius:muitos?0:3},
-      {label:'Distratos concluídos',data:ms.map(m=>m.concluidos),backgroundColor:'#b97822',borderColor:'#b97822',tension:.25,pointRadius:muitos?0:3}]},
+      {label:'Entregas de chaves',data:ms.map(m=>m.chaves),backgroundColor:'#004AAD',borderColor:'#004AAD',tension:.25,pointRadius:muitos?0:3}]},
       options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:12}}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{ticks:{autoSkip:true,maxRotation:0}}}}});
-    const an=(data.anos||[]).slice().reverse();
-    $('#psAnos').innerHTML='<thead><tr><th>Ano</th><th class="num">Avisos de saída</th><th class="num">Vistorias</th><th class="num">Chaves entregues</th><th class="num">Distratos concluídos</th><th class="num">Dias do aviso às chaves</th></tr></thead><tbody>'
-      +an.map(a=>`<tr><td><strong>${a.ano}</strong>${a.ano===new Date().getFullYear()?' <small class="muted">até hoje</small>':''}</td><td class="num">${a.avisos}</td><td class="num">${a.vistorias}</td><td class="num">${a.chaves}</td><td class="num">${a.concluidos}</td><td class="num">${a.tempo_medio??'–'}</td></tr>`).join('')+'</tbody>';    const et=(data.etapas||[]),mxe=Math.max(1,...et.map(e=>e.n));
-    $('#psEtapas').innerHTML=et.map(e=>`<div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:center;padding:4px 0;border-top:1px solid var(--line);font-size:.82rem"><span>${e.coluna.charAt(0)+e.coluna.slice(1).toLowerCase()}</span><div style="display:flex;align-items:center;gap:6px"><div style="height:9px;border-radius:4px;background:#7FA3D0;width:${Math.round(e.n*100/mxe)}%;min-width:${e.n?3:0}px"></div><small class="muted">${e.n}</small></div></div>`).join('');
-  }
-  $('#psMes').addEventListener('change',abrirPos);$('#psHist').addEventListener('change',abrirPos);
+    // Tabelas: ano × mês, desde 2022.
+    const hoje=ymHoje(),anos=[...new Set(todos.map(m=>m.mes.slice(0,4)))].reverse();
+    const tabela=k=>'<thead><tr><th>Ano</th>'+MESES.map(m=>`<th class="num">${m.slice(0,3).charAt(0)+m.slice(1,3).toLowerCase()}</th>`).join('')+'<th class="num">Total</th></tr></thead><tbody>'
+      +anos.map(a=>{const linha=MESES.map((_,i)=>todos.find(m=>m.mes===`${a}-${String(i+1).padStart(2,'0')}`));
+        return `<tr><td><strong>${a}</strong></td>${linha.map(m=>`<td class="num">${m?(m.mes===hoje?`${m[k]}*`:m[k]):''}</td>`).join('')}<td class="num"><strong>${linha.reduce((s,m)=>s+(m?m[k]:0),0)}</strong></td></tr>`}).join('')+'</tbody>';
+    $('#psTabAvisos').innerHTML=tabela('avisos');$('#psTabChaves').innerHTML=tabela('chaves');
+    $('#psTabChaves').closest('.card').querySelector('.list-head .muted').textContent='saídas de fato'+(todos.some(m=>m.mes===hoje)?' · * mês atual, até hoje':'');
+  }  $('#psMes').addEventListener('change',abrirPos);$('#psHist').addEventListener('change',abrirPos);
   async function abrirCaptacao(tab){
     if(!$('#crMes').value)$('#crMes').value=ymHoje();
     try{
