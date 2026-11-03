@@ -598,7 +598,7 @@
         <p class="msg">Locatário: ${safe(m.loc)} · Locador: ${safe(m.dono)} · Endereço: ${s.endereco?safe(s.endereco):'<span style="color:var(--red);font-weight:700">não preenchido (preencha no cartão)</span>'}</p>
         <p class="msg">${s.situacao==='pendente'?`Na coluna de cálculo desde ${br(s.criado_em.slice(0,10))}`:s.situacao==='enviado'?`Enviado à corretora em ${br(s.resolvido_em.slice(0,10))} por ${safe(s.resolvido_por)}`:`Não se aplica (marcado por ${safe(s.resolvido_por)})`}</p></div>
         <div class="seg-acoes">${s.situacao==='pendente'?`<a class="primary" href="${m.mailto}" style="text-decoration:none">Abrir e-mail</a><button class="secondary" data-seg-copiar="${s.id}">Copiar e-mail</button><button class="secondary" data-seg="${s.id}" data-sit="enviado">Marcar como enviado</button><button class="link" data-seg="${s.id}" data-sit="nao_se_aplica">Não se aplica</button>`
-          :`<button class="link" data-seg="${s.id}" data-sit="pendente">Reabrir</button>`}<a class="link" href="saidas.html?c=${s.cartao_id}">Abrir cartão ↗</a></div></div>`};
+          :`<button class="link" data-seg="${s.id}" data-sit="pendente">Reabrir</button>`}<a class="link" href="?d=${DEP.slug}&cartao=${s.cartao_id}#rescisao">Calcular rescisão</a><a class="link" href="saidas.html?c=${s.cartao_id}">Abrir cartão ↗</a></div></div>`};
     $('#segurosLista').innerHTML=(pend.length?pend.map(linha).join(''):'<p class="msg">Nenhum seguro esperando cancelamento.</p>')+(feitos.length?`<p class="msg" style="margin-top:12px;font-weight:700">Resolvidos nos últimos 30 dias</p>${feitos.map(linha).join('')}`:'');
   }
   $('#segurosLista').addEventListener('click',async e=>{
@@ -616,7 +616,25 @@
     const {data,error}=await db.storage.from(BUCKET).download(`ferramentas/${DEP.slug}/calculadora-rescisao.html`);
     if(error){msg.textContent='Não foi possível carregar a calculadora. Fale com a gerência.';return}
     const html=await data.text();calcHtml=html.includes('</body>')?html.replace('</body>',AVISA_USO+'</body>'):html+AVISA_USO;
-    carregarCalc(null);msg.hidden=true;await loadSalvas();
+    msg.hidden=true;await loadSalvas();
+    // Vindo do botão "Calcular rescisão" do cartão de saída (departamento.html?d=repasses&cartao=<id>#rescisao):
+    // abre a rescisão já ligada ao cartão, ou começa uma nova com os dados do cartão.
+    const pedido=new URLSearchParams(location.search).get('cartao');
+    if(pedido&&await ligarCartao(pedido))return;
+    carregarCalc(null);
+  }
+  // ---------- Rescisão ligada ao cartão do quadro Saídas e distratos (supabase/saidas_contrato.sql, saida_id) ----------
+  let cartaoSaida=null,prefill=null;
+  async function ligarCartao(id){
+    const {data:c}=await db.from('saidas_cartoes').select('id,titulo,referencia,locatario,locador,endereco,chaves_em').eq('id',id).maybeSingle();
+    if(!c)return false;cartaoSaida=c;
+    const {data:r}=await db.from('dep_rescisoes').select('id,estado,atualizado_em,atualizado_por').eq('departamento',DEP.slug).eq('saida_id',id).order('atualizado_em',{ascending:false}).limit(1).maybeSingle();
+    if(r){carregarCalc(r);return true}
+    const nt=nomesDoTitulo(c.titulo),campos={};
+    if(c.locatario||nt.locatario)campos.tenant=c.locatario||nt.locatario;
+    if(c.endereco)campos.property=c.endereco;
+    if(c.chaves_em)campos.keys=c.chaves_em;
+    carregarCalc(null);prefill={campos};mostrarAtual();return true;
   }
   function carregarCalc(reg){
     if(!calcHtml)return;pendente=reg;rescAtual=null;alterado=false;
@@ -631,6 +649,7 @@
       rescAtual=reg?reg.id:null;anexosSalvos=reg?.estado?.anexos||[];pastaAtual=reg?.estado?.pasta||null;
       mostrarAtual();renderSalvas();
       if(reg)abrirSalva(reg,fr.contentWindow);
+      else if(prefill){fr.contentWindow.postMessage({tipo:'rescisao:abrir',estado:prefill,arquivos:[],info:`Dados do cartão ${cartaoSaida?.referencia||''} preenchidos (locatário, endereço e entrega das chaves). Confira e complete o cálculo.`},'*');prefill=null}
     }
     if(m?.tipo==='rescisao:salvar')salvarRescisao(m.estado,m.resumo,m.arquivos);
   });
@@ -658,9 +677,12 @@
     }
     estado={...estado,pasta,anexos:anexos.map(({campo,nome,tipo,path})=>({campo,nome,tipo,path}))};
     const reg={locatario:r.locatario.slice(0,200)||null,imovel:r.imovel.slice(0,300)||null,entrega_chaves:r.chaves||null,saldo:Number.isFinite(r.saldo)?r.saldo:null,estado};
-    const q=rescAtual?db.from('dep_rescisoes').update(reg).eq('id',rescAtual):db.from('dep_rescisoes').insert({departamento:DEP.slug,...reg});
+    const nova=!rescAtual;
+    const q=rescAtual?db.from('dep_rescisoes').update(reg).eq('id',rescAtual):db.from('dep_rescisoes').insert({departamento:DEP.slug,...reg,saida_id:cartaoSaida?.id||null});
     const {data,error}=await q.select('id,atualizado_em').single();
     if(error){if(novos.length)await st.remove(novos.map(x=>x.path));responder(false,'',error.message);return}
+    // Primeira gravação de uma rescisão ligada a um cartão: fica no histórico do cartão.
+    if(nova&&cartaoSaida){const {data:{session}}=await db.auth.getSession();await db.from('saidas_historico').insert({cartao_id:cartaoSaida.id,tipo:'editado',texto:'salvou o cálculo da rescisão no Contas a Pagar',autor:session?.user?.email})}
     // Anexos tirados da rescisão saem do bucket.
     const fora=anexosSalvos.filter(a=>!anexos.some(b=>b.path===a.path)).map(a=>a.path);
     if(fora.length)await st.remove(fora);
@@ -684,16 +706,19 @@
       <td class="row-actions"><button class="link" data-abrir="${r.id}">Abrir</button><button class="link danger" data-del-resc="${r.id}">Excluir</button></td></tr>`).join('')}</tbody>`;
   }
   function mostrarAtual(){
-    const r=rescisoes.find(x=>x.id===rescAtual),el=$('#rescisaoAtual');el.hidden=!r;
-    if(r)el.innerHTML=`Aberta: <strong>${safe(r.locatario||r.imovel)}</strong>${r.locatario&&r.imovel?` · ${safe(r.imovel)}`:''}. "Salvar rescisão" atualiza esta mesma rescisão. Para começar outra, clique em "+ Nova rescisão".`;
+    const r=rescisoes.find(x=>x.id===rescAtual),el=$('#rescisaoAtual');el.hidden=!r&&!cartaoSaida;
+    const lig=cartaoSaida?` Ligada ao cartão <strong>${safe(cartaoSaida.titulo)}</strong> do quadro Saídas e distratos · <a href="saidas.html?c=${cartaoSaida.id}">Abrir cartão ↗</a>`:'';
+    if(r)el.innerHTML=`Aberta: <strong>${safe(r.locatario||r.imovel)}</strong>${r.locatario&&r.imovel?` · ${safe(r.imovel)}`:''}. "Salvar rescisão" atualiza esta mesma rescisão. Para começar outra, clique em "+ Nova rescisão".`+lig;
+    else if(cartaoSaida)el.innerHTML='Nova rescisão.'+lig+' Ao salvar, ela fica ligada ao cartão.';
   }
   $('#rBusca').addEventListener('input',renderSalvas);
   $('#salvasTable').onclick=async e=>{
     const d=e.target.dataset,r=rescisoes.find(x=>x.id===(d.abrir||d.delResc));if(!r)return;
     if(d.abrir){
       if(alterado&&!confirm('O cálculo que está na tela não foi salvo. Abrir outra rescisão mesmo assim?'))return;
-      const {data,error}=await db.from('dep_rescisoes').select('id,estado,atualizado_em,atualizado_por').eq('id',r.id).single();
+      const {data,error}=await db.from('dep_rescisoes').select('id,estado,atualizado_em,atualizado_por,saida_id').eq('id',r.id).single();
       if(error){alert('Não foi possível abrir: '+error.message);return}
+      prefill=null;cartaoSaida=data.saida_id?(await db.from('saidas_cartoes').select('id,titulo,referencia,locatario,locador,endereco,chaves_em').eq('id',data.saida_id).maybeSingle()).data:null;
       carregarCalc(data);$('#salvasWrap').open=false;frame().scrollIntoView({behavior:'smooth',block:'start'});
     }
     if(d.delResc&&confirm(`Excluir a rescisão de "${r.locatario||r.imovel}"? Não dá para desfazer.`)){
@@ -704,7 +729,7 @@
       if(rescAtual===r.id){rescAtual=null;anexosSalvos=[];pastaAtual=null}toast('Rescisão excluída');await loadSalvas();
     }
   };
-  $('#rescisaoNova').onclick=()=>{if(alterado&&!confirm('O cálculo que está na tela não foi salvo. Começar uma nova rescisão mesmo assim?'))return;carregarCalc(null)};
+  $('#rescisaoNova').onclick=()=>{if(alterado&&!confirm('O cálculo que está na tela não foi salvo. Começar uma nova rescisão mesmo assim?'))return;cartaoSaida=null;prefill=null;carregarCalc(null)};
   $('#rescisaoCheia').onclick=()=>{const fr=frame();if(!fr.hidden)fr.requestFullscreen?.()};
 
   // ---------- Gerar documentos (só Gestão Financeira / RH) ----------

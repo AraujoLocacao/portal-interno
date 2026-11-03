@@ -74,6 +74,8 @@
     .barra{height:6px;border-radius:4px;background:#e4e9ec;overflow:hidden}.barra i{display:block;height:100%;background:var(--green)}
     .cl-item{display:flex;gap:8px;align-items:flex-start;font-size:.88rem}.cl-item input{margin-top:4px}.cl-item.feito span{text-decoration:line-through;color:var(--muted)}
     .cl-item span{flex:1;overflow-wrap:anywhere}.cl-item .link{visibility:hidden}.cl-item:hover .link{visibility:visible}
+    .plan-box{border:1px solid #cfe3da;background:#f2f8f5;border-radius:10px;padding:10px 12px;font-size:.86rem;overflow-wrap:anywhere}
+    .plan-box dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:6px 0}.plan-box dt{color:var(--muted)}.plan-box dd{margin:0;font-weight:700}
     .anexos{display:grid;gap:4px}.anexos a{font-size:.85rem;color:var(--blue);font-weight:650;overflow-wrap:anywhere;text-decoration:none}.anexos a:hover{text-decoration:underline}
     .etq-picker{border:1px solid var(--line);border-radius:10px;padding:8px;display:grid;gap:4px;max-height:280px;overflow-y:auto}
     .etq-picker label{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.82rem}
@@ -142,6 +144,10 @@
           <div id="cDescForm" hidden><textarea class="edit" id="cDescTxt" maxlength="30000"></textarea>
             <div class="row" style="margin-top:8px"><button class="primary" id="cDescSalvar">Salvar</button><button class="secondary" id="cDescCancelar">Cancelar</button></div></div>
         </div>
+        <div id="cContratoBox" hidden>
+          <span class="lbl">Contrato (quadro de contratos)</span>
+          <div id="cContrato" style="margin-top:6px"></div>
+        </div>
         <div>
           <div class="row" style="justify-content:space-between"><span class="lbl">Checklists</span><button class="link" id="cClNovo">+ Checklist</button></div>
           <div id="cChecklists" style="display:grid;gap:10px;margin-top:6px"></div>
@@ -180,7 +186,8 @@
         </div>
         <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
           <a class="link" id="cTrello" target="_blank" rel="noopener noreferrer" hidden>Abrir no Trello ↗</a>
-          <a class="link" id="cCalc" href="departamento.html?d=repasses" hidden>Calculadora de rescisão ↗</a>
+          <a class="link" id="cCalc" href="departamento.html?d=repasses" hidden>Calcular rescisão ↗</a>
+          <span class="msg" id="cResc" hidden></span>
           <span class="msg" id="cCriado"></span>
           <button class="link" id="cArquivar">Arquivar cartão</button>
           <button class="link danger" id="cExcluir">Excluir cartão</button>
@@ -238,7 +245,8 @@
     purple:['#9f8fef','#352c63'],purple_dark:['#6e5dc6','#fff'],purple_light:['#dfd8fd','#352c63'],blue:['#579dff','#09326c'],blue_dark:['#0c66e4','#fff'],blue_light:['#cce0ff','#09326c'],
     sky:['#6cc3e0','#164555'],sky_dark:['#227d9b','#fff'],sky_light:['#c6edfb','#164555'],lime:['#94c748','#37471f'],lime_dark:['#5b7f24','#fff'],lime_light:['#d3f1a7','#37471f'],
     pink:['#e774bb','#50253f'],pink_dark:['#ae4787','#fff'],pink_light:['#fdd0ec','#50253f'],black:['#8590a2','#fff'],black_dark:['#626f86','#fff'],black_light:['#dcdfe4','#172b4d'],gray:['#dcdfe4','#172b4d']};
-  let colunas=[],etiquetas=[],cartoes=[],comentarios={},booted=false,meuEmail='',mostrar={},aberto=null,hist=[],avulsos=[];
+  let colunas=[],etiquetas=[],cartoes=[],comentarios={},booted=false,meuEmail='',mostrar={},aberto=null,hist=[],avulsos=[],podeContas=false;
+  const brl=v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
   // Confirmação desenhada na própria página: alguns navegadores (como o do painel do app) bloqueiam a janela confirm() do sistema.
@@ -285,6 +293,31 @@
     $('#cSeguro').textContent='Seguro incêndio: '+(data.situacao==='pendente'?`pedido de cancelamento com o financeiro desde ${dataBr(data.criado_em)}`:data.situacao==='enviado'?`cancelamento pedido à corretora em ${dataBr(data.resolvido_em)} por ${nome(data.resolvido_por)}`:`não se aplica (marcado por ${nome(data.resolvido_por)})`);
     $('#cSeguro').hidden=false;
   }
+  // Rescisão no Contas a Pagar ligada ao cartão (dep_rescisoes.saida_id): o botão abre a calculadora já com os dados do
+  // cartão ou a rescisão que já foi salva para ele. Só para quem entra no Contas a Pagar.
+  async function carregarRescisao(c){
+    $('#cCalc').href=`departamento.html?d=repasses&cartao=${c.id}#rescisao`;$('#cResc').hidden=true;$('#cCalc').textContent='Calcular rescisão ↗';
+    if(!podeContas)return;
+    const {data}=await db.from('dep_rescisoes').select('atualizado_em,atualizado_por,saldo').eq('departamento','repasses').eq('saida_id',c.id).order('atualizado_em',{ascending:false}).limit(1).maybeSingle();
+    if(!data||aberto!==c)return;
+    $('#cCalc').textContent='Abrir a rescisão salva ↗';
+    $('#cResc').textContent=`Rescisão salva em ${dataBr(data.atualizado_em)}${data.atualizado_por?' por '+nome(data.atualizado_por):''}${data.saldo!=null?` · saldo ${brl(Math.abs(data.saldo))}${data.saldo<0?' a devolver':''}`:''}`;$('#cResc').hidden=false;
+  }
+  // Contrato do imóvel no Quadro de contratos, pela mesma referência (supabase/saidas_contrato.sql). Consulta ao vivo:
+  // os dados são do início da locação e podem ter mudado com reajustes e aditivos.
+  async function carregarContrato(c){
+    $('#cContratoBox').hidden=true;if(!c.referencia)return;
+    const {data,error}=await db.rpc('saidas_contratos',{p_cartao:c.id});
+    if(error||!data?.length||aberto!==c)return;
+    const item=(q,principal)=>`<div class="plan-box" style="margin-top:${principal?0:8}px"><strong>${safe(q.titulo)}</strong>${q.mesmo_locatario?'':' <small class="muted">(outro locatário?)</small>'}
+      <dl>${q.data_locacao?`<dt>Fechado em</dt><dd>${dataBr(q.data_locacao+'T12:00')}</dd>`:''}${q.aluguel?`<dt>Aluguel inicial</dt><dd>${(+q.aluguel).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</dd>`:''}${q.garantia?`<dt>Garantia</dt><dd>${safe(q.garantia)}</dd>`:''}${q.corretora?`<dt>Corretora</dt><dd>${safe(q.corretora)}</dd>`:''}<dt>Etapa</dt><dd>${safe(q.coluna)}</dd></dl>
+      ${q.descricao?`<details style="margin-top:6px"><summary class="link" style="padding-left:0">Ver a descrição do contrato</summary><div class="desc" style="margin-top:6px">${md(q.descricao)}</div></details>`:''}
+      <a class="link" style="padding-left:0" href="quadro.html?c=${q.id}" target="_blank" rel="noopener">Abrir no quadro de contratos ↗</a></div>`;
+    $('#cContrato').innerHTML=item(data[0],true)
+      +(data.length>1?`<details style="margin-top:6px"><summary class="msg" style="cursor:pointer">Outros ${data.length-1} contrato(s) desta referência</summary>${data.slice(1).map(q=>item(q,false)).join('')}</details>`:'')
+      +'<p class="msg" style="margin-top:6px">Dados do início do contrato. Valores e condições podem ter mudado com reajustes e aditivos: confira antes de usar.</p>';
+    $('#cContratoBox').hidden=false;
+  }
   const itensDe=c=>(c.checklists||[]).flatMap(l=>l.itens||[]);
 
   // ---------- Acesso ----------
@@ -296,7 +329,7 @@
     const [q,p,r]=await Promise.all([db.rpc('pode_saidas'),db.rpc('pode_departamento',{p_departamento:'pos-locacao'}),db.rpc('pode_departamento',{p_departamento:'repasses'})]);
     if(q.error||q.data!==true){show('denied');return}
     $('#deptLinks').innerHTML=(p.data?' · <a href="departamento.html?d=pos-locacao">Pós-locação</a>':'')+(r.data?' · <a href="departamento.html?d=repasses">Contas a Pagar</a>':'');
-    $('#cCalc').hidden=!r.data;
+    $('#cCalc').hidden=!r.data;podeContas=r.data===true;
     show('app');
     if(!booted){booted=true;await carregar()}
   }
@@ -433,7 +466,7 @@
     $('#cColuna').disabled=c.arquivado;
     $('#cTrello').hidden=!c.trello_url;if(c.trello_url)$('#cTrello').href=c.trello_url;
     $('#cCriado').textContent=`Criado em ${dataBr(c.criado_em)}${c.criado_por?' por '+nome(c.criado_por):''}`;
-    pintarCartao();if(!cd.open)cd.showModal();carregarSeguro(c);
+    pintarCartao();if(!cd.open)cd.showModal();carregarSeguro(c);carregarContrato(c);carregarRescisao(c);
     $('#cHist').innerHTML='<p class="msg">Carregando histórico…</p>';
     const {data,error}=await db.from('saidas_historico').select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').eq('cartao_id',id).order('criado_em',{ascending:false});
     if(aberto!==c)return;
