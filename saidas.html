@@ -91,7 +91,25 @@
     .arq-lista{display:grid;gap:6px;max-height:60vh;overflow-y:auto}
     .arq-item{display:grid;gap:2px;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px}.arq-item:hover{border-color:#9ec5f4}
     .arq-item strong{font-size:.88rem;font-weight:650;overflow-wrap:anywhere}.arq-item small{color:var(--muted);font-size:.78rem}
-    @media(max-width:760px){.cgrid{grid-template-columns:1fr}.kcol{width:260px}.tools .busca{width:100%}}
+    /* Agenda de vistorias e entregas de chaves */
+    .vistas{display:inline-flex;gap:3px;background:#e4e9ec;border-radius:10px;padding:3px;margin-top:8px}
+    .vistas button{border:0;background:transparent;padding:5px 14px;border-radius:8px;font-weight:700;color:var(--muted);font-size:.88rem}
+    .vistas button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(20,36,49,.15)}
+    .agenda{padding:6px clamp(16px,3vw,32px) 28px}
+    .ag-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .ag-head strong{font-size:1.05rem}.ag-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .ag-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-bottom:10px}.ag-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+    .ag-sem{display:grid;gap:8px}.ag-mes{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+    .ag-dia{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;min-height:170px;min-width:0}
+    .ag-mes .ag-dia{min-height:104px;padding:6px}.ag-dia.fora{background:#f7f8f6;opacity:.6}.ag-dia.hoje{border-color:#6da7ec;box-shadow:inset 0 2px 0 #6da7ec}
+    .ag-dia>p{margin:0 0 6px;font-size:.78rem;font-weight:750;color:var(--muted)}.ag-dia.hoje>p{color:#1c5fb0}
+    .ag-item{display:block;width:100%;text-align:left;border:0;border-radius:8px;padding:5px 7px;margin-bottom:5px;font-size:.8rem;line-height:1.3;cursor:pointer;overflow-wrap:anywhere}
+    .ag-item b{font-weight:800}.ag-item small{display:block;opacity:.85}
+    .ag-item.v{background:#e6f1fb;color:#0c447c}.ag-item.c{background:#e3f1ec;color:#1d604d}.ag-item.arq{opacity:.55}
+    .ag-item:hover{outline:2px solid #9ec5f4}.ag-mes .ag-item{font-size:.72rem;padding:3px 5px}
+    .ag-vazio{font-size:.78rem;color:#9aa5ad;margin:0}
+    .ag-alerta{margin-top:12px;background:#fff6e5;border:1px solid #f0d9ad;color:#7a5410;border-radius:10px;padding:8px 12px;font-size:.86rem}
+    @media(max-width:760px){.ag-sem{grid-template-columns:1fr!important}.ag-dia{min-height:0}.ag-mes{gap:3px}.ag-mes .ag-dia{min-height:70px;padding:3px}.ag-mes .ag-item small{display:none}}    @media(max-width:760px){.cgrid{grid-template-columns:1fr}.kcol{width:260px}.tools .busca{width:100%}}
   </style>
 </head>
 <body>
@@ -119,7 +137,7 @@
 
 <main id="app" hidden>
   <div class="tools">
-    <div class="grow"><h1>Saídas e distratos</h1><p class="sub" id="resumo">Carregando…</p></div>
+    <div class="grow"><h1>Saídas e distratos</h1><p class="sub" id="resumo">Carregando…</p><div class="vistas" role="tablist" aria-label="Ver como"><button type="button" id="vQuadro" class="on" role="tab">Quadro</button><button type="button" id="vAgenda" role="tab">Agenda</button></div></div>
     <input class="busca" id="fBusca" type="search" placeholder="Buscar REF, nome ou texto" aria-label="Buscar cartão">
     <select id="fEtiqueta" aria-label="Filtrar por etiqueta"></select>
     <select id="fMembro" aria-label="Filtrar por pessoa"></select>
@@ -129,6 +147,12 @@
     <button class="primary" id="btnNovo">+ Novo cartão</button>
   </div>
   <div class="board" id="board"></div>
+  <section class="agenda" id="agenda" hidden>
+    <div class="ag-head"><strong id="agTitulo"></strong><div class="ag-nav"><button class="secondary" id="agAnt" aria-label="Anterior">‹</button><button class="secondary" id="agHoje">Hoje</button><button class="secondary" id="agProx" aria-label="Próximo">›</button><div class="vistas" style="margin:0"><button type="button" id="agSemana" class="on">Semana</button><button type="button" id="agMes">Mês</button></div></div></div>
+    <div class="ag-leg"><span><i style="background:#cfe2f7"></i>Vistoria de saída</span><span><i style="background:#cde9df"></i>Entrega das chaves</span><span>Clique num item para abrir o cartão</span></div>
+    <div id="agGrade"></div>
+    <div class="ag-alerta" id="agAlerta" hidden></div>
+  </section>
 </main>
 
 <dialog id="cardDialog" class="wide">
@@ -331,7 +355,7 @@
     $('#deptLinks').innerHTML=(p.data?' · <a href="departamento.html?d=pos-locacao">Pós-locação</a>':'')+(r.data?' · <a href="departamento.html?d=repasses">Contas a Pagar</a>':'');
     $('#cCalc').hidden=!r.data;podeContas=r.data===true;
     show('app');
-    if(!booted){booted=true;await carregar()}
+    if(!booted){booted=true;await carregar();let v=null;try{v=localStorage.getItem('saidas.vista')}catch{}if(v==='agenda')mudarVista('agenda')}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   $('#loginForm').onsubmit=async e=>{
@@ -643,6 +667,66 @@
   };
   $('#arqLista').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)abrirCartao(b.dataset.id)});
 
+  // ---------- Agenda (vistorias de saída e entregas de chaves pelas datas do cartão) ----------
+  // Semana (seg a sex; sábado e domingo só aparecem se tiverem algo) ou mês. Busca no banco o período visível, inclusive
+  // cartões arquivados, para dar para olhar semanas passadas.
+  let vista='quadro',agModo='semana',agRef=new Date();
+  try{if(localStorage.getItem('saidas.agModo')==='mes')agModo='mes'}catch{}
+  const DIAS=['seg','ter','qua','qui','sex','sáb','dom'],MESESN=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const segunda=d=>{const x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+  const somaDias=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+  const cidadeDe=c=>{const n=(c.etiquetas||[]).map(etq).filter(Boolean).map(e=>e.nome);return n.includes('NAVEGANTES')?'Navegantes':n.includes('ITAJAÍ')?'Itajaí':''};
+  function mudarVista(v){
+    vista=v;$('#vQuadro').classList.toggle('on',v==='quadro');$('#vAgenda').classList.toggle('on',v==='agenda');
+    $('#board').hidden=v!=='quadro';$('#agenda').hidden=v!=='agenda';
+    for(const id of ['#fBusca','#fEtiqueta','#fMembro','#fPrazo','#btnArquivados','#btnColunas'])$(id).hidden=v!=='quadro';
+    try{localStorage.setItem('saidas.vista',v)}catch{}
+    if(v==='agenda')pintarAgenda();
+  }
+  $('#vQuadro').onclick=()=>mudarVista('quadro');$('#vAgenda').onclick=()=>mudarVista('agenda');
+  $('#agSemana').onclick=()=>{agModo='semana';try{localStorage.setItem('saidas.agModo','semana')}catch{};pintarAgenda()};
+  $('#agMes').onclick=()=>{agModo='mes';try{localStorage.setItem('saidas.agModo','mes')}catch{};pintarAgenda()};
+  $('#agHoje').onclick=()=>{agRef=new Date();pintarAgenda()};
+  $('#agAnt').onclick=()=>{agRef=agModo==='semana'?somaDias(agRef,-7):new Date(agRef.getFullYear(),agRef.getMonth()-1,1);pintarAgenda()};
+  $('#agProx').onclick=()=>{agRef=agModo==='semana'?somaDias(agRef,7):new Date(agRef.getFullYear(),agRef.getMonth()+1,1);pintarAgenda()};
+  async function pintarAgenda(){
+    $('#agSemana').classList.toggle('on',agModo==='semana');$('#agMes').classList.toggle('on',agModo==='mes');
+    let ini,fim;
+    if(agModo==='semana'){ini=segunda(agRef);fim=somaDias(ini,6)}
+    else{const p=new Date(agRef.getFullYear(),agRef.getMonth(),1,12),u=new Date(agRef.getFullYear(),agRef.getMonth()+1,0,12);ini=segunda(p);fim=somaDias(segunda(u),6)}
+    const a=isoDia(ini),b=isoDia(fim),pedido=`${a}|${b}|${agModo}`;$('#agenda').dataset.pedido=pedido;
+    $('#agGrade').innerHTML='<p class="msg">Carregando…</p>';
+    const {data,error}=await db.from('saidas_cartoes').select('id,titulo,referencia,etiquetas,vistoria_data,vistoria_hora,chaves_em,arquivado')
+      .or(`and(vistoria_data.gte.${a},vistoria_data.lte.${b}),and(chaves_em.gte.${a},chaves_em.lte.${b})`).limit(1000);
+    if($('#agenda').dataset.pedido!==pedido)return;
+    if(error){$('#agGrade').innerHTML=`<p class="msg error">Não foi possível carregar a agenda: ${safe(error.message)}</p>`;return}
+    const porDia={};const add=(d,it)=>(porDia[d]=porDia[d]||[]).push(it);
+    for(const c of data){
+      if(c.vistoria_data&&c.vistoria_data>=a&&c.vistoria_data<=b)add(c.vistoria_data,{t:'v',c,h:c.vistoria_hora?c.vistoria_hora.slice(0,5):''});
+      if(c.chaves_em&&c.chaves_em>=a&&c.chaves_em<=b)add(c.chaves_em,{t:'c',c,h:''});
+    }
+    for(const d in porDia)porDia[d].sort((x,y)=>(x.t>y.t?-1:x.t<y.t?1:0)||(x.h||'99').localeCompare(y.h||'99'));
+    const hoje=isoDia(new Date()),mesRef=agRef.getMonth();
+    const item=it=>{const cid=cidadeDe(it.c),sub=(it.t==='v'?'vistoria':'chaves')+(cid?' · '+cid:'')+(it.c.arquivado?' · arquivado':'');
+      return `<button type="button" class="ag-item ${it.t}${it.c.arquivado?' arq':''}" data-id="${it.c.id}" title="${safe(it.c.titulo)}"><b>${it.h?it.h+' ':''}${safe(it.c.referencia||it.c.titulo.slice(0,24))}</b><small>${sub}</small></button>`};
+    const dia=(d,extra='')=>{const k=isoDia(d),its=porDia[k]||[];
+      return `<div class="ag-dia${k===hoje?' hoje':''}${extra}"><p>${agModo==='mes'?d.getDate():DIAS[(d.getDay()+6)%7]+' '+String(d.getDate()).padStart(2,'0')}${k===hoje?' · hoje':''}</p>${its.map(item).join('')||(agModo==='semana'?'<p class="ag-vazio">Nada marcado</p>':'')}</div>`};
+    if(agModo==='semana'){
+      const dias=[0,1,2,3,4,5,6].map(i=>somaDias(ini,i)).filter((d,i)=>i<5||(porDia[isoDia(d)]||[]).length);
+      $('#agGrade').innerHTML=`<div class="ag-sem" style="grid-template-columns:repeat(${dias.length},minmax(0,1fr))">${dias.map(d=>dia(d)).join('')}</div>`;
+      const f5=somaDias(ini,4),mesmo=ini.getMonth()===f5.getMonth();
+      $('#agTitulo').textContent=`${ini.getDate()}${mesmo?'':' de '+MESESN[ini.getMonth()]} a ${f5.getDate()} de ${MESESN[f5.getMonth()]}${f5.getFullYear()!==new Date().getFullYear()?' de '+f5.getFullYear():''}`;
+    }else{
+      const dias=[];for(let d=new Date(ini);d<=fim;d=somaDias(d,1))dias.push(new Date(d));
+      $('#agGrade').innerHTML=`<div class="ag-mes">${DIAS.map(x=>`<p class="ag-vazio" style="font-weight:750;color:var(--muted);text-align:center">${x}</p>`).join('')}${dias.map(d=>dia(d,d.getMonth()!==mesRef?' fora':'')).join('')}</div>`;
+      $('#agTitulo').textContent=`${MESESN[mesRef].charAt(0).toUpperCase()+MESESN[mesRef].slice(1)} de ${agRef.getFullYear()}`;
+    }
+    const semData=cartoes.filter(c=>!c.vistoria_data&&/VISTORIAS EM AGENDAMENTO/i.test(colunas.find(x=>x.id===c.coluna_id)?.nome||'')).length;
+    $('#agAlerta').hidden=!semData;
+    $('#agAlerta').innerHTML=`⚠ ${semData} cartão(ões) em "Vistorias em agendamento" ainda sem data de vistoria. <button class="link" id="agVerSem">Ver quais</button>`;
+  }
+  $('#agGrade').addEventListener('click',e=>{const b=e.target.closest('.ag-item');if(b)abrirCartao(b.dataset.id)});
+  $('#agAlerta').addEventListener('click',e=>{if(e.target.id!=='agVerSem')return;mudarVista('quadro');$('#fPrazo').value='vistsem';$('#fPrazo').dispatchEvent(new Event('input'))});
   // ---------- Novo cartão ----------
   function abrirNovo(col){
     const ent=col||ativas()[0]?.id;
@@ -691,7 +775,7 @@
   };
 
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
-  cd.addEventListener('close',()=>{aberto=null});
+  cd.addEventListener('close',()=>{aberto=null;if(vista==='agenda')pintarAgenda()});
   db.auth.onAuthStateChange(()=>setTimeout(()=>refreshSession().catch(console.error),0));
 </script>
 </body>
