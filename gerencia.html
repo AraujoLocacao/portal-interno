@@ -454,9 +454,12 @@
     </div>
     <div class="tiles" id="psTiles"></div>
     <div class="charts" style="margin-top:6px">
-      <div class="card chart-card"><div class="chart-head"><div><h2>Últimos 6 meses</h2><p>Avisos de saída, chaves entregues e distratos concluídos.</p></div><div class="legend"><span><i style="background:#7FA3D0"></i>Avisos</span><span><i style="background:#24705a"></i>Chaves</span><span><i style="background:#b97822"></i>Concluídos</span></div></div><div id="psMeses"></div></div>
+      <div class="card chart-card"><div class="chart-head"><div><h2>Histórico por mês</h2><p>Avisos de saída, chaves entregues e distratos concluídos.</p></div><select id="psHist" aria-label="Período do histórico" style="border:1px solid #cbd5da;border-radius:8px;padding:5px 8px;background:#fff"><option value="12">12 meses</option><option value="24">24 meses</option><option value="36">36 meses</option><option value="0">Desde 2020</option></select></div><div class="chart-box" id="box-pos" style="height:320px;position:relative"><canvas id="ch-pos" role="img" aria-label="Histórico mensal da Pós-locação"></canvas></div></div>
       <div class="card chart-card"><div class="chart-head"><div><h2>Cartões por etapa, agora</h2><p>Onde estão os cartões do quadro hoje.</p></div></div><div id="psEtapas"></div></div>
     </div>
+    <div class="card table-card"><div class="list-head"><h2>Por ano</h2><span class="muted">desde 2020, quando o quadro começou no Trello</span></div>
+      <div class="table-wrap"><table id="psAnos"></table></div>
+      <p class="msg" style="margin-top:10px">Os números antigos dependem de como o Trello era usado na época: vistoria e entrega das chaves só contam quando a data estava escrita no cartão (o campo entrou no modelo em 2021), e a coluna de distratos concluídos quase não foi usada entre 2021 e 2023.</p></div>
   </section>
   <section id="tab-cap-relatorio" data-tab hidden>
     <div class="top">
@@ -1743,7 +1746,7 @@
   async function abrirPos(){
     if(!$('#psMes').value)$('#psMes').value=ymHoje();
     $('#psTiles').innerHTML='<p class="msg">Carregando…</p>';
-    const {data,error}=await db.rpc('saidas_painel_gerencia',{p_mes:$('#psMes').value+'-01'});
+    const {data,error}=await db.rpc('saidas_painel_gerencia',{p_mes:$('#psMes').value+'-01',p_meses:+$('#psHist').value});
     if(error||!data){$('#psTiles').innerHTML=`<p class="msg">Não foi possível carregar: ${error?error.message:'sem permissão'}</p>`;return}
     const t=(rot,v,sub)=>`<div class="card tile"><span>${rot}</span><strong>${v??'–'}</strong>${sub?`<small>${sub}</small>`:''}</div>`;
     const atual=$('#psMes').value===ymHoje();
@@ -1752,14 +1755,18 @@
       +t('Chaves entregues',data.chaves,'pela data no cartão')+t('Distratos concluídos',data.concluidos,'pagos e assinados')
       +t('Do aviso às chaves',data.tempo_medio!=null?`${data.tempo_medio} dias`:'–','em média, nas chaves do mês')
       +t('Em cobrança',data.em_cobranca,'hoje, inclui acionamentos e acordos')+t('Na Justiça',data.na_justica,'cobrança judicial, hoje');
-    const ms=data.meses||[],mx=Math.max(1,...ms.flatMap(m=>[m.avisos,m.chaves,m.concluidos]));
-    const nomeM=m=>{const [y,mm]=m.split('-');return MESES[+mm-1].slice(0,3)+'/'+y.slice(2)};
-    const barra=(v,cor)=>`<div style="display:flex;align-items:center;gap:6px"><div style="height:10px;border-radius:4px;background:${cor};width:${Math.round(v*100/mx)}%;min-width:${v?3:0}px"></div><small class="muted">${v}</small></div>`;
-    $('#psMeses').innerHTML=ms.map(m=>`<div style="display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)"><strong style="font-size:.85rem">${nomeM(m.mes)}</strong><div style="display:grid;gap:3px">${barra(m.avisos,'#7FA3D0')}${barra(m.chaves,'#24705a')}${barra(m.concluidos,'#b97822')}</div></div>`).join('');
-    const et=(data.etapas||[]),mxe=Math.max(1,...et.map(e=>e.n));
+    const ms=data.meses||[],nomeM=m=>{const [y,mm]=m.split('-');return MESES[+mm-1].slice(0,3).toLowerCase()+'/'+y.slice(2)},muitos=ms.length>24;
+    draw('pos',{type:muitos?'line':'bar',data:{labels:ms.map(m=>nomeM(m.mes)),datasets:[
+      {label:'Avisos de saída',data:ms.map(m=>m.avisos),backgroundColor:'#7FA3D0',borderColor:'#7FA3D0',tension:.25,pointRadius:muitos?0:3},
+      {label:'Chaves entregues',data:ms.map(m=>m.chaves),backgroundColor:'#24705a',borderColor:'#24705a',tension:.25,pointRadius:muitos?0:3},
+      {label:'Distratos concluídos',data:ms.map(m=>m.concluidos),backgroundColor:'#b97822',borderColor:'#b97822',tension:.25,pointRadius:muitos?0:3}]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:12}}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{ticks:{autoSkip:true,maxRotation:0}}}}});
+    const an=(data.anos||[]).slice().reverse();
+    $('#psAnos').innerHTML='<thead><tr><th>Ano</th><th class="num">Avisos de saída</th><th class="num">Vistorias</th><th class="num">Chaves entregues</th><th class="num">Distratos concluídos</th><th class="num">Dias do aviso às chaves</th></tr></thead><tbody>'
+      +an.map(a=>`<tr><td><strong>${a.ano}</strong>${a.ano===new Date().getFullYear()?' <small class="muted">até hoje</small>':''}</td><td class="num">${a.avisos}</td><td class="num">${a.vistorias}</td><td class="num">${a.chaves}</td><td class="num">${a.concluidos}</td><td class="num">${a.tempo_medio??'–'}</td></tr>`).join('')+'</tbody>';    const et=(data.etapas||[]),mxe=Math.max(1,...et.map(e=>e.n));
     $('#psEtapas').innerHTML=et.map(e=>`<div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:center;padding:4px 0;border-top:1px solid var(--line);font-size:.82rem"><span>${e.coluna.charAt(0)+e.coluna.slice(1).toLowerCase()}</span><div style="display:flex;align-items:center;gap:6px"><div style="height:9px;border-radius:4px;background:#7FA3D0;width:${Math.round(e.n*100/mxe)}%;min-width:${e.n?3:0}px"></div><small class="muted">${e.n}</small></div></div>`).join('');
   }
-  $('#psMes').addEventListener('change',abrirPos);
+  $('#psMes').addEventListener('change',abrirPos);$('#psHist').addEventListener('change',abrirPos);
   async function abrirCaptacao(tab){
     if(!$('#crMes').value)$('#crMes').value=ymHoje();
     try{
