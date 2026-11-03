@@ -574,6 +574,7 @@
   const SEG_PARA='atendimento@atlanticoseguros.com.br',SEG_CC='financeiro.locacao@araujolocacao.com.br,financeiro.apagar@araujolocacao.com.br';
   let seguros=[];
   function nomesDoTitulo(t){
+    const x=String(t||'').match(/^\s*\S+\s+-\s+(.+?)\s+X\s+(.+)$/);if(x)return {locador:x[1].trim(),locatario:x[2].trim()};
     const sem=String(t||'').replace(/^\s*[A-Za-z]{2}\d{3,5}(\/\d+)?\s*[-–:]*\s*/,'');
     const p=sem.split(/\s*[-–]*\s*\b(?:PROPRIET[AÁ]RI[OA]|PROPRI|PROP)\b\.?\s*:?\s*/i);
     return {locatario:(p[0]||'').replace(/[-–\s]+$/,'').trim(),locador:(p[1]||'').replace(/^[-–\s]+/,'').trim()};
