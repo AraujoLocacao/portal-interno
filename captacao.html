@@ -61,7 +61,8 @@
     .tabs .badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--red);color:#fff;font-size:.72rem;line-height:1.6;text-align:center}
     .avisos{display:grid;gap:12px;max-width:900px}
     .avs{padding:14px 18px;display:grid;gap:8px}.avs.pego{box-shadow:none;background:#f7f9fa}
-    .aviso-top{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap}.aviso-top strong{font-size:.98rem;overflow-wrap:anywhere}
+    .aviso-top{display:flex;justify-content:space-between;gap:12px;align-items:start}.aviso-top strong{font-size:.98rem;overflow-wrap:anywhere;flex:1;min-width:0}.aviso-top>:last-child{flex:none;text-align:right}
+    @media(max-width:600px){.aviso-top{flex-wrap:wrap}.aviso-top>:last-child{text-align:left}}
     .aviso-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);align-items:center}
     .aviso-meta .cid{background:#e6f1f7;color:#164555;border-radius:5px;padding:0 7px;font-weight:800}
     .avs details{font-size:.86rem}.avs summary{cursor:pointer;color:var(--blue);font-weight:700}.avs .desc-aviso{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f8f9;border-radius:10px;padding:10px 12px;margin-top:6px}
