@@ -428,22 +428,23 @@
     // visitas = link de confirmação de visita e pesquisa depois da visita (30/10/2026, ver supabase/visitas.sql e visita.html).
     {slug:'corretoras-locacao',nome:'Corretoras de locação',area:'Comercial',papel:'Campo',ref:'Imóvel (REF) / cliente',limpo:true,extras:['visitas','parceria'],
       atividades:['Responsável pela locação dos imóveis']},
+    // links = atalhos para outras páginas, no fim das abas (saidas.html: quadro Saídas e distratos, 03/11/2026).
     // extras = abas próprias da área. "adm" (administradoras de condomínio) é a mesma lista em Boletos, Renovação e Contas a Pagar.
     {slug:'boletos',limpo:true,nome:'Locatário · Boletos',area:'Financeiro',papel:'Boletos',ref:'Contrato / locatário',extras:['adm','alpop'],
       atividades:['Atendimento específico','Boletos Alpop','Boletos sem condomínio','Suporte a boletos com condomínio']},
     {slug:'renovacao',limpo:true,nome:'Locatário · Renovação',area:'Financeiro',papel:'Renovação',ref:'Contrato / locatário',extras:['adm'],
       atividades:['Boletos com condomínio','Renovação de contrato','Renovação da garantia','Notificação de não renovação','Reajuste']},
-    {slug:'cobranca',limpo:true,nome:'Cobrança',area:'Financeiro',papel:'Inadimplência',ref:'Contrato / locatário',
+    {slug:'cobranca',limpo:true,links:[['saidas.html','Saídas e distratos ↗']],nome:'Cobrança',area:'Financeiro',papel:'Inadimplência',ref:'Contrato / locatário',
       atividades:['Cobrança','Acionamento de garantia','Notificação de cobrança','Notificação de desocupação por inadimplência','Negativação','Retirada de negativação']},
     // publicado = já está no portal (28/09/2026). Os demais seguem como prévia, só para a gerência.
     // Nome trocado de "Proprietário · Repasses" em 28/09/2026. O slug continua "repasses" (link, acessos e arquivos no banco dependem dele).
-    {slug:'repasses',publicado:true,limpo:true,nome:'Proprietário · Contas a Pagar',area:'Financeiro',papel:'Contas a pagar',ref:'Imóvel (REF) / proprietário',extras:['rescisao','adm'],
+    {slug:'repasses',publicado:true,limpo:true,nome:'Proprietário · Contas a Pagar',area:'Financeiro',papel:'Contas a pagar',ref:'Imóvel (REF) / proprietário',extras:['rescisao','adm'],links:[['saidas.html','Saídas e distratos ↗']],
       atividades:['Repasse','Extrato','Cálculo de rescisão','IR / DIMOB','Nota fiscal','Recibos']},
     // recebe = atividades que só entram quando outra área envia (ainda sem envio: ficam vazias).
     // energia = atividade que a Locação também envia, pelo botão no cartão do quadro de contratos (ver supabase/pos_locacao_energia_envio.sql).
     // A Pós-locação cadastra à mão o que não veio da Locação. Publicada em 02/10/2026.
     // materiais = a aba "POP e documentos" se chama "Materiais" (copiados da pasta "Pós locação Araujo" do Drive, separados por pasta).
-    {slug:'pos-locacao',publicado:true,materiais:true,nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
+    {slug:'pos-locacao',publicado:true,materiais:true,links:[['saidas.html','Saídas e distratos ↗']],nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
       recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
       atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
@@ -487,7 +488,8 @@
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
     const nomes={visitas:'Visitas',rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
     if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
-    $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('');
+    $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('')
+      +(DEP.links||[]).map(([href,t])=>`<a class="tab-link" href="${href}" style="text-decoration:none">${safe(t)}</a>`).join('');
     $('#previewNote').hidden=!!DEP.publicado;
     $('#previewNote').innerHTML=DEP.limpo
       ?`<strong>Prévia.</strong> Painel limpo por enquanto: ${DEP.extras?'as abas da área, ':''}POP e senhas. As demais ferramentas entram depois.`
@@ -948,7 +950,7 @@
     document.querySelectorAll('.tab-link').forEach(a=>{const on=a.dataset.go===tab;a.classList.toggle('active',on);a.setAttribute('aria-current',on?'page':'false')});
   }
   addEventListener('hashchange',()=>showTab());
-  $('#tabs').onclick=e=>{const b=e.target.closest('.tab-link');if(b)showTab(b.dataset.go)};
+  $('#tabs').onclick=e=>{const b=e.target.closest('[data-go]');if(b)showTab(b.dataset.go)};
 
   // ---------- Demandas ----------
   async function loadDemandas(){
