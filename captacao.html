@@ -57,6 +57,14 @@
     .mais{border:0;background:transparent;color:var(--blue);font-weight:700;font-size:.82rem;padding:6px}
     .kcol-foot{padding:0 8px 8px}.kcol-foot button{width:100%;border:0;background:transparent;text-align:left;padding:6px 8px;border-radius:8px;color:var(--muted);font-weight:650;font-size:.85rem}.kcol-foot button:hover{background:#dde3e8;color:var(--ink)}
     .vazio{margin:30px clamp(16px,3vw,32px);padding:24px;max-width:640px}
+    /* Avisos de saída */
+    .tabs .badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--red);color:#fff;font-size:.72rem;line-height:1.6;text-align:center}
+    .avisos{display:grid;gap:12px;max-width:900px}
+    .avs{padding:14px 18px;display:grid;gap:8px}.avs.pego{box-shadow:none;background:#f7f9fa}
+    .aviso-top{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap}.aviso-top strong{font-size:.98rem;overflow-wrap:anywhere}
+    .aviso-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);align-items:center}
+    .aviso-meta .cid{background:#e6f1f7;color:#164555;border-radius:5px;padding:0 7px;font-weight:800}
+    .avs details{font-size:.86rem}.avs summary{cursor:pointer;color:var(--blue);font-weight:700}.avs .desc-aviso{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f8f9;border-radius:10px;padding:10px 12px;margin-top:6px}
     /* Visão geral */
     .wrap{padding:6px clamp(16px,3vw,32px) 30px}
     .tbl-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:14px}
@@ -146,6 +154,7 @@
     <button data-tab="materiais">Materiais</button>
     <button data-tab="acessos">Acessos</button>
     <button data-tab="minhas">Minhas senhas</button>
+    <button data-tab="avisos">Avisos de saída<span class="badge" id="avisosBadge" hidden></span></button>
     <button data-tab="geral" data-gestor hidden>Visão geral</button>
   </nav>
 
@@ -205,6 +214,12 @@
     <div class="tools"><div class="grow"><h1>Minhas senhas</h1><p class="sub">Suas senhas pessoais, criptografadas. <strong>Só você vê</strong> esta lista: nem as outras captadoras, nem a gerência.</p></div>
       <button class="primary" id="newMinha">+ Nova senha</button></div>
     <div class="wrap"><div class="tbl-wrap"><table id="minhasTable"></table></div></div>
+  </section>
+
+  <section id="tab-avisos" hidden>
+    <div class="tools"><div class="grow"><h1>Avisos de saída</h1><p class="sub" id="avisosSub">Imóveis com aviso de saída do inquilino, enviados pela Pós-locação. A primeira captadora que clicar em <strong>Pegar</strong> recebe o cartão no próprio quadro, na primeira coluna, com a etiqueta PÓS.</p></div>
+      <button class="secondary" id="avisosAtualizar">Atualizar</button></div>
+    <div class="wrap"><div class="avisos" id="avisosLista"></div></div>
   </section>
 
   <section id="tab-geral" hidden>
@@ -400,7 +415,7 @@
     if(p.error||p.data!==true){show('denied');return}
     gestor=g.data===true;document.querySelectorAll('[data-gestor]').forEach(el=>el.hidden=!gestor);
     show('app');
-    if(!booted){booted=true;await carregarQuadros()}
+    if(!booted){booted=true;await carregarQuadros();carregarAvisos()}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   $('#loginForm').onsubmit=async e=>{
@@ -420,8 +435,38 @@
   // Abas
   $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)abrirAba(b.dataset.tab)});
   function abrirAba(t){document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
-    for(const s of ['quadro','relatorio','materiais','acessos','minhas','geral'])$('#tab-'+s).hidden=s!==t;
-    if(t==='geral')visaoGeral();if(t==='acessos')carregarAcessos();if(t==='relatorio')abrirRelatorio();if(t==='materiais')carregarDocs();if(t==='minhas')carregarMinhas()}
+    for(const s of ['quadro','relatorio','materiais','acessos','minhas','avisos','geral'])$('#tab-'+s).hidden=s!==t;
+    if(t==='geral')visaoGeral();if(t==='acessos')carregarAcessos();if(t==='relatorio')abrirRelatorio();if(t==='materiais')carregarDocs();if(t==='minhas')carregarMinhas();if(t==='avisos')carregarAvisos()}
+
+  // ---------- Avisos de saída (ver supabase/captacao_avisos.sql) ----------
+  // O cartão que entra em "AVISOS DE SAÍDA" no quadro Saídas e distratos vira aviso aqui. Todas as captadoras veem;
+  // a primeira que clica em "Pegar" recebe o cartão no próprio quadro. A gerência só acompanha.
+  let avisos=[];
+  const meuQuadro=()=>quadros.find(q=>!q.modelo&&q.ativo&&(q.email||'').toLowerCase()===meuEmail.toLowerCase());
+  async function carregarAvisos(){
+    const {data,error}=await db.rpc('captacao_avisos_listar');
+    if(error){$('#avisosLista').innerHTML=`<p class="msg error">Não foi possível carregar os avisos: ${safe(error.message)}</p>`;return}
+    avisos=data;pintarAvisos();
+  }
+  function pintarAvisos(){
+    const abertos=avisos.filter(a=>!a.pego_em),pegos=avisos.filter(a=>a.pego_em),meu=meuQuadro();
+    $('#avisosBadge').hidden=!abertos.length;$('#avisosBadge').textContent=abertos.length;
+    const item=a=>`<article class="card avs${a.pego_em?' pego':''}"><div class="aviso-top"><strong>${safe(a.titulo)}</strong>
+        ${a.pego_em?`<span class="msg">Pego por <strong>${safe(nome(a.pego_por))}</strong> em ${dataBr(a.pego_em)}</span>`:meu?`<button class="primary" data-pegar="${a.id}">Pegar</button>`:'<span class="msg">Aguardando uma captadora pegar</span>'}</div>
+      <div class="aviso-meta">${a.cidade?`<span class="cid">${safe(a.cidade)}</span>`:''}${a.aviso_em?`<span>Aviso de saída: <strong>${safe(a.aviso_em)}</strong></span>`:''}<span>Enviado em ${dataBr(a.criado_em)}</span>${a.pego_em?'':`<span>Etapa na Pós-locação: ${safe(a.coluna)}</span>`}</div>
+      ${a.descricao&&!a.pego_em?`<details><summary>Ver detalhes do cartão</summary><div class="desc-aviso">${md(a.descricao)}</div></details>`:''}</article>`;
+    $('#avisosLista').innerHTML=(abertos.length?abertos.map(item).join(''):'<div class="vazio-doc">Nenhum aviso de saída esperando. Quando a Pós-locação lançar um, ele aparece aqui.</div>')
+      +(pegos.length?`<h2 style="margin-top:14px">Pegos nos últimos 30 dias</h2>${pegos.map(item).join('')}`:'');
+  }
+  $('#avisosAtualizar').onclick=carregarAvisos;
+  $('#avisosLista').addEventListener('click',async e=>{
+    const b=e.target.closest('[data-pegar]');if(!b)return;b.disabled=true;
+    const {error}=await db.rpc('captacao_pegar_aviso',{p_aviso:b.dataset.pegar});
+    if(error){alert(error.message);b.disabled=false;await carregarAvisos();return}
+    toast('O cartão foi para o seu quadro, em '+(colunas[0]?.nome||'prospecção').toLowerCase());
+    await carregarAvisos();if(quadroId===meuQuadro()?.id)carregar();
+  });
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&booted)carregarAvisos()});
 
   // ---------- Dados ----------
   async function tudo(tabela,campos,ordem,filtro){
