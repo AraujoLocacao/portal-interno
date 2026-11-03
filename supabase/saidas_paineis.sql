@@ -5,7 +5,7 @@
 
 alter table public.saidas_colunas add column if not exists painel text;
 update public.saidas_colunas set painel = 'financeiro-rh'
- where nome = 'DISTRATOS COM DEVOLUÇÃO DE CAUÇÃO E/ OU PAGAMENTO - atualizado' and not arquivada;
+ where nome in ('DISTRATOS COM DEVOLUÇÃO DE CAUÇÃO E/ OU PAGAMENTO - atualizado', 'DISTRATOS COM DEVOLUÇÃO DE CAUÇÃO E/OU PAGAMENTO') and not arquivada;
 
 create or replace function public.saidas_painel(p_departamento text)
 returns table (id uuid, titulo text, referencia text, coluna text, movido_em timestamptz, prazo timestamptz, prazo_ok boolean,

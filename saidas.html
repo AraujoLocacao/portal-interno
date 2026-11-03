@@ -121,7 +121,7 @@
     <input class="busca" id="fBusca" type="search" placeholder="Buscar REF, nome ou texto" aria-label="Buscar cartão">
     <select id="fEtiqueta" aria-label="Filtrar por etiqueta"></select>
     <select id="fMembro" aria-label="Filtrar por pessoa"></select>
-    <select id="fPrazo" aria-label="Filtrar por prazo"><option value="">Qualquer prazo</option><option value="atras">Prazo vencido</option><option value="semana">Vence em 7 dias</option><option value="com">Com prazo</option><option value="padrao">Título fora do padrão</option></select>
+    <select id="fPrazo" aria-label="Mais filtros"><option value="">Mais filtros</option><option value="atras">Prazo vencido</option><option value="semana">Vence em 7 dias</option><option value="com">Com prazo</option><option value="vist7">Vistoria nos próximos 7 dias</option><option value="vistsem">Em agendamento sem data de vistoria</option><option value="padrao">Título fora do padrão</option></select>
     <button class="secondary" id="btnArquivados">Arquivados</button>
     <button class="secondary" id="btnColunas">Colunas</button>
     <button class="primary" id="btnNovo">+ Novo cartão</button>
@@ -168,12 +168,15 @@
         <div class="field"><label for="cLocador">Locador</label><input id="cLocador" maxlength="200"></div>
         <div class="field"><label for="cLocatario">Locatário</label><input id="cLocatario" maxlength="200"></div>
         <div class="field"><label for="cEndereco">Endereço do imóvel</label><input id="cEndereco" maxlength="300" placeholder="Rua, número, bairro, cidade"></div>
+        <div class="field"><label for="cVistData">Vistoria de saída</label><div class="row" style="flex-wrap:nowrap;gap:6px"><input type="date" id="cVistData" style="flex:1"><input type="time" id="cVistHora" style="width:105px;flex:none" aria-label="Hora da vistoria"></div></div>
+        <div class="field"><label for="cChaves">Entrega das chaves</label><input type="date" id="cChaves"></div>
         <p class="msg" id="cSeguro" hidden></p>
         <div class="field"><label for="cMembros">Pessoas no cartão</label><input id="cMembros" list="listaMembros" placeholder="Nomes separados por vírgula"><datalist id="listaMembros"></datalist></div>
         <div>
           <div class="row" style="justify-content:space-between"><span class="lbl">Etiquetas</span><button class="link" id="cEtqAbrir">Escolher</button></div>
           <div id="cEtqBox" hidden style="margin-top:6px"><input id="cEtqBusca" type="search" placeholder="Buscar etiqueta" style="width:100%;border:1px solid #cbd5da;border-radius:8px;padding:6px 8px;margin-bottom:6px"><div class="etq-picker" id="cEtqLista"></div>
-            <div class="row" style="margin-top:6px"><input id="cEtqNova" placeholder="Nova etiqueta" maxlength="80" style="flex:1;min-width:0;border:1px solid #cbd5da;border-radius:8px;padding:6px 8px"><select id="cEtqCor" class="mini"></select><button class="mini" id="cEtqCriar">Criar</button></div></div>
+            <div class="row" style="margin-top:6px"><input id="cEtqNova" placeholder="Nova etiqueta" maxlength="80" style="flex:1;min-width:0;border:1px solid #cbd5da;border-radius:8px;padding:6px 8px"><select id="cEtqCor" class="mini"></select></div>
+            <div class="row" style="margin-top:6px"><select id="cEtqGrupo" class="mini" aria-label="Grupo da etiqueta"><option>Situação</option><option>Garantia</option><option>Cidade</option><option>Prioridade</option></select><button class="mini" id="cEtqCriar">Criar etiqueta</button></div></div>
         </div>
         <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
           <a class="link" id="cTrello" target="_blank" rel="noopener noreferrer" hidden>Abrir no Trello ↗</a>
@@ -228,7 +231,7 @@
   const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
   const $=s=>document.querySelector(s);
   const LIMITE=40; // cartões mostrados por coluna antes de "Mostrar mais"
-  const CAMPOS='id,coluna_id,posicao,titulo,referencia,descricao,etiquetas,membros,prazo,prazo_ok,checklists,anexos,arquivado,arquivado_em,trello_url,criado_em,criado_por,movido_em,endereco,locatario,locador';
+  const CAMPOS='id,coluna_id,posicao,titulo,referencia,descricao,etiquetas,membros,prazo,prazo_ok,checklists,anexos,arquivado,arquivado_em,trello_url,criado_em,criado_por,movido_em,endereco,locatario,locador,vistoria_data,vistoria_hora,chaves_em';
   // Cores das etiquetas, iguais às do Trello.
   const CORES={green:['#4bce97','#164b35'],green_dark:['#1f845a','#fff'],green_light:['#baf3db','#164b35'],yellow:['#f5cd47','#533f04'],yellow_dark:['#946f00','#fff'],yellow_light:['#f8e6a0','#533f04'],
     orange:['#fea362','#702e00'],orange_dark:['#c25100','#fff'],orange_light:['#fedec8','#702e00'],red:['#f87168','#5d1f1a'],red_dark:['#c9372c','#fff'],red_light:['#ffd5d2','#5d1f1a'],
@@ -247,6 +250,7 @@
   const pad=n=>String(n).padStart(2,'0');
   const dataHora=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
   const dataBr=s=>{const d=new Date(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`};
+  const diaMes=s=>{const [a,m,d]=String(s).slice(0,10).split('-');return `${d}/${m}`+(+a!==new Date().getFullYear()?'/'+a.slice(2):'')};
   const isoDia=s=>{const d=new Date(s);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
   const refDe=t=>(String(t).match(/^\s*([A-Za-z]{0,3}\d{3,5}(?:\/\d+)?)(?![\d/])/)||String(t).match(/\b([A-Za-z]{2}\d{3,5})\b/)||[])[1]?.toUpperCase()||null;
   // Título padrão (pedido da gerência em 03/11/2026): "REFERÊNCIA - LOCADOR X LOCATÁRIO".
@@ -318,7 +322,7 @@
   }
   async function carregar(){
     try{
-      const [c,e,k,m]=await Promise.all([tudo('saidas_colunas','id,nome,posicao,arquivada','posicao'),tudo('saidas_etiquetas','id,nome,cor','nome'),
+      const [c,e,k,m]=await Promise.all([tudo('saidas_colunas','id,nome,posicao,arquivada','posicao'),tudo('saidas_etiquetas','id,nome,cor,grupo,arquivada','nome'),
         tudo('saidas_cartoes',CAMPOS,'posicao',q=>q.eq('arquivado',false)),tudo('saidas_comentarios','cartao_id,comentarios')]);
       colunas=c;etiquetas=e;cartoes=k;comentarios=Object.fromEntries(m.map(x=>[x.cartao_id,x.comentarios]));
       preencherFiltros();render();
@@ -333,7 +337,7 @@
   const membrosTodos=()=>[...new Set(cartoes.flatMap(c=>c.membros))].sort((a,b)=>a.localeCompare(b));
   function preencherFiltros(){
     const v=$('#fEtiqueta').value,m=$('#fMembro').value;
-    $('#fEtiqueta').innerHTML='<option value="">Todas as etiquetas</option>'+etiquetas.filter(e=>e.nome).map(e=>`<option value="${e.id}">${safe(e.nome)}</option>`).join('');
+    $('#fEtiqueta').innerHTML='<option value="">Todas as etiquetas</option>'+GRUPOS.map(g=>{const l=etiquetas.filter(e=>e.nome&&!e.arquivada&&(e.grupo||'Situação')===g);return l.length?`<optgroup label="${g}">${l.map(e=>`<option value="${e.id}">${safe(e.nome)}</option>`).join('')}</optgroup>`:''}).join('');
     $('#fEtiqueta').value=v;
     $('#fMembro').innerHTML='<option value="">Todas as pessoas</option>'+membrosTodos().map(n=>`<option>${safe(n)}</option>`).join('');
     $('#fMembro').value=m;
@@ -341,21 +345,27 @@
   }
   ['#fBusca','#fEtiqueta','#fMembro','#fPrazo'].forEach(s=>$(s).addEventListener('input',()=>{mostrar={};render()}));
   const etq=id=>etiquetas.find(e=>e.id===id);
+  // Etiquetas em grupos (supabase/saidas_etiquetas_organizar.sql): no cartão, no filtro e no seletor seguem esta ordem.
+  const GRUPOS=['Prioridade','Cidade','Garantia','Situação'];
+  const ordemEtq=(a,b)=>GRUPOS.indexOf(a.grupo||'Situação')-GRUPOS.indexOf(b.grupo||'Situação')||a.nome.localeCompare(b.nome);
+  const etqsDe=c=>c.etiquetas.map(etq).filter(Boolean).sort(ordemEtq);
   const doColuna=id=>cartoes.filter(c=>c.coluna_id===id).sort((a,b)=>a.posicao-b.posicao);
   function filtrados(list){
     const q=$('#fBusca').value.trim().toUpperCase(),e=$('#fEtiqueta').value,m=$('#fMembro').value,p=$('#fPrazo').value;
     const hoje=isoDia(new Date()),em7=isoDia(Date.now()+7*864e5);
     return list.filter(c=>!(e&&!c.etiquetas.includes(e))&&!(m&&!c.membros.includes(m))&&!(q&&!(c.titulo+' '+c.descricao).toUpperCase().includes(q))
-      &&!(p==='com'&&!c.prazo)&&!(p==='padrao'&&!foraDoPadrao(c))&&!(p==='atras'&&!(c.prazo&&!c.prazo_ok&&isoDia(c.prazo)<hoje))&&!(p==='semana'&&!(c.prazo&&!c.prazo_ok&&isoDia(c.prazo)>=hoje&&isoDia(c.prazo)<=em7)));
+      &&!(p==='com'&&!c.prazo)&&!(p==='padrao'&&!foraDoPadrao(c))
+      &&!(p==='vist7'&&!(c.vistoria_data&&c.vistoria_data>=hoje&&c.vistoria_data<=em7))
+      &&!(p==='vistsem'&&!(!c.vistoria_data&&/VISTORIAS EM AGENDAMENTO/i.test(colunas.find(x=>x.id===c.coluna_id)?.nome||'')))&&!(p==='atras'&&!(c.prazo&&!c.prazo_ok&&isoDia(c.prazo)<hoje))&&!(p==='semana'&&!(c.prazo&&!c.prazo_ok&&isoDia(c.prazo)>=hoje&&isoDia(c.prazo)<=em7)));
   }
 
   // ---------- Quadro ----------
   function cardHtml(c){
     const d=diasDesde(c.movido_em),n=comentarios[c.id]||0,pz=prazoInfo(c),it=itensDe(c),feitos=it.filter(i=>i.feito).length,na=(c.anexos||[]).length;
     return `<article class="kcard" draggable="true" data-id="${c.id}" tabindex="0">
-      ${c.etiquetas.length?`<div class="chips">${c.etiquetas.map(etq).filter(Boolean).map(chip).join('')}</div>`:''}
+      ${c.etiquetas.length?`<div class="chips">${etqsDe(c).map(chip).join('')}</div>`:''}
       <div class="t">${safe(c.titulo)}</div>
-      <div class="meta">${pz?`<span class="prazo ${pz.cls}" title="Prazo${c.prazo_ok?' (concluído)':''}">🕑 ${pz.txt}</span>`:''}${it.length?`<span class="chk${feitos===it.length?' ok':''}" title="Checklist">☑ ${feitos}/${it.length}</span>`:''}${n?`<span title="Comentários">💬 ${n}</span>`:''}${na?`<span title="Anexos">📎 ${na}</span>`:''}
+      <div class="meta">${c.vistoria_data?`<span class="prazo${c.vistoria_data===isoDia(new Date())?' hoje':''}" title="Vistoria de saída">🔍 ${diaMes(c.vistoria_data)}${c.vistoria_hora?' '+c.vistoria_hora.slice(0,5):''}</span>`:''}${c.chaves_em?`<span class="prazo ok" title="Entrega das chaves">🔑 ${diaMes(c.chaves_em)}</span>`:''}${pz?`<span class="prazo ${pz.cls}" title="Prazo${c.prazo_ok?' (concluído)':''}">🕑 ${pz.txt}</span>`:''}${it.length?`<span class="chk${feitos===it.length?' ok':''}" title="Checklist">☑ ${feitos}/${it.length}</span>`:''}${n?`<span title="Comentários">💬 ${n}</span>`:''}${na?`<span title="Anexos">📎 ${na}</span>`:''}
         <span class="${d>=7?'velho':''}" title="Tempo nesta coluna${d>=7?' (parado há 7 dias ou mais)':''}">${d===0?'hoje':d===1?'há 1 dia':`há ${d} dias`}</span>
         ${c.membros.length?`<span class="mbs">${c.membros.map(m=>`<span class="av sm" title="${safe(m)}">${safe(iniciais(m))}</span>`).join('')}</span>`:''}</div></article>`;
   }
@@ -435,10 +445,11 @@
     $('#cOnde').textContent=`na coluna ${col?.nome||'?'} · há ${diasDesde(c.movido_em)} dia(s) nesta coluna`+(foraDoPadrao(c)?' · título fora do padrão: preencha referência, locador e locatário ao lado':'');
     $('#cArqAviso').hidden=!c.arquivado;$('#cArqAviso').textContent=`Cartão arquivado${c.arquivado_em?' em '+dataBr(c.arquivado_em):''}. Ele não aparece no quadro.`;
     $('#cArquivar').textContent=c.arquivado?'Restaurar para o quadro':'Arquivar cartão';
-    $('#cChips').innerHTML=c.etiquetas.map(etq).filter(Boolean).map(chip).join('');
+    $('#cChips').innerHTML=etqsDe(c).map(chip).join('');
     $('#cDesc').innerHTML=md(c.descricao);
     $('#cPrazo').value=c.prazo?isoDia(c.prazo):'';$('#cPrazoOk').checked=c.prazo_ok;$('#cPrazoOk').disabled=!c.prazo;
     $('#cMembros').value=c.membros.join(', ');
+    $('#cVistData').value=c.vistoria_data||'';$('#cVistHora').value=c.vistoria_hora?c.vistoria_hora.slice(0,5):'';$('#cVistHora').disabled=!c.vistoria_data;$('#cChaves').value=c.chaves_em||'';
     const nt=nomesDoTitulo(c.titulo);$('#cRef').value=c.referencia||'';$('#cEndereco').value=c.endereco||'';$('#cLocatario').value=c.locatario||'';$('#cLocador').value=c.locador||'';
     $('#cLocatario').placeholder=nt.locatario?'Do título: '+nt.locatario:'';$('#cLocador').placeholder=nt.locador?'Do título: '+nt.locador:'';
     pintarChecklists();
@@ -511,6 +522,10 @@
   $('#cPrazo').onchange=e=>{const v=e.target.value;salvarCartao(v?{prazo:v+'T12:00:00-03:00'}:{prazo:null,prazo_ok:false},v?'Prazo salvo':'Prazo removido').then(pintarCartao)};
   $('#cPrazoOk').onchange=e=>salvarCartao({prazo_ok:e.target.checked},e.target.checked?'Prazo concluído':'Prazo reaberto');
   // Endereço, locatário e locador: usados no e-mail de cancelamento do seguro incêndio (Contas a Pagar). Vazios = nomes do título.
+  // Datas da saída (supabase/saidas_datas.sql): campos de data, no lugar do texto na descrição. Avisam a captadora que pegou o imóvel.
+  $('#cVistData').onchange=e=>{const v=e.target.value||null;salvarCartao(v?{vistoria_data:v}:{vistoria_data:null,vistoria_hora:null},v?'Vistoria salva':'Vistoria removida').then(pintarCartao)};
+  $('#cVistHora').onchange=e=>salvarCartao({vistoria_hora:e.target.value||null},'Horário salvo');
+  $('#cChaves').onchange=e=>salvarCartao({chaves_em:e.target.value||null},e.target.value?'Entrega das chaves salva':'Data removida');
   // Com referência, locador e locatário preenchidos, o título passa a ser o padrão "REF - LOCADOR X LOCATÁRIO".
   for(const [id,campo] of [['#cRef','referencia'],['#cEndereco','endereco'],['#cLocatario','locatario'],['#cLocador','locador']])
     $(id).onchange=async e=>{
@@ -566,13 +581,16 @@
   $('#cEtqAbrir').onclick=()=>{$('#cEtqBox').hidden=!$('#cEtqBox').hidden;$('#cEtqBusca').value='';pintarEtq();$('#cEtqCor').innerHTML=Object.keys(CORES).filter(k=>k!=='gray').map(k=>`<option value="${k}" style="background:${CORES[k][0]}">${k.replace('_',' ')}</option>`).join('')};
   function pintarEtq(){
     const q=$('#cEtqBusca').value.trim().toUpperCase();
-    $('#cEtqLista').innerHTML=etiquetas.filter(e=>!q||e.nome.toUpperCase().includes(q)).map(e=>`<label><input type="checkbox" value="${e.id}"${aberto.etiquetas.includes(e.id)?' checked':''}>${chip(e)}</label>`).join('')||'<p class="msg">Nenhuma etiqueta.</p>';
+    // Arquivadas só aparecem se já estão no cartão (para poder tirar).
+    const vis=etiquetas.filter(e=>(!e.arquivada||aberto.etiquetas.includes(e.id))&&(!q||e.nome.toUpperCase().includes(q)));
+    $('#cEtqLista').innerHTML=GRUPOS.map(g=>{const l=vis.filter(e=>(e.grupo||'Situação')===g).sort(ordemEtq);
+      return l.length?`<p class="lbl" style="margin:6px 0 2px">${g}</p>`+l.map(e=>`<label><input type="checkbox" value="${e.id}"${aberto.etiquetas.includes(e.id)?' checked':''}>${chip(e)}${e.arquivada?' <small class="muted">(arquivada)</small>':''}</label>`).join(''):''}).join('')||'<p class="msg">Nenhuma etiqueta.</p>';
   }
   $('#cEtqBusca').addEventListener('input',pintarEtq);
   $('#cEtqLista').addEventListener('change',e=>{const id=e.target.value,set=new Set(aberto.etiquetas);e.target.checked?set.add(id):set.delete(id);salvarCartao({etiquetas:[...set]}).then(pintarCartao)});
   $('#cEtqCriar').onclick=async()=>{
     const n=$('#cEtqNova').value.trim().toUpperCase();if(!n)return;
-    const {data,error}=await db.from('saidas_etiquetas').insert({nome:n,cor:$('#cEtqCor').value}).select('id,nome,cor').single();
+    const {data,error}=await db.from('saidas_etiquetas').insert({nome:n,cor:$('#cEtqCor').value,grupo:$('#cEtqGrupo').value}).select('id,nome,cor,grupo,arquivada').single();
     if(error){alert('Não foi possível criar: '+error.message);return}
     etiquetas.push(data);etiquetas.sort((a,b)=>a.nome.localeCompare(b.nome));$('#cEtqNova').value='';preencherFiltros();
     await salvarCartao({etiquetas:[...aberto.etiquetas,data.id]});pintarCartao();pintarEtq();

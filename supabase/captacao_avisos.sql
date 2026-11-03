@@ -6,7 +6,7 @@
 -- Rodar uma vez em: Supabase > portal-interno > SQL Editor. Depende de saidas.sql e captacao.sql.
 
 alter table public.saidas_colunas add column if not exists aviso_captacao boolean not null default false;
-update public.saidas_colunas set aviso_captacao = true where nome = 'AVISOS DE SAÍDA - PÓS LOCAÇÃO' and not arquivada;
+update public.saidas_colunas set aviso_captacao = true where nome in ('AVISOS DE SAÍDA - PÓS LOCAÇÃO', 'AVISOS DE SAÍDA - PÓS-LOCAÇÃO') and not arquivada;
 
 create table if not exists public.captacao_avisos (
   id uuid primary key default gen_random_uuid(),
