@@ -257,6 +257,14 @@
       <p class="msg no-print" style="margin-top:12px">Ajuda de custo: 10% do VGL do mês, limitada a R$ 2.000; a partir de R$ 40.000, R$ 5.000. Bonificação: R$ 500 a partir de R$ 20.000 e R$ 1.000 a partir de R$ 30.000 (sem bonificação a partir de R$ 40.000). "à mão" = valor digitado pela Locação no lugar da tabela.</p></div>
   </section>
 
+  <section id="tab-devolucoes" data-tab hidden>
+    <div class="top">
+      <div><h2>Devoluções e pagamentos</h2><p>Distratos com devolução de caução e/ou pagamento, direto do quadro Saídas e distratos. O cartão sai desta lista quando sai da coluna no quadro.</p></div>
+      <div class="bar-actions"><button class="secondary" id="devAtualizar">Atualizar</button><a class="secondary" href="saidas.html" style="text-decoration:none">Abrir o quadro ↗</a></div>
+    </div>
+    <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="devTable"></table></div></div>
+  </section>
+
   <section id="tab-documentos" data-tab hidden>
     <div class="top">
       <div><h2>Gerar documentos</h2><p>Escolha o modelo, preencha os dados e baixe o contrato em Word, para conferir e imprimir para assinar. O que é digitado aqui não fica salvo no portal.</p></div>
@@ -448,8 +456,9 @@
       recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
       atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
+    // devolucoes = cartões do quadro Saídas e distratos na coluna de devolução de caução / pagamento (supabase/saidas_paineis.sql, 03/11/2026).
     // documentos = gerador de contratos em Word (08/10/2026). Os modelos ficam no bucket privado, em ferramentas/financeiro-rh/.
-    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','fechamento','documentos'],
+    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','fechamento','documentos','devolucoes'],
       atividades:['Colaboradores (admissão/demissão/folha)','Contas a pagar da empresa','Suporte direto à equipe financeira']},
     {slug:'supervisao',limpo:true,nome:'Supervisão',area:'Liderança',papel:'Administrativo',ref:'Referência',
       atividades:['Resposta a notificações direcionadas à imobiliária','Monitoramento da demanda do administrativo','Reuniões semanais']},
@@ -486,7 +495,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={visitas:'Visitas',rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
+    const nomes={visitas:'Visitas',rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',devolucoes:'Devoluções e pagamentos',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
     if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('')
       +(DEP.links||[]).map(([href,t])=>`<a class="tab-link" href="${href}" style="text-decoration:none">${safe(t)}</a>`).join('');
@@ -513,7 +522,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,ABAS.includes('parceria')?loadParceria():null,ABAS.includes('visitas')?loadVisitas():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,ABAS.includes('devolucoes')?loadDevolucoes():null,ABAS.includes('parceria')?loadParceria():null,ABAS.includes('visitas')?loadVisitas():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // Quem entra em mais de um departamento (gerência e acesso geral, ver supabase/acesso_geral.sql) ganha um seletor no topo.
@@ -1106,6 +1115,18 @@
   const anosTxt=n=>`${n} ${n===1?'ano':'anos'} de casa`;
   const tempoCasa=adm=>{const [a,m,d]=ymd(adm),h=hojeD();let anos=h.getFullYear()-a;if(h<new Date(h.getFullYear(),m-1,d))anos--;
     if(anos>=1)return anosTxt(anos);const meses=(h.getFullYear()-a)*12+h.getMonth()-(m-1)-(h.getDate()<d?1:0);return meses<=0?'entrou há pouco':`${meses} ${meses===1?'mês':'meses'} de casa`};
+  // ---------- Devoluções e pagamentos (quadro Saídas e distratos) ----------
+  async function loadDevolucoes(){
+    $('#devTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
+    const {data,error}=await db.rpc('saidas_painel',{p_departamento:DEP.slug});
+    if(error){$('#devTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
+    if(!data.length){$('#devTable').innerHTML='<tbody><tr><td class="empty">Nenhum distrato esperando devolução ou pagamento.</td></tr></tbody>';return}
+    const dias=s=>Math.floor((Date.now()-new Date(s))/864e5);
+    $('#devTable').innerHTML='<thead><tr><th>Contrato</th><th>Etiquetas</th><th>Na coluna</th><th>Prazo</th><th></th></tr></thead><tbody>'+data.map(c=>{const d=dias(c.movido_em);
+      return `<tr><td style="white-space:normal;min-width:260px"><strong>${safe(c.titulo)}</strong>${c.comentarios?` <small class="muted">💬 ${c.comentarios}</small>`:''}</td><td style="white-space:normal">${safe(c.etiquetas.join(' · '))}</td><td${d>=7?' style="color:var(--red);font-weight:700"':''}>${d===0?'hoje':d===1?'há 1 dia':`há ${d} dias`}</td><td>${c.prazo?br(c.prazo.slice(0,10))+(c.prazo_ok?' ✓':''):'—'}</td><td><a class="secondary" style="text-decoration:none;padding:5px 10px" href="saidas.html?c=${c.id}">Abrir cartão</a></td></tr>`}).join('')+'</tbody>';
+  }
+  $('#devAtualizar').onclick=loadDevolucoes;
+
   // ---------- Fechamento da Locação ----------
   // Ranking do mês fechado, gravado pelo banco todo dia 10 (supabase/locacao_fechamento.sql, tabela locacao_fechamentos).
   let fechamentos=[];
