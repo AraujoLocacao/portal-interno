@@ -450,6 +450,7 @@
   // ---------- Avisos de saída (ver supabase/captacao_avisos.sql) ----------
   // O cartão que entra em "AVISOS DE SAÍDA" no quadro Saídas e distratos vira aviso aqui. Todas as captadoras veem;
   // a primeira que clica em "Pegar" recebe o cartão no próprio quadro. A gerência só acompanha.
+  // Se a Pós arquiva o cartão ou o devolve para uma coluna anterior, o aviso some daqui (supabase/captacao_avisos_cancelar.sql).
   let avisos=[];
   const meuQuadro=()=>quadros.find(q=>!q.modelo&&q.ativo&&(q.email||'').toLowerCase()===meuEmail.toLowerCase());
   async function carregarAvisos(){
@@ -486,7 +487,7 @@
     $('#sino').hidden=!notifs.length&&!gestor&&!meuQuadro();$('#sinoN').textContent=novas||'';$('#sinoN').hidden=!novas;
   }
   $('#sino').onclick=async()=>{
-    $('#notifLista').innerHTML=notifs.length?notifs.map(n=>`<div class="notif${n.minha&&!n.lida_em?' nova':''}"><div><strong>${n.tipo==='vistoria'?'🗓️':'🔑'} ${safe(n.texto)}</strong>
+    $('#notifLista').innerHTML=notifs.length?notifs.map(n=>`<div class="notif${n.minha&&!n.lida_em?' nova':''}"><div><strong>${{vistoria:'🗓️',chaves:'🔑',cancelado:'⚠️',reativado:'↩️'}[n.tipo]||'🔔'} ${safe(n.texto)}</strong>
       <p class="msg">${safe(n.titulo||'')}${n.minha?'':` · quadro ${safe(n.quadro)}`} · ${dataHora(n.criado_em)}</p></div>${n.minha&&n.cartao_id?`<button class="link" data-notif-cartao="${n.cartao_id}">Abrir cartão</button>`:''}</div>`).join('')
       :'<p class="msg">Nenhuma notificação nos últimos 30 dias. Quando a Pós-locação preencher a data da vistoria de saída ou da entrega das chaves de um imóvel que você pegou, ela aparece aqui.</p>';
     $('#notifDialog').showModal();
