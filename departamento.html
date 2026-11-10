@@ -269,6 +269,9 @@
       <div><h2>Devoluções e pagamentos</h2><p>Distratos com devolução de caução e/ou pagamento, direto do quadro Saídas e distratos. O cartão sai desta lista quando sai da coluna no quadro.</p></div>
       <div class="bar-actions"><button class="secondary" id="devAtualizar">Atualizar</button><a class="secondary" href="saidas.html" style="text-decoration:none">Abrir o quadro ↗</a></div>
     </div>
+    <details class="card seguros" id="caucoesWrap" open><summary id="caucoesTitulo">Cauções em saída</summary>
+      <p class="msg" style="margin:6px 0 0">Inquilinos com garantia em caução que deram aviso de saída (etiqueta CAUÇÃO no quadro Saídas e distratos). A etapa, a vistoria e as chaves acompanham o cartão.</p>
+      <div id="caucoesLista"></div></details>
     <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="devTable"></table></div></div>
   </section>
 
@@ -1191,7 +1194,35 @@
   const tempoCasa=adm=>{const [a,m,d]=ymd(adm),h=hojeD();let anos=h.getFullYear()-a;if(h<new Date(h.getFullYear(),m-1,d))anos--;
     if(anos>=1)return anosTxt(anos);const meses=(h.getFullYear()-a)*12+h.getMonth()-(m-1)-(h.getDate()<d?1:0);return meses<=0?'entrou há pouco':`${meses} ${meses===1?'mês':'meses'} de casa`};
   // ---------- Devoluções e pagamentos (quadro Saídas e distratos) ----------
+  // Cauções em saída (supabase/saidas_caucao.sql): cartão com etiqueta CAUÇÃO que chega aos avisos de saída vira aviso aqui.
+  let caucoes=[];
+  async function loadCaucoes(){
+    const {data,error}=await db.rpc('saidas_caucoes_listar');
+    if(error){$('#caucoesLista').innerHTML=`<p class="msg">Não foi possível carregar os avisos: ${safe(error.message)}</p>`;return}
+    caucoes=data;pintarCaucoes();
+  }
+  function pintarCaucoes(){
+    const novos=caucoes.filter(a=>!a.ciente_em),vistos=caucoes.filter(a=>a.ciente_em);
+    $('#caucoesTitulo').textContent=`Cauções em saída (${novos.length} ${novos.length===1?'novo':'novos'})`;
+    const aba=document.querySelector('[data-go="devolucoes"]');if(aba)aba.textContent='Devoluções e pagamentos'+(novos.length?` (${novos.length})`:'');
+    const linha=a=>{const nt=nomesDoTitulo(a.titulo),loc=a.locatario||nt.locatario||'—',dono=a.locador||nt.locador||'—';
+      const vist=a.vistoria_data?`${br(a.vistoria_data)}${a.vistoria_hora?' às '+a.vistoria_hora.slice(0,5):''}`:'sem data',chaves=a.chaves_em?br(a.chaves_em):'sem data';
+      return `<div class="seg-item${a.ciente_em?' feito':''}"><div><strong>${safe(a.titulo)}</strong>
+        <p class="msg">Locatário: ${safe(loc)} · Locador: ${safe(dono)}</p>
+        <p class="msg">Aviso em ${br(a.criado_em.slice(0,10))} · Etapa agora: <strong>${a.arquivado?'cartão arquivado':safe(a.coluna)}</strong></p>
+        <p class="msg">🔍 Vistoria: ${vist} · 🔑 Chaves: ${chaves}${a.ciente_em?` · Ciente em ${br(a.ciente_em.slice(0,10))} por ${safe(a.ciente_por)}`:''}</p></div>
+        <div class="seg-acoes">${a.ciente_em?`<button class="link" data-cau="${a.id}" data-ciente="0">Desfazer ciente</button>`:`<button class="primary" data-cau="${a.id}" data-ciente="1">Ciente</button>`}<a class="link" href="saidas.html?c=${a.cartao_id}">Abrir cartão ↗</a></div></div>`};
+    $('#caucoesLista').innerHTML=(novos.length?novos.map(linha).join(''):'<p class="msg" style="margin-top:10px">Nenhum aviso novo de caução.</p>')
+      +(vistos.length?`<p class="msg" style="margin-top:12px;font-weight:700">Vistos nos últimos 30 dias</p>${vistos.map(linha).join('')}`:'');
+  }
+  $('#caucoesLista').addEventListener('click',async e=>{
+    const b=e.target.closest('[data-cau]');if(!b)return;b.disabled=true;
+    const {error}=await db.rpc('saidas_caucao_ciente',{p_id:b.dataset.cau,p_ciente:b.dataset.ciente==='1'});
+    if(error){alert('Não foi possível salvar: '+error.message);b.disabled=false;return}
+    toast(b.dataset.ciente==='1'?'Marcado como ciente':'Ciente desfeito');await loadCaucoes();
+  });
   async function loadDevolucoes(){
+    loadCaucoes();
     $('#devTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
     const {data,error}=await db.rpc('saidas_painel',{p_departamento:DEP.slug});
     if(error){$('#devTable').innerHTML=`<tbody><tr><td class="empty">Não foi possível carregar: ${safe(error.message)}</td></tr></tbody>`;return}
