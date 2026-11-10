@@ -137,7 +137,7 @@
 
 <main id="app" hidden>
   <div class="tools">
-    <div class="grow"><h1>Saídas e distratos</h1><p class="sub" id="resumo">Carregando…</p><div class="vistas" role="tablist" aria-label="Ver como"><button type="button" id="vQuadro" class="on" role="tab">Quadro</button><button type="button" id="vAgenda" role="tab">Agenda</button></div></div>
+    <div class="grow"><h1>Saídas e distratos</h1><p class="sub" id="resumo">Carregando…</p><p class="sub" id="achadosArq" hidden></p><div class="vistas" role="tablist" aria-label="Ver como"><button type="button" id="vQuadro" class="on" role="tab">Quadro</button><button type="button" id="vAgenda" role="tab">Agenda</button></div></div>
     <input class="busca" id="fBusca" type="search" placeholder="Buscar REF, nome ou texto" aria-label="Buscar cartão">
     <select id="fEtiqueta" aria-label="Filtrar por etiqueta"></select>
     <select id="fMembro" aria-label="Filtrar por pessoa"></select>
@@ -381,7 +381,7 @@
     try{
       const [c,e,k,m]=await Promise.all([tudo('saidas_colunas','id,nome,posicao,arquivada','posicao'),tudo('saidas_etiquetas','id,nome,cor,grupo,arquivada','nome'),
         tudo('saidas_cartoes',CAMPOS,'posicao',q=>q.eq('arquivado',false)),tudo('saidas_comentarios','cartao_id,comentarios')]);
-      colunas=c;etiquetas=e;cartoes=k;comentarios=Object.fromEntries(m.map(x=>[x.cartao_id,x.comentarios]));
+      colunas=c;etiquetas=e;cartoes=k;comentarios=Object.fromEntries(m.map(x=>[x.cartao_id,x.comentarios]));arqCache=null;
       preencherFiltros();render();
       const pedido=new URLSearchParams(location.search).get('c');
       if(pedido&&!document.querySelector('dialog[open]')){abrirCartao(pedido);try{history.replaceState(null,'',location.pathname)}catch{}}
@@ -407,10 +407,41 @@
   const ordemEtq=(a,b)=>GRUPOS.indexOf(a.grupo||'Situação')-GRUPOS.indexOf(b.grupo||'Situação')||a.nome.localeCompare(b.nome);
   const etqsDe=c=>c.etiquetas.map(etq).filter(Boolean).sort(ordemEtq);
   const doColuna=id=>cartoes.filter(c=>c.coluna_id===id).sort((a,b)=>a.posicao-b.posicao);
+  // Busca: ignora acentos e maiúsculas, e cada palavra pode estar em qualquer parte do cartão (título, descrição, REF,
+  // locador, locatário, endereço, pessoas). Assim "joao silva" acha "JOÃO DA SILVA" e "AP 0700" acha "AP0700".
+  const semAcento=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase();
+  const termosBusca=s=>semAcento(s).split(/[\s,;]+/).filter(Boolean);
+  function textoBusca(c){
+    const t=[c.titulo,c.descricao,c.referencia,c.locador,c.locatario,c.endereco,...(c.membros||[])].join(' ');
+    if(c._bt!==t){c._bt=t;c._bn=semAcento(t)}
+    return c._bn;
+  }
+  const bate=(c,termos)=>{const t=textoBusca(c);return termos.every(w=>t.includes(w))};
+  // Arquivados (quase 2 mil, a maior parte vinda do Trello): carregados uma vez na primeira busca, para a busca do topo
+  // avisar quando há arquivados com o mesmo texto. Recarrega quando o quadro recarrega.
+  let arqCache=null,arqCarregando=null;
+  function carregarArquivados(){
+    if(arqCache)return Promise.resolve(arqCache);
+    if(!arqCarregando)arqCarregando=tudo('saidas_cartoes','id,titulo,referencia,descricao,locador,locatario,endereco,membros,coluna_id,arquivado_em','id',q=>q.eq('arquivado',true))
+      .then(l=>{l.sort((a,b)=>String(b.arquivado_em||'').localeCompare(String(a.arquivado_em||'')));arqCache=l;return l}).finally(()=>{arqCarregando=null});
+    return arqCarregando;
+  }
+  let avisoArqVez=0;
+  async function avisarArquivados(){
+    const vez=++avisoArqVez,termos=termosBusca($('#fBusca').value),el=$('#achadosArq');
+    if(!termos.length||vista!=='quadro'){el.hidden=true;return}
+    let l;try{l=await carregarArquivados()}catch{return}
+    if(vez!==avisoArqVez)return;
+    const n=l.filter(c=>bate(c,termos)).length;
+    el.hidden=!n;if(n)el.innerHTML=`Também ${n===1?'há 1 cartão arquivado':`há ${n} cartões arquivados`} com essa busca. <button class="link" id="verArq">Ver ${n===1?'o arquivado':'os arquivados'}</button>`;
+  }
+  $('#achadosArq').addEventListener('click',e=>{if(e.target.id!=='verArq')return;$('#arqBusca').value=$('#fBusca').value.trim();$('#arqDialog').showModal();$('#arqForm').requestSubmit()});
+  let avisoArqTimer;
+  $('#fBusca').addEventListener('input',()=>{clearTimeout(avisoArqTimer);avisoArqTimer=setTimeout(avisarArquivados,300)});
   function filtrados(list){
-    const q=$('#fBusca').value.trim().toUpperCase(),e=$('#fEtiqueta').value,m=$('#fMembro').value,p=$('#fPrazo').value;
+    const q=termosBusca($('#fBusca').value),e=$('#fEtiqueta').value,m=$('#fMembro').value,p=$('#fPrazo').value;
     const hoje=isoDia(new Date()),em7=isoDia(Date.now()+7*864e5);
-    return list.filter(c=>!(e&&!c.etiquetas.includes(e))&&!(m&&!c.membros.includes(m))&&!(q&&!(c.titulo+' '+c.descricao).toUpperCase().includes(q))
+    return list.filter(c=>!(e&&!c.etiquetas.includes(e))&&!(m&&!c.membros.includes(m))&&!(q.length&&!bate(c,q))
       &&!(p==='com'&&!c.prazo)&&!(p==='padrao'&&!foraDoPadrao(c))
       &&!(p==='vist7'&&!(c.vistoria_data&&c.vistoria_data>=hoje&&c.vistoria_data<=em7))
       &&!(p==='vistsem'&&!(!c.vistoria_data&&/VISTORIAS EM AGENDAMENTO/i.test(colunas.find(x=>x.id===c.coluna_id)?.nome||'')))&&!(p==='atras'&&!(c.prazo&&!c.prazo_ok&&isoDia(c.prazo)<hoje))&&!(p==='semana'&&!(c.prazo&&!c.prazo_ok&&isoDia(c.prazo)>=hoje&&isoDia(c.prazo)<=em7)));
@@ -626,6 +657,7 @@
     if(!await salvarCartao(campos))return;
     await db.from('saidas_historico').insert({cartao_id:c.id,tipo:restaurar?'restaurado':'arquivado',autor:meuEmail});
     if(restaurar){avulsos=avulsos.filter(x=>x.id!==c.id);cartoes.push(c)}else{cartoes=cartoes.filter(x=>x.id!==c.id);avulsos.push(c)}
+    arqCache=null;avisarArquivados();
     render();toast(restaurar?'Cartão restaurado':'Cartão arquivado');abrirCartao(c.id);
   };
   $('#cExcluir').onclick=async()=>{
@@ -656,13 +688,12 @@
   // ---------- Arquivados ----------
   $('#btnArquivados').onclick=()=>{$('#arqDialog').showModal();$('#arqBusca').focus()};
   $('#arqForm').onsubmit=async e=>{
-    e.preventDefault();const q=$('#arqBusca').value.trim().replace(/[%,()]/g,' ');
+    e.preventDefault();const termos=termosBusca($('#arqBusca').value);
     $('#arqLista').innerHTML='<p class="msg">Buscando…</p>';
-    let req=db.from('saidas_cartoes').select('id,titulo,coluna_id,arquivado_em,movido_em').eq('arquivado',true).order('arquivado_em',{ascending:false,nullsFirst:false}).limit(100);
-    if(q)req=req.or(`titulo.ilike.%${q}%,descricao.ilike.%${q}%`);
-    const {data,error}=await req;
-    if(error){$('#arqLista').innerHTML=`<p class="msg error">Não foi possível buscar: ${safe(error.message)}</p>`;return}
-    $('#arqResumo').textContent=data.length===100?'Mostrando os 100 mais recentes. Refine a busca para achar outros.':`${data.length} cartão(ões) arquivado(s)${q?' encontrados':''}.`;
+    let todos;try{todos=await carregarArquivados()}catch(err){$('#arqLista').innerHTML=`<p class="msg error">Não foi possível buscar: ${safe(err.message)}</p>`;return}
+    const achados=termos.length?todos.filter(c=>bate(c,termos)):todos,MAX=200,data=achados.slice(0,MAX);
+    $('#arqResumo').textContent=achados.length>MAX?`${achados.length} encontrados; mostrando os ${MAX} arquivados mais recentes. Digite mais uma palavra para achar outros.`
+      :`${achados.length} cartão(ões) arquivado(s)${termos.length?' encontrado(s)':''}. A busca ignora acentos, e cada palavra pode estar em qualquer parte do cartão.`;
     $('#arqLista').innerHTML=data.map(c=>`<button class="arq-item" data-id="${c.id}"><strong>${safe(c.titulo)}</strong><small>${safe(colunas.find(x=>x.id===c.coluna_id)?.nome||'')}${c.arquivado_em?' · arquivado em '+dataBr(c.arquivado_em):''}</small></button>`).join('')||'<p class="msg">Nada encontrado.</p>';
   };
   $('#arqLista').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)abrirCartao(b.dataset.id)});
@@ -681,6 +712,7 @@
     $('#board').hidden=v!=='quadro';$('#agenda').hidden=v!=='agenda';
     for(const id of ['#fBusca','#fEtiqueta','#fMembro','#fPrazo','#btnArquivados','#btnColunas'])$(id).hidden=v!=='quadro';
     try{localStorage.setItem('saidas.vista',v)}catch{}
+    avisarArquivados();
     if(v==='agenda')pintarAgenda();
   }
   $('#vQuadro').onclick=()=>mudarVista('quadro');$('#vAgenda').onclick=()=>mudarVista('agenda');
