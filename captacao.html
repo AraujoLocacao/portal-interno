@@ -93,6 +93,7 @@
     .etq-picker{border:1px solid var(--line);border-radius:10px;padding:8px;display:grid;gap:4px;max-height:280px;overflow-y:auto}
     .etq-picker label{display:flex;gap:8px;align-items:center;cursor:pointer;font-size:.82rem}
     .hist{display:grid;gap:10px}
+    .anexos{display:grid;gap:4px}.anexos .link{text-align:left;padding-left:0;overflow-wrap:anywhere;font-size:.85rem}
     .hist .h{font-size:.84rem;display:grid;gap:3px}.hist .h small{color:var(--muted)}
     .hist .h.com .txt{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere}
     .hist .h.mov{color:#52616c}
@@ -245,6 +246,10 @@
             <div class="row" style="margin-top:8px"><button class="primary" id="cDescSalvar">Salvar</button><button class="secondary" id="cDescCancelar">Cancelar</button></div></div>
         </div>
         <div>
+          <div class="row" style="justify-content:space-between"><span class="lbl">Anexos</span><label class="link" style="cursor:pointer">+ Anexar foto ou PDF<input type="file" id="cAnexar" accept="image/*,.pdf,application/pdf" multiple hidden></label></div>
+          <div class="anexos" id="cAnexos" style="margin-top:6px"></div>
+        </div>
+        <div>
           <span class="lbl">Comentário</span>
           <textarea class="edit" id="cComentario" style="min-height:70px;margin-top:5px" maxlength="5000" placeholder="Escreva um comentário…"></textarea>
           <div class="row" style="margin-top:6px"><button class="primary" id="cComentar">Comentar</button></div>
@@ -264,7 +269,7 @@
         <label class="msg" id="cModeloBox"><input type="checkbox" id="cModelo"> Cartão-modelo (serve de base para cartões novos)</label>
         <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
           <a class="link" id="cTrello" target="_blank" rel="noopener noreferrer" hidden>Abrir no Trello ↗</a>
-          <span class="msg" id="cAnexos" hidden></span>
+          <span class="msg" id="cAnexosTrello" hidden></span>
           <span class="msg" id="cCriado"></span>
           <button class="link" id="cArquivar">Arquivar cartão</button>
           <button class="link danger" id="cExcluir">Excluir cartão</button>
@@ -392,7 +397,7 @@
     purple:['#9f8fef','#352c63'],purple_dark:['#6e5dc6','#fff'],purple_light:['#dfd8fd','#352c63'],blue:['#579dff','#09326c'],blue_dark:['#0c66e4','#fff'],blue_light:['#cce0ff','#09326c'],
     sky:['#6cc3e0','#164555'],sky_dark:['#227d9b','#fff'],sky_light:['#c6edfb','#164555'],lime:['#94c748','#37471f'],lime_dark:['#5b7f24','#fff'],lime_light:['#d3f1a7','#37471f'],
     pink:['#e774bb','#50253f'],pink_dark:['#ae4787','#fff'],pink_light:['#fdd0ec','#50253f'],black:['#8590a2','#fff'],black_dark:['#626f86','#fff'],black_light:['#dcdfe4','#172b4d'],gray:['#dcdfe4','#172b4d']};
-  const CARTAO='id,quadro_id,coluna_id,posicao,titulo,referencia,descricao,etiquetas,modelo,trello_url,anexos_trello,criado_em,criado_por,movido_em,arquivado_em';
+  const CARTAO='id,quadro_id,coluna_id,posicao,titulo,referencia,descricao,etiquetas,modelo,trello_url,anexos_trello,anexos,criado_em,criado_por,movido_em,arquivado_em';
   let quadros=[],quadroId=null,colunas=[],etiquetas=[],cartoes=[],comentarios={},booted=false,gestor=false,meuEmail='',mostrar={},aberto=null,hist=[];
 
   const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
@@ -565,7 +570,7 @@
     return `<article class="kcard${c.modelo?' modelo':''}${c.arquivado_em?' arq':''}" draggable="${!c.arquivado_em}" data-id="${c.id}" tabindex="0">
       ${c.etiquetas.length?`<div class="chips">${c.etiquetas.map(etq).filter(Boolean).map(chip).join('')}</div>`:''}
       <div class="t">${safe(c.titulo)}</div>${c.arquivado_em?`<div class="meta"><span>arquivado em ${dataBr(c.arquivado_em)}</span></div>`:''}
-      <div class="meta">${n?`<span title="Comentários">💬 ${n}</span>`:''}${c.anexos_trello?`<span title="Anexos no Trello">📎 ${c.anexos_trello}</span>`:''}
+      <div class="meta">${n?`<span title="Comentários">💬 ${n}</span>`:''}${(c.anexos||[]).length?`<span title="Anexos">📎 ${c.anexos.length}</span>`:c.anexos_trello?`<span title="Anexos no Trello">📎 ${c.anexos_trello}</span>`:''}
         ${c.modelo?'<span>cartão-modelo</span>':`<span class="${parado?'velho':''}" title="Tempo nesta coluna${parado?' (parado há 7 dias ou mais)':''}">${d<=0?'hoje':d===1?'há 1 dia':`há ${d} dias`}</span>`}</div></article>`;
   }
   function render(){
@@ -635,7 +640,7 @@
     $('#cTitulo').value=c.titulo;$('#cDescForm').hidden=true;$('#cDesc').hidden=false;$('#cDescEditar').hidden=false;$('#cComentario').value='';$('#cEtqBox').hidden=true;
     $('#cColuna').innerHTML=colunas.map(x=>`<option value="${x.id}"${x.id===c.coluna_id?' selected':''}>${safe(x.nome)}</option>`).join('');
     $('#cTrello').hidden=!c.trello_url;if(c.trello_url)$('#cTrello').href=c.trello_url;
-    $('#cAnexos').hidden=!c.anexos_trello;$('#cAnexos').textContent=`${c.anexos_trello} ${c.anexos_trello===1?'anexo ficou':'anexos ficaram'} no Trello`;
+    $('#cAnexosTrello').hidden=!c.anexos_trello;$('#cAnexosTrello').textContent=`${c.anexos_trello} ${c.anexos_trello===1?'anexo ficou':'anexos ficaram'} no Trello`;
     $('#cCriado').textContent=`Criado em ${dataBr(c.criado_em)}${c.criado_por?' por '+nome(c.criado_por):''}`;
     $('#cModelo').checked=c.modelo;$('#cArquivar').textContent=c.arquivado_em?'Restaurar para o quadro':'Arquivar cartão';$('#cArquivar').hidden=c.modelo;
     pintarCartao();if(!cd.open)cd.showModal();
@@ -650,7 +655,60 @@
     $('#cOnde').textContent=c.modelo?`cartão-modelo na coluna ${col?.nome||'?'}`:`na coluna ${col?.nome||'?'} · há ${diasDesde(c.movido_em)} dia(s) nesta coluna`;
     $('#cChips').innerHTML=c.etiquetas.map(etq).filter(Boolean).map(chip).join('');
     $('#cDesc').innerHTML=md(c.descricao);
+    pintarAnexos();
   }
+  // Anexos (fotos e PDFs): bucket privado "captacao", pasta = id do cartão (ver supabase/captacao_anexos.sql).
+  const ANEXOS='captacao';
+  function pintarAnexos(){
+    const an=aberto.anexos||[];
+    $('#cAnexos').innerHTML=an.map((a,i)=>`<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="link" data-abrir="${i}">${/\.pdf$/i.test(a.nome||'')?'📄':'🖼️'} ${safe(a.nome||'arquivo')}</button>
+      <small class="muted" style="white-space:nowrap">${a.data?dataBr(a.data):''}</small><button class="link danger" data-tirar="${i}" aria-label="Excluir anexo" title="Excluir anexo">×</button></div>`).join('')||'<p class="msg">Nenhum anexo.</p>';
+  }
+  const nomeArquivo=n=>n.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.\-]+/g,'_').slice(-120);
+  // Foto de celular grande (mais de 2 MB) é reduzida para no máximo 2560 px antes de enviar, para não lotar o armazenamento.
+  async function reduzirFoto(f){
+    if(!/^image\/(jpeg|png|webp|heic|heif)$/i.test(f.type)||f.size<=2*1024*1024)return f;
+    try{
+      const img=await createImageBitmap(f),esc=Math.min(1,2560/Math.max(img.width,img.height));
+      const cv=document.createElement('canvas');cv.width=Math.round(img.width*esc);cv.height=Math.round(img.height*esc);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      const b=await new Promise(r=>cv.toBlob(r,'image/jpeg',.85));
+      return b&&b.size<f.size?new File([b],f.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'}):f;
+    }catch{return f}
+  }
+  $('#cAnexar').onchange=async e=>{
+    const c=aberto,arqs=[...e.target.files];e.target.value='';if(!arqs.length)return;
+    const novos=[];
+    for(const orig of arqs){
+      if(!/^image\//.test(orig.type)&&!/\.pdf$/i.test(orig.name)&&orig.type!=='application/pdf'){alert(`"${orig.name}" não é foto nem PDF.`);continue}
+      toast('Enviando '+orig.name+'…');
+      const f=await reduzirFoto(orig);
+      if(f.size>50*1024*1024){alert(`"${orig.name}" tem mais de 50 MB e não pode ser anexado.`);continue}
+      const caminho=`${c.id}/${Date.now()}-${nomeArquivo(f.name)}`;
+      const {error}=await db.storage.from(ANEXOS).upload(caminho,f,{contentType:f.type||'application/octet-stream'});
+      if(error){alert(`Não foi possível enviar "${orig.name}": ${error.message}`);continue}
+      novos.push({nome:f.name,caminho,data:new Date().toISOString(),por:meuEmail});
+    }
+    if(!novos.length)return;
+    if(await salvarCartaoDe(c,{anexos:[...(c.anexos||[]),...novos]},novos.length===1?'Arquivo anexado':`${novos.length} arquivos anexados`)){
+      const {data}=await db.from('captacao_historico').insert({cartao_id:c.id,tipo:'editado',texto:'anexou '+novos.map(n=>n.nome).join(', '),autor:meuEmail}).select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').single();
+      if(aberto===c){pintarAnexos();if(data){hist.unshift(data);pintarHist()}}
+    }else await db.storage.from(ANEXOS).remove(novos.map(n=>n.caminho));
+  };
+  $('#cAnexos').addEventListener('click',async e=>{
+    const ab=e.target.closest('[data-abrir]'),ti=e.target.closest('[data-tirar]');
+    if(ab){const a=aberto.anexos[+ab.dataset.abrir],w=window.open('','_blank');
+      const {data,error}=await db.storage.from(ANEXOS).createSignedUrl(a.caminho,300);
+      if(error||!data){w?.close();alert('Não foi possível abrir o arquivo: '+(error?.message||''));return}
+      if(w)w.location=data.signedUrl;else location.href=data.signedUrl;return}
+    if(ti){const c=aberto,i=+ti.dataset.tirar,a=c.anexos[i];if(!await confirmar(`Excluir o anexo "${a.nome}"?`))return;
+      const {error}=await db.storage.from(ANEXOS).remove([a.caminho]);if(error){alert('Não foi possível excluir: '+error.message);return}
+      const l=[...c.anexos];l.splice(i,1);
+      if(await salvarCartaoDe(c,{anexos:l},'Anexo excluído')){
+        const {data}=await db.from('captacao_historico').insert({cartao_id:c.id,tipo:'editado',texto:'excluiu o anexo '+a.nome,autor:meuEmail}).select('id,tipo,texto,de_coluna,para_coluna,autor,criado_em').single();
+        if(aberto===c){pintarAnexos();if(data){hist.unshift(data);pintarHist()}}
+      }}
+  });
   function pintarHist(){
     const so=$('#cSoComent').checked,list=hist.filter(h=>!so||h.tipo==='comentario');
     if(!list.length){$('#cHist').innerHTML='<p class="msg">Nada no histórico.</p>';return}
@@ -662,10 +720,11 @@
     }).join('');
   }
   $('#cSoComent').onchange=pintarHist;
-  async function salvarCartao(campos,oque){
-    const c=aberto,antes={...c};Object.assign(c,campos,{atualizado_em:new Date().toISOString()});
+  const salvarCartao=(campos,oque)=>salvarCartaoDe(aberto,campos,oque);
+  async function salvarCartaoDe(c,campos,oque){
+    const antes={...c};Object.assign(c,campos,{atualizado_em:new Date().toISOString()});
     const {error}=await db.from('captacao_cartoes').update({...campos,atualizado_em:c.atualizado_em}).eq('id',c.id);
-    if(error){Object.assign(c,antes);alert('Não foi possível salvar: '+error.message);pintarCartao();return false}
+    if(error){Object.assign(c,antes);alert('Não foi possível salvar: '+error.message);if(aberto===c)pintarCartao();return false}
     render();if(oque)toast(oque);return true;
   }
   $('#cTitulo').addEventListener('change',()=>{const t=$('#cTitulo').value.trim();if(!t){$('#cTitulo').value=aberto.titulo;return}if(t!==aberto.titulo)salvarCartao({titulo:t,referencia:refDe(t)},'Título salvo')});
@@ -694,7 +753,9 @@
     if(arquivar)cd.close();else abrirCartao(c.id);
   };
   $('#cExcluir').onclick=async()=>{
-    if(!await confirmar(`Excluir o cartão "${aberto.titulo}"? O cartão e os comentários serão apagados. Se ele já foi captado, a captação também sai do relatório. Para só tirar do quadro, prefira "Arquivar".`))return;
+    if(!await confirmar(`Excluir o cartão "${aberto.titulo}"? O cartão, os comentários e os anexos serão apagados. Se ele já foi captado, a captação também sai do relatório. Para só tirar do quadro, prefira "Arquivar".`))return;
+    const arqs=(aberto.anexos||[]).map(a=>a.caminho).filter(Boolean);
+    if(arqs.length){const r=await db.storage.from(ANEXOS).remove(arqs);if(r.error){alert('Não foi possível excluir os anexos: '+r.error.message);return}}
     const {error}=await db.from('captacao_cartoes').delete().eq('id',aberto.id);if(error){alert('Não foi possível excluir: '+error.message);return}
     cartoes=cartoes.filter(x=>x.id!==aberto.id);cd.close();render();toast('Cartão excluído');
   };
