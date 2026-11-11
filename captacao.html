@@ -68,6 +68,7 @@
     @media(max-width:600px){.aviso-top{flex-wrap:wrap}.aviso-top>:last-child{text-align:left}}
     .aviso-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);align-items:center}
     .aviso-meta .cid{background:#e6f1f7;color:#164555;border-radius:5px;padding:0 7px;font-weight:800}
+    .arq-aviso{background:#fff6e5;border:1px solid #f0d9ad;color:#7a5410;border-radius:10px;padding:8px 12px;font-size:.86rem;overflow-wrap:anywhere}
     .avs details{font-size:.86rem}.avs summary{cursor:pointer;color:var(--blue);font-weight:700}.avs .desc-aviso{white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f8f9;border-radius:10px;padding:10px 12px;margin-top:6px}
     /* Visão geral */
     .wrap{padding:6px clamp(16px,3vw,32px) 30px}
@@ -160,6 +161,7 @@
     <button data-tab="acessos">Acessos</button>
     <button data-tab="minhas">Minhas senhas</button>
     <button data-tab="avisos">Avisos de saída<span class="badge" id="avisosBadge" hidden></span></button>
+    <button data-tab="possiveis">Possíveis clientes<span class="badge" id="possBadge" hidden></span></button>
     <button data-tab="geral" data-gestor hidden>Visão geral</button>
   </nav>
 
@@ -225,6 +227,15 @@
     <div class="tools"><div class="grow"><h1>Avisos de saída</h1><p class="sub" id="avisosSub">Imóveis com aviso de saída do inquilino, enviados pela Pós-locação. A primeira captadora que clicar em <strong>Pegar</strong> recebe o cartão no próprio quadro, na primeira coluna, com a etiqueta PÓS.</p></div>
       <button class="secondary" id="avisosAtualizar">Atualizar</button></div>
     <div class="wrap"><div class="avisos" id="avisosLista"></div></div>
+  </section>
+
+  <section id="tab-possiveis" hidden>
+    <div class="tools"><div class="grow"><h1>Possíveis clientes</h1><p class="sub">Imóveis de aluguel anunciados pelo próprio dono (OLX e Eemovel) em Itajaí e Navegantes, a partir de R$ 4.000. A lista é atualizada nos dias úteis, por volta do meio-dia. Os imóveis que já são da Araujo no CRM ficam de fora; os parecidos aparecem com aviso. A primeira captadora que clicar em <strong>Pegar</strong> recebe o cartão no próprio quadro.</p></div>
+      <select id="possFiltro" aria-label="Filtrar"><option value="">Todos</option><option value="sem">Sem aviso do CRM</option><option value="com">Com aviso do CRM</option></select>
+      <select id="possOrdem" aria-label="Ordenar"><option value="valor">Maior valor</option><option value="data">Mais recentes</option></select>
+      <input class="busca" id="possBusca" type="search" placeholder="Buscar bairro, rua ou texto" aria-label="Buscar anúncio">
+      <button class="secondary" id="possAtualizar">Atualizar</button></div>
+    <div class="wrap"><div class="avisos" id="possLista"></div></div>
   </section>
 
   <section id="tab-geral" hidden>
@@ -429,7 +440,7 @@
     if(p.error||p.data!==true){show('denied');return}
     gestor=g.data===true;document.querySelectorAll('[data-gestor]').forEach(el=>el.hidden=!gestor);
     show('app');
-    if(!booted){booted=true;await carregarQuadros();carregarAvisos();carregarNotifs()}
+    if(!booted){booted=true;await carregarQuadros();carregarAvisos();carregarPossiveis();carregarNotifs()}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   $('#loginForm').onsubmit=async e=>{
@@ -449,8 +460,8 @@
   // Abas
   $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)abrirAba(b.dataset.tab)});
   function abrirAba(t){document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
-    for(const s of ['quadro','relatorio','materiais','acessos','minhas','avisos','geral'])$('#tab-'+s).hidden=s!==t;
-    if(t==='geral')visaoGeral();if(t==='acessos')carregarAcessos();if(t==='relatorio')abrirRelatorio();if(t==='materiais')carregarDocs();if(t==='minhas')carregarMinhas();if(t==='avisos')carregarAvisos()}
+    for(const s of ['quadro','relatorio','materiais','acessos','minhas','avisos','possiveis','geral'])$('#tab-'+s).hidden=s!==t;
+    if(t==='geral')visaoGeral();if(t==='acessos')carregarAcessos();if(t==='relatorio')abrirRelatorio();if(t==='materiais')carregarDocs();if(t==='minhas')carregarMinhas();if(t==='avisos')carregarAvisos();if(t==='possiveis')carregarPossiveis()}
 
   // ---------- Avisos de saída (ver supabase/captacao_avisos.sql) ----------
   // O cartão que entra em "AVISOS DE SAÍDA" no quadro Saídas e distratos vira aviso aqui. Todas as captadoras veem;
@@ -482,6 +493,76 @@
     await carregarAvisos();if(quadroId===meuQuadro()?.id)carregar();
   });
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&booted)carregarAvisos()});
+
+  // ---------- Possíveis clientes (ver supabase/captacao_possiveis.sql e automacoes/possiveis-clientes) ----------
+  // Anúncios de aluguel feitos pelo dono (OLX e Eemovel), Itajaí e Navegantes, a partir de R$ 4.000, coletados nos dias úteis.
+  // Os que já são nossos no CRM não chegam aqui; os parecidos chegam com o aviso do CRM. A primeira que pegar leva o cartão.
+  // O telefone do dono não é coletado: a captadora abre o anúncio e fala pelo próprio site.
+  let possiveis=[];
+  const brl0=v=>v==null?'':'R$ '+Math.round(+v).toLocaleString('pt-BR');
+  // Canal de contato do anúncio (só o tipo; o número não é guardado): "chat" = chat da OLX, "site" = formulário do site.
+  const contatoTxt=p=>String(p.contato||'').split(/,\s*/).map(c=>c==='chat'?(p.fonte==='olx'?'chat da OLX':'chat do site'):c==='site'?'pelo site do anúncio':c==='whatsapp'?'WhatsApp':c==='telefone'?'telefone no anúncio':c).join(', ');
+  const semAc=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  async function carregarPossiveis(){
+    const {data,error}=await db.rpc('captacao_possiveis_listar');
+    if(error){$('#possLista').innerHTML=`<p class="msg error">Não foi possível carregar os possíveis clientes: ${safe(error.message)}</p>`;return}
+    possiveis=data;pintarPossiveis();
+  }
+  function pintarPossiveis(){
+    const novos=possiveis.filter(p=>p.situacao==='novo'),meu=meuQuadro();
+    $('#possBadge').hidden=!novos.length;$('#possBadge').textContent=novos.length;
+    const f=$('#possFiltro').value,o=$('#possOrdem').value,q=semAc($('#possBusca').value).split(/\s+/).filter(Boolean);
+    const bate=p=>q.every(w=>semAc([p.titulo,p.bairro,p.rua,p.cidade,p.tipo,p.nosso_ref,p.cep].join(' ')).includes(w));
+    let lista=novos.filter(p=>(!f||(f==='com')===!!p.nosso_ref)&&bate(p));
+    lista.sort((a,b)=>o==='data'?String(b.anunciado_em||b.encontrado_em).localeCompare(String(a.anunciado_em||a.encontrado_em)):(+b.valor||0)-(+a.valor||0));
+    const fonte=p=>p.fonte==='olx'?'OLX':'Eemovel';
+    const item=p=>{
+      const end=[p.rua,p.bairro,p.cidade?p.cidade.charAt(0)+p.cidade.slice(1).toLowerCase():'',p.cep?p.cep.replace(/^(\d{5})(\d{3})$/,'$1-$2'):''].filter(Boolean).join(', ');
+      const med=[p.area?`${+p.area} m²`:'',p.quartos?`${p.quartos} quarto${p.quartos>1?'s':''}`:'',p.banheiros?`${p.banheiros} banh.`:'',p.vagas?`${p.vagas} vaga${p.vagas>1?'s':''}`:''].filter(Boolean).join(' · ');
+      const acao=p.situacao==='pego'?`<span class="msg">Pego por <strong>${safe(nome(p.pego_por))}</strong> em ${dataBr(p.pego_em)}</span>`
+        :p.situacao==='descartado'?`<span class="msg">Descartado por ${safe(nome(p.descartado_por))} em ${dataBr(p.descartado_em)}${p.motivo?`: ${safe(p.motivo)}`:''} <button class="link" data-desfazer="${p.id}">Desfazer</button></span>`
+        :`<span class="row" style="gap:6px;justify-content:flex-end">${meu?`<button class="primary" data-pegar-poss="${p.id}">Pegar</button>`:''}<button class="secondary" data-descartar="${p.id}">Descartar</button></span>`;
+      return `<article class="card avs${p.situacao!=='novo'?' pego':''}"><div class="aviso-top"><strong>${safe(p.titulo||'Anúncio sem título')}</strong>${acao}</div>
+        <div class="aviso-meta">${p.cidade?`<span class="cid">${safe(p.cidade)}</span>`:''}<span><strong style="color:var(--ink)">${brl0(p.valor)}</strong>${+p.condominio>1?` + cond. ${brl0(p.condominio)}`:''}</span>${med?`<span>${med}</span>`:''}${p.anunciado_em?`<span>Anunciado em ${dataBr(p.anunciado_em+'T12:00')}</span>`:''}<span>${fonte(p)}</span></div>
+        ${end||p.contato?`<div class="aviso-meta">${end?`<span>📍 ${safe(end)}</span>`:''}${p.contato?`<span>💬 Contato: ${safe(contatoTxt(p))}</span>`:''}</div>`:''}
+        ${p.nosso_ref?`<div class="arq-aviso" style="font-size:.84rem">⚠️ Parecido com o <strong>${safe(p.nosso_ref)}</strong> do CRM: ${safe(p.nosso_info||'')}. Confira antes de ligar.</div>`:''}
+        ${p.situacao!=='descartado'?`<div class="row" style="gap:4px 14px">${p.situacao==='novo'&&p.link?`<a class="link" style="padding-left:0" href="${safe(p.link)}" target="_blank" rel="noopener noreferrer">Ver anúncio na ${fonte(p)==='OLX'?'OLX':'origem'} ↗</a>`:''}${p.rua?`<button class="link" style="padding-left:0" data-eemovel="${p.id}" title="Copia o endereço e abre a Pesquisa de proprietários e moradores do Eemovel">🔎 Pesquisar dono no Eemovel ↗</button>`:''}</div>`:''}</article>`;
+    };
+    const outros=possiveis.filter(p=>p.situacao!=='novo');
+    $('#possLista').innerHTML=(meu||!novos.length?'':'<p class="msg">Só as captadoras com quadro podem pegar. A gerência acompanha e pode descartar.</p>')
+      +(lista.length?lista.map(item).join(''):`<div class="vazio-doc">${novos.length?'Nenhum anúncio com esse filtro.':'Nenhum possível cliente esperando. A lista é atualizada nos dias úteis, por volta do meio-dia.'}</div>`)
+      +(outros.length?`<details style="margin-top:10px"><summary class="msg" style="cursor:pointer;font-weight:700">Pegos e descartados nos últimos 30 dias (${outros.length})</summary><div class="avisos" style="margin-top:10px">${outros.map(item).join('')}</div></details>`:'');
+  }
+  ['#possFiltro','#possOrdem','#possBusca'].forEach(s=>$(s).addEventListener('input',pintarPossiveis));
+  $('#possAtualizar').onclick=carregarPossiveis;
+  $('#possLista').addEventListener('click',async e=>{
+    const pg=e.target.closest('[data-pegar-poss]'),ds=e.target.closest('[data-descartar]'),df=e.target.closest('[data-desfazer]'),ee=e.target.closest('[data-eemovel]');
+    // Pesquisa do dono no Eemovel (teste de 11/11/2026): grátis pesquisar o endereço; 1 crédito no "Ver mais" que tem contato.
+    // Funciona bem em casa. Em prédio, precisa do número do apartamento (perguntar no chat do anúncio antes).
+    if(ee){const p=possiveis.find(x=>x.id===ee.dataset.eemovel);const end=p?String(p.rua).split(' - ')[0]:'';
+      let copiado=false;try{await navigator.clipboard.writeText(end);copiado=true}catch{}
+      const w=window.open('https://brokers.eemovel.com.br/consulta','_blank');if(w)w.opener=null;
+      if(!w)alert('Abra o Eemovel em "Pesquisa de proprietários e moradores" e pesquise: '+end);
+      else toast(copiado?'Endereço copiado: no Eemovel, cole em "Endereço", escolha a sugestão e informe o número':'No Eemovel, digite: '+end);
+      return}
+    if(pg){pg.disabled=true;const {error}=await db.rpc('captacao_pegar_possivel',{p_id:pg.dataset.pegarPoss});
+      if(error){alert(error.message);pg.disabled=false;await carregarPossiveis();return}
+      toast('O cartão foi para o seu quadro, em '+(colunas[0]?.nome||'prospecção').toLowerCase());await carregarPossiveis();if(quadroId===meuQuadro()?.id)carregar();return}
+    if(ds){const motivo=await pedirMotivo();if(motivo===null)return;ds.disabled=true;
+      const {error}=await db.rpc('captacao_descartar_possivel',{p_id:ds.dataset.descartar,p_motivo:motivo});
+      if(error){alert(error.message);ds.disabled=false}await carregarPossiveis();return}
+    if(df){const {error}=await db.rpc('captacao_descartar_possivel',{p_id:df.dataset.desfazer,p_motivo:'',p_desfazer:true});if(error)alert(error.message);await carregarPossiveis()}
+  });
+  // Motivo do descarte numa janela da própria página (o prompt() do sistema é bloqueado em alguns navegadores).
+  function pedirMotivo(){return new Promise(res=>{const d=document.createElement('dialog');
+    d.innerHTML=`<form method="dialog" style="padding:22px;display:grid;gap:12px;width:min(440px,calc(100vw - 48px))"><strong>Descartar este anúncio?</strong>
+      <div class="field"><label for="motivoDesc">Motivo</label><select id="motivoDesc"><option>Já falamos com o dono</option><option>Dono não quer imobiliária</option><option>Imóvel já é nosso</option><option>Anúncio de imobiliária</option><option>Anúncio saiu do ar</option><option>Outro</option></select></div>
+      <div class="field"><label for="motivoObs">Observação (opcional)</label><input id="motivoObs" maxlength="200"></div>
+      <div class="row" style="justify-content:flex-end"><button type="button" class="secondary" value="n">Cancelar</button><button class="primary" value="s">Descartar</button></div></form>`;
+    let feito=false;const fim=v=>{if(!feito){feito=true;res(v)}};
+    d.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
+      fim(b.value==='s'?[d.querySelector('#motivoDesc').value,d.querySelector('#motivoObs').value.trim()].filter(Boolean).join(': '):null);d.close()});
+    d.addEventListener('close',()=>{fim(null);d.remove()});document.body.append(d);d.showModal()})}
 
   // ---------- Notificações da Pós-locação (supabase/captacao_notificacoes.sql) ----------
   // Datas de vistoria de saída e de entrega das chaves preenchidas no cartão de saídas, para a captadora que pegou o aviso.
