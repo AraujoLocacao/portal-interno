@@ -3,3 +3,9 @@
 !.env.example
 node_modules/
 .vercel/
+# Trilha da Corretora: páginas do material de treinamento e arquivos de trabalho (vão para o bucket privado "treinamento", não para o site)
+treinamento-paginas/
+materiais-trilha/
+# Conteúdo da trilha: fica no banco (treinamento_conteudo), não no site público
+treinamento-conteudo.local.js
+supabase/treinamento_conteudo_inicial.sql

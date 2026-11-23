@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Trilha da Corretora | Araujo Locação</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
+  <style>
+    :root{--navy:#173552;--blue:#294b68;--green:#24705a;--green-soft:#e3f1ea;--cream:#f5f5f0;--white:#fff;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10)}
+    *{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+    button,input{font:inherit;color:inherit} button{cursor:pointer} [hidden]{display:none!important}
+    header.bar{background:var(--navy);color:#fff;padding:14px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .bar a{color:#cbd8e1;text-decoration:none;font-weight:600;font-size:.9rem}.bar a:hover{color:#fff}
+    .bar strong{font-size:1.02rem}.bar .who{color:#b9cad7;font-size:.82rem;margin-right:8px;overflow-wrap:anywhere}
+    .bar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    main{padding:28px clamp(16px,4vw,48px) 64px;max-width:1080px;margin:0 auto}
+    h1{font-family:Georgia,serif;font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin:0}
+    h2{font-family:Georgia,serif;font-size:1.35rem;margin:0}
+    .primary{border:0;background:var(--green);color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;box-shadow:0 6px 18px rgba(36,112,90,.2);text-decoration:none;display:inline-flex;align-items:center;gap:6px}.primary:hover{background:#1d604d}
+    .secondary{border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:10px;font-weight:650;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px}.secondary:hover{border-color:#b6c5cf}
+    .ghost{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;font-size:.85rem}
+    .link{border:0;background:none;color:var(--blue);font-weight:700;padding:2px 4px;border-radius:6px;font-size:.84rem}.link:hover{background:#eef2f4}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .field{display:grid;gap:5px}.field label{font-size:.76rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .field input{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;min-width:0}
+    .field input:focus{outline:2px solid #9ec5f4;border-color:#6da7ec}
+    .gate{max-width:420px;margin:60px auto;padding:28px}.gate h1{font-size:1.6rem;margin-bottom:6px}.gate p{color:var(--muted);margin:0 0 18px}.gate form{display:grid;gap:14px}
+    .msg{margin:0;font-size:.85rem;color:var(--muted)}.msg.error{color:var(--red)}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:650;z-index:50;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+    .note{background:#fdf6e8;color:#7a5314;border:1px solid #f0dfbd;border-radius:12px;padding:10px 14px;font-size:.88rem;margin-bottom:18px}
+
+    /* Topo: progresso geral */
+    .hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;padding:26px 28px;margin-bottom:22px;background:linear-gradient(135deg,#fff 55%,#eef6f2)}
+    .eyebrow{font-size:.75rem;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.11em;margin-bottom:8px}
+    .hero p{color:var(--muted);margin:8px 0 16px;max-width:560px}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .ring{position:relative;width:148px;height:148px;flex:none}
+    .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+    .ring circle{fill:none;stroke-width:12}.ring .bg{stroke:#e4ebe7}.ring .fg{stroke:var(--green);stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+    .ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+    .ring strong{font-size:2.1rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--navy)}.ring small{color:var(--muted);font-size:.78rem;font-weight:650;margin-top:4px}
+
+    .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto}
+    .tab-link{padding:10px 16px;font-weight:700;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;white-space:nowrap}
+    .tab-link:hover{color:var(--ink)}.tab-link[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--green)}
+
+    /* Certificado de conclusão */
+    .certificado{padding:26px 28px;margin-bottom:22px;text-align:center;border:2px solid #cfe3da;background:radial-gradient(circle at 50% 0,#eef6f2,#fff 70%)}
+    .certificado .selo{width:64px;height:64px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;margin:0 auto 12px;box-shadow:0 8px 24px rgba(36,112,90,.3)}
+    .certificado h2{font-size:1.6rem}.certificado p{margin:8px auto 0;color:var(--muted);max-width:520px}
+
+    /* A trilha */
+    .trail{list-style:none;margin:0;padding:0;position:relative}
+    .trail li{position:relative;display:grid;grid-template-columns:56px 1fr;gap:16px;padding-bottom:16px}
+    .trail li::before{content:"";position:absolute;left:27px;top:56px;bottom:0;width:3px;background:#dfe5e1;border-radius:2px}
+    .trail li:last-child::before{display:none}
+    .trail li.is-done::before{background:var(--green)}
+    .trail li.parte-sep{padding:10px 0 18px}.trail li.parte-sep h2{font-size:1.2rem;color:var(--navy)}
+    .trail li.parte-sep::before{top:0}.trail li.parte-sep:first-child::before{display:none}
+    .node{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1.15rem;background:#fff;border:3px solid #cfd8dd;color:var(--muted);position:relative;z-index:1}
+    .is-done .node{background:var(--green);border-color:var(--green);color:#fff}
+    .is-current .node{border-color:var(--green);color:var(--green);box-shadow:0 0 0 6px rgba(36,112,90,.14)}
+    .is-locked .node{background:#eef1f2;border-color:#e0e5e8;color:#9aa6ae}
+    .mod-card{display:block;width:100%;text-align:left;padding:16px 18px;border-radius:16px;border:1px solid var(--line);background:#fff;box-shadow:0 6px 20px rgba(23,53,82,.06);transition:border-color .15s,transform .15s}
+    .mod-card:hover{border-color:#b6c5cf;transform:translateY(-1px)}
+    .mod-card:focus-visible{outline:2px solid #6da7ec;outline-offset:2px}
+    .is-current .mod-card{border-color:#9fcbb8;box-shadow:0 10px 30px rgba(36,112,90,.12)}
+    .is-locked .mod-card{background:#fafbfa;box-shadow:none;cursor:default}
+    .is-locked .mod-card:hover{transform:none;border-color:var(--line)}
+    .mod-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+    .mod-num{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+    .mod-card h3{margin:2px 0 4px;font-size:1.1rem;color:var(--navy)}.is-locked .mod-card h3{color:#6f7d86}
+    .mod-card p{margin:0 0 12px;color:var(--muted);font-size:.9rem}
+    .chip{border-radius:999px;padding:2px 10px;font-size:.72rem;font-weight:800;white-space:nowrap;background:#eef2f4;color:#52616c}
+    .chip.ok{background:var(--green-soft);color:var(--green)}.chip.now{background:#e8f0fa;color:#004AAD}
+    .bar-line{height:8px;border-radius:999px;background:#e9eeec;overflow:hidden}.bar-line i{display:block;height:100%;background:var(--green);border-radius:999px;transition:width .4s ease}
+    .mod-foot{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:.8rem;color:var(--muted);font-weight:650}
+
+    /* Módulo aberto */
+    .mod-head{padding:22px 24px;margin-bottom:16px}
+    .mod-head .row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+    .mod-head p{margin:6px 0 14px;color:var(--muted)}
+    .back{margin-bottom:14px}
+    .steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+    .step{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+    .step.open{border-color:#9fcbb8;box-shadow:0 10px 30px rgba(36,112,90,.10)}
+    .step-head{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;width:100%;padding:12px 16px;border:0;background:none;text-align:left}
+    .step-head:focus-visible{outline:2px solid #6da7ec;outline-offset:-2px}
+    .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#eef2f4;color:var(--blue)}
+    .ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .step.done .step-head .ico{background:var(--green);color:#fff}
+    .step-head b{display:block;font-size:.98rem;line-height:1.3}.step.done .step-head b{color:var(--muted)}
+    .step-head small{display:block;color:var(--muted);font-size:.78rem;font-weight:650;margin-top:2px}
+    .chev{width:10px;height:10px;border-right:2px solid #8a969e;border-bottom:2px solid #8a969e;transform:rotate(45deg);margin:0 6px 4px 0;transition:transform .2s}
+    .step.open .chev{transform:rotate(-135deg);margin-bottom:-4px}
+    .step-body{padding:2px 20px 20px 68px}
+    .step-body p{margin:0 0 10px}
+    .step-body ul,.step-body ol{margin:0 0 14px;padding-left:20px}.step-body li{margin:4px 0}
+    .refs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}
+    .video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0d1b26;margin:0 0 14px;max-width:720px}
+    .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .step-foot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid #eef1f2;padding-top:14px}
+    .feito{color:var(--green);font-weight:750;font-size:.9rem}
+    /* Checkpoint */
+    .quiz fieldset{border:1px solid var(--line);border-radius:12px;padding:12px 14px 8px;margin:0 0 12px}
+    .quiz legend{font-weight:750;padding:0 6px}
+    .quiz label{display:flex;gap:9px;align-items:flex-start;padding:7px 8px;border-radius:9px;cursor:pointer}
+    .quiz label:hover{background:#f6f8f8}.quiz input{margin-top:4px;accent-color:var(--green)}
+    .quiz fieldset.certo{border-color:#9fcbb8;background:#f4faf7}.quiz fieldset.errado{border-color:#e7c9c9;background:#fdf7f7}
+    .quiz .dica{font-size:.82rem;color:var(--red);margin:0 8px 6px;font-weight:650}
+    .mod-next{margin-top:18px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border:2px solid #cfe3da}
+
+    /* Equipe (gerência) */
+    .table-card{padding:20px}.table-wrap{overflow-x:auto}
+    table{border-collapse:collapse;width:100%;font-size:.9rem}
+    th{text-align:left;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:750;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+    td{padding:11px 10px;border-bottom:1px solid #eef1f2;vertical-align:middle}tr:last-child td{border-bottom:0}
+    td small{display:block;color:var(--muted);font-size:.78rem;overflow-wrap:anywhere}
+    .pct{display:flex;align-items:center;gap:10px;min-width:170px}.pct .bar-line{flex:1}.pct b{font-variant-numeric:tabular-nums;min-width:42px;text-align:right}
+    .mods{display:flex;gap:3px}.mods i{width:14px;height:14px;border-radius:4px;background:#e6ebee}.mods i.p{background:#a9d3c2}.mods i.c{background:var(--green)}
+    .empty{padding:30px;text-align:center;color:var(--muted)}
+
+    /* Materiais dentro da etapa */
+    .mats{display:grid;gap:10px;margin:4px 0 16px}
+    .mat{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fbfcfb}
+    .mat.aberto{border-color:#b7d6c8}
+    .mat-head{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:9px 12px;text-align:left}
+    .mat-head .ico{width:32px;height:32px;border-radius:9px}
+    .mat-head b{flex:1;font-size:.92rem}
+    .mat-acao{font-size:.8rem;font-weight:750;color:var(--green);white-space:nowrap}
+    .viewer{position:relative;height:min(72vh,720px);background:#fff;border-top:1px solid var(--line)}
+    .viewer.v{height:auto;aspect-ratio:16/9;background:#0d1b26}
+    .viewer iframe,.viewer video{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .viewer img{display:block;max-width:100%;margin:0 auto;max-height:100%}
+    .viewer:fullscreen{height:100vh}
+    .viewer.img{height:auto;background:#f3f5f6;padding:10px}.viewer.img img{max-height:70vh;border-radius:8px;box-shadow:0 2px 8px rgba(23,53,82,.08)}
+    .viewer.pags{height:auto;max-height:none;background:#eef1f2;display:grid;gap:10px;padding:10px}
+    .viewer.pags:fullscreen{overflow:auto}
+    .viewer.pags figure{margin:0;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(23,53,82,.08)}
+    .viewer.pags img{display:block;width:100%;height:auto;max-height:none;aspect-ratio:16/9;object-fit:contain}
+    .viewer.pags img[data-path]{aspect-ratio:auto}
+    .viewer.pags figcaption{font-size:.76rem;font-weight:700;color:var(--muted);padding:5px 10px;border-top:1px solid #eef1f2}
+    .faq{display:grid;gap:8px;margin:4px 0 16px}
+    .faq details{border:1px solid var(--line);border-radius:12px;background:#fbfcfb}
+    .faq details[open]{border-color:#b7d6c8;background:#fff}
+    .faq summary{cursor:pointer;font-weight:700;padding:11px 14px;list-style-position:inside}
+    .faq summary:focus-visible{outline:2px solid #6da7ec;outline-offset:-2px;border-radius:12px}
+    .faq-r{padding:0 16px 10px}.faq-r p{margin:0 0 8px}.faq-r ul{margin:0 0 8px}
+    .alerta{background:#fdece4;color:#7a2e1f;border:1px solid #f1c7b6;border-left:5px solid var(--red);border-radius:10px;padding:10px 14px;font-weight:700;margin:2px 0 14px!important}
+    .modelos{display:grid;gap:10px;margin:4px 0 16px}
+    .modelo{border:1px solid var(--line);border-radius:12px;background:#fbfcfb;overflow:hidden}
+    .modelo-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px 8px 14px;border-bottom:1px solid var(--line);background:#fff}
+    .modelo-head .secondary{padding:6px 12px;font-size:.85rem}
+    .modelo pre{margin:0;padding:12px 14px;white-space:pre-wrap;font-family:inherit;font-size:.9rem;line-height:1.5}
+    .edit-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+    .mat-foot{display:flex;justify-content:flex-end;padding:4px 8px;border-top:1px solid var(--line);background:#fff}
+    .link.danger{color:var(--red)}.link:disabled{opacity:.35;cursor:default;background:none}
+
+    /* Edição (gerência) */
+    .edit-note{background:#e8f0fa;color:#1d3f66;border-color:#c9daf0}
+    .edit-bar{display:flex;gap:4px;flex-wrap:wrap;padding:6px 4px 0}
+    .step>.edit-bar{padding:0 16px 8px 68px}
+    .novo{margin:8px 0 0 72px}
+    .quiz-ver{margin:0 0 10px;padding-left:20px}.quiz-ver ul{margin:4px 0 8px}.quiz-ver .certa{color:var(--green);font-weight:750}
+    dialog{border:0;border-radius:18px;padding:0;box-shadow:0 28px 90px rgba(10,30,45,.3);width:min(600px,calc(100% - 32px));overflow-x:hidden}
+    dialog.largo{width:min(800px,calc(100% - 32px))}
+    dialog::backdrop{background:rgba(10,30,45,.62);backdrop-filter:blur(3px)}
+    .dialog-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+    .close{border:0;background:#eef2f4;width:34px;height:34px;border-radius:50%;font-size:1.2rem}
+    dialog form{padding:18px 22px 22px;display:grid;gap:14px}
+    .field textarea,.field select{width:100%;border:1px solid #cbd5da;border-radius:10px;padding:9px 11px;background:#fff;min-width:0;font:inherit}
+    .field .lbl{font-size:.76rem;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .row2{display:grid;grid-template-columns:1fr 220px;gap:14px}
+    .check{display:flex;align-items:center;gap:7px;font-size:.88rem;font-weight:650;text-transform:none;letter-spacing:0;color:var(--ink)}
+    .actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+    .mat-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) auto;gap:8px;align-items:center;margin-bottom:8px}
+    .mat-row input{border:1px solid #cbd5da;border-radius:10px;padding:8px 10px;min-width:0}.mat-row input[readonly]{background:#f3f6f5;color:var(--muted)}
+    .q-ed{border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px;display:grid;gap:10px}
+    .q-foot{display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap}
+
+    @media (max-width:640px){
+      .hero{grid-template-columns:1fr;padding:20px}.ring{width:120px;height:120px;justify-self:start;grid-row:1}
+      .trail li{grid-template-columns:40px 1fr;gap:12px}.node{width:40px;height:40px;font-size:.95rem}.trail li::before{left:19px;top:40px}
+      .step-body{padding:2px 16px 18px}
+      .step-head{grid-template-columns:36px 1fr auto;padding:12px}.ico{width:36px;height:36px}
+      .step>.edit-bar{padding:0 12px 8px}.novo{margin-left:52px}.row2,.mat-row{grid-template-columns:1fr}
+    }
+    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+    /* Certificado */
+    #certDoc{position:fixed;inset:0;z-index:60;background:rgba(10,30,45,.72);overflow:auto;padding:20px 16px 40px}
+    .cert-tools{max-width:960px;margin:0 auto 14px;background:#fff;border-radius:14px;padding:14px 16px;display:flex;gap:14px;align-items:end;flex-wrap:wrap}
+    .cert-tools .field{flex:1;min-width:220px}.cert-tools .msg{flex-basis:100%;margin:0}
+    .cert-botoes{display:flex;gap:10px;flex-wrap:wrap}
+    .cert-page{max-width:960px;margin:0 auto;aspect-ratio:297/210;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:2.2%;font-family:Georgia,"Times New Roman",serif;color:#142431}
+    .cert-borda{height:100%;border:3px solid #004AAD;outline:1px solid #7FA3D0;outline-offset:-10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3% 8%;background:radial-gradient(circle at 50% 0,#eef4fb,#fff 60%)}
+    .cert-logo{width:clamp(90px,16%,170px);height:auto;margin-bottom:2%}
+    .cert-eyebrow{font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:clamp(.7rem,1.4vw,1rem);letter-spacing:.3em;text-transform:uppercase;color:#004AAD;font-weight:700}
+    .cert-titulo{font-size:clamp(1.3rem,3.6vw,2.6rem);color:#173552;margin:1% 0 3%}
+    .cert-texto{font-size:clamp(.8rem,1.6vw,1.15rem);margin:0;line-height:1.5;max-width:760px}
+    .cert-nome{font-size:clamp(1.5rem,4.4vw,3.2rem);font-style:italic;color:#004AAD;margin:1.5% 0 2.5%;border-bottom:2px solid #7FA3D0;padding:0 4% 1%;min-width:50%}
+    .cert-data{font-size:clamp(.8rem,1.5vw,1.05rem);margin:3% 0 0;color:#3b4a56}
+    .cert-assin{margin-top:4%;display:grid;justify-items:center;gap:2px;font-family:Inter,"Segoe UI",Arial,sans-serif}
+    .cert-assin .linha{display:block;width:clamp(160px,30vw,280px);border-top:1.5px solid #173552;margin-bottom:6px}
+    .cert-assin b{font-size:clamp(.85rem,1.5vw,1.05rem)}.cert-assin small{color:#65727d;font-size:clamp(.7rem,1.2vw,.85rem)}
+    @media print{
+      @page{size:A4 landscape;margin:0}
+      body.imprimindo>*:not(#certDoc){display:none!important}
+      body.imprimindo{background:#fff}
+      body.imprimindo #certDoc{position:static;background:none;padding:0;overflow:visible}
+      body.imprimindo .cert-tools{display:none}
+      body.imprimindo .cert-page{max-width:none;width:297mm;height:210mm;aspect-ratio:auto;box-shadow:none;padding:8mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body.imprimindo .cert-titulo{font-size:30pt}body.imprimindo .cert-nome{font-size:36pt}body.imprimindo .cert-texto{font-size:13pt}body.imprimindo .cert-eyebrow{font-size:11pt}body.imprimindo .cert-data{font-size:12pt}
+    }
+  </style>
+</head>
+<body>
+<header class="bar">
+  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Trilha da Corretora</strong></div>
+  <div class="bar-actions" id="barActions" hidden><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
+</header>
+
+<section class="card gate" id="gate" hidden>
+  <h1>Trilha da Corretora</h1>
+  <p>Treinamento da corretora de locação. Entre com o seu e-mail e senha do portal.</p>
+  <form id="loginForm">
+    <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
+    <button class="primary" type="submit" style="justify-content:center">Entrar</button>
+    <p class="msg error" id="loginMsg" hidden></p>
+    <a href="redefinir-senha.html" style="justify-self:start;font-size:.86rem;font-weight:650;color:#294b68">Esqueci minha senha</a>
+  </form>
+</section>
+
+<section class="card gate" id="denied" hidden>
+  <h1>Sem acesso</h1>
+  <p>Este login ainda não tem acesso à trilha das corretoras de locação. Fale com a gerência.</p>
+  <button class="secondary" id="deniedLogout">Entrar com outro e-mail</button>
+</section>
+
+<main id="app" hidden>
+  <p class="note" id="demoNote" hidden><strong>Demonstração.</strong> O progresso fica salvo só neste navegador. Com login, ele fica guardado no portal.</p>
+
+  <section class="card hero" aria-labelledby="heroTitle">
+    <div>
+      <div class="eyebrow">Comercial · Corretoras de locação</div>
+      <h1 id="heroTitle">Trilha da Corretora</h1>
+      <p id="heroText">Do primeiro contato com o lead à entrega das chaves: o treinamento da Araujo e as aulas de atendimento comercial da Cupola. Siga os módulos em ordem e marque cada etapa ao concluir.</p>
+      <div class="hero-actions"><button class="primary" id="continuar">Continuar ▸</button><button class="secondary" id="editar" hidden>✎ Editar trilha</button><span class="msg" id="heroCount"></span></div>
+    </div>
+    <div class="ring" role="img" id="ring" aria-label="Progresso">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ringFg" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="326.73"/></svg>
+      <div><strong id="ringPct">0%</strong><small>concluído</small></div>
+    </div>
+  </section>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Seções" hidden>
+    <button class="tab-link" role="tab" data-tab="trilha" aria-selected="true">Minha trilha</button>
+    <button class="tab-link" role="tab" data-tab="equipe" aria-selected="false">Equipe</button>
+  </nav>
+
+  <div id="tab-trilha">
+    <p class="note" id="gestorNote" hidden><strong>Visão da gerência.</strong> Todos os módulos ficam liberados para você revisar. Para as corretoras, cada módulo abre quando o anterior chega a 100%.</p>
+    <p class="note edit-note" id="editNote" hidden><strong>Modo edição.</strong> Cada mudança é salva na hora e as corretoras veem a nova versão quando abrirem a trilha. Abra um módulo para editar as etapas. <span id="editInfo"></span>
+      <span class="edit-acoes"><button type="button" class="secondary" id="verModeloCert">🎓 Ver o certificado</button><button type="button" class="secondary" id="enviarPaginas">⬆ Enviar páginas e imagens da trilha</button><input type="file" id="arqPaginas" multiple accept="image/jpeg,image/png,application/pdf,video/mp4" hidden><span class="msg" id="msgPaginas"></span></span></p>
+    <section class="card certificado" id="certificado" hidden></section>
+    <div id="trilha"></div>
+    <div id="modulo" hidden></div>
+  </div>
+
+  <div id="tab-equipe" hidden>
+    <div style="margin-bottom:16px"><h2>Progresso da equipe</h2><p class="msg" style="margin-top:4px">Corretoras liberadas em Corretoras de locação e quem já começou a trilha.</p></div>
+    <div class="card table-card"><div class="table-wrap" id="equipe"><div class="empty">Carregando…</div></div></div>
+  </div>
+</main>
+
+<!-- Certificado de conclusão: abre por cima da página e imprime sozinho (A4 deitado) -->
+<section id="certDoc" hidden aria-label="Certificado de conclusão">
+  <div class="cert-tools">
+    <div class="field"><label for="certNome">Nome no certificado</label><input id="certNome" maxlength="80" autocomplete="name"></div>
+    <div class="cert-botoes"><button type="button" class="primary" id="certImprimir">🖨 Imprimir ou salvar em PDF</button><button type="button" class="secondary" id="certFechar">Fechar</button></div>
+    <p class="msg">Para salvar em PDF, escolha "Salvar como PDF" na janela de impressão.</p>
+  </div>
+  <div class="cert-page">
+    <div class="cert-borda">
+      <img src="logo-araujo.jpg" alt="Araujo Locação" class="cert-logo">
+      <div class="cert-eyebrow">Certificado de conclusão</div>
+      <h1 class="cert-titulo">Trilha da Corretora de Locação</h1>
+      <p class="cert-texto">Certificamos que</p>
+      <div class="cert-nome" id="certNomeTexto"></div>
+      <p class="cert-texto" id="certDescricao"></p>
+      <p class="cert-data" id="certData"></p>
+      <div class="cert-assin"><span class="linha"></span><b>Stefani</b><small>Gestora · Araujo Locação</small></div>
+    </div>
+  </div>
+</section>
+
+<dialog id="dlgModulo">
+  <div class="dialog-head"><h2 id="dlgModuloTitulo">Módulo</h2><button class="close" type="button" data-close aria-label="Fechar">×</button></div>
+  <form id="formModulo" novalidate>
+    <div class="field"><label for="fmTitulo">Título do módulo</label><input id="fmTitulo" maxlength="120" required></div>
+    <div class="field"><label for="fmDesc">Descrição (aparece no cartão da trilha)</label><textarea id="fmDesc" rows="3" maxlength="400"></textarea></div>
+    <div class="field"><label for="fmParte">Parte da trilha</label><select id="fmParte"></select></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary">Salvar</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgEtapa" class="largo">
+  <div class="dialog-head"><h2 id="dlgEtapaTitulo">Etapa</h2><button class="close" type="button" data-close aria-label="Fechar">×</button></div>
+  <form id="formEtapa" novalidate>
+    <div class="row2">
+      <div class="field"><label for="feTitulo">Título da etapa</label><input id="feTitulo" maxlength="160" required></div>
+      <div class="field"><label for="feTipo">Tipo</label><select id="feTipo"></select></div>
+    </div>
+    <div class="field"><label for="feAlerta">Aviso em destaque (opcional, aparece em vermelho no topo da etapa)</label><input id="feAlerta" maxlength="300"></div>
+    <div class="field"><label for="feTexto">Texto de abertura (opcional)</label><textarea id="feTexto" rows="2" maxlength="1500"></textarea></div>
+    <div class="field"><label for="fePontos">Pontos principais (um por linha)</label><textarea id="fePontos" rows="6" maxlength="6000"></textarea>
+      <label class="check"><input type="checkbox" id="feOrdenada"> Mostrar como lista numerada (passo a passo)</label></div>
+    <div class="field"><label for="feFaq">Perguntas e respostas (opcional)</label><textarea id="feFaq" rows="6" maxlength="30000"></textarea>
+      <p class="msg">Uma pergunta por bloco: a primeira linha é a pergunta e as de baixo são a resposta. Deixe uma linha em branco entre um bloco e outro. Linhas que começam com • viram lista. Para um botão que abre um site, escreva numa linha: [Texto do botão](https://endereço)</p></div>
+    <div class="field"><label for="feModelos">Modelos para copiar (opcional)</label><textarea id="feModelos" rows="6" maxlength="20000"></textarea>
+      <p class="msg">Textos que a corretora copia e cola no WhatsApp. A primeira linha é o nome do modelo e as de baixo são o texto. Para separar um modelo do outro, use uma linha só com três traços: ---</p></div>
+    <div class="field" style="max-width:420px"><label for="feRef">Páginas do material de treinamento (opcional)</label><input id="feRef" maxlength="40" placeholder="Ex.: 13–15"><p class="msg">Essas páginas aparecem dentro da etapa, já abertas no ponto certo.</p></div>
+    <div class="field" id="grpYoutube"><label for="feYt">Link do vídeo no YouTube</label><input id="feYt" placeholder="https://www.youtube.com/watch?v=…"></div>
+    <div class="field" id="grpMateriais"><span class="lbl">Materiais da etapa</span>
+      <p class="msg">Links do Drive, Google Docs e YouTube e os arquivos enviados abrem dentro da trilha. Outros sites abrem em nova aba.</p>
+      <div id="feMateriais"></div>
+      <div class="actions" style="justify-content:flex-start"><button type="button" class="secondary" id="feAddMat">+ Colar link</button><button type="button" class="secondary" id="feArquivoBtn">⬆ Enviar arquivo (PDF, imagem ou vídeo até 50 MB)</button><input type="file" id="feArquivo" accept="application/pdf,image/*,video/mp4,video/webm,video/quicktime" hidden></div>
+      <p class="msg" id="feEnvio"></p>
+    </div>
+    <div class="field" id="grpQuiz"><span class="lbl">Perguntas do checkpoint</span><div id="fePerguntas"></div>
+      <div><button type="button" class="secondary" id="feAddQ">+ Adicionar pergunta</button></div></div>
+    <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary">Salvar etapa</button></div>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Trilha de treinamento da corretora de locação (20/11/2026; edição pela página em 22/11/2026).
+  // Conteúdo: a gerência edita na própria página ("Editar trilha"), e tudo fica na tabela treinamento_conteudo.
+  // PADRAO, abaixo, é só o conteúdo inicial (pasta "Corretora - Araujo Locação" do Drive, Lais e Cupola), usado enquanto
+  // nada foi salvo. Materiais do Drive, Google Docs, YouTube e arquivos enviados abrem dentro da etapa.
+  // Progresso: tabela treinamento_progresso (supabase/treinamento.sql), uma linha por etapa concluída.
+  // ?demo abre sem login (visão da gerência; &corretora mostra a visão da corretora), com tudo salvo só no navegador.
+  // Os ids das etapas ficam gravados no banco: a edição mantém o id; etapas novas ganham id próprio.
+
+  const SUPABASE_URL='https://qlwqluemvkqkohtklrct.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_esXUe_LAhWn0n68AxQeBww_hdD4yIIQ';
+  const DEP='corretoras-locacao';
+
+  // O conteúdo da trilha fica no banco (treinamento_conteudo), com login, e não neste arquivo público.
+  // Na prévia local (?demo), ele vem de treinamento-conteudo.local.js, que fica fora do git e do site.
+  let PADRAO=[];
+  // Partes da trilha: viram separadores na lista de módulos (campo "parte" de cada módulo).
+  const PARTES={
+    araujo:{rotulo:'Parte 1 · Araujo Locação',titulo:'Treinamento da corretora de locação',texto:'O nosso processo, do lead à entrega das chaves.'},
+    cupola:{rotulo:'Parte 2 · Cupola',titulo:'Trilha 3: Comercial · Atendimento Comercial',texto:'Aulas em vídeo na plataforma Cupola, assistidas com o login de cada corretora. Marque cada aula aqui ao terminar.'}};
+  const TIPOS={leitura:'Leitura',material:'Material',video:'Vídeo do sistema',youtube:'Vídeo',cupola:'Aula em vídeo · Cupola',quiz:'Checkpoint'};
+  const ICONES={
+    leitura:'<path d="M4 5.5C6.5 4 9.5 4 12 5.5v14c-2.5-1.5-5.5-1.5-8 0zM20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/>',
+    material:'<path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/>',
+    video:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
+    youtube:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
+    cupola:'<path d="M3 10 12 5l9 5-9 5zM7 12.2V16c3 2 7 2 10 0v-3.8"/>',
+    quiz:'<path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
+    feito:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+    cadeado:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
+  const svg=(k,s=20)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">${ICONES[k]}</svg>`;
+
+  const $=s=>document.querySelector(s);
+  const safe=s=>{const d=document.createElement('div');d.textContent=s??'';return d.innerHTML};
+  const br=iso=>{if(!iso)return '';const d=new Date(iso);return d.toLocaleDateString('pt-BR')};
+  const brHora=iso=>{if(!iso)return '';const d=new Date(iso);return d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
+  const clonar=o=>JSON.parse(JSON.stringify(o));
+  const novoId=p=>p+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  function toast(text){const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=text;document.body.append(t);setTimeout(()=>t.remove(),2800)}
+
+  const P=new URLSearchParams(location.search);
+  const DEMO=P.has('demo');
+  const db=DEMO?null:supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  let MODS=[],TODAS=[],IDS=new Set();
+  function usarConteudo(mods){MODS=mods;TODAS=MODS.flatMap(m=>m.etapas);IDS=new Set(TODAS.map(e=>e.id))}
+  usarConteudo([]);
+  let feitos=new Map(),gestor=false,email='',booted=false,editando=false,infoConteudo=null;
+  let modAberto=null,etapaAberta=null,respostas={};
+  const visor=new Map();      // material aberto ou fechado dentro da etapa (chave etapa:índice)
+  const linksArquivo=new Map(); // links temporários dos arquivos enviados pela trilha
+
+  // ---------- Onde o progresso fica ----------
+  const CHAVE='trilha-corretora-demo';
+  const ler=k=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}};
+  const gravar=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+  const store=DEMO?{
+    async carregar(){return new Map(Object.entries(ler(CHAVE)||{}))},
+    async marcar(){gravar(CHAVE,Object.fromEntries(feitos))},
+    async desmarcar(){gravar(CHAVE,Object.fromEntries(feitos))}
+  }:{
+    async carregar(){const {data,error}=await db.from('treinamento_progresso').select('item,concluido_em').eq('email',email);if(error)throw error;return new Map(data.map(r=>[r.item,r.concluido_em]))},
+    async marcar(id){const {error}=await db.from('treinamento_progresso').insert({email,item:id});if(error&&error.code!=='23505')throw error},
+    async desmarcar(id){const {error}=await db.from('treinamento_progresso').delete().eq('email',email).eq('item',id);if(error)throw error}
+  };
+
+  // ---------- Onde o conteúdo fica (tabela treinamento_conteudo; na demonstração, o navegador) ----------
+  const CHAVE_CONT='trilha-conteudo-demo';
+  const conteudo=DEMO?{
+    async carregar(){return ler(CHAVE_CONT)},
+    async salvar(mods){const info={modulos:mods,atualizado_em:new Date().toISOString(),atualizado_por:'demonstração'};gravar(CHAVE_CONT,info);return info}
+  }:{
+    async carregar(){const {data,error}=await db.from('treinamento_conteudo').select('modulos,atualizado_em,atualizado_por').eq('id','trilha').maybeSingle();if(error)throw error;return data},
+    async salvar(mods){const info={id:'trilha',modulos:mods,atualizado_em:new Date().toISOString(),atualizado_por:email};const {error}=await db.from('treinamento_conteudo').upsert(info);if(error)throw error;return info}
+  };
+
+  // ---------- Contas ----------
+  const feitasDo=m=>m.etapas.filter(e=>feitos.has(e.id)).length;
+  const completo=i=>feitasDo(MODS[i])===MODS[i].etapas.length;
+  const liberado=i=>gestor||i===0||completo(i-1);
+  const totalFeitas=()=>TODAS.filter(e=>feitos.has(e.id)).length;
+  const pct=n=>TODAS.length?Math.round(n/TODAS.length*100):0;
+  const atual=()=>MODS.findIndex((m,i)=>liberado(i)&&!completo(i));
+  const pc=(n,t)=>t?Math.round(n/t*100):0;
+
+  // ---------- Topo ----------
+  function renderHero(){
+    const n=totalFeitas(),p=pct(n);
+    $('#ringPct').textContent=p+'%';
+    $('#ringFg').style.strokeDashoffset=String(326.73*(1-p/100));
+    $('#ring').setAttribute('aria-label',`Progresso da trilha: ${p}%`);
+    $('#heroCount').textContent=`${n} de ${TODAS.length} etapas · ${MODS.filter((m,i)=>completo(i)).length} de ${MODS.length} módulos`;
+    const i=atual();
+    $('#continuar').hidden=i<0||editando;
+    $('#continuar').textContent=n===0?'Começar a trilha ▸':'Continuar ▸';
+    $('#editar').hidden=!gestor;
+    $('#editar').textContent=editando?'✓ Concluir edição':'✎ Editar trilha';
+    $('#editar').className=editando?'primary':'secondary';
+    $('#editNote').hidden=!editando;
+    if(editando)$('#editInfo').textContent=infoConteudo?.atualizado_em?`Última alteração em ${brHora(infoConteudo.atualizado_em)}${infoConteudo.atualizado_por?` (${infoConteudo.atualizado_por})`:''}.`:'Ainda sem alterações: a trilha está com o conteúdo inicial.';
+    const cert=$('#certificado');
+    if(p===100&&!editando){
+      const fim=[...feitos.values()].sort().pop();
+      cert.innerHTML=`<div class="selo">${svg('feito',32)}</div><h2>Trilha concluída!</h2><p>Você completou os ${MODS.length} módulos da Trilha da Corretora${fim?` em ${br(fim)}`:''}. Agora é colocar o Padrão Araujo em prática em cada atendimento.</p><p style="margin-top:14px"><button type="button" class="primary" data-certificado>🎓 Ver o meu certificado</button></p>`;
+      cert.querySelector('[data-certificado]').onclick=()=>abrirCertificado(nomeCertificado(),fim);
+      cert.hidden=modAberto!==null;
+    }else cert.hidden=true;
+  }
+
+  // ---------- Certificado de conclusão ----------
+  // Aparece quando a corretora chega a 100%. O nome vem do que ela digitou antes (navegador), do cadastro da corretora ou do e-mail.
+  let nomeCorretora='';
+  const CHAVE_NOME='trilha-nome-certificado';
+  const nomeCertificado=()=>{try{const n=localStorage.getItem(CHAVE_NOME);if(n)return n}catch{}return nomeCorretora||(email?email.split('@')[0]:'')};
+  const dataExtenso=iso=>{const d=iso?new Date(iso):new Date();return d.toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})};
+  let certProprio=true;
+  function abrirCertificado(nome,quando,proprio=true){
+    certProprio=proprio;
+    $('#certNome').value=nome||'';$('#certNomeTexto').textContent=nome||'Nome da corretora';
+    $('#certDescricao').textContent=`concluiu a Trilha da Corretora de Locação da Araujo Locação, com os ${MODS.length} módulos e as ${TODAS.length} etapas do treinamento: cultura e processo da Araujo, atendimento com a Lais, sistema e CRM, atendimento e qualificação, pré-análise, visitas, garantias, proposta, contrato e entrega das chaves, Lei do Inquilinato e cases de sucesso, além da Trilha 3: Comercial da Cupola.`;
+    $('#certData').textContent=`Itajaí/SC, ${dataExtenso(quando)}.`;
+    $('#certDoc').hidden=false;document.body.style.overflow='hidden';$('#certNome').focus();
+  }
+  $('#certNome').oninput=e=>{const v=e.target.value.trim();$('#certNomeTexto').textContent=v||'Nome da corretora';if(certProprio){try{localStorage.setItem(CHAVE_NOME,v)}catch{}}};
+  $('#certFechar').onclick=()=>{$('#certDoc').hidden=true;document.body.style.overflow=''};
+  $('#certImprimir').onclick=()=>{document.body.classList.add('imprimindo');window.print();setTimeout(()=>document.body.classList.remove('imprimindo'),500)};
+  window.addEventListener('afterprint',()=>document.body.classList.remove('imprimindo'));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#certDoc').hidden)$('#certFechar').click()});
+  $('#verModeloCert').onclick=()=>abrirCertificado('Nome da corretora',null,false);
+
+  // ---------- A trilha ----------
+  const barraEd=(tipo,id,i,total)=>`<div class="edit-bar"><button type="button" class="link" data-ed-${tipo}="${id}">✎ Editar</button><button type="button" class="link" data-sobe-${tipo}="${id}" ${i===0?'disabled':''} aria-label="Mover para cima">↑ Subir</button><button type="button" class="link" data-desce-${tipo}="${id}" ${i===total-1?'disabled':''} aria-label="Mover para baixo">↓ Descer</button><button type="button" class="link danger" data-del-${tipo}="${id}">Excluir</button></div>`;
+  function renderTrilha(){
+    if(!MODS.length){$('#trilha').innerHTML=`<div class="card empty">A trilha ainda não foi carregada no portal.${gestor?' Rode a carga inicial do conteúdo no Supabase (supabase/treinamento_conteudo_inicial.sql) ou use “Editar trilha” para criar os módulos.':' Fale com a gerência.'}</div>`;return}
+    const cur=atual();
+    $('#trilha').innerHTML=`<ol class="trail">${MODS.map((m,i)=>{
+      const n=feitasDo(m),t=m.etapas.length,done=t>0&&n===t,lib=liberado(i),isCur=i===cur;
+      const cls=done?'is-done':!lib?'is-locked':isCur?'is-current':'';
+      const chip=done?'<span class="chip ok">Concluído</span>':!lib?'<span class="chip">Bloqueado</span>':n?'<span class="chip now">Em andamento</span>':isCur?'<span class="chip now">Próximo</span>':'<span class="chip">Liberado</span>';
+      const node=done?svg('feito',24):!lib?svg('cadeado',20):i+1;
+      const parte=m.parte||'araujo',pt=PARTES[parte]||PARTES.araujo;
+      const sep=(i===0||parte!==(MODS[i-1].parte||'araujo'))?`<li class="parte-sep"><div></div><div><div class="eyebrow" style="margin-bottom:2px">${safe(pt.rotulo)}</div><h2>${safe(pt.titulo)}</h2><p class="msg" style="margin-top:4px">${safe(pt.texto)}</p></div></li>`:'';
+      return `${sep}<li class="${cls}"><div class="node" aria-hidden="true">${node}</div><div>
+        <button type="button" class="mod-card" data-mod="${i}" ${lib?'':'aria-disabled="true"'} aria-label="Módulo ${i+1}: ${safe(m.titulo)}. ${n} de ${t} etapas${lib?'':'. Bloqueado'}">
+          <div class="mod-top"><span class="mod-num">Módulo ${i+1}</span>${chip}</div>
+          <h3>${safe(m.titulo)}</h3><p>${safe(m.desc)}</p>
+          <div class="bar-line"><i style="width:${pc(n,t)}%"></i></div>
+          <div class="mod-foot"><span>${n} de ${t} etapas</span><span>${pc(n,t)}%</span></div>
+        </button>${editando?barraEd('mod',i,i,MODS.length):''}</div></li>`}).join('')}</ol>
+      ${editando?'<button type="button" class="secondary novo" data-novo-mod>+ Novo módulo</button>':''}`;
+  }
+  $('#trilha').addEventListener('click',e=>{
+    if(acaoEdicao(e))return;
+    const b=e.target.closest('[data-mod]');if(!b)return;
+    const i=+b.dataset.mod;
+    if(!liberado(i)){toast(`Conclua o módulo ${i} para liberar este`);return}
+    abrirModulo(i);
+  });
+
+  // ---------- Módulo aberto ----------
+  function abrirModulo(i,etapa){
+    modAberto=i;const m=MODS[i];
+    etapaAberta=etapa||(m.etapas.find(e=>!feitos.has(e.id))||m.etapas[0])?.id||null;
+    try{history.replaceState(null,'','#m'+(i+1))}catch{}
+    render();window.scrollTo({top:$('#tab-trilha').offsetTop-12,behavior:'smooth'});
+  }
+  function fecharModulo(){
+    modAberto=null;etapaAberta=null;
+    try{history.replaceState(null,'',location.pathname+location.search)}catch{}
+    render();
+  }
+
+  // Materiais: o que for do Drive, Google Docs, YouTube ou arquivo enviado abre dentro da etapa.
+  const TREIN_ROTULO=r=>'Material de treinamento · '+(r.includes('–')||r.includes('-')?'págs. ':'pág. ')+r;
+  const materiaisDe=e=>[...(e.ref?[[TREIN_ROTULO(e.ref),'paginas:'+e.ref]]:[]),...(e.links||[])];
+  // "3–5", "6", "9-10, 12" → [3,4,5] etc. (páginas do material de treinamento, em imagens)
+  function paginasDe(ref){
+    const out=[];
+    for(const parte of String(ref).replace(/[–—]/g,'-').split(/[,;]/)){
+      const m=/^\s*(\d+)\s*(?:-\s*(\d+))?\s*$/.exec(parte);if(!m)continue;
+      const a=+m[1],b=+(m[2]||m[1]);for(let p=Math.min(a,b);p<=Math.max(a,b)&&out.length<30;p++)out.push(p);
+    }
+    return out;
+  }
+  const nomePagina=p=>`p${String(p).padStart(2,'0')}.jpg`;
+  function embutir(u){
+    if(u.startsWith('paginas:'))return {paginas:paginasDe(u.slice(8))};
+    // "imagens:materiais/contrato-alpop|13" → materiais/contrato-alpop-p01.jpg … p13.jpg (documento em páginas de imagem)
+    const im=/^imagens:(.+)\|(\d+)$/.exec(u);if(im)return {imagens:Array.from({length:Math.min(+im[2],60)},(_,i)=>`${im[1]}-p${String(i+1).padStart(2,'0')}.jpg`)};
+    if(u.startsWith('arquivo:'))return {arquivo:u.slice(8)};
+    let m=/drive\.google\.com\/file\/d\/([\w-]+)/.exec(u);if(m)return {src:`https://drive.google.com/file/d/${m[1]}/preview`};
+    m=/docs\.google\.com\/(document|spreadsheets|presentation)\/d\/([\w-]+)/.exec(u);if(m)return {src:`https://docs.google.com/${m[1]}/d/${m[2]}/preview`};
+    const yt=idYoutube(u);if(yt)return {src:`https://www.youtube-nocookie.com/embed/${yt}?rel=0`,video:true};
+    // Posts e reels do Instagram abrem dentro da etapa pelo embed oficial.
+    m=/instagram\.com\/(p|reel)\/([\w-]+)/.exec(u);if(m)return {src:`https://www.instagram.com/p/${m[2]}/embed/captioned/`,insta:true};   // reels também abrem pelo endereço /p/
+    // Páginas do próprio portal (ex.: organograma_versaofinal.html) abrem dentro da etapa, já abertas.
+    if(/^[\w.-]+\.html$/i.test(u))return {src:u,portal:true};
+    return null;
+  }
+  function idYoutube(u){const m=/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([\w-]{11})/.exec(u||'');return m?m[1]:(/^[\w-]{11}$/.test(u||'')?u:null)}
+  const ehVideo=n=>/\.(mp4|webm|mov)$/i.test(n),ehImagem=n=>/\.(png|jpe?g|webp|gif)$/i.test(n);
+  function blocoMateriais(e){
+    const mats=materiaisDe(e);if(!mats.length)return '';
+    const auto=['material','video'].includes(e.tipo);
+    let primeiro=mats.findIndex(([,u])=>embutir(u));
+    const externos=[],dentro=[];
+    mats.forEach(([t,u],k)=>{
+      const emb=embutir(u);
+      if(!emb){externos.push(`<a class="${['cupola','video'].includes(e.tipo)&&!externos.length?'primary':'secondary'}" href="${safe(u)}" target="_blank" rel="noopener">${safe(t)} <span aria-hidden="true">↗</span></a>`);return}
+      const img=ehImagem(emb.arquivo||'');
+      const chave=e.id+':'+k,aberto=visor.has(chave)?visor.get(chave):((auto&&k===primeiro)||!!emb.portal||!!emb.insta||img);
+      const alto=emb.video||ehVideo(emb.arquivo||'')||e.tipo==='video';
+      const quadro=emb.imagens?`<div class="viewer pags">${emb.imagens.map((p,i)=>`<figure><img alt="Página ${i+1}" loading="lazy" data-path="${safe(p)}"><figcaption>Página ${i+1} de ${emb.imagens.length}</figcaption></figure>`).join('')}</div>`
+        :emb.paginas?`<div class="viewer pags" data-paginas="${emb.paginas.join(',')}">${emb.paginas.map(p=>`<figure><img alt="Página ${p} do material de treinamento" loading="lazy" data-pagina="${p}"><figcaption>Página ${p}</figcaption></figure>`).join('')}</div>`
+        :emb.arquivo?`<div class="viewer${alto?' v':''}${img?' img':''}" data-arquivo="${safe(emb.arquivo)}"><p class="msg" style="padding:18px">Carregando o arquivo…</p></div>`
+        :`<div class="viewer${alto?' v':''}"><iframe src="${emb.src}" title="${safe(t)}" loading="lazy" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
+      dentro.push(`<div class="mat${aberto?' aberto':''}"><button type="button" class="mat-head" data-ver="${chave}" aria-expanded="${aberto}"><span class="ico">${svg(alto?'video':'material',18)}</span><b>${safe(t)}</b><span class="mat-acao">${aberto?'Fechar':'Abrir aqui'}</span></button>${aberto?quadro+'<div class="mat-foot"><button type="button" class="link" data-tela="'+chave+'">⤢ Tela cheia</button></div>':''}</div>`);
+    });
+    return (dentro.length?`<div class="mats">${dentro.join('')}</div>`:'')+(externos.length?`<div class="refs">${externos.join('')}</div>`:'');
+  }
+  // Páginas do material: na demonstração vêm da pasta treinamento-paginas/; com login, do bucket privado (treinamento/paginas/).
+  async function hidratarPaginas(){
+    for(const box of document.querySelectorAll('#modulo [data-paginas]')){
+      const imgs=[...box.querySelectorAll('img[data-pagina]')];
+      const falhou=img=>{img.closest('figure').outerHTML=`<p class="msg" style="padding:14px 16px">A página ${img.dataset.pagina} ainda não foi enviada ao portal. Em "Editar trilha", use "Enviar páginas e imagens da trilha".</p>`};
+      if(DEMO){imgs.forEach(img=>{img.onerror=()=>falhou(img);img.src='treinamento-paginas/'+nomePagina(img.dataset.pagina)});continue}
+      const faltam=imgs.filter(img=>!(linksArquivo.get('paginas/'+nomePagina(img.dataset.pagina))?.expira>Date.now()));
+      if(faltam.length){
+        const paths=faltam.map(img=>'paginas/'+nomePagina(img.dataset.pagina));
+        const {data}=await db.storage.from('treinamento').createSignedUrls(paths,3600);
+        (data||[]).forEach(r=>{if(r.signedUrl)linksArquivo.set(r.path,{url:r.signedUrl,expira:Date.now()+3500*1000})});
+      }
+      imgs.forEach(img=>{const l=linksArquivo.get('paginas/'+nomePagina(img.dataset.pagina));if(l){img.onerror=()=>falhou(img);img.src=l.url}else falhou(img)});
+    }
+  }
+  // Documentos em páginas de imagem (ex.: contratos embaçados): na demonstração vêm de materiais-trilha/; com login, do bucket.
+  async function hidratarImagens(){
+    const imgs=[...document.querySelectorAll('#modulo img[data-path]')];if(!imgs.length)return;
+    const falhou=img=>{img.closest('figure').outerHTML=`<p class="msg" style="padding:14px 16px">Esta página ainda não foi enviada ao portal. Em "Editar trilha", use "Enviar páginas e imagens da trilha".</p>`};
+    if(DEMO){imgs.forEach(img=>{img.onerror=()=>falhou(img);img.src='materiais-trilha/'+img.dataset.path.split('/').pop()});return}
+    const faltam=imgs.map(i=>i.dataset.path).filter(p=>!(linksArquivo.get(p)?.expira>Date.now()));
+    if(faltam.length){const {data}=await db.storage.from('treinamento').createSignedUrls(faltam,3600);(data||[]).forEach(r=>{if(r.signedUrl)linksArquivo.set(r.path,{url:r.signedUrl,expira:Date.now()+3500*1000})})}
+    imgs.forEach(img=>{const l=linksArquivo.get(img.dataset.path);if(l){img.onerror=()=>falhou(img);img.src=l.url}else falhou(img)});
+  }
+  async function hidratarArquivos(){
+    hidratarPaginas();hidratarImagens();
+    for(const box of document.querySelectorAll('#modulo [data-arquivo]')){
+      const path=box.dataset.arquivo;
+      const nome=path.split('/').pop();
+      if(DEMO){
+        // Na demonstração, os arquivos vêm da pasta local materiais-trilha/ (mesmo nome do arquivo no bucket).
+        const url='materiais-trilha/'+nome,falha=`<p class="msg" style="padding:18px">${safe(nome)} não está na pasta materiais-trilha. Com login, ele vem do portal.</p>`;
+        if(ehImagem(nome)){box.innerHTML=`<img src="${url}" alt="">`;box.querySelector('img').onerror=()=>{box.innerHTML=falha}}
+        else box.innerHTML=ehVideo(nome)?`<video src="${url}" controls preload="metadata"></video>`:`<iframe src="${url}" title="Arquivo"></iframe>`;
+        continue;
+      }
+      let l=linksArquivo.get(path);
+      if(!l||l.expira<Date.now()){
+        const {data,error}=await db.storage.from('treinamento').createSignedUrl(path,3600);
+        if(error){box.innerHTML=`<p class="msg error" style="padding:18px">Não foi possível abrir o arquivo. ${safe(error.message)}</p>`;continue}
+        l={url:data.signedUrl,expira:Date.now()+3500*1000};linksArquivo.set(path,l);
+      }
+      box.innerHTML=ehImagem(nome)?`<img src="${l.url}" alt="">`:ehVideo(nome)?`<video src="${l.url}" controls preload="metadata"></video>`:`<iframe src="${l.url}" title="Arquivo"></iframe>`;
+    }
+  }
+
+  function corpo(e){
+    let h='';
+    if(e.alerta)h+=`<p class="alerta" role="note"><span aria-hidden="true">⚠️</span> ${safe(e.alerta)}</p>`;
+    if(e.texto)h+=`<p>${safe(e.texto)}</p>`;
+    if(e.tipo==='youtube'&&e.yt)h+=`<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${safe(e.yt)}?rel=0" title="${safe(e.titulo)}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`;
+    if(e.tipo==='cupola')h+=`<p>Aula em vídeo na plataforma Cupola. Entre com o seu login da Cupola, assista à aula e volte aqui para marcar.</p>`;
+    if(e.pontos?.length){const tag=e.ordenada?'ol':'ul';h+=`<${tag}>${e.pontos.map(p=>`<li>${safe(p)}</li>`).join('')}</${tag}>`}
+    if(e.faq?.length)h+=`<div class="faq">${e.faq.map(([q,r])=>`<details><summary>${safe(q)}</summary><div class="faq-r">${textoComListas(r)}</div></details>`).join('')}</div>`;
+    if(e.modelos?.length)h+=`<div class="modelos">${e.modelos.map(([t,txt],k)=>`<div class="modelo"><div class="modelo-head"><b>${safe(t)}</b><button type="button" class="secondary" data-copiar="${e.id}:${k}">⧉ Copiar</button></div><pre>${safe(txt)}</pre></div>`).join('')}</div>`;
+    h+=blocoMateriais(e);
+    if(e.tipo==='quiz')h+=quiz(e);
+    if(editando)return h;
+    const quando=feitos.get(e.id);
+    if(quando)h+=`<div class="step-foot"><span class="feito">✓ Concluída em ${br(quando)}</span>${e.tipo==='quiz'?'':`<button type="button" class="link" data-desfazer="${e.id}">Desmarcar</button>`}</div>`;
+    else if(e.tipo!=='quiz')h+=`<div class="step-foot"><button type="button" class="primary" data-marcar="${e.id}">${svg('feito',18)} Marcar como concluída</button></div>`;
+    return h;
+  }
+  // Resposta das dúvidas: linhas começando com "•" ou "-" viram lista; as outras, parágrafos.
+  function textoComListas(t){
+    let h='',lista=[];
+    const fecha=()=>{if(lista.length){h+=`<ul>${lista.map(i=>`<li>${safe(i)}</li>`).join('')}</ul>`;lista=[]}};
+    for(const l of String(t||'').split('\n').map(s=>s.trim()).filter(Boolean)){
+      // Linha só com [texto](https://...) vira botão que abre o site em outra aba.
+      const bt=/^\[([^\]]+)\]\((https:\/\/[^\s)]+)\)$/.exec(l);
+      if(bt){fecha();h+=`<p><a class="secondary" href="${safe(bt[2])}" target="_blank" rel="noopener">${safe(bt[1])} <span aria-hidden="true">↗</span></a></p>`;continue}
+      const m=/^[•\-–]\s*(.+)$/.exec(l);if(m)lista.push(m[1]);else{fecha();h+=`<p>${safe(l)}</p>`}
+    }
+    fecha();return h;
+  }
+  function quiz(e){
+    const pergs=e.perguntas||[];
+    if(editando)return `<ol class="quiz-ver">${pergs.map(p=>`<li><b>${safe(p.q)}</b><ul>${p.ops.map((o,j)=>`<li${j===p.c?' class="certa"':''}>${safe(o)}${j===p.c?' ✓':''}</li>`).join('')}</ul></li>`).join('')}</ol>`;
+    if(feitos.has(e.id))return `<p>Checkpoint feito. Você acertou todas as perguntas.</p>`;
+    const r=respostas[e.id]||{};
+    return `<p>Responda para concluir o módulo. É preciso acertar todas.</p><form class="quiz" data-quiz="${e.id}">${pergs.map((p,k)=>{
+      const st=r.conferido?(r[k]===p.c?'certo':'errado'):'';
+      return `<fieldset class="${st}"><legend>${k+1}. ${safe(p.q)}</legend>${p.ops.map((o,j)=>`<label><input type="radio" name="q${k}" value="${j}" ${r[k]===j?'checked':''} required> <span>${safe(o)}</span></label>`).join('')}${st==='errado'?'<p class="dica">Ainda não. Reveja o módulo e tente de novo.</p>':''}</fieldset>`}).join('')}
+      <div class="step-foot"><button type="submit" class="primary">Conferir respostas</button></div></form>`;
+  }
+  function renderModulo(){
+    const i=modAberto,m=MODS[i],n=feitasDo(m),t=m.etapas.length,done=t>0&&n===t;
+    const prox=i+1<MODS.length?i+1:null;
+    $('#modulo').innerHTML=`<button type="button" class="secondary back" data-voltar>← Voltar à trilha</button>
+      <section class="card mod-head"><div class="row"><div><div class="eyebrow" style="margin-bottom:4px">Módulo ${i+1} de ${MODS.length}</div><h2>${safe(m.titulo)}</h2></div>${editando?`<button type="button" class="secondary" data-ed-mod="${i}">✎ Editar módulo</button>`:done?'<span class="chip ok">Concluído</span>':''}</div>
+        <p>${safe(m.desc)}</p><div class="bar-line"><i style="width:${pc(n,t)}%"></i></div><div class="mod-foot"><span>${n} de ${t} etapas</span><span>${pc(n,t)}%</span></div></section>
+      <ol class="steps">${m.etapas.map((e,k)=>{
+        const ok=feitos.has(e.id),open=e.id===etapaAberta;
+        const sub=(TIPOS[e.tipo]||'Etapa')+(e.ref?` · Material de treinamento, ${e.ref.includes('–')||e.ref.includes('-')?'págs.':'pág.'} ${e.ref}`:'');
+        return `<li class="step${ok?' done':''}${open?' open':''}" id="etapa-${e.id}">
+          <button type="button" class="step-head" data-etapa="${e.id}" aria-expanded="${open}"><span class="ico">${svg(ok?'feito':(ICONES[e.tipo]?e.tipo:'leitura'))}</span><span><b>${safe(e.titulo)}</b><small>${sub}${ok?' · concluída':''}</small></span><span class="chev" aria-hidden="true"></span></button>
+          ${editando?barraEd('etapa',e.id,k,t):''}
+          ${open?`<div class="step-body">${corpo(e)}</div>`:''}</li>`}).join('')}</ol>
+      ${editando?'<button type="button" class="secondary novo" data-nova-etapa>+ Nova etapa</button>':''}
+      ${done&&!editando?`<div class="card mod-next"><div><strong>Módulo ${i+1} concluído!</strong><p class="msg" style="margin-top:2px">${prox!==null?`O módulo ${prox+1}, ${safe(MODS[prox].titulo)}, está liberado.`:'Você chegou ao fim da trilha.'}</p></div>${prox!==null?`<button type="button" class="primary" data-ir="${prox}">Ir para o módulo ${prox+1} ▸</button>`:'<button type="button" class="primary" data-voltar>Ver a trilha completa</button>'}</div>`:''}`;
+    hidratarArquivos();
+  }
+  $('#modulo').addEventListener('click',async e=>{
+    if(acaoEdicao(e))return;
+    const t=e.target.closest('[data-voltar],[data-etapa],[data-marcar],[data-desfazer],[data-ir],[data-ver],[data-tela],[data-copiar]');if(!t)return;
+    if(t.dataset.copiar){
+      const [id,k]=t.dataset.copiar.split(':'),txt=TODAS.find(x=>x.id===id)?.modelos?.[+k]?.[1]||'';
+      try{await navigator.clipboard.writeText(txt);toast('Copiado. Agora é só colar no WhatsApp.')}
+      catch{const r=document.createRange();r.selectNodeContents(t.closest('.modelo').querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Texto selecionado: use Ctrl+C para copiar')}
+      return;
+    }
+    if(t.dataset.voltar!==undefined)return fecharModulo();
+    if(t.dataset.ir)return abrirModulo(+t.dataset.ir);
+    if(t.dataset.etapa){etapaAberta=etapaAberta===t.dataset.etapa?null:t.dataset.etapa;renderModulo();return}
+    if(t.dataset.ver){const aberto=t.getAttribute('aria-expanded')==='true';visor.set(t.dataset.ver,!aberto);renderModulo();return}
+    if(t.dataset.tela){const v=t.closest('.mat')?.querySelector('.viewer');try{await v?.requestFullscreen()}catch{toast('Tela cheia indisponível neste navegador')}return}
+    if(t.dataset.marcar)return marcar(t.dataset.marcar);
+    if(t.dataset.desfazer)return desmarcar(t.dataset.desfazer);
+  });
+  $('#modulo').addEventListener('change',e=>{
+    const form=e.target.closest('[data-quiz]');if(!form)return;
+    const r=respostas[form.dataset.quiz]||(respostas[form.dataset.quiz]={});
+    r[+e.target.name.slice(1)]=+e.target.value;
+  });
+  $('#modulo').addEventListener('submit',e=>{
+    const form=e.target.closest('[data-quiz]');if(!form)return;e.preventDefault();
+    const q=TODAS.find(x=>x.id===form.dataset.quiz),r=respostas[q.id]||(respostas[q.id]={});
+    r.conferido=true;
+    const erros=(q.perguntas||[]).filter((p,k)=>r[k]!==p.c).length;
+    if(erros){toast(erros===1?'Uma resposta ainda não está certa':`${erros} respostas ainda não estão certas`);renderModulo();return}
+    marcar(q.id);
+  });
+
+  async function marcar(id){
+    const m=MODS[modAberto],antes=completo(modAberto),antesTudo=totalFeitas()===TODAS.length;
+    feitos.set(id,new Date().toISOString());
+    const prox=m.etapas.find(e=>!feitos.has(e.id));
+    etapaAberta=prox?prox.id:null;
+    render();
+    try{await store.marcar(id)}catch(err){feitos.delete(id);etapaAberta=id;render();toast('Não foi possível salvar. Tente de novo.');return}
+    if(!antes&&completo(modAberto))toast(totalFeitas()===TODAS.length&&!antesTudo?'Parabéns! Você concluiu a trilha 🎉':`Módulo ${modAberto+1} concluído!`);
+    if(prox)document.getElementById('etapa-'+prox.id)?.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  async function desmarcar(id){
+    const q=feitos.get(id);feitos.delete(id);render();
+    try{await store.desmarcar(id)}catch(err){feitos.set(id,q);render();toast('Não foi possível salvar. Tente de novo.')}
+  }
+
+  $('#continuar').onclick=()=>{const i=atual();if(i>=0)abrirModulo(i)};
+  $('#editar').onclick=()=>{editando=!editando;armado=null;if(modAberto!==null&&!MODS[modAberto])modAberto=null;render()};
+
+  function render(){
+    renderHero();
+    $('#trilha').hidden=modAberto!==null;$('#modulo').hidden=modAberto===null;
+    if(modAberto===null)renderTrilha();else renderModulo();
+  }
+
+  // ---------- Edição da trilha (gerência) ----------
+  // Tudo é salvo na hora, no conteúdo inteiro da trilha. As corretoras veem a nova versão quando abrem a página.
+  let armado=null; // excluir pede um segundo clique
+  async function salvarConteudo(mudar,msg){
+    const antes=clonar(MODS),novos=clonar(MODS);
+    mudar(novos);usarConteudo(novos);render();
+    try{infoConteudo=await conteudo.salvar(MODS);renderHero();toast(msg||'Trilha atualizada')}
+    catch(err){usarConteudo(antes);render();toast('Não foi possível salvar: '+(err.message||'tente de novo'))}
+  }
+  const trocar=(lista,a,b)=>{if(b<0||b>=lista.length)return;[lista[a],lista[b]]=[lista[b],lista[a]]};
+  function acaoEdicao(ev){
+    if(!editando)return false;
+    const t=ev.target.closest('[data-ed-mod],[data-sobe-mod],[data-desce-mod],[data-del-mod],[data-novo-mod],[data-ed-etapa],[data-sobe-etapa],[data-desce-etapa],[data-del-etapa],[data-nova-etapa]');
+    if(!t)return false;
+    const d=t.dataset;
+    if(d.edMod!==undefined){abrirDlgModulo(+d.edMod);return true}
+    if(d.novoMod!==undefined){abrirDlgModulo(null);return true}
+    if(d.sobeMod!==undefined||d.desceMod!==undefined){const i=+(d.sobeMod??d.desceMod),j=d.sobeMod!==undefined?i-1:i+1;salvarConteudo(m=>trocar(m,i,j),'Ordem dos módulos atualizada');return true}
+    if(d.delMod!==undefined){
+      const i=+d.delMod;
+      if(armado!=='mod'+i){armado='mod'+i;t.textContent='Confirmar exclusão';setTimeout(()=>{if(armado==='mod'+i){armado=null;t.textContent='Excluir'}},4000);return true}
+      armado=null;salvarConteudo(m=>m.splice(i,1),'Módulo excluído');return true}
+    const mi=modAberto;
+    if(d.novaEtapa!==undefined){abrirDlgEtapa(null);return true}
+    if(d.edEtapa!==undefined){abrirDlgEtapa(d.edEtapa);return true}
+    if(d.sobeEtapa!==undefined||d.desceEtapa!==undefined){const id=d.sobeEtapa??d.desceEtapa,k=MODS[mi].etapas.findIndex(e=>e.id===id);salvarConteudo(m=>trocar(m[mi].etapas,k,d.sobeEtapa!==undefined?k-1:k+1),'Ordem das etapas atualizada');return true}
+    if(d.delEtapa!==undefined){
+      const id=d.delEtapa;
+      if(armado!=='et'+id){armado='et'+id;t.textContent='Confirmar exclusão';setTimeout(()=>{if(armado==='et'+id){armado=null;t.textContent='Excluir'}},4000);return true}
+      armado=null;if(etapaAberta===id)etapaAberta=null;salvarConteudo(m=>{m[mi].etapas=m[mi].etapas.filter(e=>e.id!==id)},'Etapa excluída');return true}
+    return false;
+  }
+
+  // Módulo: título, descrição e parte.
+  let dlgModIdx=null;
+  $('#fmParte').innerHTML=Object.entries(PARTES).map(([k,p])=>`<option value="${k}">${safe(p.rotulo)}</option>`).join('');
+  function abrirDlgModulo(i){
+    dlgModIdx=i;const m=i===null?{titulo:'',desc:'',parte:MODS[MODS.length-1]?.parte||'araujo'}:MODS[i];
+    $('#dlgModuloTitulo').textContent=i===null?'Novo módulo':`Editar módulo ${i+1}`;
+    $('#fmTitulo').value=m.titulo||'';$('#fmDesc').value=m.desc||'';$('#fmParte').value=m.parte||'araujo';
+    $('#dlgModulo').showModal();
+  }
+  $('#formModulo').onsubmit=e=>{
+    e.preventDefault();
+    const dados={titulo:$('#fmTitulo').value.trim(),desc:$('#fmDesc').value.trim(),parte:$('#fmParte').value};
+    if(!dados.titulo){toast('Informe o título do módulo');return}
+    const i=dlgModIdx;$('#dlgModulo').close();
+    if(i===null)salvarConteudo(m=>m.push({...dados,etapas:[]}),'Módulo criado');
+    else salvarConteudo(m=>Object.assign(m[i],dados),'Módulo atualizado');
+  };
+
+  // Etapa: tipo, textos, materiais (link ou arquivo) e perguntas do checkpoint.
+  let dlgEtapaId=null;
+  $('#feTipo').innerHTML=Object.entries(TIPOS).map(([k,t])=>`<option value="${k}">${t}</option>`).join('');
+  function mostrarCampos(){
+    const tipo=$('#feTipo').value;
+    $('#grpYoutube').hidden=tipo!=='youtube';$('#grpQuiz').hidden=tipo!=='quiz';$('#grpMateriais').hidden=tipo==='quiz';
+  }
+  $('#feTipo').onchange=mostrarCampos;
+  const linhaMaterial=(t='',u='')=>{
+    const arquivo=u.startsWith('arquivo:');
+    return `<div class="mat-row"><input class="mt" maxlength="120" placeholder="Nome que aparece na etapa" value="${safe(t)}"><input class="mu" placeholder="Link do Drive, Google Docs, YouTube ou site" value="${safe(u)}" ${arquivo?'readonly title="Arquivo enviado pela trilha"':''}><button type="button" class="link danger" data-rm-mat aria-label="Remover material">Remover</button></div>`};
+  const blocoPergunta=(p={q:'',ops:['',''],c:0})=>`<fieldset class="q-ed"><div class="field"><label>Pergunta</label><input class="pq" maxlength="300" value="${safe(p.q)}"></div>
+    <div class="field"><label>Alternativas (uma por linha)</label><textarea class="po" rows="3">${safe((p.ops||[]).join('\n'))}</textarea></div>
+    <div class="q-foot"><div class="field" style="max-width:220px"><label>Número da alternativa certa</label><input class="pc" type="number" min="1" value="${(p.c??0)+1}"></div><button type="button" class="link danger" data-rm-q>Remover pergunta</button></div></fieldset>`;
+  function abrirDlgEtapa(id){
+    dlgEtapaId=id;const e=id?MODS[modAberto].etapas.find(x=>x.id===id):{tipo:'leitura',titulo:''};
+    $('#dlgEtapaTitulo').textContent=id?'Editar etapa':'Nova etapa';
+    $('#feTitulo').value=e.titulo||'';$('#feTipo').value=e.tipo||'leitura';
+    $('#feTexto').value=e.texto||'';$('#feAlerta').value=e.alerta||'';$('#fePontos').value=(e.pontos||[]).join('\n');$('#feOrdenada').checked=!!e.ordenada;
+    $('#feFaq').value=(e.faq||[]).map(([q,r])=>q+'\n'+r).join('\n\n');
+    $('#feModelos').value=(e.modelos||[]).map(([t,txt])=>t+'\n'+txt).join('\n---\n');
+    $('#feRef').value=e.ref||'';$('#feYt').value=e.yt?`https://www.youtube.com/watch?v=${e.yt}`:'';
+    $('#feMateriais').innerHTML=(e.links||[]).map(([t,u])=>linhaMaterial(t,u)).join('');
+    $('#fePerguntas').innerHTML=(e.perguntas||[]).map(blocoPergunta).join('')||blocoPergunta();
+    $('#feEnvio').textContent='';mostrarCampos();
+    $('#dlgEtapa').showModal();
+  }
+  $('#feAddMat').onclick=()=>$('#feMateriais').insertAdjacentHTML('beforeend',linhaMaterial());
+  $('#feAddQ').onclick=()=>$('#fePerguntas').insertAdjacentHTML('beforeend',blocoPergunta());
+  $('#dlgEtapa').addEventListener('click',e=>{
+    if(e.target.closest('[data-rm-mat]'))e.target.closest('.mat-row').remove();
+    if(e.target.closest('[data-rm-q]'))e.target.closest('.q-ed').remove();
+  });
+  $('#feArquivoBtn').onclick=()=>{if(DEMO){toast('Na demonstração não dá para enviar arquivos. Entre com login no portal.');return}$('#feArquivo').click()};
+  $('#feArquivo').onchange=async e=>{
+    const file=e.target.files[0];e.target.value='';if(!file)return;
+    if(file.size>50*1024*1024){toast('Arquivo maior que 50 MB. Para vídeos grandes, use um link do Drive ou do YouTube.');return}
+    const nome=file.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.-]+/g,'-').toLowerCase();
+    const path=`materiais/${Date.now().toString(36)}-${nome}`;
+    $('#feEnvio').textContent=`Enviando ${file.name}…`;
+    const {error}=await db.storage.from('treinamento').upload(path,file,{contentType:file.type||undefined});
+    if(error){$('#feEnvio').textContent='Não foi possível enviar: '+error.message;return}
+    $('#feEnvio').textContent=`${file.name} enviado. Ele abre dentro da etapa.`;
+    $('#feMateriais').insertAdjacentHTML('beforeend',linhaMaterial(file.name.replace(/\.[^.]+$/,''),'arquivo:'+path));
+  };
+  $('#formEtapa').onsubmit=e=>{
+    e.preventDefault();
+    const tipo=$('#feTipo').value,titulo=$('#feTitulo').value.trim();
+    if(!titulo){toast('Informe o título da etapa');return}
+    const nova={id:dlgEtapaId||novoId('e'),tipo,titulo};
+    const texto=$('#feTexto').value.trim();if(texto)nova.texto=texto;
+    const alerta=$('#feAlerta').value.trim();if(alerta)nova.alerta=alerta;
+    const pontos=$('#fePontos').value.split('\n').map(s=>s.trim()).filter(Boolean);if(pontos.length){nova.pontos=pontos;if($('#feOrdenada').checked)nova.ordenada=true}
+    const faq=$('#feFaq').value.split(/\n\s*\n/).map(b=>b.split('\n').map(s=>s.trim()).filter(Boolean)).filter(l=>l.length).map(l=>[l[0],l.slice(1).join('\n')]);
+    if(faq.some(([,r])=>!r)){toast('Cada pergunta precisa da resposta na linha de baixo');return}
+    if(faq.length)nova.faq=faq;
+    const modelos=$('#feModelos').value.split(/\n\s*---\s*\n/).map(b=>b.replace(/^\s*\n/,'').replace(/\s+$/,'')).filter(Boolean).map(b=>{const i=b.indexOf('\n');return i<0?[b.trim(),'']:[b.slice(0,i).trim(),b.slice(i+1)]});
+    if(modelos.some(([,t])=>!t.trim())){toast('Cada modelo precisa do nome na primeira linha e do texto embaixo');return}
+    if(modelos.length)nova.modelos=modelos;
+    const ref=$('#feRef').value.trim();if(ref){if(!paginasDe(ref).length){toast('Páginas: use números, como 13–15 ou 6');return}nova.ref=ref}
+    if(tipo==='youtube'){const yt=idYoutube($('#feYt').value.trim());if(!yt){toast('Cole o link do vídeo do YouTube');return}nova.yt=yt}
+    if(tipo!=='quiz'){
+      const links=[...document.querySelectorAll('#feMateriais .mat-row')].map(r=>[r.querySelector('.mt').value.trim(),r.querySelector('.mu').value.trim()]).filter(([,u])=>u).map(([t,u])=>[t||'Material',u]);
+      if(links.length)nova.links=links;
+    }else{
+      const pergs=[];
+      for(const b of document.querySelectorAll('#fePerguntas .q-ed')){
+        const q=b.querySelector('.pq').value.trim(),ops=b.querySelector('.po').value.split('\n').map(s=>s.trim()).filter(Boolean),c=(+b.querySelector('.pc').value||1)-1;
+        if(!q&&!ops.length)continue;
+        if(!q||ops.length<2){toast('Cada pergunta precisa do texto e de pelo menos 2 alternativas');return}
+        if(c<0||c>=ops.length){toast(`Na pergunta "${q.slice(0,40)}", a alternativa certa precisa estar entre 1 e ${ops.length}`);return}
+        pergs.push({q,ops,c});
+      }
+      if(!pergs.length){toast('O checkpoint precisa de pelo menos uma pergunta');return}
+      nova.perguntas=pergs;delete respostas[nova.id];
+    }
+    const mi=modAberto,id=dlgEtapaId;$('#dlgEtapa').close();
+    etapaAberta=nova.id;
+    if(id)salvarConteudo(m=>{const k=m[mi].etapas.findIndex(x=>x.id===id);m[mi].etapas[k]=nova},'Etapa atualizada');
+    else salvarConteudo(m=>m[mi].etapas.push(nova),'Etapa criada');
+  };
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+
+  // Páginas do material de treinamento (imagens p01.jpg, p02.jpg…): enviadas de uma vez para treinamento/paginas/.
+  // Mandar de novo um arquivo com o mesmo nome troca a página.
+  $('#enviarPaginas').onclick=()=>{if(DEMO){toast('Na demonstração, as páginas e imagens vêm das pastas treinamento-paginas e materiais-trilha. Com login, envie por aqui.');return}$('#arqPaginas').click()};
+  $('#arqPaginas').onchange=async e=>{
+    const files=[...e.target.files];e.target.value='';if(!files.length)return;
+    const msg=$('#msgPaginas');let ok=0,erros=[];
+    for(const file of files){
+      // p13.jpg → paginas/p13.jpg (página do material); qualquer outro nome → materiais/<nome> (ex.: prints da pasta materiais-trilha)
+      const m=/^p(\d+)\.(jpe?g|png)$/i.exec(file.name);
+      const nome=file.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.-]+/g,'-').toLowerCase();
+      const destino=m?'paginas/'+nomePagina(+m[1]):'materiais/'+nome;
+      msg.textContent=`Enviando ${ok+1} de ${files.length}…`;
+      const {error}=await db.storage.from('treinamento').upload(destino,file,{upsert:true,contentType:file.type||'image/jpeg'});
+      if(error)erros.push(file.name+': '+error.message);else ok++;
+    }
+    linksArquivo.clear();
+    msg.textContent=`${ok} arquivo(s) enviado(s).`+(erros.length?` Não foram: ${erros.slice(0,3).join('; ')}${erros.length>3?'…':''}`:'');
+    if(modAberto!==null)renderModulo();
+  };
+
+  // ---------- Equipe (gerência) ----------
+  $('#tabs').addEventListener('click',e=>{
+    const b=e.target.closest('[data-tab]');if(!b)return;
+    document.querySelectorAll('#tabs [data-tab]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+    $('#tab-trilha').hidden=b.dataset.tab!=='trilha';$('#tab-equipe').hidden=b.dataset.tab!=='equipe';
+    if(b.dataset.tab==='equipe')carregarEquipe();
+  });
+  async function carregarEquipe(){
+    const box=$('#equipe');box.innerHTML='<div class="empty">Carregando…</div>';
+    const {data,error}=await db.rpc('treinamento_equipe');
+    if(error){box.innerHTML=`<div class="empty">Não foi possível carregar a equipe.<br><small>${safe(error.message)}</small></div>`;return}
+    if(!data.length){box.innerHTML='<div class="empty">Nenhuma corretora liberada ainda.</div>';return}
+    const linhas=data.map(r=>{const s=new Set((r.itens||[]).filter(x=>IDS.has(x)));return {...r,s,n:s.size}}).sort((a,b)=>b.n-a.n||String(a.corretora||a.email).localeCompare(String(b.corretora||b.email)));
+    box.innerHTML=`<table><thead><tr><th>Corretora</th><th>Progresso</th><th>Módulos</th><th>Onde está</th><th>Última atividade</th><th>Certificado</th></tr></thead><tbody>${linhas.map(r=>{
+      const p=pct(r.n);
+      const mods=MODS.map((m,i)=>{const k=m.etapas.filter(e=>r.s.has(e.id)).length;return `<i class="${k===m.etapas.length?'c':k?'p':''}" title="Módulo ${i+1}: ${k} de ${m.etapas.length}"></i>`}).join('');
+      const onde=MODS.findIndex(m=>m.etapas.some(e=>!r.s.has(e.id)));
+      return `<tr><td><strong>${safe(r.corretora||r.email.split('@')[0])}</strong><small>${safe(r.email)}</small></td>
+        <td><div class="pct"><div class="bar-line"><i style="width:${p}%"></i></div><b>${p}%</b></div></td>
+        <td><div class="mods">${mods}</div></td>
+        <td>${onde<0?'<span class="chip ok">Concluiu</span>':r.n?`Módulo ${onde+1} · ${safe(MODS[onde].titulo)}`:'<span style="color:var(--muted)">Não começou</span>'}</td>
+        <td>${r.ultimo?br(r.ultimo):'—'}</td>
+        <td>${onde<0?`<button type="button" class="link" data-cert-nome="${safe(r.corretora||r.email.split('@')[0])}" data-cert-data="${safe(r.ultimo||'')}">🎓 Ver</button>`:'<span style="color:var(--muted)">—</span>'}</td></tr>`}).join('')}</tbody></table>`;
+  }
+  $('#equipe').addEventListener('click',e=>{const b=e.target.closest('[data-cert-nome]');if(b)abrirCertificado(b.dataset.certNome,b.dataset.certData||null,false)});
+
+  // ---------- Acesso ----------
+  function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
+  async function iniciarApp(){
+    try{const c=await conteudo.carregar();if(c?.modulos?.length){usarConteudo(c.modulos);infoConteudo=c}else usarConteudo(clonar(PADRAO))}
+    catch(err){usarConteudo(clonar(PADRAO));if(gestor)toast('O conteúdo da trilha não carregou. '+(err.message||''))}
+    feitos=await store.carregar();
+    $('#gestorNote').hidden=!gestor;$('#tabs').hidden=!gestor||DEMO;
+    const h=/^#m(\d+)$/.exec(location.hash);
+    if(h&&MODS[+h[1]-1]&&liberado(+h[1]-1)){modAberto=+h[1]-1;etapaAberta=(MODS[modAberto].etapas.find(e=>!feitos.has(e.id))||MODS[modAberto].etapas[0])?.id||null}
+    render();
+  }
+  async function refreshSession(){
+    const {data:{session}}=await db.auth.getSession();
+    $('#barActions').hidden=!session;
+    if(!session){show('gate');booted=false;return}
+    email=session.user.email.toLowerCase();
+    $('#who').textContent=email;
+    const [{data:pode,error},{data:ges}]=await Promise.all([db.rpc('pode_departamento',{p_departamento:DEP}),db.rpc('is_gestor')]);
+    if(error||pode!==true){show('denied');return}
+    gestor=ges===true;
+    Promise.resolve(db.rpc('visita_contexto')).then(r=>{if(r?.data?.corretora)nomeCorretora=String(r.data.corretora)}).catch(()=>{});
+    show('app');
+    if(!booted){booted=true;try{await iniciarApp()}catch(err){$('#trilha').innerHTML=`<div class="card empty">Não foi possível carregar o seu progresso.<br><small>${safe(err.message)}</small></div>`}}
+  }
+
+  if(DEMO){
+    // Na demonstração, a visão é a da gerência (tudo liberado e "Editar trilha"); &corretora mostra como a corretora vê.
+    gestor=!P.has('corretora');
+    $('#demoNote').hidden=false;
+    $('#demoNote').innerHTML=`<strong>Demonstração.</strong> O progresso e as edições ficam salvos só neste navegador. Com login, ficam guardados no portal. `+(gestor?'<a href="?demo&corretora">Ver como a corretora vê</a>':'<a href="?demo">Voltar à visão da gerência</a>');
+    // Conteúdo inicial só existe na cópia local (treinamento-conteudo.local.js); no site, a demonstração fica vazia.
+    const sc=document.createElement('script');sc.src='treinamento-conteudo.local.js';
+    sc.onload=()=>{PADRAO=window.TRILHA_PADRAO||[];show('app');iniciarApp()};
+    sc.onerror=()=>{show('app');iniciarApp()};
+    document.head.append(sc);
+  }else{
+    $('#loginForm').onsubmit=async e=>{
+      e.preventDefault();const form=e.currentTarget,fd=new FormData(form),msg=$('#loginMsg');msg.hidden=true;
+      const {error}=await db.auth.signInWithPassword({email:String(fd.get('email')).trim(),password:String(fd.get('senha'))});
+      if(error){msg.textContent='Não foi possível entrar: e-mail ou senha incorretos.';msg.hidden=false;return}
+      form.reset();
+    };
+    const sair=async()=>{await db.auth.signOut();feitos=new Map();modAberto=null;etapaAberta=null;respostas={};gestor=false;editando=false};
+    $('#logout').onclick=sair;$('#deniedLogout').onclick=sair;
+    db.auth.onAuthStateChange(()=>setTimeout(refreshSession,0));
+    refreshSession();
+  }
+</script>
+</body>
+</html>
