@@ -464,16 +464,16 @@
     // energia = atividade que a Locação também envia, pelo botão no cartão do quadro de contratos (ver supabase/pos_locacao_energia_envio.sql).
     // A Pós-locação cadastra à mão o que não veio da Locação. Publicada em 02/10/2026.
     // materiais = a aba "POP e documentos" se chama "Materiais" (copiados da pasta "Pós locação Araujo" do Drive, separados por pasta).
-    {slug:'pos-locacao',publicado:true,materiais:true,links:[['saidas.html','Saídas e distratos ↗']],nome:'Pós-locação',area:'Operação',papel:'Saída / Renovação',ref:'Contrato / imóvel (REF)',
+    // Em 23/11/2026 a Supervisão e a Pós-locação viraram uma função só (como no organograma): um quadro de demandas só.
+    // O slug continua "pos-locacao" (login, demandas e materiais dependem dele); ?d=supervisao abre esta mesma página.
+    {slug:'pos-locacao',publicado:true,materiais:true,links:[['saidas.html','Saídas e distratos ↗']],nome:'Supervisão / Pós-locação',area:'Liderança',papel:'Administrativo · Saída',ref:'Contrato / imóvel (REF)',
       recebe:['Assuntos pós-retirada de chaves'],energia:'Monitorar transferência de titularidade de consumos',
-      atividades:['Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
+      atividades:['Resposta a notificações direcionadas à imobiliária','Reuniões semanais','Assuntos pós-retirada de chaves','Monitorar transferência de titularidade de consumos','Orçamento de reparos','Aviso de saída','Agendamento de vistoria de saída','Rescisão (validação de laudo e documento)','Recebimento de chaves – saída','Visita de venda','Notificação de direito de preferência']},
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
     // devolucoes = cartões do quadro Saídas e distratos na coluna de devolução de caução / pagamento (supabase/saidas_paineis.sql, 03/11/2026).
     // documentos = gerador de contratos em Word (08/10/2026). Os modelos ficam no bucket privado, em ferramentas/financeiro-rh/.
     {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','fechamento','documentos','devolucoes'],
       atividades:['Colaboradores (admissão/demissão/folha)','Contas a pagar da empresa','Suporte direto à equipe financeira']},
-    {slug:'supervisao',limpo:true,nome:'Supervisão',area:'Liderança',papel:'Administrativo',ref:'Referência',
-      atividades:['Resposta a notificações direcionadas à imobiliária','Monitoramento da demanda do administrativo','Reuniões semanais']},
   ];
   const AREAS=['Atendimento','Captação de imóveis','Comercial','Operação','Financeiro','Liderança'];
   const STATUS=[['A fazer','#6f8faf'],['Em andamento','#2a78d6'],['Aguardando','#b97822'],['Concluída','#24705a']];
@@ -491,7 +491,8 @@
   async function copiar(text,oque){try{await navigator.clipboard.writeText(text);toast(oque+' copiado')}catch{prompt('Copie abaixo:',text)}}
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
 
-  const DEP=DEPS.find(d=>d.slug===new URLSearchParams(location.search).get('d'));
+  const DEP_PEDIDO=({supervisao:'pos-locacao'})[new URLSearchParams(location.search).get('d')]||new URLSearchParams(location.search).get('d');
+  const DEP=DEPS.find(d=>d.slug===DEP_PEDIDO);
   const abasDoDep=()=>DEP.limpo?[...(DEP.extras||[]),'pop','senhas']:['demandas',...(DEP.extras||[]),'atividades','senhas','pop'];
 
   // ---------- Sem departamento: lista para escolher ----------
