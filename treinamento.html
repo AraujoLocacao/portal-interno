@@ -263,7 +263,7 @@
   <div id="tab-trilha">
     <p class="note" id="gestorNote" hidden><strong>Visão da gerência.</strong> Todos os módulos ficam liberados para você revisar. Para as corretoras, cada módulo abre quando o anterior chega a 100%.</p>
     <p class="note edit-note" id="editNote" hidden><strong>Modo edição.</strong> Cada mudança é salva na hora e as corretoras veem a nova versão quando abrirem a trilha. Abra um módulo para editar as etapas. <span id="editInfo"></span>
-      <span class="edit-acoes"><button type="button" class="secondary" id="verModeloCert">🎓 Ver o certificado</button><button type="button" class="secondary" id="enviarPaginas">⬆ Enviar páginas e imagens da trilha</button><input type="file" id="arqPaginas" multiple accept="image/jpeg,image/png,application/pdf,video/mp4" hidden><span class="msg" id="msgPaginas"></span></span></p>
+      <span class="edit-acoes"><button type="button" class="secondary" id="verModeloCert">🎓 Ver o certificado</button><button type="button" class="secondary" id="enviarPaginas">⬆ Enviar páginas e imagens da trilha</button><input type="file" id="arqPaginas" multiple accept="image/jpeg,image/png,application/pdf,video/mp4,.docx" hidden><span class="msg" id="msgPaginas"></span></span></p>
     <section class="card certificado" id="certificado" hidden></section>
     <div id="trilha"></div>
     <div id="modulo" hidden></div>
@@ -535,7 +535,9 @@
     return null;
   }
   function idYoutube(u){const m=/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([\w-]{11})/.exec(u||'');return m?m[1]:(/^[\w-]{11}$/.test(u||'')?u:null)}
-  const ehVideo=n=>/\.(mp4|webm|mov)$/i.test(n),ehImagem=n=>/\.(png|jpe?g|webp|gif)$/i.test(n);
+  const ehVideo=n=>/\.(mp4|webm|mov)$/i.test(n),ehImagem=n=>/\.(png|jpe?g|webp|gif)$/i.test(n),ehPdf=n=>/\.pdf$/i.test(n);
+  // Arquivos que o navegador não mostra (ex.: Word): botão para baixar e abrir no computador.
+  const baixar=(url,nome)=>`<div style="padding:18px"><p class="msg" style="margin:0 0 10px">Este arquivo abre no Word. Baixe e abra no computador.</p><a class="primary" href="${url}" download="${safe(nome)}">⬇ Baixar ${safe(nome)}</a></div>`;
   function blocoMateriais(e){
     const mats=materiaisDe(e);if(!mats.length)return '';
     const auto=['material','video'].includes(e.tipo);
@@ -588,7 +590,7 @@
         // Na demonstração, os arquivos vêm da pasta local materiais-trilha/ (mesmo nome do arquivo no bucket).
         const url='materiais-trilha/'+nome,falha=`<p class="msg" style="padding:18px">${safe(nome)} não está na pasta materiais-trilha. Com login, ele vem do portal.</p>`;
         if(ehImagem(nome)){box.innerHTML=`<img src="${url}" alt="">`;box.querySelector('img').onerror=()=>{box.innerHTML=falha}}
-        else box.innerHTML=ehVideo(nome)?`<video src="${url}" controls preload="metadata"></video>`:`<iframe src="${url}" title="Arquivo"></iframe>`;
+        else box.innerHTML=ehVideo(nome)?`<video src="${url}" controls preload="metadata"></video>`:ehPdf(nome)?`<iframe src="${url}" title="Arquivo"></iframe>`:baixar(url,nome);
         continue;
       }
       let l=linksArquivo.get(path);
@@ -597,7 +599,7 @@
         if(error){box.innerHTML=`<p class="msg error" style="padding:18px">Não foi possível abrir o arquivo. ${safe(error.message)}</p>`;continue}
         l={url:data.signedUrl,expira:Date.now()+3500*1000};linksArquivo.set(path,l);
       }
-      box.innerHTML=ehImagem(nome)?`<img src="${l.url}" alt="">`:ehVideo(nome)?`<video src="${l.url}" controls preload="metadata"></video>`:`<iframe src="${l.url}" title="Arquivo"></iframe>`;
+      box.innerHTML=ehImagem(nome)?`<img src="${l.url}" alt="">`:ehVideo(nome)?`<video src="${l.url}" controls preload="metadata"></video>`:ehPdf(nome)?`<iframe src="${l.url}" title="Arquivo"></iframe>`:baixar(l.url,nome);
     }
   }
 

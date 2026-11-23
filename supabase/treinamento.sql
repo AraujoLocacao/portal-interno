@@ -96,7 +96,8 @@ create policy "treinamento_conteudo: alterar" on public.treinamento_conteudo for
 -- PDF, imagens e vídeos que a gerência envia ao editar uma etapa. Abrem dentro da trilha por link temporário.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('treinamento', 'treinamento', false, 52428800, array[
-  'application/pdf', 'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'video/quicktime'])
+  'application/pdf', 'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'video/quicktime',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
 on conflict (id) do update set public = false, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 
 drop policy if exists "treinamento: ler arquivos" on storage.objects;
