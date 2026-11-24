@@ -22,15 +22,38 @@ drop policy if exists "treinamento: ler" on public.treinamento_progresso;
 create policy "treinamento: ler" on public.treinamento_progresso for select to authenticated
   using (email = lower(coalesce(auth.jwt() ->> 'email', '')) or public.is_gestor());
 
--- Marcar etapa: só para o próprio e-mail e com acesso à área.
+-- Etapas da "Prática acompanhada" (tipo 'pratica' no conteúdo da trilha, 24/11/2026): só a gestão confirma ou desfaz.
+create or replace function public.treinamento_item_pratica(p_item text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.treinamento_conteudo c,
+      jsonb_array_elements(c.modulos) m, jsonb_array_elements(m -> 'etapas') e
+    where c.id = 'trilha' and e ->> 'id' = p_item and e ->> 'tipo' = 'pratica');
+$$;
+revoke all on function public.treinamento_item_pratica(text) from public, anon;
+grant execute on function public.treinamento_item_pratica(text) to authenticated;
+
+-- Marcar etapa: só para o próprio e-mail, com acesso à área, e nunca uma etapa da prática acompanhada.
 drop policy if exists "treinamento: marcar" on public.treinamento_progresso;
 create policy "treinamento: marcar" on public.treinamento_progresso for insert to authenticated
-  with check (email = lower(coalesce(auth.jwt() ->> 'email', '')) and public.pode_departamento('corretoras-locacao'));
+  with check (email = lower(coalesce(auth.jwt() ->> 'email', '')) and public.pode_departamento('corretoras-locacao')
+              and not public.treinamento_item_pratica(item));
 
--- Desmarcar: só as próprias.
+-- A gestão confirma etapas para qualquer pessoa (aba Equipe, botão "Prática").
+drop policy if exists "treinamento: gestão confirma" on public.treinamento_progresso;
+create policy "treinamento: gestão confirma" on public.treinamento_progresso for insert to authenticated
+  with check (public.is_gestor());
+
+-- Desmarcar: só as próprias (menos a prática acompanhada); a gestão desfaz qualquer uma.
 drop policy if exists "treinamento: desmarcar" on public.treinamento_progresso;
 create policy "treinamento: desmarcar" on public.treinamento_progresso for delete to authenticated
-  using (email = lower(coalesce(auth.jwt() ->> 'email', '')));
+  using ((email = lower(coalesce(auth.jwt() ->> 'email', '')) and not public.treinamento_item_pratica(item))
+         or public.is_gestor());
 
 -- Ligação login → corretora (mesma tabela de visitas_por_corretora.sql; criada aqui também, se ainda não existir,
 -- porque a aba Equipe e o nome no certificado usam). Uma linha por corretora: (e-mail, nome igual ao da tabela corretoras).

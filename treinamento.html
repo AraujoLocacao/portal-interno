@@ -177,6 +177,19 @@
     .mat-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) auto;gap:8px;align-items:center;margin-bottom:8px}
     .mat-row input{border:1px solid #cbd5da;border-radius:10px;padding:8px 10px;min-width:0}.mat-row input[readonly]{background:#f3f6f5;color:var(--muted)}
     .q-ed{border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px;display:grid;gap:10px}
+
+    /* Prática acompanhada: etapas que só a gestão confirma */
+    .aguarda{color:#7a5314;background:#fdf6e8;border:1px solid #f0dfbd;border-radius:10px;padding:8px 12px;font-size:.88rem;font-weight:650}
+    .pr-corpo{padding:18px 22px 22px;display:grid;gap:14px}
+    .pr-lista{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+    .pr-lista li{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 14px;background:#fbfcfb}
+    .pr-lista li.ok{background:var(--green-soft);border-color:#bfdccd}
+    .pr-lista b{display:block;font-size:.92rem}.pr-lista small{color:var(--muted);font-size:.8rem}
+    .pr-lista li.atrasado small{color:var(--red);font-weight:700}
+    .pr-lista .primary{padding:7px 12px;font-size:.85rem;white-space:nowrap}
+    .pr-data{display:flex;align-items:end;gap:10px;flex-wrap:wrap}
+    .pr-data .field{max-width:220px}
+    @media(max-width:560px){.pr-lista li{flex-direction:column;align-items:flex-start}}
     .q-foot{display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap}
 
     @media (max-width:640px){
@@ -322,6 +335,8 @@
     <div class="field"><label for="feModelos">Modelos para copiar (opcional)</label><textarea id="feModelos" rows="6" maxlength="20000"></textarea>
       <p class="msg">Textos que a corretora copia e cola no WhatsApp. A primeira linha é o nome do modelo e as de baixo são o texto. Para separar um modelo do outro, use uma linha só com três traços: ---</p></div>
     <div class="field" style="max-width:420px"><label for="feRef">Páginas do material de treinamento (opcional)</label><input id="feRef" maxlength="40" placeholder="Ex.: 13–15"><p class="msg">Essas páginas aparecem dentro da etapa, já abertas no ponto certo.</p></div>
+    <div class="row2" id="grpPrazo"><div class="field"><label for="feDias">Prazo em dias (opcional, para feedbacks)</label><input id="feDias" type="number" min="1" max="365" placeholder="Ex.: 7"></div>
+      <div class="field"><label for="feDepois">Contar a partir</label><select id="feDepois"><option value="inicio">do início da trilha</option><option value="anterior">do feedback anterior</option></select></div></div>
     <div class="field" id="grpYoutube"><label for="feYt">Link do vídeo no YouTube</label><input id="feYt" placeholder="https://www.youtube.com/watch?v=…"></div>
     <div class="field" id="grpMateriais"><span class="lbl">Materiais da etapa</span>
       <p class="msg">Links do Drive, Google Docs e YouTube e os arquivos enviados abrem dentro da trilha. Outros sites abrem em nova aba.</p>
@@ -333,6 +348,15 @@
       <div><button type="button" class="secondary" id="feAddQ">+ Adicionar pergunta</button></div></div>
     <div class="actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary">Salvar etapa</button></div>
   </form>
+</dialog>
+
+<dialog id="dlgPratica" class="largo" aria-labelledby="prTitulo">
+  <div class="dialog-head"><h2 id="prTitulo">Prática acompanhada</h2><button class="close" type="button" data-close aria-label="Fechar">×</button></div>
+  <div class="pr-corpo">
+    <p class="msg" id="prInfo"></p>
+    <div class="pr-data"><div class="field"><label for="prData">Data da confirmação</label><input id="prData" type="date"></div><p class="msg">Use a data em que a prática ou o feedback aconteceu.</p></div>
+    <div id="prLista"><div class="empty">Carregando…</div></div>
+  </div>
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -355,8 +379,10 @@
   // Partes da trilha: viram separadores na lista de módulos (campo "parte" de cada módulo).
   const PARTES={
     araujo:{rotulo:'Parte 1 · Araujo Locação',titulo:'Treinamento da corretora de locação',texto:'O nosso processo, do lead à entrega das chaves.'},
-    cupola:{rotulo:'Parte 2 · Cupola',titulo:'Trilha 3: Comercial · Atendimento Comercial',texto:'Aulas em vídeo na plataforma Cupola, assistidas com o login de cada corretora. Marque cada aula aqui ao terminar.'}};
-  const TIPOS={leitura:'Leitura',material:'Material',video:'Vídeo do sistema',youtube:'Vídeo',cupola:'Aula em vídeo · Cupola',quiz:'Checkpoint'};
+    cupola:{rotulo:'Parte 2 · Cupola',titulo:'Trilha 3: Comercial · Atendimento Comercial',texto:'Aulas em vídeo na plataforma Cupola, assistidas com o login de cada corretora. Marque cada aula aqui ao terminar.'},
+    // Parte 3 (24/11/2026): corre junto com o resto, desde o primeiro dia. Só a gestão confirma as etapas (tipo "pratica").
+    pratica:{rotulo:'Parte 3 · Prática acompanhada',titulo:'Prática acompanhada',texto:'Atendimentos, visitas e propostas de verdade, com feedbacks da gestão. Começa junto com a trilha, e a gestão confirma cada etapa com você.'}};
+  const TIPOS={leitura:'Leitura',material:'Material',video:'Vídeo do sistema',youtube:'Vídeo',cupola:'Aula em vídeo · Cupola',quiz:'Checkpoint',pratica:'Prática · a gestão confirma'};
   const ICONES={
     leitura:'<path d="M4 5.5C6.5 4 9.5 4 12 5.5v14c-2.5-1.5-5.5-1.5-8 0zM20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/>',
     material:'<path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/>',
@@ -364,6 +390,7 @@
     youtube:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
     cupola:'<path d="M3 10 12 5l9 5-9 5zM7 12.2V16c3 2 7 2 10 0v-3.8"/>',
     quiz:'<path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
+    pratica:'<circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6.5 7-6.5s7 2.5 7 6.5M16 11.5l2 2 4-4"/>',
     feito:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
     cadeado:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
   const svg=(k,s=20)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">${ICONES[k]}</svg>`;
@@ -414,7 +441,21 @@
   // ---------- Contas ----------
   const feitasDo=m=>m.etapas.filter(e=>feitos.has(e.id)).length;
   const completo=i=>feitasDo(MODS[i])===MODS[i].etapas.length;
-  const liberado=i=>gestor||i===0||completo(i-1);
+  const liberado=i=>gestor||i===0||completo(i-1)||MODS[i]?.parte==='pratica';
+  // Prática acompanhada: data prevista das etapas com "dias" (os feedbacks). "inicio" conta da primeira etapa concluída
+  // na trilha; "anterior" conta do feedback anterior (a data confirmada ou, se ainda não houve, a data prevista dele).
+  function prazosPratica(datas){
+    const inicio=[...datas.values()].sort()[0],r=new Map();let ant=null;
+    for(const e of TODAS){
+      if(e.tipo!=='pratica'||!(+e.dias>0))continue;
+      const base=e.depois==='anterior'&&ant?ant:inicio;
+      if(!base){ant=null;continue}
+      const d=new Date(base);d.setDate(d.getDate()+(+e.dias));r.set(e.id,d.toISOString());
+      ant=datas.get(e.id)||d.toISOString();
+    }
+    return r;
+  }
+  const atrasado=iso=>iso&&new Date(iso)<new Date(new Date().toDateString());
   const totalFeitas=()=>TODAS.filter(e=>feitos.has(e.id)).length;
   const pct=n=>TODAS.length?Math.round(n/TODAS.length*100):0;
   const atual=()=>MODS.findIndex((m,i)=>liberado(i)&&!completo(i));
@@ -454,7 +495,7 @@
   function abrirCertificado(nome,quando,proprio=true){
     certProprio=proprio;
     $('#certNome').value=nome||'';$('#certNomeTexto').textContent=nome||'Nome da corretora';
-    $('#certDescricao').textContent=`concluiu a Trilha da Corretora de Locação da Araujo Locação, com os ${MODS.length} módulos e as ${TODAS.length} etapas do treinamento: cultura e processo da Araujo, atendimento com a Lais, sistema e CRM, atendimento e qualificação, pré-análise, visitas, garantias, proposta, contrato e entrega das chaves, Lei do Inquilinato e cases de sucesso, além da Trilha 3: Comercial da Cupola.`;
+    $('#certDescricao').textContent=`concluiu a Trilha da Corretora de Locação da Araujo Locação, com os ${MODS.length} módulos e as ${TODAS.length} etapas do treinamento: cultura e processo da Araujo, atendimento com a Lais, sistema e CRM, atendimento e qualificação, pré-análise, visitas, garantias, proposta, contrato e entrega das chaves, Lei do Inquilinato e cases de sucesso, além da Trilha 3: Comercial da Cupola${TODAS.some(e=>e.tipo==='pratica')?', e a prática acompanhada, com atendimentos, visitas, proposta e feedbacks da gestão':''}.`;
     $('#certData').textContent=`Itajaí/SC, ${dataExtenso(quando)}.`;
     $('#certDoc').hidden=false;document.body.style.overflow='hidden';$('#certNome').focus();
   }
@@ -615,6 +656,12 @@
     h+=blocoMateriais(e);
     if(e.tipo==='quiz')h+=quiz(e);
     if(editando)return h;
+    if(e.tipo==='pratica'){
+      // Só a gestão confirma (aba Equipe). A corretora vê a data prevista e, depois, a data confirmada.
+      const q=feitos.get(e.id),prev=gestor?null:prazosPratica(feitos).get(e.id);
+      if(q)return h+`<div class="step-foot"><span class="feito">✓ Confirmada pela gestão em ${br(q)}</span></div>`;
+      return h+`<div class="step-foot"><span class="aguarda">${gestor?'Você confirma esta etapa para cada corretora na aba <b>Equipe</b>, no botão “Prática”.':'A gestão confirma esta etapa com você.'}${prev?` Previsto para ${br(prev)}.`:''}</span></div>`;
+    }
     const quando=feitos.get(e.id);
     if(quando)h+=`<div class="step-foot"><span class="feito">✓ Concluída em ${br(quando)}</span>${e.tipo==='quiz'?'':`<button type="button" class="link" data-desfazer="${e.id}">Desmarcar</button>`}</div>`;
     else if(e.tipo!=='quiz')h+=`<div class="step-foot"><button type="button" class="primary" data-marcar="${e.id}">${svg('feito',18)} Marcar como concluída</button></div>`;
@@ -645,14 +692,16 @@
   function renderModulo(){
     const i=modAberto,m=MODS[i],n=feitasDo(m),t=m.etapas.length,done=t>0&&n===t;
     const prox=i+1<MODS.length?i+1:null;
+    const prz=gestor?new Map():prazosPratica(feitos);
     $('#modulo').innerHTML=`<button type="button" class="secondary back" data-voltar>← Voltar à trilha</button>
       <section class="card mod-head"><div class="row"><div><div class="eyebrow" style="margin-bottom:4px">Módulo ${i+1} de ${MODS.length}</div><h2>${safe(m.titulo)}</h2></div>${editando?`<button type="button" class="secondary" data-ed-mod="${i}">✎ Editar módulo</button>`:done?'<span class="chip ok">Concluído</span>':''}</div>
         <p>${safe(m.desc)}</p><div class="bar-line"><i style="width:${pc(n,t)}%"></i></div><div class="mod-foot"><span>${n} de ${t} etapas</span><span>${pc(n,t)}%</span></div></section>
       <ol class="steps">${m.etapas.map((e,k)=>{
         const ok=feitos.has(e.id),open=e.id===etapaAberta;
-        const sub=(TIPOS[e.tipo]||'Etapa')+(e.ref?` · Material de treinamento, ${e.ref.includes('–')||e.ref.includes('-')?'págs.':'pág.'} ${e.ref}`:'');
+        const pv=!ok&&prz.get(e.id);
+        const sub=(TIPOS[e.tipo]||'Etapa')+(e.ref?` · Material de treinamento, ${e.ref.includes('–')||e.ref.includes('-')?'págs.':'pág.'} ${e.ref}`:'')+(pv?` · previsto para ${br(pv)}`:'');
         return `<li class="step${ok?' done':''}${open?' open':''}" id="etapa-${e.id}">
-          <button type="button" class="step-head" data-etapa="${e.id}" aria-expanded="${open}"><span class="ico">${svg(ok?'feito':(ICONES[e.tipo]?e.tipo:'leitura'))}</span><span><b>${safe(e.titulo)}</b><small>${sub}${ok?' · concluída':''}</small></span><span class="chev" aria-hidden="true"></span></button>
+          <button type="button" class="step-head" data-etapa="${e.id}" aria-expanded="${open}"><span class="ico">${svg(ok?'feito':(ICONES[e.tipo]?e.tipo:'leitura'))}</span><span><b>${safe(e.titulo)}</b><small>${sub}${ok?(e.tipo==='pratica'?' · confirmada':' · concluída'):''}</small></span><span class="chev" aria-hidden="true"></span></button>
           ${editando?barraEd('etapa',e.id,k,t):''}
           ${open?`<div class="step-body">${corpo(e)}</div>`:''}</li>`}).join('')}</ol>
       ${editando?'<button type="button" class="secondary novo" data-nova-etapa>+ Nova etapa</button>':''}
@@ -770,7 +819,7 @@
   $('#feTipo').innerHTML=Object.entries(TIPOS).map(([k,t])=>`<option value="${k}">${t}</option>`).join('');
   function mostrarCampos(){
     const tipo=$('#feTipo').value;
-    $('#grpYoutube').hidden=tipo!=='youtube';$('#grpQuiz').hidden=tipo!=='quiz';$('#grpMateriais').hidden=tipo==='quiz';
+    $('#grpYoutube').hidden=tipo!=='youtube';$('#grpQuiz').hidden=tipo!=='quiz';$('#grpMateriais').hidden=tipo==='quiz';$('#grpPrazo').hidden=tipo!=='pratica';
   }
   $('#feTipo').onchange=mostrarCampos;
   const linhaMaterial=(t='',u='')=>{
@@ -787,6 +836,7 @@
     $('#feFaq').value=(e.faq||[]).map(([q,r])=>q+'\n'+r).join('\n\n');
     $('#feModelos').value=(e.modelos||[]).map(([t,txt])=>t+'\n'+txt).join('\n---\n');
     $('#feRef').value=e.ref||'';$('#feYt').value=e.yt?`https://www.youtube.com/watch?v=${e.yt}`:'';
+    $('#feDias').value=e.dias||'';$('#feDepois').value=e.depois==='anterior'?'anterior':'inicio';
     $('#feMateriais').innerHTML=(e.links||[]).map(([t,u])=>linhaMaterial(t,u)).join('');
     $('#fePerguntas').innerHTML=(e.perguntas||[]).map(blocoPergunta).join('')||blocoPergunta();
     $('#feEnvio').textContent='';mostrarCampos();
@@ -826,6 +876,7 @@
     if(modelos.length)nova.modelos=modelos;
     const ref=$('#feRef').value.trim();if(ref){if(!paginasDe(ref).length){toast('Páginas: use números, como 13–15 ou 6');return}nova.ref=ref}
     if(tipo==='youtube'){const yt=idYoutube($('#feYt').value.trim());if(!yt){toast('Cole o link do vídeo do YouTube');return}nova.yt=yt}
+    if(tipo==='pratica'){const d=Math.round(+$('#feDias').value);if(d>0){nova.dias=d;nova.depois=$('#feDepois').value}}
     if(tipo!=='quiz'){
       const links=[...document.querySelectorAll('#feMateriais .mat-row')].map(r=>[r.querySelector('.mt').value.trim(),r.querySelector('.mu').value.trim()]).filter(([,u])=>u).map(([t,u])=>[t||'Material',u]);
       if(links.length)nova.links=links;
@@ -875,13 +926,30 @@
     $('#tab-trilha').hidden=b.dataset.tab!=='trilha';$('#tab-equipe').hidden=b.dataset.tab!=='equipe';
     if(b.dataset.tab==='equipe')carregarEquipe();
   });
+  // De onde vem a equipe: no portal, o banco; na demonstração, uma corretora de exemplo guardada no navegador.
+  const CHAVE_EQ='trilha-equipe-demo',EMAIL_DEMO='corretora.exemplo@araujolocacao.com.br';
+  const lerEqDemo=()=>{let d=ler(CHAVE_EQ);if(!d){d={};const ini=new Date();ini.setDate(ini.getDate()-10);(MODS[0]?.etapas||[]).slice(0,3).forEach(e=>d[e.id]=ini.toISOString());gravar(CHAVE_EQ,d)}return d};
+  const equipeFonte=DEMO?{
+    async listar(){const d=lerEqDemo();return [{email:EMAIL_DEMO,corretora:'Corretora de exemplo',itens:Object.keys(d),ultimo:Object.values(d).sort().pop()||null}]},
+    async datas(){return new Map(Object.entries(lerEqDemo()))},
+    async confirmar(em,id,quando){const d=lerEqDemo();d[id]=quando;gravar(CHAVE_EQ,d)},
+    async desfazer(em,id){const d=lerEqDemo();delete d[id];gravar(CHAVE_EQ,d)}
+  }:{
+    async listar(){const {data,error}=await db.rpc('treinamento_equipe');if(error)throw error;return data},
+    async datas(em){const {data,error}=await db.from('treinamento_progresso').select('item,concluido_em').eq('email',em);if(error)throw error;return new Map(data.map(r=>[r.item,r.concluido_em]))},
+    async confirmar(em,id,quando){const {error}=await db.from('treinamento_progresso').insert({email:em,item:id,concluido_em:quando});if(error&&error.code!=='23505')throw error},
+    async desfazer(em,id){const {error}=await db.from('treinamento_progresso').delete().eq('email',em).eq('item',id);if(error)throw error}
+  };
+  const etapasPratica=()=>TODAS.filter(e=>e.tipo==='pratica');
   async function carregarEquipe(){
-    const box=$('#equipe');box.innerHTML='<div class="empty">Carregando…</div>';
-    const {data,error}=await db.rpc('treinamento_equipe');
-    if(error){box.innerHTML=`<div class="empty">Não foi possível carregar a equipe.<br><small>${safe(error.message)}</small></div>`;return}
+    const box=$('#equipe');if(!box.querySelector('table'))box.innerHTML='<div class="empty">Carregando…</div>';
+    let data;try{data=await equipeFonte.listar()}catch(error){box.innerHTML=`<div class="empty">Não foi possível carregar a equipe.<br><small>${safe(error.message)}</small></div>`;return}
     if(!data.length){box.innerHTML='<div class="empty">Nenhuma corretora liberada ainda.</div>';return}
+    const PR=etapasPratica();
     const linhas=data.map(r=>{const s=new Set((r.itens||[]).filter(x=>IDS.has(x)));return {...r,s,n:s.size}}).sort((a,b)=>b.n-a.n||String(a.corretora||a.email).localeCompare(String(b.corretora||b.email)));
-    box.innerHTML=`<table><thead><tr><th>Corretora</th><th>Progresso</th><th>Módulos</th><th>Onde está</th><th>Última atividade</th><th>Certificado</th></tr></thead><tbody>${linhas.map(r=>{
+    box.innerHTML=`<table><thead><tr><th>Corretora</th><th>Progresso</th><th>Módulos</th><th>Onde está</th>${PR.length?'<th>Prática</th>':''}<th>Última atividade</th><th>Certificado</th></tr></thead><tbody>${linhas.map(r=>{
+      const nome=r.corretora||r.email.split('@')[0],kp=PR.filter(e=>r.s.has(e.id)).length;
+      const colPr=PR.length?`<td><button type="button" class="secondary" style="padding:6px 10px;font-size:.84rem;white-space:nowrap" data-pratica="${safe(r.email)}" data-pratica-nome="${safe(nome)}">${svg('pratica',16)} ${kp} de ${PR.length}</button></td>`:'';
       const p=pct(r.n);
       const mods=MODS.map((m,i)=>{const k=m.etapas.filter(e=>r.s.has(e.id)).length;return `<i class="${k===m.etapas.length?'c':k?'p':''}" title="Módulo ${i+1}: ${k} de ${m.etapas.length}"></i>`}).join('');
       const onde=MODS.findIndex(m=>m.etapas.some(e=>!r.s.has(e.id)));
@@ -889,10 +957,40 @@
         <td><div class="pct"><div class="bar-line"><i style="width:${p}%"></i></div><b>${p}%</b></div></td>
         <td><div class="mods">${mods}</div></td>
         <td>${onde<0?'<span class="chip ok">Concluiu</span>':r.n?`Módulo ${onde+1} · ${safe(MODS[onde].titulo)}`:'<span style="color:var(--muted)">Não começou</span>'}</td>
-        <td>${r.ultimo?br(r.ultimo):'—'}</td>
+        ${colPr}<td>${r.ultimo?br(r.ultimo):'—'}</td>
         <td>${onde<0?`<button type="button" class="link" data-cert-nome="${safe(r.corretora||r.email.split('@')[0])}" data-cert-data="${safe(r.ultimo||'')}">🎓 Ver</button>`:'<span style="color:var(--muted)">—</span>'}</td></tr>`}).join('')}</tbody></table>`;
   }
-  $('#equipe').addEventListener('click',e=>{const b=e.target.closest('[data-cert-nome]');if(b)abrirCertificado(b.dataset.certNome,b.dataset.certData||null,false)});
+  $('#equipe').addEventListener('click',e=>{
+    const p=e.target.closest('[data-pratica]');if(p)return abrirPratica(p.dataset.pratica,p.dataset.praticaNome);
+    const b=e.target.closest('[data-cert-nome]');if(b)abrirCertificado(b.dataset.certNome,b.dataset.certData||null,false);
+  });
+
+  // Prática acompanhada: a gestão confirma cada etapa (atendimentos, visitas, proposta e feedbacks) para a corretora.
+  let prEmail=null,prNome='';
+  const hojeISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+  async function abrirPratica(em,nome){
+    prEmail=em;prNome=nome;$('#prTitulo').textContent='Prática acompanhada · '+nome;
+    $('#prData').value=hojeISO();$('#prData').max=hojeISO();$('#prLista').innerHTML='<div class="empty">Carregando…</div>';$('#prInfo').textContent='';
+    $('#dlgPratica').showModal();await renderPratica();
+  }
+  async function renderPratica(){
+    const box=$('#prLista');let datas;
+    try{datas=await equipeFonte.datas(prEmail)}catch(err){box.innerHTML=`<p class="msg error">Não foi possível carregar. ${safe(err.message)}</p>`;return}
+    const prz=prazosPratica(datas),lista=etapasPratica(),feitas=lista.filter(e=>datas.has(e.id)).length,inicio=[...datas.values()].sort()[0];
+    $('#prInfo').textContent=`${feitas} de ${lista.length} etapas confirmadas. `+(inicio?`Começou a trilha em ${br(inicio)}.`:'Ainda não começou a trilha: as datas previstas dos feedbacks aparecem quando ela concluir a primeira etapa.');
+    box.innerHTML=`<ol class="pr-lista">${lista.map(e=>{const q=datas.get(e.id),p=prz.get(e.id),at=!q&&atrasado(p);
+      return `<li class="${q?'ok':at?'atrasado':''}"><div><b>${safe(e.titulo)}</b><small>${q?`✓ Confirmada em ${br(q)}`:p?`Previsto para ${br(p)}${at?' · atrasado':''}`:'Sem data prevista'}</small></div>${q?`<button type="button" class="link" data-pr-desfazer="${e.id}">Desfazer</button>`:`<button type="button" class="primary" data-pr-ok="${e.id}">${svg('feito',16)} Confirmar</button>`}</li>`}).join('')}</ol>`;
+  }
+  $('#prLista').addEventListener('click',async e=>{
+    const ok=e.target.closest('[data-pr-ok]'),des=e.target.closest('[data-pr-desfazer]'),b=ok||des;if(!b)return;
+    if(ok){const v=$('#prData').value;if(!v||v>hojeISO()){toast('Escolha a data em que aconteceu (hoje ou antes)');return}}
+    b.disabled=true;
+    try{
+      if(ok){await equipeFonte.confirmar(prEmail,ok.dataset.prOk,new Date($('#prData').value+'T12:00:00').toISOString());toast('Etapa confirmada para '+prNome)}
+      else{await equipeFonte.desfazer(prEmail,des.dataset.prDesfazer);toast('Confirmação desfeita')}
+    }catch(err){b.disabled=false;toast('Não foi possível salvar. '+(err.message||''));return}
+    await renderPratica();carregarEquipe();
+  });
 
   // ---------- Acesso ----------
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
@@ -900,7 +998,7 @@
     try{const c=await conteudo.carregar();if(c?.modulos?.length){usarConteudo(c.modulos);infoConteudo=c}else usarConteudo(clonar(PADRAO))}
     catch(err){usarConteudo(clonar(PADRAO));if(gestor)toast('O conteúdo da trilha não carregou. '+(err.message||''))}
     feitos=await store.carregar();
-    $('#gestorNote').hidden=!gestor;$('#tabs').hidden=!gestor||DEMO;
+    $('#gestorNote').hidden=!gestor;$('#tabs').hidden=!gestor;
     const h=/^#m(\d+)$/.exec(location.hash);
     if(h&&MODS[+h[1]-1]&&liberado(+h[1]-1)){modAberto=+h[1]-1;etapaAberta=(MODS[modAberto].etapas.find(e=>!feitos.has(e.id))||MODS[modAberto].etapas[0])?.id||null}
     render();
