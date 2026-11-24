@@ -78,6 +78,14 @@
     .seguros{padding:14px 20px;margin-bottom:14px}.seguros summary{cursor:pointer;font-weight:800;color:var(--navy)}
     .seg-item{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:12px 0}.seg-item.feito{opacity:.75}.seg-item .msg{margin:2px 0 0}
     .seg-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    /* Faturas das garantias (24/11/2026) */
+    .gar-anexo{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:14px 0}.gar-anexo:first-of-type{border-top:0}
+    .gar-anexo h3{margin:0 0 4px;font-size:1.05rem}.gar-anexo .msg{max-width:720px}
+    .gar-arqs{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:4px}.gar-arqs li{font-size:.86rem;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .gar-sit{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.75rem;font-weight:800;white-space:nowrap}
+    .gar-sit.ok{background:#e3f1ea;color:var(--green)}.gar-sit.falta{background:#fdece4;color:var(--red)}.gar-sit.espera{background:#fdf6e8;color:#7a5314}.gar-sit.nada{background:#eef2f4;color:#52616c}
+    .gar-prob{padding:14px 20px;margin-bottom:14px}.gar-prob summary{cursor:pointer;font-weight:800;color:var(--navy)}
+    .gar-prob h4{margin:14px 0 6px;font-size:.9rem}
     .salvas{padding:14px 20px;margin-bottom:14px}.salvas summary{cursor:pointer;font-weight:800;color:var(--navy)}.salvas tr.aberta{background:#eef6f2}
     .atual{background:#eef6f2;color:#1d4d3f;border:1px solid #cfe3da;border-radius:12px;padding:9px 14px;font-size:.88rem;margin:0 0 14px}
     .doc h3{margin:0 0 3px;font-size:1rem;overflow-wrap:anywhere}.doc small{color:var(--muted);display:block;overflow-wrap:anywhere}.doc .row-actions{text-align:left;margin-top:8px;margin-left:-4px}
@@ -273,6 +281,18 @@
       <p class="msg" style="margin:6px 0 0">Inquilinos com garantia em caução que deram aviso de saída (etiqueta CAUÇÃO no quadro Saídas e distratos). A etapa, a vistoria e as chaves acompanham o cartão.</p>
       <div id="caucoesLista"></div></details>
     <div class="card table-card"><div class="table-wrap" style="margin-top:0"><table id="devTable"></table></div></div>
+  </section>
+
+  <section id="tab-garantias" data-tab hidden>
+    <div class="top">
+      <div><h2>Faturas das garantias</h2><p id="garSub">Todo mês, nos dias úteis do dia 20 ao 25, as faturas das 7 garantias são conferidas com os lançamentos do Superlógica. A Porto e a Too dependem de você: anexe aqui assim que chegarem.</p></div>
+      <div class="bar-actions"><select class="fech-sel" id="garMes" aria-label="Mês da conferência"></select><button class="secondary" id="garAtualizar">Atualizar</button></div>
+    </div>
+    <div class="card table-card" id="garAnexos"></div>
+    <input type="file" id="garArquivo" accept=".pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg" hidden>
+    <div class="tiles" id="garTiles"></div>
+    <div class="card table-card"><h3 style="margin:0">Resultado da conferência</h3><div class="table-wrap"><table id="garTable"></table></div></div>
+    <div id="garProblemas"></div>
   </section>
 
   <section id="tab-documentos" data-tab hidden>
@@ -472,7 +492,8 @@
     // rh = aba RH: colaboradores com aniversário de vida e de empresa (ver supabase/rh.sql). Os avisos também aparecem no portal.
     // devolucoes = cartões do quadro Saídas e distratos na coluna de devolução de caução / pagamento (supabase/saidas_paineis.sql, 03/11/2026).
     // documentos = gerador de contratos em Word (08/10/2026). Os modelos ficam no bucket privado, em ferramentas/financeiro-rh/.
-    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','fechamento','documentos','devolucoes'],
+    // garantias = anexos da Porto e da Too + resultado da conferência mensal das 7 garantias (supabase/garantias_faturas.sql, 24/11/2026).
+    {slug:'financeiro-rh',publicado:true,limpo:true,nome:'Gestão Financeira / RH',area:'Liderança',papel:'Gestão direta',ref:'Colaborador / fornecedor',extras:['rh','fechamento','documentos','devolucoes','garantias'],
       atividades:['Colaboradores (admissão/demissão/folha)','Contas a pagar da empresa','Suporte direto à equipe financeira']},
   ];
   const AREAS=['Atendimento','Captação de imóveis','Comercial','Operação','Financeiro','Liderança'];
@@ -508,7 +529,7 @@
     $('#depNome').textContent=DEP.nome;$('#depArea').textContent=`${DEP.area} · ${DEP.papel}`;
     $('#deniedText').textContent=`Este login não tem permissão para ${DEP.nome}. Fale com a gerência.`;
     $('#mRefLabel').textContent=DEP.ref;$('#dTitulo').placeholder=`Ex.: POP – ${DEP.nome}`;
-    const nomes={visitas:'Visitas',rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',devolucoes:'Devoluções e pagamentos',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
+    const nomes={visitas:'Visitas',rh:'RH',fechamento:'Fechamento da Locação',documentos:'Gerar documentos',devolucoes:'Devoluções e pagamentos',garantias:'Faturas das garantias',parceria:'Calculadora de parceria',demandas:'Demandas',rescisao:'Calculadora de rescisão',adm:'Adm. de condomínio',alpop:'Contratos Alpop',atividades:'Atividades',senhas:'Senhas',pop:DEP.materiais?'Materiais':'POP e documentos'};
     if(DEP.materiais){$('#popTitulo').textContent='Materiais';$('#popSub').textContent='POP do departamento e materiais de apoio, separados por pasta.'}
     $('#tabs').innerHTML=abasDoDep().map(a=>`<button type="button" class="tab-link" data-go="${a}">${nomes[a]}</button>`).join('')
       +(DEP.links||[]).map(([href,t])=>`<a class="tab-link" href="${href}" style="text-decoration:none">${safe(t)}</a>`).join('');
@@ -535,7 +556,7 @@
     const {data,error}=await db.rpc('pode_departamento',{p_departamento:DEP.slug});
     if(error||data!==true){show('denied');return}
     show('app');
-    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,ABAS.includes('devolucoes')?loadDevolucoes():null,ABAS.includes('parceria')?loadParceria():null,ABAS.includes('visitas')?loadVisitas():null,loadSenhas(),loadDocs()])}
+    if(!booted){booted=true;showTab();montarTrocar();await Promise.all([DEP.limpo?null:loadDemandas(),ABAS.includes('rh')?loadRh():null,ABAS.includes('fechamento')?loadFechamentos():null,ABAS.includes('rescisao')?loadRescisao():null,ABAS.includes('documentos')?loadDocumentos():null,ABAS.includes('devolucoes')?loadDevolucoes():null,ABAS.includes('garantias')?loadGarantias():null,ABAS.includes('parceria')?loadParceria():null,ABAS.includes('visitas')?loadVisitas():null,loadSenhas(),loadDocs()])}
   }
   function show(id){for(const s of ['gate','denied','app'])$('#'+s).hidden=s!==id}
   // Quem entra em mais de um departamento (gerência e acesso geral, ver supabase/acesso_geral.sql) ganha um seletor no topo.
@@ -1235,6 +1256,97 @@
       return `<tr><td style="white-space:normal;min-width:260px"><strong>${safe(c.titulo)}</strong>${c.comentarios?` <small class="muted">💬 ${c.comentarios}</small>`:''}</td><td style="white-space:normal">${safe(c.etiquetas.join(' · '))}</td><td${d>=7?' style="color:var(--red);font-weight:700"':''}>${d===0?'hoje':d===1?'há 1 dia':`há ${d} dias`}</td><td>${c.prazo?br(c.prazo.slice(0,10))+(c.prazo_ok?' ✓':''):'—'}</td><td><a class="secondary" style="text-decoration:none;padding:5px 10px" href="saidas.html?c=${c.id}">Abrir cartão</a></td></tr>`}).join('')+'</tbody>';
   }
   $('#devAtualizar').onclick=loadDevolucoes;
+
+  // ---------- Faturas das garantias (24/11/2026) ----------
+  // A Chau anexa as faturas da Porto e da Too (bucket privado "garantias" + tabela garantias_faturas). A tarefa agendada dos
+  // dias úteis 20 a 25 confere as 7 garantias com o Superlógica e grava o resultado em garantias_conferencias
+  // (supabase/garantias_faturas.sql). A tela só lê o resultado; quem garante o acesso são as regras do banco.
+  const GAR_TODAS=['Seu Fiador','CredAluga','Pottencial','Porto','Tokio','Too','Loft'];
+  const GAR_ANEXA={
+    Porto:'Chega por e-mail (Porto Bank), por volta do dia 4, com senha (os 5 primeiros dígitos do CNPJ). Abra o PDF com a senha e salve uma cópia sem senha (Imprimir → Salvar como PDF), ou tire a planilha de dentro do .zip do link do e-mail. Vêm duas: Araujo Locações e Araujo Negócios Imobiliários. Anexe as duas.',
+    Too:'Chega no seu WhatsApp. Baixe o arquivo da conversa e anexe aqui.'};
+  const garBrl=v=>v==null?'—':(+v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const mesAtualGar=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}`};
+  const nomeMesGar=m=>{const [y,mm]=m.split('-');return `${MESES[+mm-1]} de ${y}`};
+  let garFaturas=[],garConfs=[],garAlvo=null;
+  function montarMesesGar(){
+    const sel=$('#garMes');if(sel.options.length)return;
+    const d=new Date(),ops=[];for(let i=0;i<6;i++){const x=new Date(d.getFullYear(),d.getMonth()-i,1);ops.push(`${x.getFullYear()}-${pad(x.getMonth()+1)}`)}
+    sel.innerHTML=ops.map(m=>`<option value="${m}">${nomeMesGar(m).replace(/^./,c=>c.toUpperCase())}</option>`).join('');
+  }
+  async function loadGarantias(){
+    montarMesesGar();const mes=$('#garMes').value;
+    $('#garTable').innerHTML='<tbody><tr><td class="empty">Carregando…</td></tr></tbody>';
+    const [f,c]=await Promise.all([
+      db.from('garantias_faturas').select('*').eq('mes',mes).order('enviado_em'),
+      db.from('garantias_conferencias').select('*').eq('mes',mes)]);
+    if(f.error||c.error){const e=(f.error||c.error).message;$('#garAnexos').innerHTML=`<p class="empty">Não foi possível carregar: ${safe(e)}</p>`;$('#garTable').innerHTML='';$('#garTiles').innerHTML='';$('#garProblemas').innerHTML='';return}
+    garFaturas=f.data;garConfs=c.data;pintarGarantias();
+    if(mes===mesAtualGar()){const falta=Object.keys(GAR_ANEXA).filter(g=>!garFaturas.some(x=>x.garantia===g)).length;
+      const aba=document.querySelector('[data-go="garantias"]');if(aba)aba.textContent='Faturas das garantias'+(falta?` (${falta})`:'')}
+  }
+  function pintarGarantias(){
+    const mes=$('#garMes').value,atual=mes===mesAtualGar(),dia=new Date().getDate();
+    $('#garAnexos').innerHTML=`<h3 style="margin:0 0 4px">Anexar as faturas de ${nomeMesGar(mes)}</h3><p class="msg">Estas duas a conferência não consegue pegar sozinha. Anexe o PDF sem senha, a planilha ou uma foto legível, de preferência até o dia 20.</p>`
+      +Object.entries(GAR_ANEXA).map(([g,dica])=>{const arqs=garFaturas.filter(x=>x.garantia===g);
+        return `<div class="gar-anexo"><div><h3>${g} <span class="gar-sit ${arqs.length?'ok':'falta'}">${arqs.length?'Anexada':'Falta anexar'}</span></h3><p class="msg">${safe(dica)}</p>
+          ${arqs.length?`<ul class="gar-arqs">${arqs.map(a=>`<li>📄 <strong>${safe(a.nome)}</strong> <small class="muted">${new Date(a.enviado_em).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})} · ${safe(a.enviado_por)}</small><button class="link" data-gar-abrir="${a.id}">Abrir</button><button class="link danger" data-gar-excluir="${a.id}">Excluir</button></li>`).join('')}</ul>`:''}</div>
+          <div class="seg-acoes"><button class="primary" data-gar-anexar="${g}">${arqs.length?'Anexar outra':'Anexar fatura'}</button></div></div>`}).join('');
+    const conf=garConfs.filter(x=>x.situacao==='Conferida'),probs=conf.reduce((a,x)=>a+(x.com_problema||0),0),val=conf.reduce((a,x)=>a+(+x.valor_problema||0),0);
+    const prazo=!atual?nomeMesGar(mes):dia<20?'a conferência começa no dia 20':dia<=25?'prazo: até o dia 25':'prazo encerrado';
+    $('#garTiles').innerHTML=`<div class="card tile"><span>Conferidas</span><strong>${conf.length} de 7</strong><small>${prazo}</small></div>
+      <div class="card tile${probs?' alert':''}"><span>Com problema</span><strong>${probs}</strong><small>inquilinos com algo a ver</small></div>
+      <div class="card tile${val?' warn':''}"><span>Valor com problema</span><strong>${garBrl(val)}</strong><small>nas faturas conferidas</small></div>
+      <div class="card tile"><span>Total das faturas</span><strong>${garBrl(conf.reduce((a,x)=>a+(+x.total_fatura||0),0))}</strong><small>das garantias conferidas</small></div>`;
+    const sitCls=s=>s==='Conferida'?'ok':s==='Erro'||s==='Fatura não encontrada'?'falta':'espera';
+    $('#garTable').innerHTML=`<thead><tr><th>Garantia</th><th>Situação</th><th>Fatura</th><th class="num">Total</th><th class="num">Inquilinos</th><th class="num">Certos</th><th class="num">Com problema</th><th class="num">Valor com problema</th><th></th></tr></thead><tbody>${GAR_TODAS.map(g=>{const r=garConfs.find(x=>x.garantia===g);
+      if(!r)return `<tr><td><strong>${g}</strong></td><td><span class="gar-sit nada">Ainda não conferida</span></td><td colspan="7" class="muted">${atual&&dia<20?'A conferência começa no dia 20.':''}</td></tr>`;
+      return `<tr><td><strong>${g}</strong></td><td><span class="gar-sit ${sitCls(r.situacao)}">${safe(r.situacao)}</span>${r.conferido_em?`<br><small class="muted">em ${new Date(r.conferido_em).toLocaleDateString('pt-BR')}</small>`:''}</td>
+        <td style="white-space:normal;min-width:200px">${safe([r.referencia,r.vencimento?'venc. '+br(r.vencimento):'',r.fonte].filter(Boolean).join(' · '))}${r.observacao?`<br><small class="muted">${safe(r.observacao)}</small>`:''}</td>
+        <td class="num">${garBrl(r.total_fatura)}</td><td class="num">${r.inquilinos??'—'}</td><td class="num">${r.certos??'—'}</td><td class="num"${r.com_problema?' style="color:var(--red);font-weight:800"':''}>${r.com_problema??'—'}</td><td class="num">${garBrl(r.valor_problema)}</td>
+        <td class="row-actions">${r.relatorio?`<button class="link" data-gar-rel="${safe(r.relatorio)}">Relatório PDF</button>`:''}</td></tr>`}).join('')}</tbody>`;
+    $('#garProblemas').innerHTML=garConfs.filter(r=>(r.problemas||[]).length).sort((a,b)=>GAR_TODAS.indexOf(a.garantia)-GAR_TODAS.indexOf(b.garantia)).map(r=>{
+      const grupos={};for(const p of r.problemas)(grupos[p.tipo||'Outros']??=[]).push(p);
+      return `<details class="card gar-prob"><summary>${safe(r.garantia)}: ${r.problemas.length} ${r.problemas.length===1?'ponto':'pontos'} para ver</summary>${Object.entries(grupos).map(([t,ps])=>`<h4>${safe(t)} (${ps.length})</h4><div class="table-wrap" style="margin-top:0"><table><thead><tr><th>Inquilino</th><th>Contrato / imóvel</th><th class="num">Na fatura</th><th class="num">No sistema</th><th>Observação</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${safe(p.inquilino)}</td><td>${safe(p.contrato||'')}</td><td class="num">${garBrl(p.valor_fatura)}</td><td class="num">${garBrl(p.valor_sistema)}</td><td style="white-space:normal;min-width:220px">${safe(p.obs||'')}</td></tr>`).join('')}</tbody></table></div>`).join('')}</details>`}).join('');
+  }
+  async function garComSenha(file){
+    const b=new Uint8Array(await file.arrayBuffer());
+    if(b[0]===0x25&&b[1]===0x50&&b[2]===0x44&&b[3]===0x46)return /\/Encrypt\b/.test(new TextDecoder('latin1').decode(b))?'pdf':null;
+    if(b[0]===0xd0&&b[1]===0xcf&&/\.xlsx$/i.test(file.name))return 'planilha';
+    if(b[0]===0x50&&b[1]===0x4b&&(b[6]&1))return 'planilha';
+    return null;
+  }
+  $('#garMes').onchange=loadGarantias;$('#garAtualizar').onclick=loadGarantias;
+  $('#tab-garantias').addEventListener('click',async e=>{
+    const an=e.target.closest('[data-gar-anexar]');if(an){garAlvo=an.dataset.garAnexar;$('#garArquivo').value='';$('#garArquivo').click();return}
+    const ab=e.target.closest('[data-gar-abrir]'),rel=e.target.closest('[data-gar-rel]');
+    if(ab||rel){const caminho=rel?rel.dataset.garRel:garFaturas.find(x=>x.id===ab.dataset.garAbrir)?.caminho;if(!caminho)return;
+      const w=window.open('','_blank');const {data,error}=await db.storage.from('garantias').createSignedUrl(caminho,600);
+      if(error){if(w)w.close();alert('Não foi possível abrir: '+error.message);return}
+      if(w)w.location=data.signedUrl;else location.assign(data.signedUrl);return}
+    const ex=e.target.closest('[data-gar-excluir]');if(!ex)return;
+    const a=garFaturas.find(x=>x.id===ex.dataset.garExcluir);if(!a||!confirm(`Excluir "${a.nome}"?`))return;
+    ex.disabled=true;const r=await db.storage.from('garantias').remove([a.caminho]);
+    if(r.error){alert('Não foi possível excluir: '+r.error.message);ex.disabled=false;return}
+    const {error}=await db.from('garantias_faturas').delete().eq('id',a.id);
+    if(error){alert('Não foi possível excluir: '+error.message);ex.disabled=false;return}
+    toast('Arquivo excluído');loadGarantias();
+  });
+  $('#garArquivo').onchange=async()=>{
+    const file=$('#garArquivo').files[0];if(!file||!garAlvo)return;
+    if(file.size>25*1024*1024){alert('Arquivo grande demais (máximo 25 MB).');return}
+    if(/\.zip$/i.test(file.name)){alert('Este é um arquivo .zip. Abra o .zip, tire a planilha de dentro (digitando a senha, se pedir) e anexe a planilha.');return}
+    const senha=await garComSenha(file);
+    if(senha){alert(senha==='pdf'?'Este PDF está com senha, e a conferência não consegue abrir. Abra o PDF com a senha e salve uma cópia sem senha (Imprimir → Salvar como PDF). Depois anexe a cópia.':'Esta planilha está com senha. Abra com a senha, salve uma cópia sem senha e anexe a cópia.');return}
+    const mes=$('#garMes').value,limpo=file.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w.\-]+/g,'_').slice(-120);
+    const caminho=`${mes}/${garAlvo}/${Date.now()}-${limpo}`;
+    toast('Enviando…');
+    const up=await db.storage.from('garantias').upload(caminho,file,{contentType:file.type||undefined});
+    if(up.error){alert('Não foi possível enviar: '+up.error.message);return}
+    const {error}=await db.from('garantias_faturas').insert({mes,garantia:garAlvo,nome:file.name.slice(0,200),caminho,tamanho:file.size});
+    if(error){await db.storage.from('garantias').remove([caminho]);alert('Não foi possível salvar: '+error.message);return}
+    toast(`Fatura da ${garAlvo} anexada`);loadGarantias();
+  };
 
   // ---------- Fechamento da Locação ----------
   // Ranking do mês fechado, gravado pelo banco todo dia 10 (supabase/locacao_fechamento.sql, tabela locacao_fechamentos).
