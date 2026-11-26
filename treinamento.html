@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Trilha da Corretora | Araujo Locação</title>
+  <title>Trilha do Corretor | Araujo Locação</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23294468'/%3E%3Cpath d='M15 42 31 16l18 26h-9l-9-14-8 14z' fill='%23fff'/%3E%3C/svg%3E">
   <style>
     :root{--navy:#173552;--blue:#294b68;--green:#24705a;--green-soft:#e3f1ea;--cream:#f5f5f0;--white:#fff;--ink:#142431;--muted:#65727d;--line:#dce2e5;--amber:#b97822;--red:#a94343;--shadow:0 18px 50px rgba(23,53,82,.10)}
@@ -230,13 +230,13 @@
 </head>
 <body>
 <header class="bar">
-  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Trilha da Corretora</strong></div>
+  <div><a href="./#funcoes">← Portal interno</a> &nbsp;·&nbsp; <strong>Trilha do Corretor</strong></div>
   <div class="bar-actions" id="barActions" hidden><span class="who" id="who"></span><button class="ghost" id="logout">Sair</button></div>
 </header>
 
 <section class="card gate" id="gate" hidden>
-  <h1>Trilha da Corretora</h1>
-  <p>Treinamento da corretora de locação. Entre com o seu e-mail e senha do portal.</p>
+  <h1>Trilha do Corretor</h1>
+  <p>Treinamento do corretor de locação. Entre com o seu e-mail e senha do portal.</p>
   <form id="loginForm">
     <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username" required></div>
     <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
@@ -248,7 +248,7 @@
 
 <section class="card gate" id="denied" hidden>
   <h1>Sem acesso</h1>
-  <p>Este login ainda não tem acesso à trilha das corretoras de locação. Fale com a gerência.</p>
+  <p>Este login ainda não tem acesso à trilha dos corretores de locação. Fale com a gerência.</p>
   <button class="secondary" id="deniedLogout">Entrar com outro e-mail</button>
 </section>
 
@@ -257,8 +257,8 @@
 
   <section class="card hero" aria-labelledby="heroTitle">
     <div>
-      <div class="eyebrow">Comercial · Corretoras de locação</div>
-      <h1 id="heroTitle">Trilha da Corretora</h1>
+      <div class="eyebrow">Comercial · Corretores de locação</div>
+      <h1 id="heroTitle">Trilha do Corretor</h1>
       <p id="heroText">Do primeiro contato com o lead à entrega das chaves: o treinamento da Araujo e as aulas de atendimento comercial da Cupola. Siga os módulos em ordem e marque cada etapa ao concluir.</p>
       <div class="hero-actions"><button class="primary" id="continuar">Continuar ▸</button><button class="secondary" id="editar" hidden>✎ Editar trilha</button><span class="msg" id="heroCount"></span></div>
     </div>
@@ -274,8 +274,8 @@
   </nav>
 
   <div id="tab-trilha">
-    <p class="note" id="gestorNote" hidden><strong>Visão da gerência.</strong> Todos os módulos ficam liberados para você revisar. Para as corretoras, cada módulo abre quando o anterior chega a 100%.</p>
-    <p class="note edit-note" id="editNote" hidden><strong>Modo edição.</strong> Cada mudança é salva na hora e as corretoras veem a nova versão quando abrirem a trilha. Abra um módulo para editar as etapas. <span id="editInfo"></span>
+    <p class="note" id="gestorNote" hidden><strong>Visão da gerência.</strong> Todos os módulos ficam liberados para você revisar. Para os corretores, cada módulo abre quando o anterior chega a 100%.</p>
+    <p class="note edit-note" id="editNote" hidden><strong>Modo edição.</strong> Cada mudança é salva na hora e os corretores veem a nova versão quando abrirem a trilha. Abra um módulo para editar as etapas. <span id="editInfo"></span>
       <span class="edit-acoes"><button type="button" class="secondary" id="verModeloCert">🎓 Ver o certificado</button><button type="button" class="secondary" id="enviarPaginas">⬆ Enviar páginas e imagens da trilha</button><input type="file" id="arqPaginas" multiple accept="image/jpeg,image/png,application/pdf,video/mp4,.docx" hidden><span class="msg" id="msgPaginas"></span></span></p>
     <section class="card certificado" id="certificado" hidden></section>
     <div id="trilha"></div>
@@ -283,7 +283,7 @@
   </div>
 
   <div id="tab-equipe" hidden>
-    <div style="margin-bottom:16px"><h2>Progresso da equipe</h2><p class="msg" style="margin-top:4px">Corretoras liberadas em Corretoras de locação e quem já começou a trilha.</p></div>
+    <div style="margin-bottom:16px"><h2>Progresso da equipe</h2><p class="msg" style="margin-top:4px">Corretores liberados em Corretoras de locação e quem já começou a trilha.</p></div>
     <div class="card table-card"><div class="table-wrap" id="equipe"><div class="empty">Carregando…</div></div></div>
   </div>
 </main>
@@ -299,7 +299,7 @@
     <div class="cert-borda">
       <img src="logo-araujo.jpg" alt="Araujo Locação" class="cert-logo">
       <div class="cert-eyebrow">Certificado de conclusão</div>
-      <h1 class="cert-titulo">Trilha da Corretora de Locação</h1>
+      <h1 class="cert-titulo">Trilha do Corretor de Locação</h1>
       <p class="cert-texto">Certificamos que</p>
       <div class="cert-nome" id="certNomeTexto"></div>
       <p class="cert-texto" id="certDescricao"></p>
@@ -333,7 +333,7 @@
     <div class="field"><label for="feFaq">Perguntas e respostas (opcional)</label><textarea id="feFaq" rows="6" maxlength="30000"></textarea>
       <p class="msg">Uma pergunta por bloco: a primeira linha é a pergunta e as de baixo são a resposta. Deixe uma linha em branco entre um bloco e outro. Linhas que começam com • viram lista. Para um botão que abre um site, escreva numa linha: [Texto do botão](https://endereço)</p></div>
     <div class="field"><label for="feModelos">Modelos para copiar (opcional)</label><textarea id="feModelos" rows="6" maxlength="20000"></textarea>
-      <p class="msg">Textos que a corretora copia e cola no WhatsApp. A primeira linha é o nome do modelo e as de baixo são o texto. Para separar um modelo do outro, use uma linha só com três traços: ---</p></div>
+      <p class="msg">Textos que o corretor copia e cola no WhatsApp. A primeira linha é o nome do modelo e as de baixo são o texto. Para separar um modelo do outro, use uma linha só com três traços: ---</p></div>
     <div class="field" style="max-width:420px"><label for="feRef">Páginas do material de treinamento (opcional)</label><input id="feRef" maxlength="40" placeholder="Ex.: 13–15"><p class="msg">Essas páginas aparecem dentro da etapa, já abertas no ponto certo.</p></div>
     <div class="row2" id="grpPrazo"><div class="field"><label for="feDias">Prazo em dias (opcional, para feedbacks)</label><input id="feDias" type="number" min="1" max="365" placeholder="Ex.: 7"></div>
       <div class="field"><label for="feDepois">Contar a partir</label><select id="feDepois"><option value="inicio">do início da trilha</option><option value="anterior">do feedback anterior</option></select></div></div>
@@ -378,8 +378,8 @@
   let PADRAO=[];
   // Partes da trilha: viram separadores na lista de módulos (campo "parte" de cada módulo).
   const PARTES={
-    araujo:{rotulo:'Parte 1 · Araujo Locação',titulo:'Treinamento da corretora de locação',texto:'O nosso processo, do lead à entrega das chaves.'},
-    cupola:{rotulo:'Parte 2 · Cupola',titulo:'Trilha 3: Comercial · Atendimento Comercial',texto:'Aulas em vídeo na plataforma Cupola, assistidas com o login de cada corretora. Marque cada aula aqui ao terminar.'},
+    araujo:{rotulo:'Parte 1 · Araujo Locação',titulo:'Treinamento do corretor de locação',texto:'O nosso processo, do lead à entrega das chaves.'},
+    cupola:{rotulo:'Parte 2 · Cupola',titulo:'Trilha 3: Comercial · Atendimento Comercial',texto:'Aulas em vídeo na plataforma Cupola, assistidas com o login de cada corretor. Marque cada aula aqui ao terminar.'},
     // Parte 3 (24/11/2026): corre junto com o resto, desde o primeiro dia. Só a gestão confirma as etapas (tipo "pratica").
     pratica:{rotulo:'Parte 3 · Prática acompanhada',titulo:'Prática acompanhada',texto:'Atendimentos, visitas e propostas de verdade, com feedbacks da gestão. Começa junto com a trilha, e a gestão confirma cada etapa com você.'}};
   const TIPOS={leitura:'Leitura',material:'Material',video:'Vídeo do sistema',youtube:'Vídeo',cupola:'Aula em vídeo · Cupola',quiz:'Checkpoint',pratica:'Prática · a gestão confirma'};
@@ -479,7 +479,7 @@
     const cert=$('#certificado');
     if(p===100&&!editando){
       const fim=[...feitos.values()].sort().pop();
-      cert.innerHTML=`<div class="selo">${svg('feito',32)}</div><h2>Trilha concluída!</h2><p>Você completou os ${MODS.length} módulos da Trilha da Corretora${fim?` em ${br(fim)}`:''}. Agora é colocar o Padrão Araujo em prática em cada atendimento.</p><p style="margin-top:14px"><button type="button" class="primary" data-certificado>🎓 Ver o meu certificado</button></p>`;
+      cert.innerHTML=`<div class="selo">${svg('feito',32)}</div><h2>Trilha concluída!</h2><p>Você completou os ${MODS.length} módulos da Trilha do Corretor${fim?` em ${br(fim)}`:''}. Agora é colocar o Padrão Araujo em prática em cada atendimento.</p><p style="margin-top:14px"><button type="button" class="primary" data-certificado>🎓 Ver o meu certificado</button></p>`;
       cert.querySelector('[data-certificado]').onclick=()=>abrirCertificado(nomeCertificado(),fim);
       cert.hidden=modAberto!==null;
     }else cert.hidden=true;
@@ -494,17 +494,17 @@
   let certProprio=true;
   function abrirCertificado(nome,quando,proprio=true){
     certProprio=proprio;
-    $('#certNome').value=nome||'';$('#certNomeTexto').textContent=nome||'Nome da corretora';
-    $('#certDescricao').textContent=`concluiu a Trilha da Corretora de Locação da Araujo Locação, com os ${MODS.length} módulos e as ${TODAS.length} etapas do treinamento: cultura e processo da Araujo, atendimento com a Lais, sistema e CRM, atendimento e qualificação, pré-análise, visitas, garantias, proposta, contrato e entrega das chaves, Lei do Inquilinato e cases de sucesso, além da Trilha 3: Comercial da Cupola${TODAS.some(e=>e.tipo==='pratica')?', e a prática acompanhada, com atendimentos, visitas, proposta e feedbacks da gestão':''}.`;
+    $('#certNome').value=nome||'';$('#certNomeTexto').textContent=nome||'Nome do corretor';
+    $('#certDescricao').textContent=`concluiu a Trilha do Corretor de Locação da Araujo Locação, com os ${MODS.length} módulos e as ${TODAS.length} etapas do treinamento: cultura e processo da Araujo, atendimento com a Lais, sistema e CRM, atendimento e qualificação, pré-análise, visitas, garantias, proposta, contrato e entrega das chaves, Lei do Inquilinato e cases de sucesso, além da Trilha 3: Comercial da Cupola${TODAS.some(e=>e.tipo==='pratica')?', e a prática acompanhada, com atendimentos, visitas, proposta e feedbacks da gestão':''}.`;
     $('#certData').textContent=`Itajaí/SC, ${dataExtenso(quando)}.`;
     $('#certDoc').hidden=false;document.body.style.overflow='hidden';$('#certNome').focus();
   }
-  $('#certNome').oninput=e=>{const v=e.target.value.trim();$('#certNomeTexto').textContent=v||'Nome da corretora';if(certProprio){try{localStorage.setItem(CHAVE_NOME,v)}catch{}}};
+  $('#certNome').oninput=e=>{const v=e.target.value.trim();$('#certNomeTexto').textContent=v||'Nome do corretor';if(certProprio){try{localStorage.setItem(CHAVE_NOME,v)}catch{}}};
   $('#certFechar').onclick=()=>{$('#certDoc').hidden=true;document.body.style.overflow=''};
   $('#certImprimir').onclick=()=>{document.body.classList.add('imprimindo');window.print();setTimeout(()=>document.body.classList.remove('imprimindo'),500)};
   window.addEventListener('afterprint',()=>document.body.classList.remove('imprimindo'));
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#certDoc').hidden)$('#certFechar').click()});
-  $('#verModeloCert').onclick=()=>abrirCertificado('Nome da corretora',null,false);
+  $('#verModeloCert').onclick=()=>abrirCertificado('Nome do corretor',null,false);
 
   // ---------- A trilha ----------
   const barraEd=(tipo,id,i,total)=>`<div class="edit-bar"><button type="button" class="link" data-ed-${tipo}="${id}">✎ Editar</button><button type="button" class="link" data-sobe-${tipo}="${id}" ${i===0?'disabled':''} aria-label="Mover para cima">↑ Subir</button><button type="button" class="link" data-desce-${tipo}="${id}" ${i===total-1?'disabled':''} aria-label="Mover para baixo">↓ Descer</button><button type="button" class="link danger" data-del-${tipo}="${id}">Excluir</button></div>`;
@@ -660,7 +660,7 @@
       // Só a gestão confirma (aba Equipe). A corretora vê a data prevista e, depois, a data confirmada.
       const q=feitos.get(e.id),prev=gestor?null:prazosPratica(feitos).get(e.id);
       if(q)return h+`<div class="step-foot"><span class="feito">✓ Confirmada pela gestão em ${br(q)}</span></div>`;
-      return h+`<div class="step-foot"><span class="aguarda">${gestor?'Você confirma esta etapa para cada corretora na aba <b>Equipe</b>, no botão “Prática”.':'A gestão confirma esta etapa com você.'}${prev?` Previsto para ${br(prev)}.`:''}</span></div>`;
+      return h+`<div class="step-foot"><span class="aguarda">${gestor?'Você confirma esta etapa para cada pessoa na aba <b>Equipe</b>, no botão “Prática”.':'A gestão confirma esta etapa com você.'}${prev?` Previsto para ${br(prev)}.`:''}</span></div>`;
     }
     const quando=feitos.get(e.id);
     if(quando)h+=`<div class="step-foot"><span class="feito">✓ Concluída em ${br(quando)}</span>${e.tipo==='quiz'?'':`<button type="button" class="link" data-desfazer="${e.id}">Desmarcar</button>`}</div>`;
@@ -930,7 +930,7 @@
   const CHAVE_EQ='trilha-equipe-demo',EMAIL_DEMO='corretora.exemplo@araujolocacao.com.br';
   const lerEqDemo=()=>{let d=ler(CHAVE_EQ);if(!d){d={};const ini=new Date();ini.setDate(ini.getDate()-10);(MODS[0]?.etapas||[]).slice(0,3).forEach(e=>d[e.id]=ini.toISOString());gravar(CHAVE_EQ,d)}return d};
   const equipeFonte=DEMO?{
-    async listar(){const d=lerEqDemo();return [{email:EMAIL_DEMO,corretora:'Corretora de exemplo',itens:Object.keys(d),ultimo:Object.values(d).sort().pop()||null}]},
+    async listar(){const d=lerEqDemo();return [{email:EMAIL_DEMO,corretora:'Corretor de exemplo',itens:Object.keys(d),ultimo:Object.values(d).sort().pop()||null}]},
     async datas(){return new Map(Object.entries(lerEqDemo()))},
     async confirmar(em,id,quando){const d=lerEqDemo();d[id]=quando;gravar(CHAVE_EQ,d)},
     async desfazer(em,id){const d=lerEqDemo();delete d[id];gravar(CHAVE_EQ,d)}
@@ -944,10 +944,10 @@
   async function carregarEquipe(){
     const box=$('#equipe');if(!box.querySelector('table'))box.innerHTML='<div class="empty">Carregando…</div>';
     let data;try{data=await equipeFonte.listar()}catch(error){box.innerHTML=`<div class="empty">Não foi possível carregar a equipe.<br><small>${safe(error.message)}</small></div>`;return}
-    if(!data.length){box.innerHTML='<div class="empty">Nenhuma corretora liberada ainda.</div>';return}
+    if(!data.length){box.innerHTML='<div class="empty">Nenhum corretor liberado ainda.</div>';return}
     const PR=etapasPratica();
     const linhas=data.map(r=>{const s=new Set((r.itens||[]).filter(x=>IDS.has(x)));return {...r,s,n:s.size}}).sort((a,b)=>b.n-a.n||String(a.corretora||a.email).localeCompare(String(b.corretora||b.email)));
-    box.innerHTML=`<table><thead><tr><th>Corretora</th><th>Progresso</th><th>Módulos</th><th>Onde está</th>${PR.length?'<th>Prática</th>':''}<th>Última atividade</th><th>Certificado</th></tr></thead><tbody>${linhas.map(r=>{
+    box.innerHTML=`<table><thead><tr><th>Corretor</th><th>Progresso</th><th>Módulos</th><th>Onde está</th>${PR.length?'<th>Prática</th>':''}<th>Última atividade</th><th>Certificado</th></tr></thead><tbody>${linhas.map(r=>{
       const nome=r.corretora||r.email.split('@')[0],kp=PR.filter(e=>r.s.has(e.id)).length;
       const colPr=PR.length?`<td><button type="button" class="secondary" style="padding:6px 10px;font-size:.84rem;white-space:nowrap" data-pratica="${safe(r.email)}" data-pratica-nome="${safe(nome)}">${svg('pratica',16)} ${kp} de ${PR.length}</button></td>`:'';
       const p=pct(r.n);
@@ -1021,7 +1021,7 @@
     // Na demonstração, a visão é a da gerência (tudo liberado e "Editar trilha"); &corretora mostra como a corretora vê.
     gestor=!P.has('corretora');
     $('#demoNote').hidden=false;
-    $('#demoNote').innerHTML=`<strong>Demonstração.</strong> O progresso e as edições ficam salvos só neste navegador. Com login, ficam guardados no portal. `+(gestor?'<a href="?demo&corretora">Ver como a corretora vê</a>':'<a href="?demo">Voltar à visão da gerência</a>');
+    $('#demoNote').innerHTML=`<strong>Demonstração.</strong> O progresso e as edições ficam salvos só neste navegador. Com login, ficam guardados no portal. `+(gestor?'<a href="?demo&corretora">Ver como o corretor vê</a>':'<a href="?demo">Voltar à visão da gerência</a>');
     // Conteúdo inicial só existe na cópia local (treinamento-conteudo.local.js); no site, a demonstração fica vazia.
     const sc=document.createElement('script');sc.src='treinamento-conteudo.local.js';
     sc.onload=()=>{PADRAO=window.TRILHA_PADRAO||[];show('app');iniciarApp()};
